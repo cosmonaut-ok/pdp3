@@ -286,3 +286,8 @@ __pycache__/
 *.btm.cs
 *.odx.cs
 *.xsd.cs
+
+# PDP3 Project-specific exclusions
+0rho
+coords
+rho1
