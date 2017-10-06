@@ -291,3 +291,6 @@ __pycache__/
 0rho
 coords
 rho1
+Debug/
+Release/
+x64/
