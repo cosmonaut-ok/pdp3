@@ -1,6 +1,6 @@
 
 #pragma once
-#include "particles.h"
+#include "Particles.h"
 class Beam :
 	public Particles
 {

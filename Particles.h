@@ -3,7 +3,7 @@
 #include "pdp3_time.h"
 #include "charge_density.h"
 #include"current.h"
-#include "triple.h"
+#include "Triple.h"
 #include"particles_list.h"
 #include <fstream>
 #include<iostream>

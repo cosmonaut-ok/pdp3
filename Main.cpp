@@ -6,8 +6,8 @@
 #include "Particles.h"
 #include "Fourier.h"
 #include "Poisson.h"
-#include "Poisson_neumann.h"
-#include "Poisson_dirichlet.h"
+#include "poisson_neumann.h"
+#include "poisson_dirichlet.h"
 #include "particles_list.h"
 #include <fstream>
 #include <math.h>
