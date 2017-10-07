@@ -1,5 +1,5 @@
 #include "Beam.h"
-#include "Time.h"
+#include "pdp3_time.h"
 #include "Poisson_dirichlet.h"
 
 using namespace std;

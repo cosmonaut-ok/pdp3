@@ -1,5 +1,5 @@
 #include "Bunch.h"
-#include "Time.h"
+#include "pdp3_time.h"
 #include "Poisson_dirichlet.h"
 
 Bunch::Bunch(char* p_name, double p_charge, double p_mass, int p_number, Geometry* geom, particles_list* p_list, double b_duration, double b_radius):Particles(p_name,p_charge,p_mass,p_number,geom,p_list)

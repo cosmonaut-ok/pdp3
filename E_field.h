@@ -7,7 +7,7 @@
 #include"PML.h"
 #include"charge_density.h"
 #include"current.h"
-#include"triple.h"
+#include"Triple.h"
 #include "particles_struct.h"
 
 class H_field;
