@@ -14,8 +14,8 @@ EXES                  = pdp3
 
 ### Common settings
 
-CEXTRA                = -mno-cygwin
-CXXEXTRA              =
+CEXTRA                = -ggdb
+CXXEXTRA              = -ggdb
 RCEXTRA               =
 DEFINES               =
 INCLUDE_PATH          = -I.
@@ -61,21 +61,15 @@ pdp3_CXX_SRCS         = Beam.cpp \
 			tinyxmlparser.cpp
 pdp3_RC_SRCS          = pdp3.rc \
 			pdp31.rc
-pdp3_LDFLAGS          = -mwindows \
-			-mno-cygwin
+pdp3_LDFLAGS          =
 pdp3_ARFLAGS          =
 pdp3_DLL_PATH         =
-pdp3_DLLS             = odbc32 \
-			ole32 \
-			oleaut32 \
-			winspool \
-			odbccp32
+pdp3_DLLS             =
 pdp3_LIBRARY_PATH     =
-pdp3_LIBRARIES        = uuid
+pdp3_LIBRARIES        =
 
 pdp3_OBJS             = $(pdp3_C_SRCS:.c=.o) \
-			$(pdp3_CXX_SRCS:.cpp=.o) \
-			$(pdp3_RC_SRCS:.rc=.res)
+			$(pdp3_CXX_SRCS:.cpp=.o)
 
 
 
@@ -88,10 +82,10 @@ RC_SRCS               = $(pdp3_RC_SRCS)
 
 ### Tools
 
-# CC = gcc
-# CXX = g++
-CC = winegcc
-CXX = wineg++
+CC = gcc
+CXX = g++
+# CC = winegcc
+# CXX = wineg++
 RC = wrc
 AR = ar
 

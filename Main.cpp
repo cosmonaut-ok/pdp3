@@ -11,7 +11,7 @@
 #include "particles_list.h"
 #include <fstream>
 #include <math.h>
-#include <tchar.h>
+// #include <tchar.h>
 
 #include "Boundary_Maxwell_conditions.h"
 #include "input_output_class.h"
@@ -30,7 +30,7 @@ int main(int argc, char **argv)
 
 	clock_t start, finish;
 	flcuda time_elapsed;
-	Load_init_param init_param((char *) "C:\\WORK\\PDP3\\PDP3\\pdp3\\parameters.xml");
+	Load_init_param init_param((char *) "parameters.xml");
 	init_param.read_xml();
 	init_param.load_system();
 
@@ -38,14 +38,14 @@ int main(int argc, char **argv)
 
 	PML pml1(0.0,0.0, 0.0, 0.000001, 0.07);
 	Geometry geom1(0.25,2.0, 255, 2047, &pml1);
-    //Geometry geom1(0.2,1.5, 63, 255, &pml1);
+	//Geometry geom1(0.2,1.5, 63, 255, &pml1);
 	flcuda left_plasma_boundary = geom1.second_size*0.0;
 
 	Time time1(0,0,0,200000e-12,1e-12);
 	E_field e_field1(&geom1);
 	H_field h_field1(&geom1);
 	Fourier four1(0);
-	input_output_class out_class((char *) "D:/pdp3_files/_results_ocl/", (char *) "E:/Science[Plasma]/pdp3_result/dump");
+	input_output_class out_class((char *) "pdp3_files/_results_ocl/", (char *) "pdp3_result/dump");
 	
 	Boundary_Maxwell_conditions maxwell_rad(&e_field1);
 	maxwell_rad.specify_initial_field(&geom1,0,0,0);
