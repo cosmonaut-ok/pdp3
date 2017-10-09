@@ -18,13 +18,12 @@ Load_init_param::~Load_init_param(void)
 void Load_init_param::read_xml()
 {
 
-  int i=1.2e7;
-  // TiXmlDocument  xml_f("parameters.xml");
+  // int i=1.2e7;
   TiXmlDocument  xml_f(xml_file);
   xml_f.LoadFile();
   if(xml_f.Error())
     {
-      cout<< "can't read file";
+      cout<< "can't read file!\n";
       return;
     }
 
@@ -36,7 +35,7 @@ void Load_init_param::read_xml()
   // strcpy( test, sub_root->GetText());
   //	 i = get_int_value(sub_root->FirstChildElement( ));
 
-  cout << i;
+  // cout << i;
   // cin  >> i;
   // TiXmlElement* sub_root = root->FirstChildElement ("geometry");
   // TiXmlElement* value = sub_root->FirstChildElement ();
@@ -63,12 +62,12 @@ double Load_init_param:: get_double_value(const char* r_str)
 	 xml_f.LoadFile();
 	 if(xml_f.Error())
 	 {
-		 cout<< "couldn't read file";
+		 cout<< "couldn't read file!\n";
 			 return 0;
 	 }
 	 int number= 0;
 	 TiXmlElement* root = xml_f.FirstChildElement ("Initial_parameters");
-    TiXmlElement* sub_root =root->FirstChildElement (p_name);
+	TiXmlElement* sub_root =root->FirstChildElement (p_name);
 	char* vul_arr = new char [50];
  	strcpy(vul_arr, sub_root->GetText());
 
@@ -81,7 +80,7 @@ double* Load_init_param:: read_double_params(const char* p_name)
   xml_f.LoadFile();
   if(xml_f.Error())
     {
-      cout<< "couldn't read file";
+      cout<< "couldn't read file!\n";
       return 0;
     }
   int number = 0;
@@ -114,8 +113,8 @@ void Load_init_param:: read_load_particles()
 	 xml_f.LoadFile();
 	 if(xml_f.Error())
 	 {
-		 cout<< "couldn't read file";
-			 return ;
+		 cout<< "couldn't read file! \n";
+			 return;
 	 }
 	 int number= 0;
 	 TiXmlElement* root = xml_f.FirstChildElement ("Initial_parameters");
@@ -146,8 +145,8 @@ Bunch* Load_init_param:: read_load_bunch()
 	 xml_f.LoadFile();
 	 if(xml_f.Error())
 	 {
-		 cout<< "couldn't read file";
-			 return NULL;
+		 cout<< "couldn't read file!\n";
+			 return 0;
 	 }
 	 int number= 0;
 	 TiXmlElement* root = xml_f.FirstChildElement ("Initial_parameters");
@@ -275,11 +274,11 @@ void Load_init_param:: Run(void)
 	//variable for out_class function
 	p_list->create_coord_arrays();
 	int step_number= 0;
+        clock_t t1 = clock();
 
     while (c_time->current_time < c_time->end_time)
 	{
-		clock_t t1 = clock();
-	    c_bunch->bunch_inject(c_time);
+		c_bunch->bunch_inject(c_time);
 
         //1. Calculate H field
 		hfield->calc_field(efield, c_time);
@@ -306,16 +305,21 @@ void Load_init_param:: Run(void)
         //continuity equation
 		c_rho_new->reset_rho();
 
-			p_list->charge_weighting(c_rho_new);  //continuity equation
+		p_list->charge_weighting(c_rho_new);  //continuity equation
 		//bool res =  continuity_equation(c_time, c_geom, c_current, c_rho_old, c_rho_new);
-
-		cout << "Execution time: " << clock() - t1 << endl;
 
 		if  ((((int)(c_time->current_time/c_time->delta_t))%5==0))
 		//if  ((((int)(c_time->current_time/c_time->delta_t)) < 10))
 		//if  ( abs(time1.current_time - time1.end_time + time1.delta_t) < 1e-13)
 		{
-			cout<<c_time->current_time<<" ";
+
+                        // Logging after step
+                        cout << "\n";
+			cout << "Model step: " << step_number
+                             << ", Execution time: "
+                             << 1000 * (clock() - t1) / CLOCKS_PER_SEC << " ms"
+                             << ", Current time: "
+                             << c_time->current_time << "\n";
 			c_bunch->charge_weighting(c_rho_beam);
 			c_rho_old->reset_rho();
 			p_list[0].charge_weighting(c_rho_old);
@@ -332,9 +336,11 @@ void Load_init_param:: Run(void)
 			//out_class.out_coord("coords",electrons.x1, electrons.x3, step_number, 100, electrons.number);
 			//out_class.out_coord("vels",electrons.v1, electrons.v3, step_number, 100, electrons.number);
 			c_io_class->out_data("h2",hfield->h2,step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-				step_number=step_number+1;
-				if  ((((int)(c_time->current_time/c_time->delta_t))%1000==0)&&(step_number!=1))
-				this->SaveSystemState();
+			step_number=step_number+1;
+			t1 = clock();
+			if  ((((int)(c_time->current_time/c_time->delta_t))%1000==0)&&(step_number!=1))
+                          this->SaveSystemState();
+
 		}
 
 		c_time->current_time = c_time->current_time + c_time->delta_t;
