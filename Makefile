@@ -72,10 +72,11 @@ CXX = g++
 # CXX = wineg++
 RC = wrc
 AR = ar
-CFLAGS= -O3 -Wall
+CFLAGS = -O2 -Wall
+CXXFLAGS = ${CFLAGS}
 
 ### Generic targets
-all: $(SUBDIRS) $(DLLS:%=%.so) $(LIBS) $(EXES)
+all: $(SUBDIRS) $(DLLS:%=%.so) $(LIBS) $(EXES) bootstrap
 
 ### Build rules
 .PHONY: all clean dummy
@@ -115,3 +116,9 @@ DEFLIB = $(LIBRARY_PATH) $(LIBRARIES) $(DLL_PATH) $(DLL_IMPORTS:%=-l%)
 
 $(pdp3_MODULE): $(pdp3_OBJS)
 	$(CXX) $(pdp3_LDFLAGS) -o $@ $(pdp3_OBJS) $(pdp3_LIBRARY_PATH) $(pdp3_DLL_PATH) $(DEFLIB) $(pdp3_DLLS:%=-l%) $(pdp3_LIBRARIES:%=-l%)
+
+bootstrap:
+	mkdir -p pdp3_files pdp3_result/Dump
+
+wipe:
+	rm -rf pdp3_files pdp3_result
