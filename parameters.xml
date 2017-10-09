@@ -71,14 +71,14 @@
   <Boundary_conditions type = "dirichlet">0</Boundary_conditions>
   
   
-  <PathtoResult>C:/WORK/PDP3/pdp3_result/</PathtoResult>
-  <PathtoSaveState>C:/WORK/PDP3/pdp3_result/Dump/</PathtoSaveState>
+  <PathtoResult>pdp3_result/</PathtoResult>
+  <PathtoSaveState>pdp3_result/Dump/</PathtoSaveState>
 
   <file_save_paramters>
     <time_step>100</time_step>
     <number>100</number>
   </file_save_paramters>
-  <out_folder>C:/WORK/PDP3/pdp3_result/</out_folder>
+  <out_folder>pdp3_result/</out_folder>
   <e1>true</e1>
   <e2>true</e2>
   <e3>false</e3>
