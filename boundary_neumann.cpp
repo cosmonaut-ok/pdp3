@@ -1,6 +1,6 @@
 #include "boundary_neumann.h"
 #include "Poisson.h"
-#include "Poisson_neumann.h"
+#include "poisson_neumann.h"
 
 boundary_neumann::boundary_neumann(E_field* ef_t,charge_density* rho_t,Geometry *geom_t): e_f(ef_t),rho(rho_t),cyl_geom(geom_t)
 {

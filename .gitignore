@@ -294,3 +294,5 @@ rho1
 Debug/
 Release/
 x64/
+*.o
+*.bak
