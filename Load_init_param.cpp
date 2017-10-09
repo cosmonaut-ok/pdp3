@@ -314,7 +314,6 @@ void Load_init_param:: Run(void)
 		{
 
                         // Logging after step
-                        cout << "\n";
 			cout << "Model step: " << step_number
                              << ", Execution time: "
                              << 1000 * (clock() - t1) / CLOCKS_PER_SEC << " ms"
