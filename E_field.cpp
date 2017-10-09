@@ -1,6 +1,6 @@
 #include "E_field.h"
 #include "H_field.h"
-#include "Math.h"
+#include "math.h"
 #include "Fourier.h"
 #include <fstream>
 E_field::E_field(): epsilon0(8.85E-12)

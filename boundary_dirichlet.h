@@ -1,5 +1,5 @@
 #pragma once
-#include "boundary_conditions.h"
+#include "Boundary_conditions.h"
 #include "charge_density.h"
 
 class boundary_dirichlet :
