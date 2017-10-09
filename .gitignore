@@ -296,3 +296,6 @@ Release/
 x64/
 *.o
 *.bak
+*.exe
+*.res
+*.so

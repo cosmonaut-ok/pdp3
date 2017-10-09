@@ -1,6 +1,6 @@
 #include "Load_init_param.h"
 #include "time.h"
-#include "kern_accessor.h"
+// #include "kern_accessor.h"
 //extern KernAccessor *kern_access_global;
 Load_init_param::Load_init_param(void)
 {

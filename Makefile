@@ -53,14 +53,12 @@ pdp3_CXX_SRCS         = Beam.cpp \
 			current.cpp \
 			field.cpp \
 			input_output_class.cpp \
-			kern_accessor.cpp \
 			particles_list.cpp \
 			particles_struct.cpp \
 			tinystr.cpp \
 			tinyxml.cpp \
 			tinyxmlerror.cpp \
-			tinyxmlparser.cpp \
-			wrapper.cpp
+			tinyxmlparser.cpp
 pdp3_RC_SRCS          = pdp3.rc \
 			pdp31.rc
 pdp3_LDFLAGS          = -mwindows \
@@ -90,6 +88,8 @@ RC_SRCS               = $(pdp3_RC_SRCS)
 
 ### Tools
 
+# CC = gcc
+# CXX = g++
 CC = winegcc
 CXX = wineg++
 RC = wrc
