@@ -126,5 +126,5 @@ mrproper: clean
 run: bootstrap
 	./pdp3
 
-test: all
+test: mrproper all
 	TESTDIR=$(TESTDIR) /bin/bash ./test.sh

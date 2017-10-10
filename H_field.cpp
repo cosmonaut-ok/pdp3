@@ -195,7 +195,7 @@ void H_field::calc_field(E_field* e_field1, Time* time1)
 	flcuda const_magn0 = 1.26E-6;
 	flcuda alpha;
 	int i=0;
-	int k=0;
+	// int k=0;
 	//Hr - last i value //
 ///////////////////////////////////////////////
 		for(int k=0;k<(geom1->n_grid_2-1);k++)
@@ -242,9 +242,9 @@ void H_field::magnetostatic_equation(Geometry* geom1)
 	flcuda c=0;
 	flcuda b=0;
 	flcuda d=0;
-	flcuda* alpha = new flcuda [geom1->n_grid_1];
-	flcuda* beta = new flcuda [geom1->n_grid_1];
-	Fourier* four1=0;
+	// flcuda* alpha = new flcuda [geom1->n_grid_1];
+	// flcuda* beta = new flcuda [geom1->n_grid_1];
+	// Fourier* four1=0;
 
 //////////////////////////////////////////////////
 	//
