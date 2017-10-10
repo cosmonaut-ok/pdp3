@@ -5,8 +5,9 @@
 #include "Triple.h"
 #include <math.h>
 #include <string.h>
+#include <Constant.h>
 
-#define  pi 3.14159265358979
+const float pi = constant::PI;
 
 using namespace std;
 
