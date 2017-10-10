@@ -301,7 +301,7 @@ void E_field::poisson_equation2(Geometry* geom1, charge_density* ro1)
 	flcuda *phi = new flcuda [geom1->n_grid_1];
 	Fourier* four1=0;
 
-	flcuda dr = geom1->dr;
+	// flcuda dr = geom1->dr;
 	flcuda dr2 = geom1->dr*geom1->dr;
 
 	flcuda** ro=ro1->get_ro();
@@ -404,7 +404,7 @@ void E_field::TridiagonalSolve(const flcuda *a, const flcuda *b, flcuda *c, flcu
 	/* Modify the coefficients. */
 	c[0] /= b[0];				/* Division by zero risk. */
 	d[0] /= b[0];				/* Division by zero would imply a singular matrix. */
-	for(i = 1; i < n; i++){
+	for(int i = 1; i < n; i++){
 		flcuda id = (b[i] - c[i-1] * a[i]);	/* Division by zero risk. */
 		c[i] /= id;				/* Last value calculated is redundant. */
 		d[i] = (d[i] - d[i-1] * a[i])/id;
