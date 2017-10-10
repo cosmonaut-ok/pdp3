@@ -3,7 +3,7 @@ SUBDIRS               =
 DLLS                  =
 LIBS                  =
 EXES                  = pdp3
-
+TESTDIR               = testdir
 ### Common settings
 CEXTRA                =
 CXXEXTRA              =
@@ -102,7 +102,7 @@ CLEAN_FILES     = y.tab.c y.tab.h lex.yy.c core *.orig *.rej \
                   \\\#*\\\# *~ *% .\\\#*
 
 clean:: $(SUBDIRS:%=%/__clean__) $(EXTRASUBDIRS:%=%/__clean__)
-	$(RM) $(CLEAN_FILES) $(RC_SRCS:.rc=.res) $(C_SRCS:.c=.o) $(CXX_SRCS:.cpp=.o)
+	$(RM) $(CLEAN_FILES) $(C_SRCS:.c=.o) $(CXX_SRCS:.cpp=.o)
 	$(RM) $(DLLS:%=%.so) $(LIBS) $(EXES) $(EXES:%=%.so)
 
 $(SUBDIRS:%=%/__clean__): dummy
@@ -120,8 +120,11 @@ $(pdp3_MODULE): $(pdp3_OBJS)
 bootstrap:
 	mkdir -p pdp3_files pdp3_result/Dump
 
-wipe:
-	rm -rf pdp3_files pdp3_result
+mrproper: clean
+	rm -rf pdp3_files pdp3_result $(TESTDIR)
 
 run: bootstrap
 	./pdp3
+
+test: all
+	TESTDIR=$(TESTDIR) /bin/bash ./test.sh
