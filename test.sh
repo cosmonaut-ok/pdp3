@@ -116,7 +116,7 @@ tar -xf ../../${TESTING_DATA_ARCHIVE}
 success="true"
 for i in `find . -type f`; do
     bn=`basename $i`
-    test -z `diff ${bn} ../pdp3_result/${bn}` || success="false"
+    test -z "$(diff ${bn} ../pdp3_result/${bn})" || success="false"
 done
 
 if [ "$success" == "false" ]; then
