@@ -1,0 +1,41 @@
+function lambda = get_beam_lambda(inject_param, geometry, time);
+
+%the function calculates linear density of beam particles
+
+%density (or mean density in case of modulation) of the beam in m^-3; one
+%of the injection parameters
+density = inject_param.density;
+
+%width of beam in normalized (to Ly) units;
+beam_width = inject_param.beam_width;
+
+%absolute velocity of the beam;
+velocity = sqrt(inject_param.vx^2 + inject_param.vy^2)
+
+%the angle of the beam velocity
+theta = atan(inject_param.vy/inject_param.vx);
+
+%number of injected particles per time step
+n_injected = inject_param.n_injected;
+
+%value time step
+dt = time.dt;
+beam_struct(1).internal_prop.lambda = round(density*beam_width*geometry.y_size*velocity*dt/n_injected);
+
+x_size = geometry.x_size;
+y_size = geometry.y_size;
+
+n_bin_x = 2048;
+n_bin_y = 2048;
+
+dx = x_size/n_bin_x;
+dy = y_size/n_bin_y;
+
+x = dx/2:dx:(x_size - dx/2);
+y = dy/2:dy:(y_size - dy/2);
+
+
+z = concentration.handle(x,y,geometry,concentration.param);
+
+lambda = sum(sum(z))*dx*dy/Nbig;
+
