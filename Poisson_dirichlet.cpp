@@ -1,4 +1,4 @@
-#include "Poisson_dirichlet.h"
+#include "poisson_dirichlet.h"
 
 
 Poisson_dirichlet::Poisson_dirichlet(Geometry* cyl_geom):Poisson(cyl_geom)

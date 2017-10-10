@@ -294,3 +294,10 @@ rho1
 Debug/
 Release/
 x64/
+*.o
+*.bak
+*.exe
+*.res
+*.so
+pdp3
+pdp3_result/

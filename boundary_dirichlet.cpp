@@ -1,6 +1,6 @@
 #include "boundary_dirichlet.h"
 #include "Poisson.h"
-#include "Poisson_dirichlet.h"
+#include "poisson_dirichlet.h"
 
 boundary_dirichlet::boundary_dirichlet(E_field* ef_t,charge_density* rho_t,Geometry *geom_t): e_f(ef_t),rho(rho_t),cyl_geom(geom_t)
 {
