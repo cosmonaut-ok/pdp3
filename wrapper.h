@@ -5,7 +5,7 @@
 using namespace std;
 
 #ifdef __APPLE__
-#include <OpenCL/cl.h>
+#include <opencl/cl.h>
 #else
 //#include <CL/cl.h>
 #endif

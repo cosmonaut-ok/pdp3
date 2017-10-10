@@ -1,6 +1,6 @@
 #include "Beam.h"
 #include "pdp3_time.h"
-#include "Poisson_dirichlet.h"
+#include "poisson_dirichlet.h"
 
 using namespace std;
 

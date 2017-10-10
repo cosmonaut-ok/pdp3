@@ -1248,7 +1248,7 @@ void Particles:: strict_motion_weighting(Time *time1, current *this_j, flcuda x1
 
 	if ((abs(x1_new-x1_old)<1e-15)&&(abs(x3_new-x3_old)<1e-15))
 	{
-		cout<<"zero velocity";
+		cout<<"WARNING! zero velocity!\n";
 		return;
 	}
 	//stirct axis motion
