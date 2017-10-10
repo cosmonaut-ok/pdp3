@@ -43,7 +43,7 @@ if (time->current_time<duration)
      for(int i = 0; i <  particles_in_step; i++)
      {
 
-        double  rand_r = random_reverse(i,9);    
+       // double  rand_r = random_reverse(i,9);    
         double  rand_z = random_reverse(i,11);
      //x1[i+start_number] = (radius)*sqrt(rand_r) + dr/2.0;
        //double rand_i = (double)i / particles_in_step;
@@ -128,7 +128,7 @@ void Bunch::half_step_coord(Time* t)
 	double half_dr = dr/2.0;
 	double half_dz = dz/2.0;
 	double x1_wallX2 = x1_wall*2.0;
-	double x3_wallX2 = x3_wall*2.0;
+	// double x3_wallX2 = x3_wall*2.0;
 	double half_dt = t->delta_t/2.0;
 
 	for( i=0;i<number;i++)
