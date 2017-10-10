@@ -1,0 +1,1 @@
+rho_movie_create_light3('C:\WORK\PDP3\pdp3_result\e1','C:\WORK\PDP3\pdp3_result\e3','C:\WORK\PDP3\pdp3_result\h2',100,255,2047,1,1,1)
