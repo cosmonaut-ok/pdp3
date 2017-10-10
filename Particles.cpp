@@ -5,8 +5,9 @@
 #include "Triple.h"
 #include <math.h>
 #include <string.h>
+#include <Constant.h>
 
-#define  pi 3.14159265358979
+const float pi = constant::PI;
 
 using namespace std;
 
@@ -617,7 +618,7 @@ void Particles::load_spatial_distribution(double n1, double n2, double left_plas
 			 x1[i]=sigma*sqrt(-2.0*log(int_rd - rand_r*(int_rd-exp(-R_sq/(2.0*sigma*sigma)))));
 
 			 //x1[i] = (geom1->first_size - dr)*(rand_r)*rand_r + dr/2.0;
-			 double tt = exp(-R_sq/(2.0*sigma*sigma));
+			 // double tt = exp(-R_sq/(2.0*sigma*sigma));
 			 rand_z = random_reverse(number - 1 - i,11);
 			 x3[i] = (geom1->second_size - dz/2.0)*rand_z + dz/2.0;
 			//x3[i] = (geom1->second_size - left_plasma_boundary - dz)/dn*(sqrt(n1*n1 + rand_z*(2*n1*dn + dn*dn)) - n1) + left_plasma_boundary + dz/2.0;
@@ -841,8 +842,8 @@ void Particles::simple_constrho_j_weighting(Time* time1, current *j1, flcuda x1_
 		///////////////////////////////////
 		// equation y = k*x+b;//
 		// finding k & b//
-		flcuda k = delta_r/delta_z;
-		flcuda b = x1_old-dr/2.0;
+		// flcuda k = delta_r/delta_z;
+		// flcuda b = x1_old-dr/2.0;
 //		flcuda r0 = (i_n+0.5)*dr;
 	    //calculate current jz in [i,k] cell//
 	//	wj = particle_rho*pi*delta_z/(delta_t*2*pi*i_n*dr*dr) * (r0*r0 - b*b -a*a*delta_z*delta_z/3.0 - a*b*delta_z); 
@@ -858,10 +859,10 @@ void Particles::simple_constrho_j_weighting(Time* time1, current *j1, flcuda x1_
 	    //calculate current jr in [i,k] cell//
 		// equation y = k*x+b;//
 		// finding k & b//
-		 k = -delta_z/delta_r;
-		 flcuda r0 = (i_n+0.5)*dr;
-		 flcuda r1 =  x1_old;
-		 b= (k_n+1.0)*dz - x3_old;
+		 flcuda k = -delta_z/delta_r;
+		 // flcuda r0 = (i_n+0.5)*dr;
+		 // flcuda r1 =  x1_old;
+		 flcuda b = (k_n+1.0)*dz - x3_old;
 
         //weighting jr in [i][k] cell
 //		wj = charge/(2*pi*r0*dz*dz*dr*delta_t) *();
@@ -1404,7 +1405,7 @@ bool continuity_equation(Time *input_time, Geometry *input_geometry, current *in
     flcuda **rho_new_array = rho_new->get_ro() ;
 	flcuda **J1 = input_J->get_j1() ;
 	flcuda **J3 = input_J->get_j3() ;
-	flcuda delta_rho = 1.0/(input_geometry->dz*4.0*pi*input_geometry->dr*input_geometry->dr) ;
+	// flcuda delta_rho = 1.0/(input_geometry->dz*4.0*pi*input_geometry->dr*input_geometry->dr) ;
 	int i, k;
 	bool ok = true;
 	double res, tolerance = 1e-3 ;

@@ -1,8 +1,11 @@
 #include "Beam.h"
 #include "pdp3_time.h"
 #include "poisson_dirichlet.h"
+#include <Constant.h>
 
 using namespace std;
+
+const float pi = constant::PI;
 
 Beam::Beam(char* p_name, double p_charge, double p_mass, int p_number, Geometry* geom, particles_list* p_list, double b_radius):Particles(p_name,p_charge,p_mass,p_number,geom,p_list)
 {
@@ -13,7 +16,6 @@ void Beam::calc_init_param(Time* time,int particles_in_step,double n_b, double b
 	n_beam = n_b;
 	vel_beam = b_vel;
 	double dl = vel_beam*time->delta_t;
-	double pi = 3.1415926;
 	double n_in_big = 3.1415*radius*radius*dl*n_beam/particles_in_step;
 	charge *= n_in_big;
  	mass *= n_in_big;
@@ -30,7 +32,6 @@ void Beam::beam_inject(Time* time,int particles_in_step, double fi, double koef)
 	flcuda dl = vel_beam*time->delta_t;
 	flcuda dr = geom1->dr*1.00000001;
 	flcuda dz = geom1->dz*1.00000001;
-	double pi = 3.1415926;
 	double mod_n = (1 - koef/2.0 + koef/2.0*sin(2*pi*fi*time->current_time));
 	int n=0;
 	int i=0;

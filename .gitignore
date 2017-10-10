@@ -301,3 +301,4 @@ x64/
 *.so
 pdp3
 pdp3_result/
+testdir/
