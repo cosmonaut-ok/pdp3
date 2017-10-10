@@ -1,0 +1,29 @@
+language: c++
+sudo: required
+dist: trusty
+
+matrix:
+  include:
+    # works on Precise and Trusty
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-7
+      env:
+- MATRIX_EVAL="export CC=gcc-7 && export CXX=g++-7"
+
+before_install:
+    - eval "${MATRIX_EVAL}"
+
+before_script:
+    - echo 'Europe/Kiev' | sudo tee /etc/timezone
+    - sudo dpkg-reconfigure --frontend noninteractive tzdata
+
+script:
+    - make test
+
+after_script:
+    - make mrproper
