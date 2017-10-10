@@ -61,7 +61,7 @@ void Fourier::dct_2(flcuda** a, int lenght_n, int ir, bool inv)
 	{
 		a_t[k]=a[ir][k];
 	}
-	flcuda sq =  sqrt((flcuda) (lenght_n));
+	// flcuda sq =  sqrt((flcuda) (lenght_n));
 	for (k=0;k<lenght_n;k++)
 	{
 		t_f=0;
@@ -178,7 +178,7 @@ while (n_bit>0)
 		
 		for (k=0;k<n_step;k++)
 		{
-			int kt=k;
+		  // int kt=k;
 			W=exp((-pi*(flcuda)2.0*k/(n_step*2))*im_j);
 
 			for(m=k;m<(lenght_n);m+=2*n_step)
