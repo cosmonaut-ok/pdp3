@@ -1,0 +1,12 @@
+function var = iteration_vs_superscalar;
+
+N = 1000000;
+
+
+t = rand(1,N);
+t1
+
+
+tic
+
+t
