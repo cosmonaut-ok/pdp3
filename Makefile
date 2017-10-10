@@ -122,3 +122,6 @@ bootstrap:
 
 wipe:
 	rm -rf pdp3_files pdp3_result
+
+run: bootstrap
+	./pdp3
