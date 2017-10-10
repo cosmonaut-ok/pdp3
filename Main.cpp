@@ -1,4 +1,5 @@
 #include<iostream>
+#include <Constant.h>
 #include "field.h"
 #include "E_field.h"
 #include "H_field.h"
@@ -21,7 +22,7 @@
 #include "particles_struct.h"
 #include "system_host.cuh"
 #include "Load_init_param.h"
-#define  pi = 3.1415926535897932;
+
 using namespace std;
 Particles_struct specie;
 #define BUILD_OPENCL
@@ -223,8 +224,9 @@ int main(int argc, char **argv)
 
       time1.current_time = time1.current_time + time1.delta_t;
       if (!res)
+	exit(0); // TODO: is it right?
         //break;
-        cout<<"Error:"<<time1.current_time<<"! ";
+        // cout<<"Error:"<<time1.current_time<<"! ";
 
     }
 
