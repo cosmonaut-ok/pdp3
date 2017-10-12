@@ -2,6 +2,7 @@
 #include <Constant.h>
 
 const double PI = constant::PI;
+const double LIGHT_SPEED = constant::LIGHT_SPEED;
 
 Boundary_Maxwell_conditions::Boundary_Maxwell_conditions(E_field* e_fld_t):e_fld(e_fld_t)
 {
@@ -73,7 +74,7 @@ void Boundary_Maxwell_conditions::probe_mode_exitation(Geometry* cyl_geom,
 {
 	int k_max =0, k=0;
 	int k_start =0;
-	flcuda probe_lenght = 3.0e8*n/frequency; // TODO: light velicity?
+	flcuda probe_lenght = LIGHT_SPEED*n/frequency; // TODO: light velicity?
 	k_max = (int) (probe_lenght/cyl_geom->dz)+k_start;
 	flcuda dz = cyl_geom->dz;
 	flcuda **j_p;
