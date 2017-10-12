@@ -1,7 +1,9 @@
 #pragma once
 #include "PML.h"
 #include "particles_struct.h"
+
 class PML;
+
 class Geometry
 {
 public:
@@ -14,10 +16,10 @@ public:
 	flcuda** epsilon;
 	flcuda** sigma;
 	PML* pml1;
-//	Geometry* geom1;
+	// Geometry* geom1;
 	flcuda set_dr();
 	flcuda set_dz();
-//	#num geometry_type;
+	// #num geometry_type;
 
 	void set_epsilon();
 //	friend void calc_sigma(Geometry *geom1);

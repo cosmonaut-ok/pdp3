@@ -21,7 +21,6 @@ must not be misrepresented as being the original software.
 distribution.
 */
 
-
 #ifndef TIXML_USE_STL
 
 #include "tinystr.h"
@@ -33,7 +32,6 @@ const TiXmlString::size_type TiXmlString::npos = static_cast< TiXmlString::size_
 // Null rep.
 TiXmlString::Rep TiXmlString::nullrep_ = { 0, 0, { '\0' } };
 
-
 void TiXmlString::reserve (size_type cap)
 {
 	if (cap > capacity())
@@ -44,7 +42,6 @@ void TiXmlString::reserve (size_type cap)
 		swap(tmp);
 	}
 }
-
 
 TiXmlString& TiXmlString::assign(const char* str, size_type len)
 {
@@ -64,7 +61,6 @@ TiXmlString& TiXmlString::assign(const char* str, size_type len)
 	return *this;
 }
 
-
 TiXmlString& TiXmlString::append(const char* str, size_type len)
 {
 	size_type newsize = length() + len;
@@ -76,7 +72,6 @@ TiXmlString& TiXmlString::append(const char* str, size_type len)
 	set_size(newsize);
 	return *this;
 }
-
 
 TiXmlString operator + (const TiXmlString & a, const TiXmlString & b)
 {
@@ -106,6 +101,5 @@ TiXmlString operator + (const char* a, const TiXmlString & b)
 	tmp += b;
 	return tmp;
 }
-
 
 #endif	// TIXML_USE_STL
