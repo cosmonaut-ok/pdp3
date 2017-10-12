@@ -10,8 +10,11 @@ public:
 	boundary_dirichlet(void);
 	~boundary_dirichlet(void);
 public:
-	 Geometry *cyl_geom;
-	E_field * e_f;
+	Geometry *cyl_geom;
+	E_field *e_f;
 	charge_density *rho;
-	void specify_boundary_conditions(flcuda E_fi_upper, flcuda E_fi_left, flcuda E_fi_right, flcuda fi_upper_wall);
+	void specify_boundary_conditions(flcuda E_fi_upper,
+                                   flcuda E_fi_left,
+                                   flcuda E_fi_right,
+                                   flcuda fi_upper_wall);
 };
