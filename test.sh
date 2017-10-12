@@ -122,4 +122,7 @@ done
 if [ "$success" == "false" ]; then
     echo "Test failed. Generated data is not match control data"
     exit 1
+else
+    echo "Test passed."
+    exit 0
 fi
