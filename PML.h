@@ -1,7 +1,9 @@
 #pragma once
-#include"Geometry.h"
+#include "Geometry.h"
 #include "particles_struct.h"
+
 class Geometry;
+
 class PML
 {
 public:
@@ -16,5 +18,5 @@ public:
 	PML(double* pml_params);
 
 	PML(void);
-	~PML(void);  
+	~PML(void);
 };

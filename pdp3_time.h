@@ -1,11 +1,12 @@
 #pragma once
 #include "particles_struct.h"
+
 class Time
 {
 public:
 	flcuda current_time;
 	flcuda start_time;
-    flcuda relaxation_time;
+	flcuda relaxation_time;
 	flcuda end_time;
 	flcuda delta_t;
 public:

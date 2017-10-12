@@ -4,12 +4,11 @@ current::current(void)
 {
 }
 
-
 current::current(Geometry* geom1_t): geom1(geom1_t)
 {
 	//jr//
 	///////////////////////////////////
-	//n_grid - кількість ребер
+	//n_grid - number of edges
 	j1 = new flcuda*[geom1->n_grid_1-1];
 	for (int i=0; i<(geom1->n_grid_1-1);i++)
 	{
@@ -36,55 +35,56 @@ current::current(Geometry* geom1_t): geom1(geom1_t)
 
 	j1_1d = new flcuda[(geom1->n_grid_1-1)*geom1->n_grid_2];
 	///////////////////////////////////
-	
+
 	j2_1d = new flcuda[geom1->n_grid_1*geom1->n_grid_2];
 	//////////////////////////////////////
-	
-	j3_1d = new flcuda[geom1->n_grid_1*(geom1->n_grid_2-1)];
-   //////////////////////////////////////
-	   //initialization//
 
-	 for (int i=0; i<(geom1->n_grid_1-1);i++)
+	j3_1d = new flcuda[geom1->n_grid_1*(geom1->n_grid_2-1)];
+	//////////////////////////////////////
+	//initialization//
+
+	for (int i=0; i<(geom1->n_grid_1-1);i++)
 		for (int k=0; k<(geom1->n_grid_2-1);k++)
 		{
 			j1[i][k]=0;
 			j2[i][k]=0;
 			j3[i][k]=0;
 		}
-	 for (int i=0; i<(geom1->n_grid_1-1);i++)
-	  {
-		  j1[i][geom1->n_grid_2-1]=0;
-	  }
+	for (int i=0; i<(geom1->n_grid_1-1);i++)
+	{
+		j1[i][geom1->n_grid_2-1]=0;
+	}
 
-	 for(int k=0;k<(geom1->n_grid_2);k++)
-			{
-				j2[geom1->n_grid_1-1][k]=0;
-			}
-	 for(int i=0;i<(geom1->n_grid_1);i++)
-		{
-		 j2[i][geom1->n_grid_2-1]=0;
-		}
-	 for(int k=0;k<(geom1->n_grid_2-1);k++)
-		{
-			j3[geom1->n_grid_1-1][k]=0;
-		};
-	  
+	for(int k=0;k<(geom1->n_grid_2);k++)
+	{
+		j2[geom1->n_grid_1-1][k]=0;
+	}
+	for(int i=0;i<(geom1->n_grid_1);i++)
+	{
+		j2[i][geom1->n_grid_2-1]=0;
+	}
+	for(int k=0;k<(geom1->n_grid_2-1);k++)
+	{
+		j3[geom1->n_grid_1-1][k]=0;
+	};
+
 
 }
 
+// Destructor
 current::~current(void)
 {
 	for (int i=0; i<(geom1->n_grid_1-1);i++)
 		delete[]j1[i];
-    delete[]j1;
+	delete[]j1;
 
 	for (int i=0; i<(geom1->n_grid_1);i++)
 		delete[]j2[i];
-    delete[]j2;
+	delete[]j2;
 
 	for (int i=0; i<(geom1->n_grid_1-1);i++)
 		delete[]j3[i];
-    delete[]j3;
+	delete[]j3;
 
 	delete j1_1d;
 	delete j2_1d;
@@ -96,7 +96,7 @@ current::~current(void)
 //////////////////////////////////////////
 
 /////////////////////////////////////////
- //functions for getting access to j arrays//
+//functions for getting access to j arrays//
 /////////////////////////////////////////
 
 flcuda** current::get_j1() const
@@ -119,61 +119,61 @@ flcuda** current::get_j3() const
 
 flcuda* current::get_j1_1d() const
 {
-  //copy 2d field array into 1d array rowwise
-  for (int i = 0; i < geom1->n_grid_1 - 1; i++)
-      for (int k = 0; k < geom1->n_grid_2; k++)
-		  j1_1d[i * geom1->n_grid_2 + k] = j1[i][k];
-  return j1_1d;
+	//copy 2d field array into 1d array rowwise
+	for (int i = 0; i < geom1->n_grid_1 - 1; i++)
+		for (int k = 0; k < geom1->n_grid_2; k++)
+			j1_1d[i * geom1->n_grid_2 + k] = j1[i][k];
+	return j1_1d;
 }
 
 flcuda* current::get_j2_1d() const
 {
-  //copy 2d field array into 1d array rowwise
-  for (int i = 0; i < geom1->n_grid_1; i++)
-      for (int k = 0; k < geom1->n_grid_2; k++)
-		  j2_1d[i * geom1->n_grid_2 + k] = j2[i][k];
-  return j2_1d;
+	//copy 2d field array into 1d array rowwise
+	for (int i = 0; i < geom1->n_grid_1; i++)
+		for (int k = 0; k < geom1->n_grid_2; k++)
+			j2_1d[i * geom1->n_grid_2 + k] = j2[i][k];
+	return j2_1d;
 }
 
 flcuda* current::get_j3_1d() const
 {
-  //copy 2d field array into 1d array rowwise
-  for (int i = 0; i < geom1->n_grid_1; i++)
-      for (int k = 0; k < geom1->n_grid_2 - 1; k++)
-		  j3_1d[i * (geom1->n_grid_2 - 1) + k] = j3[i][k];
-  return j3_1d;
+	//copy 2d field array into 1d array rowwise
+	for (int i = 0; i < geom1->n_grid_1; i++)
+		for (int k = 0; k < geom1->n_grid_2 - 1; k++)
+			j3_1d[i * (geom1->n_grid_2 - 1) + k] = j3[i][k];
+	return j3_1d;
 }
 
 
-void current::j1_add_1d(flcuda *j1_1d) 
+void current::j1_add_1d(flcuda *j1_1d)
 {
-  //copy 2d field array into 1d array rowwise
-  for (int i = 0; i < geom1->n_grid_1 - 1; i++)
-      for (int k = 0; k < geom1->n_grid_2; k++)
-		  j1[i][k] += j1_1d[i * geom1->n_grid_2 + k];
-  return;
+	//copy 2d field array into 1d array rowwise
+	for (int i = 0; i < geom1->n_grid_1 - 1; i++)
+		for (int k = 0; k < geom1->n_grid_2; k++)
+			j1[i][k] += j1_1d[i * geom1->n_grid_2 + k];
+	return;
 }
 
-void current::j2_add_1d(flcuda *j2_1d) 
+void current::j2_add_1d(flcuda *j2_1d)
 {
-  //copy 2d field array into 1d array rowwise
-  for (int i = 0; i < geom1->n_grid_1; i++)
-      for (int k = 0; k < geom1->n_grid_2; k++)
-		  j2[i][k] += j2_1d[i * geom1->n_grid_2 + k];
-  return;
+	//copy 2d field array into 1d array rowwise
+	for (int i = 0; i < geom1->n_grid_1; i++)
+		for (int k = 0; k < geom1->n_grid_2; k++)
+			j2[i][k] += j2_1d[i * geom1->n_grid_2 + k];
+	return;
 }
 
-void current::j3_add_1d(flcuda *j3_1d) 
+void current::j3_add_1d(flcuda *j3_1d)
 {
-  //copy 2d field array into 1d array rowwise
-  for (int i = 0; i < geom1->n_grid_1; i++)
-      for (int k = 0; k < geom1->n_grid_2 - 1; k++)
-		  j3[i][k] += j3_1d[i * (geom1->n_grid_2 - 1) + k];
-  return;
+	//copy 2d field array into 1d array rowwise
+	for (int i = 0; i < geom1->n_grid_1; i++)
+		for (int k = 0; k < geom1->n_grid_2 - 1; k++)
+			j3[i][k] += j3_1d[i * (geom1->n_grid_2 - 1) + k];
+	return;
 }
 
 //////////////////////////////////////////
-	// functions for changing values of j//
+// functions for changing values of j//
 void current::set_j1(int i, int k, flcuda value)
 {
 	j1[i][k]= j1[i][k]+value;
@@ -191,24 +191,23 @@ void current::set_j3(int i, int k, flcuda value)
 
 void current::reset_j()
 {
-    int i=0;
+	int i=0;
 	int k=0;
-	 for (i=0; i<(geom1->n_grid_1-1);i++)
+	for (i=0; i<(geom1->n_grid_1-1);i++)
 		for (k=0; k<(geom1->n_grid_2-1);k++)
 		{
 			j1[i][k]=0;
 			j3[i][k]=0;
 		}
 
-	 for (i=0;i<geom1->n_grid_1;i++)
+	for (i=0;i<geom1->n_grid_1;i++)
 		for (k=0;k<geom1->n_grid_2;k++)
 			j2[i][k] = 0.0;
 
-	 for (i=0; i<(geom1->n_grid_1-1);i++)
+	for (i=0; i<(geom1->n_grid_1-1);i++)
 		j1[i][geom1->n_grid_2-1]=0;
 
 
-	 for(k=0;k<(geom1->n_grid_2-1);k++)
+	for(k=0;k<(geom1->n_grid_2-1);k++)
 		j3[geom1->n_grid_1-1][k]=0;
-
 }

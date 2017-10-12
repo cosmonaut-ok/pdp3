@@ -24,6 +24,9 @@ public:
 public:
 	void calc_init_param(double n_b,double b_vel);
 	void bunch_inject(Time* time);
-	void bunch_inject_calc_E(Geometry* geom, E_field * E_beam,E_field* E, Time* time);
+	void bunch_inject_calc_E(Geometry* geom,
+                           E_field * E_beam,
+                           E_field* E,
+                           Time* time);
 	virtual void  half_step_coord(Time* t);
 };
