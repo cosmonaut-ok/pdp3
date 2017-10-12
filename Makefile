@@ -128,3 +128,7 @@ run: bootstrap
 
 test: mrproper all
 	TESTDIR=$(TESTDIR) /bin/bash ./test.sh
+
+.PHONY: check-syntax
+check-syntax:
+	$(CXX) $(LIBRARY_PATH) $(INCLUDE_PATH) -Wall -Wextra -pedantic -fsyntax-only $(CHK_SOURCES)

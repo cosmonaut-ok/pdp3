@@ -6,7 +6,14 @@ class Bunch :
 	public Particles
 {
 public:
-	Bunch(char* p_name, double p_charge, double p_mass, int p_number, Geometry* geom, particles_list* p_list, double b_duration, double b_radius );
+	Bunch(char* p_name,
+        double p_charge,
+        double p_mass,
+        int p_number,
+        Geometry* geom,
+        particles_list* p_list,
+        double b_duration,
+        double b_radius);
 
 	~Bunch(void);
 public:
