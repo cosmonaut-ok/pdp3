@@ -16,11 +16,11 @@ Fourier::~Fourier(void)
 }
 
 /////////////////////////////////////////////////////
-void Fourier::fast_sine_transform(flcuda** a, int lenght_n, int ir, bool inv)
+void Fourier::fast_sine_transform(double** a, int lenght_n, int ir, bool inv)
 {
 	int d_lenght=2*lenght_n;
-	complex<flcuda> im_i (0,1);
-	complex<flcuda>* a_sinc = new complex<flcuda> [d_lenght+2];
+	complex<double> im_i (0,1);
+	complex<double>* a_sinc = new complex<double> [d_lenght+2];
 
 	int k=0;
 	for (k=0;k<lenght_n;k++)
@@ -38,7 +38,7 @@ void Fourier::fast_sine_transform(flcuda** a, int lenght_n, int ir, bool inv)
 
 	for (k=0;k<lenght_n;k++)
 	{
-		a_sinc[k+1]=-(flcuda)1.0/((flcuda)2.0*im_i)*a_sinc[k+1];
+		a_sinc[k+1]=-(double)1.0/((double)2.0*im_i)*a_sinc[k+1];
 		a[ir][k]=real(a_sinc[k+1]);
 	}
 
@@ -53,18 +53,18 @@ void Fourier::fast_sine_transform(flcuda** a, int lenght_n, int ir, bool inv)
 }
 
 ///////////////////////////////////////////////////
-void Fourier::dct_2(flcuda** a, int lenght_n, int ir, bool inv)
+void Fourier::dct_2(double** a, int lenght_n, int ir, bool inv)
 {
 	int k=0, n=0;
 	// TODO: why we should calculate constnt every time?
-	// flcuda pi = 4.0*atan(1.0);
-	flcuda t_f = 0;
-	flcuda* a_t = new flcuda [lenght_n];
+	// double pi = 4.0*atan(1.0);
+	double t_f = 0;
+	double* a_t = new double [lenght_n];
 	for (k=0;k<lenght_n;k++)
 	{
 		a_t[k]=a[ir][k];
 	}
-	// flcuda sq =	sqrt((flcuda) (lenght_n));
+	// double sq =	sqrt((double) (lenght_n));
 	for (k=0;k<lenght_n;k++)
 	{
 		t_f=0;
@@ -87,12 +87,12 @@ void Fourier::dct_2(flcuda** a, int lenght_n, int ir, bool inv)
 
 }
 
-void Fourier::fast_cosine_transform(flcuda** a, int lenght_n, int ir, bool inv)
+void Fourier::fast_cosine_transform(double** a, int lenght_n, int ir, bool inv)
 {
-//	void fast_fourier_alg(complex<flcuda>* a, int lenght_n);
+//	void fast_fourier_alg(complex<double>* a, int lenght_n);
 	int d_lenght=2*lenght_n;
-	complex<flcuda> im_i (0,1);
-	complex<flcuda>* a_sinc = new complex<flcuda> [d_lenght-2];
+	complex<double> im_i (0,1);
+	complex<double>* a_sinc = new complex<double> [d_lenght-2];
 
 
 	int k=0;
@@ -130,16 +130,16 @@ void Fourier::fast_cosine_transform(flcuda** a, int lenght_n, int ir, bool inv)
 
 }
 //////////////////////////////////////////////////
-void Fourier::fast_fourier_alg(complex<flcuda>* a, int lenght_n)
+void Fourier::fast_fourier_alg(complex<double>* a, int lenght_n)
 {
 	//bit reversal part//
 ////////////////////////////////////////////
-	complex<flcuda> W;
-	complex<flcuda> t_comp_a;
-	complex<flcuda> im_j (0,1);
+	complex<double> W;
+	complex<double> t_comp_a;
+	complex<double> im_j (0,1);
 
 	int bt,k,j,inver;
-	complex<flcuda> temp;
+	complex<double> temp;
 	for (k=0; k<lenght_n; k++)
 	{
 		bt=lenght_n >> 1;
@@ -171,7 +171,7 @@ void Fourier::fast_fourier_alg(complex<flcuda>* a, int lenght_n)
 	//fast algorithm//
 //////////////////////////////////////////
 
-	// flcuda pi = 4.0*atan(1.0);
+	// double pi = 4.0*atan(1.0);
 	int n_bit=lenght_n-1;
 	int n_step;
 	int m;
@@ -182,7 +182,7 @@ void Fourier::fast_fourier_alg(complex<flcuda>* a, int lenght_n)
 		for (k=0;k<n_step;k++)
 		{
 			// int kt=k;
-			W=exp((-PI*(flcuda)2.0*k/(n_step*2))*im_j);
+			W=exp((-PI*(double)2.0*k/(n_step*2))*im_j);
 
 			for(m=k;m<(lenght_n);m+=2*n_step)
 			{
@@ -208,10 +208,10 @@ void Fourier::fast_fourier_alg(complex<flcuda>* a, int lenght_n)
 //use fast_fourier_alg to real data//
 ////////////////////////////////////////////////////
 
-void Fourier::fast_fourier_transform(flcuda**a,int lenght_n,int ir, bool inv)
+void Fourier::fast_fourier_transform(double**a,int lenght_n,int ir, bool inv)
 {
 	int k=0;
-	complex<flcuda>* im_a = new complex<flcuda> [lenght_n];
+	complex<double>* im_a = new complex<double> [lenght_n];
 	for(k=0;k<lenght_n;k++)
 	{
 		im_a[k].real(a[ir][k]);
@@ -237,42 +237,42 @@ void Fourier::fast_fourier_transform(flcuda**a,int lenght_n,int ir, bool inv)
 /////////////////////////////////////////////////////
 // tnn=2^n//
 // array [0..tnn], number of function vulues = 2^n+1 //
-void Fourier::fastcosinetransform_old(flcuda** a,
+void Fourier::fastcosinetransform_old(double** a,
                                       int tnn,
                                       bool inversefct,
                                       int ir)
 {
-	// flcuda pi = 3.14159265;
+	// double pi = 3.14159265;
 	int j;
 	int n2;
-	flcuda sum;
-	flcuda y1;
-	flcuda y2;
-	flcuda theta;
-	flcuda wi;
-	flcuda wpi;
-	flcuda wr;
-	flcuda wpr;
-	flcuda wtemp;
-	flcuda twr;
-	flcuda twi;
-	flcuda twpr;
-	flcuda twpi;
-	flcuda twtemp;
-	flcuda ttheta;
+	double sum;
+	double y1;
+	double y2;
+	double theta;
+	double wi;
+	double wpi;
+	double wr;
+	double wpr;
+	double wtemp;
+	double twr;
+	double twi;
+	double twpr;
+	double twpi;
+	double twtemp;
+	double ttheta;
 	int i;
 	int i1;
 	int i2;
 	int i3;
 	int i4;
-	flcuda c1;
-	flcuda c2;
-	flcuda h1r;
-	flcuda h1i;
-	flcuda h2r;
-	flcuda h2i;
-	flcuda wrs;
-	flcuda wis;
+	double c1;
+	double c2;
+	double h1r;
+	double h1i;
+	double h2r;
+	double h2i;
+	double wrs;
+	double wis;
 	int nn;
 	int ii;
 	int jj;
@@ -281,8 +281,8 @@ void Fourier::fastcosinetransform_old(flcuda** a,
 	int m;
 	int istep;
 	int isign;
-	flcuda tempr;
-	flcuda tempi;
+	double tempr;
+	double tempi;
 
 	if( tnn==1 )
 	{
@@ -423,44 +423,44 @@ void Fourier::fastcosinetransform_old(flcuda** a,
 ///////////////////////////////////////////////////////////////////
 //tnn=2^n//
 // array [0..tnn-1], number of function vulues = 2^n//
-void Fourier::fastsinetransform_old(flcuda** a,
+void Fourier::fastsinetransform_old(double** a,
                                     int tnn,
                                     bool inversefst,
                                     int ir)
 {
-	// flcuda pi = 3.14159265;
+	// double pi = 3.14159265;
 	int jj;
 	int j;
 	int tm;
 	int n2;
-	flcuda sum;
-	flcuda y1;
-	flcuda y2;
-	flcuda theta;
-	flcuda wi;
-	flcuda wr;
-	flcuda wpi;
-	flcuda wpr;
-	flcuda wtemp;
-	flcuda twr;
-	flcuda twi;
-	flcuda twpr;
-	flcuda twpi;
-	flcuda twtemp;
-	flcuda ttheta;
+	double sum;
+	double y1;
+	double y2;
+	double theta;
+	double wi;
+	double wr;
+	double wpi;
+	double wpr;
+	double wtemp;
+	double twr;
+	double twi;
+	double twpr;
+	double twpi;
+	double twtemp;
+	double ttheta;
 	int i;
 	int i1;
 	int i2;
 	int i3;
 	int i4;
-	flcuda c1;
-	flcuda c2;
-	flcuda h1r;
-	flcuda h1i;
-	flcuda h2r;
-	flcuda h2i;
-	flcuda wrs;
-	flcuda wis;
+	double c1;
+	double c2;
+	double h1r;
+	double h1i;
+	double h2r;
+	double h2i;
+	double wrs;
+	double wis;
 	int nn;
 	int ii;
 	int n;
@@ -468,8 +468,8 @@ void Fourier::fastsinetransform_old(flcuda** a,
 	int m;
 	int istep;
 	int isign;
-	flcuda tempr;
-	flcuda tempi;
+	double tempr;
+	double tempi;
 
 	if( tnn==1 )
 	{
