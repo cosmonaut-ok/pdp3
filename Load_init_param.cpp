@@ -3,6 +3,9 @@
 // #include "kern_accessor.h"
 //extern KernAccessor *kern_access_global;
 
+#define INITIAL_PARAMS_NAME "Initial_parameters"
+
+
 Load_init_param::Load_init_param(void)
 {
 }
@@ -26,11 +29,12 @@ void Load_init_param::read_xml()
 		return;
 	}
 
-	TiXmlElement* root = xml_f.FirstChildElement ("Initial_parameters");
+	TiXmlElement* root = xml_f.FirstChildElement (INITIAL_PARAMS_NAME);
 	TiXmlElement* sub_root = root->FirstChildElement ("geometry");
 	// char test [30];
 	TiXmlElement* ss_root = sub_root->FirstChildElement();
-	const char* a =ss_root->GetText();
+	const char* a = ss_root->GetText();
+
 	// strcpy( test, sub_root->GetText());
 	//	 i = get_int_value(sub_root->FirstChildElement( ));
 
@@ -66,7 +70,7 @@ double Load_init_param:: get_double_value(const char* r_str)
 		return 0;
 	}
 	int number = 0;
-	TiXmlElement* root = xml_f.FirstChildElement ("Initial_parameters");
+	TiXmlElement* root = xml_f.FirstChildElement (INITIAL_PARAMS_NAME);
 	TiXmlElement* sub_root =root->FirstChildElement (p_name);
 	char* vul_arr = new char [50];
 	strcpy(vul_arr, sub_root->GetText());
@@ -84,7 +88,7 @@ double* Load_init_param:: read_double_params(const char* p_name)
 		return 0;
 	}
 	int number = 0;
-	TiXmlElement* root = xml_f.FirstChildElement ("Initial_parameters");
+	TiXmlElement* root = xml_f.FirstChildElement (INITIAL_PARAMS_NAME);
 	TiXmlElement* sub_root = root->FirstChildElement (p_name);
 	TiXmlElement* read_elem = sub_root->FirstChildElement ();
 	while(read_elem)
@@ -118,7 +122,7 @@ void Load_init_param:: read_load_particles()
 		return;
 	}
 	int number = 0;
-	TiXmlElement* root = xml_f.FirstChildElement ("Initial_parameters");
+	TiXmlElement* root = xml_f.FirstChildElement (INITIAL_PARAMS_NAME);
 	TiXmlElement* sub_root =root->FirstChildElement ("Particle_Name");
 	double* params= 0;
 	char* p_name= new char [50];
@@ -149,7 +153,7 @@ Bunch* Load_init_param:: read_load_bunch()
 		return 0;
 	}
 	int number = 0;
-	TiXmlElement* root = xml_f.FirstChildElement ("Initial_parameters");
+	TiXmlElement* root = xml_f.FirstChildElement (INITIAL_PARAMS_NAME);
 	TiXmlElement* sub_root =root->FirstChildElement ("Inject_Particles");
 	double* params= 0;
 	char* p_name= new char [50];
@@ -167,7 +171,7 @@ Bunch* Load_init_param:: read_load_bunch()
 ////////////////////////////////////////////
 void Load_init_param:: load_system()
 {
-	int i=0;
+	// int i=0;
 	//load PML parameters///
 	///////////////////////////////////
 	double * r_params = read_double_params("PML");
@@ -175,7 +179,7 @@ void Load_init_param:: load_system()
 
 	//load Geometry parameters///
 	/////////////////////////////////////
-	r_params	 =	read_double_params("geometry");
+	r_params = read_double_params("geometry");
 	c_geom	= new Geometry (r_params ,c_pml);
 	c_geom->set_epsilon();
 	//delete r_params;
