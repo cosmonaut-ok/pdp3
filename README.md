@@ -14,3 +14,6 @@ RoadMap:
 - paralellize (CAF?)
 - add openCL support
 - wrappers for octave (CLI) to build images
+
+https://github.com/leethomason/tinyxml2
+
