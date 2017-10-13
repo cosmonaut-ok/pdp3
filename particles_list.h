@@ -1,11 +1,14 @@
 #pragma once
-#include"Particles.h"
+#include "Particles.h"
 #include <vector>
-#include"charge_density.h"
-#include"E_field.h"
-#include"H_field.h"
+#include "charge_density.h"
+#include "E_field.h"
+#include "H_field.h"
+
 using namespace std;
+
 class Particles;
+
 class particles_list
 {
 public:
@@ -30,6 +33,4 @@ public:
 	void azimuthal_j_weighting(Time* time1, current *j1);
 	void create_coord_arrays(void);
 	void copy_coords(void);
-
-
 };

@@ -24,7 +24,9 @@
 #include "tinyxml.h"
 #include <fstream>
 #include<iostream>
+
 using namespace std;
+
 class Load_init_param
 {
 public:
@@ -46,18 +48,17 @@ public:
 public:
 	char* xml_file;
 
-		PML * c_pml;
-		Geometry * c_geom;
-		Time * c_time;
-		Particles* c_part;
-    	Bunch *     c_bunch;
-		particles_list* p_list;
-		E_field* efield;
-		H_field* hfield;
-		input_output_class * c_io_class;
-		charge_density * c_rho_new;
-		charge_density * c_rho_old;
-		charge_density * c_rho_beam;
-		current * c_current;
+	PML * c_pml;
+	Geometry * c_geom;
+	Time * c_time;
+	Particles* c_part;
+	Bunch * c_bunch;
+	particles_list* p_list;
+	E_field* efield;
+	H_field* hfield;
+	input_output_class * c_io_class;
+	charge_density * c_rho_new;
+	charge_density * c_rho_old;
+	charge_density * c_rho_beam;
+	current * c_current;
 };
-
