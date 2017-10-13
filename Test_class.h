@@ -1,5 +1,6 @@
 #pragma once
 #include "particles_struct.h"
+
 class Test_class
 {
 public:
@@ -8,4 +9,3 @@ public:
 public:
 	flcuda get_energy(flcuda *,flcuda, int);
 };
-

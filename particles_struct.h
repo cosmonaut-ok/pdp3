@@ -5,18 +5,17 @@ typedef double flcuda;
 
 //#define BUILD_OPENCL
 
-
 struct Particles_struct
 {
 	// The specie charge
 	flcuda charge;
 	// The specie mass
 	flcuda mass;
-	// Number of particles 
+	// Number of particles
 	int number;
 	// Particles' coordinates
-	//flcuda* x1;  //r  
-	//flcuda* x3;  //z
+	//flcuda* x1;	 //r
+	//flcuda* x3;	 //z
 	//// Particles' velocity
 	//flcuda* v1; //vr
 	//flcuda* v2; //vphi
@@ -41,7 +40,12 @@ struct Particle
 	bool is_active;
 };
 
-Particles_struct CreateParticles_struct(flcuda charge, flcuda mass, int number, int grid_num1, int grid_num3, flcuda dr, flcuda dz);
-
+Particles_struct CreateParticles_struct(flcuda charge,
+                                        flcuda mass,
+                                        int number,
+                                        int grid_num1,
+                                        int grid_num3,
+                                        flcuda dr,
+                                        flcuda dz);
 
 #endif
