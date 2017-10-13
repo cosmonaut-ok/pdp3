@@ -1,5 +1,7 @@
 #include "Load_init_param.h"
 #include "time.h"
+#include "tinyxml2.h"
+
 // #include "kern_accessor.h"
 //extern KernAccessor *kern_access_global;
 
@@ -23,18 +25,18 @@ Load_init_param::~Load_init_param(void)
 void Load_init_param::read_xml()
 {
 	// int i=1.2e7;
-	XmlDocument xml_f(xml_file);
-	xml_f.LoadFile();
+  XMLDocument xml_f(true, COLLAPSE_WHITESPACE);
+	xml_f.LoadFile(xml_file);
 	if(xml_f.Error())
 	{
 		cout<< "can't read file!\n";
 		return;
 	}
 
-	XmlElement* root = xml_f.FirstChildElement (INITIAL_PARAMS_NAME);
-	XmlElement* sub_root = root->FirstChildElement ("geometry");
+	XMLElement* root = xml_f.FirstChildElement (INITIAL_PARAMS_NAME);
+	XMLElement* sub_root = root->FirstChildElement ("geometry");
 	// char test [30];
-	XmlElement* ss_root = sub_root->FirstChildElement();
+	XMLElement* ss_root = sub_root->FirstChildElement();
 	const char* a = ss_root->GetText();
 
 	// strcpy( test, sub_root->GetText());
@@ -42,8 +44,8 @@ void Load_init_param::read_xml()
 
 	// cout << i;
 	// cin	>> i;
-	// XmlElement* sub_root = root->FirstChildElement ("geometry");
-	// XmlElement* value = sub_root->FirstChildElement ();
+	// XMLElement* sub_root = root->FirstChildElement ("geometry");
+	// XMLElement* value = sub_root->FirstChildElement ();
 	// double r_size	= get_double_value(value);
 	//double z_size	 = get_double_value(value->NextSiblingElement());
 
@@ -64,16 +66,16 @@ double Load_init_param:: get_double_value(const char* r_str)
 
 char* Load_init_param:: read_char(char* p_name)
 {
-	XmlDocument	 xml_f(xml_file);
-	xml_f.LoadFile();
+	XMLDocument xml_f(true, COLLAPSE_WHITESPACE);
+	xml_f.LoadFile(xml_file);
 	if(xml_f.Error())
 	{
 		cout<< "couldn't read file!\n";
 		return 0;
 	}
 	int number = 0;
-	XmlElement* root = xml_f.FirstChildElement (INITIAL_PARAMS_NAME);
-	XmlElement* sub_root =root->FirstChildElement (p_name);
+	XMLElement* root = xml_f.FirstChildElement (INITIAL_PARAMS_NAME);
+	XMLElement* sub_root =root->FirstChildElement (p_name);
 	char* vul_arr = new char [50];
 	strcpy(vul_arr, sub_root->GetText());
 
@@ -82,17 +84,17 @@ char* Load_init_param:: read_char(char* p_name)
 
 double* Load_init_param::read_double_params(const char* p_name)
 {
-	XmlDocument xml_f(xml_file);
-	xml_f.LoadFile();
+	XMLDocument xml_f(true, COLLAPSE_WHITESPACE);
+	xml_f.LoadFile(xml_file);
 	if(xml_f.Error())
 	{
 		cout<< "couldn't read file!\n";
 		return 0;
 	}
 	int number = 0;
-	XmlElement* root = xml_f.FirstChildElement (INITIAL_PARAMS_NAME);
-	XmlElement* sub_root = root->FirstChildElement (p_name);
-	XmlElement* read_elem = sub_root->FirstChildElement ();
+	XMLElement* root = xml_f.FirstChildElement (INITIAL_PARAMS_NAME);
+	XMLElement* sub_root = root->FirstChildElement (p_name);
+	XMLElement* read_elem = sub_root->FirstChildElement ();
 	while(read_elem)
 	{
 		read_elem = read_elem->NextSiblingElement();
@@ -115,23 +117,25 @@ double* Load_init_param::read_double_params(const char* p_name)
 
 void Load_init_param:: read_load_particles()
 {
-	XmlDocument	 xml_f(xml_file);
-	xml_f.LoadFile();
+	XMLDocument xml_f(true, COLLAPSE_WHITESPACE);
+	xml_f.LoadFile(xml_file);
 	if(xml_f.Error())
 	{
 		cout<< "couldn't read file! \n";
 		return;
 	}
 	int number = 0;
-	XmlElement* root = xml_f.FirstChildElement (INITIAL_PARAMS_NAME);
-	XmlElement* sub_root =root->FirstChildElement ("Particle_Name");
+	XMLElement* root = xml_f.FirstChildElement (INITIAL_PARAMS_NAME);
+	XMLElement* sub_root =root->FirstChildElement ("Particle_Name");
 	double* params= 0;
 	char* p_name= new char [50];
 	Particles*	 prtls =0;
+
 	while(sub_root)
 	{
 		const char* test = sub_root->GetText();
 		strcpy (p_name,sub_root->GetText());
+		
 		params = read_double_params(p_name);
 		prtls = new Particles(strcpy(new char [50],p_name),params,c_geom, p_list);
 		prtls->load_spatial_distribution_with_variable_mass(params[3],params[4],0,0);
@@ -146,16 +150,16 @@ void Load_init_param:: read_load_particles()
 
 Bunch* Load_init_param:: read_load_bunch()
 {
-	XmlDocument	 xml_f(xml_file);
-	xml_f.LoadFile();
+	XMLDocument xml_f(true, COLLAPSE_WHITESPACE);
+	xml_f.LoadFile(xml_file);
 	if(xml_f.Error())
 	{
 		cout<< "couldn't read file!\n";
 		return 0;
 	}
 	int number = 0;
-	XmlElement* root = xml_f.FirstChildElement (INITIAL_PARAMS_NAME);
-	XmlElement* sub_root =root->FirstChildElement ("Inject_Particles");
+	XMLElement* root = xml_f.FirstChildElement (INITIAL_PARAMS_NAME);
+	XMLElement* sub_root =root->FirstChildElement ("Inject_Particles");
 	double* params= 0;
 	char* p_name= new char [50];
 	Bunch*	 prtls =0;
@@ -213,7 +217,7 @@ void Load_init_param::load_system()
 
 	//////////////////////////////////////
 	//Maxwell initial conditions///
-	r_params	 =	read_double_params("Boundary_Maxwell_conditions");
+	r_params = read_double_params("Boundary_Maxwell_conditions");
 	Boundary_Maxwell_conditions maxwell_rad(efield);
 	maxwell_rad.specify_initial_field(c_geom,r_params[0],r_params[1],r_params[2]);
 
