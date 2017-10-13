@@ -5,20 +5,31 @@
 
 using namespace std;
 
-const float pi = constant::PI;
+const double PI = constant::PI; // prevent "magic numbers"
 
-Beam::Beam(char* p_name, double p_charge, double p_mass, int p_number, Geometry* geom, particles_list* p_list, double b_radius):Particles(p_name,p_charge,p_mass,p_number,geom,p_list)
+Beam::Beam(char* p_name,
+           double p_charge,
+           double p_mass,
+           int p_number,
+           Geometry* geom,
+           particles_list* p_list,
+           double b_radius):Particles(p_name, p_charge, p_mass, p_number,
+                                      geom, p_list)
 {
 	radius = b_radius;
 }
-void Beam::calc_init_param(Time* time,int particles_in_step,double n_b, double b_vel)
+
+void Beam::calc_init_param(Time* time,
+                           int particles_in_step,
+                           double n_b,
+                           double b_vel)
 {
 	n_beam = n_b;
 	vel_beam = b_vel;
 	double dl = vel_beam*time->delta_t;
-	double n_in_big = 3.1415*radius*radius*dl*n_beam/particles_in_step;
+	double n_in_big = PI*radius*radius*dl*n_beam/particles_in_step;
 	charge *= n_in_big;
- 	mass *= n_in_big;
+	mass *= n_in_big;
 	for(int i=0;i<number;i++)
 	{
 		is_alive[i]=false;
@@ -27,35 +38,35 @@ void Beam::calc_init_param(Time* time,int particles_in_step,double n_b, double b
 		v3[i]=0;
 	}
 }
+
 void Beam::beam_inject(Time* time,int particles_in_step, double fi, double koef)
 {
 	flcuda dl = vel_beam*time->delta_t;
-	flcuda dr = geom1->dr*1.00000001;
+	flcuda dr = geom1->dr*1.00000001; // TODO: WTF?
 	flcuda dz = geom1->dz*1.00000001;
-	double mod_n = (1 - koef/2.0 + koef/2.0*sin(2*pi*fi*time->current_time));
+	double mod_n = (1 - koef/2.0 + koef/2.0*sin(2*PI*fi*time->current_time));
 	int n=0;
 	int i=0;
 	particles_in_step = particles_in_step*mod_n;
- 		while((n<particles_in_step)&&(i<number))
+	while((n<particles_in_step)&&(i<number))
+	{
+		if(!is_alive[i])
 		{
-			if(!is_alive[i])
-			{
-		flcuda	rand_r = random_reverse(i,3);		
-		flcuda	rand_z = random_reverse(i,5);
-				x1[i] = (radius)*sqrt(rand_r) + dr/2.0;
-				x3[i] = dl*(rand_z)-dl;
-				v3[i] = vel_beam;
-				is_alive[i] = true;
-				n=n+1;
-			}
-		i=i+1;
+			flcuda	rand_r = random_reverse(i,3);
+			flcuda	rand_z = random_reverse(i,5);
+			x1[i] = (radius)*sqrt(rand_r) + dr/2.0;
+			x3[i] = dl*(rand_z)-dl;
+			v3[i] = vel_beam;
+			is_alive[i] = true;
+			n=n+1;
 		}
-		for(int i = 0; i <  number; i++)
+		i=i+1;
+	}
+	for(int i = 0; i <	number; i++)
 		if(x3[i]>(geom1->second_size - dz/2.0))
 		{
 			is_alive[i]=false;
 		}
-
 }
 
 void Beam::half_step_coord(Time* t)
@@ -73,9 +84,9 @@ void Beam::half_step_coord(Time* t)
 
 	for( i=0;i<number;i++)
 		if (is_alive[i])
-		{	
-			x1[i] = x1[i] + v1[i]*half_dt; 
-            x3[i] = x3[i] + v3[i]*half_dt;
+		{
+			x1[i] = x1[i] + v1[i]*half_dt;
+			x3[i] = x3[i] + v3[i]*half_dt;
 
 			if (x1[i] > x1_wall)
 			{
