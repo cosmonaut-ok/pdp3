@@ -9,11 +9,22 @@ CEXTRA                =
 CXXEXTRA              =
 RCEXTRA               =
 DEFINES               =
-INCLUDE_PATH          = -I.
+INCLUDE_PATH          = -I$(SRCDIR)
 DLL_PATH              =
 DLL_IMPORTS           =
 LIBRARY_PATH          =
 LIBRARIES             =
+
+### tinyxml2 sources and settings
+tinyxml2_SUBDIR := $(SRCDIR)/lib/tinyxml2/
+# LDFLAGS := -L$(tinyxml2_SUBDIR)
+INCLUDE_PATH := $(INCLUDE_PATH) -I$(tinyxml2_SUBDIR)
+SUBDIRS := $(SUBDIRS) $(tinyxml2_SUBDIR)
+DLL_IMPORTS := tinyxml2
+LDFLAGS := $(LDFLAGS) -L$(tinyxml2_SUBDIR)
+
+# FOO_LIBSFILES := $(FOO_SUBDIR)/libfoo.a $(FOO_SUBDIR)/libgnufoo.a
+# FOO_LDLIBS := -lfoo -lgnufoo
 
 ### pdp3 sources and settings
 pdp3_MODULE           = pdp3
@@ -43,11 +54,7 @@ pdp3_CXX_SRCS         = Beam.cpp \
 			field.cpp \
 			input_output_class.cpp \
 			particles_list.cpp \
-			particles_struct.cpp \
-			tinystr.cpp \
-			tinyxml.cpp \
-			tinyxmlerror.cpp \
-			tinyxmlparser.cpp
+			particles_struct.cpp
 pdp3_RC_SRCS          = pdp3.rc \
 			pdp31.rc
 pdp3_LDFLAGS          =
@@ -59,6 +66,8 @@ pdp3_LIBRARIES        =
 
 pdp3_OBJS             = $(pdp3_C_SRCS:.c=.o) \
 			$(pdp3_CXX_SRCS:.cpp=.o)
+
+LDFLAGS := $(LDFLAGS) $(pdp3_LDFLAGS)
 
 ### Global source lists
 C_SRCS                = $(pdp3_C_SRCS)
@@ -115,13 +124,13 @@ $(EXTRASUBDIRS:%=%/__clean__): dummy
 DEFLIB = $(LIBRARY_PATH) $(LIBRARIES) $(DLL_PATH) $(DLL_IMPORTS:%=-l%)
 
 $(pdp3_MODULE): $(pdp3_OBJS)
-	$(CXX) $(pdp3_LDFLAGS) -o $@ $(pdp3_OBJS) $(pdp3_LIBRARY_PATH) $(pdp3_DLL_PATH) $(DEFLIB) $(pdp3_DLLS:%=-l%) $(pdp3_LIBRARIES:%=-l%)
+	$(CXX) $(LDFLAGS) -o $@ $(pdp3_OBJS) $(pdp3_LIBRARY_PATH) $(pdp3_DLL_PATH) $(DEFLIB) $(pdp3_DLLS:%=-l%) $(pdp3_LIBRARIES:%=-l%)
 
 bootstrap:
 	mkdir -p pdp3_files pdp3_result/Dump
 
 mrproper: clean
-	rm -rf pdp3_files pdp3_result $(TESTDIR)
+	$(RM) -r pdp3_files pdp3_result $(TESTDIR)
 
 run: bootstrap
 	./pdp3
@@ -130,5 +139,10 @@ test: mrproper all
 	TESTDIR=$(TESTDIR) /bin/bash ./test.sh
 
 .PHONY: check-syntax
+
 check-syntax:
 	$(CXX) $(LIBRARY_PATH) $(INCLUDE_PATH) -Wall -Wextra -pedantic -fsyntax-only $(CHK_SOURCES)
+
+echo:
+	@echo $(INCLUDE_PATH)
+	@echo $(LIBRARY_PATH)
