@@ -14,14 +14,14 @@ Poisson::~Poisson(void)
 bool Poisson::test_poisson_equation(E_field* input_e ,charge_density *rho)
 {
 	int i=0, k=0;
-	flcuda dr = cyl_geom->dr;
-	flcuda dz = cyl_geom->dz;
-	flcuda accur =1e-3;
-	flcuda a=0;
+	double dr = cyl_geom->dr;
+	double dz = cyl_geom->dz;
+	double accur =1e-3;
+	double a=0;
 	bool res =true;
-	flcuda **rho1 = rho->get_ro();
-	flcuda** e1 =input_e->e1;
-	flcuda** e3 = input_e->e3;
+	double **rho1 = rho->get_ro();
+	double** e1 =input_e->e1;
+	double** e3 = input_e->e3;
 	ofstream delta("delta");
 	for (i=1;i<cyl_geom->n_grid_1-1;i++)
 		for (k=1;k<cyl_geom->n_grid_2-1;k++)

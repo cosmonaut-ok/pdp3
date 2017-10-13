@@ -3,8 +3,8 @@
 
 // class constructor with sigma //
 /////////////////////////////////////////////
-Geometry::Geometry(flcuda fs,
-                   flcuda ss,
+Geometry::Geometry(double fs,
+                   double ss,
                    int ng1,
                    int ng2,
                    PML* pml1_t): pml1(pml1_t)//, geom1(geom1_t)
@@ -16,16 +16,16 @@ Geometry::Geometry(flcuda fs,
 	dr=set_dr();
 	dz=set_dz();
 	//////////////////////////////////////
-	epsilon = new flcuda*[n_grid_1];
+	epsilon = new double*[n_grid_1];
 	for (int i=0; i<(n_grid_1);i++)
 	{
-		epsilon[i]= new flcuda[n_grid_2];
+		epsilon[i]= new double[n_grid_2];
 	}
 
-	sigma = new flcuda*[n_grid_1];
+	sigma = new double*[n_grid_1];
 	for (int i=0; i<(n_grid_1);i++)
 	{
-		sigma[i]= new flcuda[n_grid_2];
+		sigma[i]= new double[n_grid_2];
 	}
 
 	for (int i=0; i<(n_grid_1);i++)
@@ -52,16 +52,16 @@ Geometry::Geometry(double* param, PML* pml1_t): pml1(pml1_t)//, geom1(geom1_t)
 	dr=set_dr();
 	dz=set_dz();
 	//////////////////////////////////////
-	epsilon = new flcuda*[n_grid_1];
+	epsilon = new double*[n_grid_1];
 	for (int i=0; i<(n_grid_1);i++)
 	{
-		epsilon[i]= new flcuda[n_grid_2];
+		epsilon[i]= new double[n_grid_2];
 	}
 
-	sigma = new flcuda*[n_grid_1];
+	sigma = new double*[n_grid_1];
 	for (int i=0; i<(n_grid_1);i++)
 	{
-		sigma[i]= new flcuda[n_grid_2];
+		sigma[i]= new double[n_grid_2];
 	}
 
 	for (int i=0; i<(n_grid_1);i++)
@@ -79,7 +79,7 @@ Geometry::Geometry(double* param, PML* pml1_t): pml1(pml1_t)//, geom1(geom1_t)
 
 // class constructor: sigma =0 //
 /////////////////////////////////////////////
-Geometry::Geometry(flcuda fs, flcuda ss,	int ng1, int ng2)
+Geometry::Geometry(double fs, double ss,	int ng1, int ng2)
 {
 	first_size=fs;
 	second_size=ss;
@@ -89,16 +89,16 @@ Geometry::Geometry(flcuda fs, flcuda ss,	int ng1, int ng2)
 	dz=set_dz();
 	pml1=0;
 	//////////////////////////////////////
-	epsilon = new flcuda*[n_grid_1];
+	epsilon = new double*[n_grid_1];
 	for (int i=0; i<(n_grid_1);i++)
 	{
-		epsilon[i]= new flcuda[n_grid_2];
+		epsilon[i]= new double[n_grid_2];
 	}
 
-	sigma = new flcuda*[n_grid_1];
+	sigma = new double*[n_grid_1];
 	for (int i=0; i<(n_grid_1);i++)
 	{
-		sigma[i]= new flcuda[n_grid_2];
+		sigma[i]= new double[n_grid_2];
 	}
 
 	for (int i=0; i<(n_grid_1);i++)
@@ -131,12 +131,12 @@ Geometry::~Geometry(void)
 {
 }
 
-flcuda Geometry::set_dr()
+double Geometry::set_dr()
 {
 	return first_size/(n_grid_1-1);
 }
 
-flcuda Geometry::set_dz()
+double Geometry::set_dz()
 {
 	return second_size/(n_grid_2-1);
 }

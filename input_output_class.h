@@ -16,26 +16,26 @@ public:
 	input_output_class(char* cpathres,char* cpathdump);
 	~input_output_class(void);
 	void out_data(char const *comp_name,
-                flcuda** out_value,
+                double** out_value,
                 int step_number,
                 int number,
                 int r_step,
                 int z_step);
-	void out_field_dump(char* comp_name,flcuda** out_value,int r_step,int z_step);
+	void out_field_dump(char* comp_name,double** out_value,int r_step,int z_step);
 
 	void out_coord(char* comp_name,
-                 flcuda* coord_r,
-                 flcuda* coord_z,
+                 double* coord_r,
+                 double* coord_z,
                  int step_number,
                  int number,
                  int particles_number);
 	void out_coord_dump(char* comp_name,
-                      flcuda* coord_r,
-                      flcuda* coord_z,
+                      double* coord_r,
+                      double* coord_z,
                       int particles_number);
 	void out_velocity_dump(char* comp_name,
-                         flcuda* v1,
-                         flcuda* v2,
-                         flcuda* v3,
+                         double* v1,
+                         double* v2,
+                         double* v3,
                          int particles_number);
 };
