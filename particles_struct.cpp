@@ -1,12 +1,12 @@
 #include "particles_struct.h"
 
-Particles_struct CreateParticles_struct(flcuda charge,
-                                        flcuda mass,
+Particles_struct CreateParticles_struct(double charge,
+                                        double mass,
                                         int number,
                                         int grid_num1,
                                         int grid_num3,
-                                        flcuda dr,
-                                        flcuda dz)
+                                        double dr,
+                                        double dz)
 {
   Particles_struct res;
   res.charge = charge;

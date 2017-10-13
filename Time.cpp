@@ -10,7 +10,7 @@ Time::~Time(void)
 {
 }
 
-Time::Time(flcuda ct, flcuda st, flcuda rt, flcuda et, flcuda dt)
+Time::Time(double ct, double st, double rt, double et, double dt)
 {
 	start_time=st;
 	relaxation_time = rt;

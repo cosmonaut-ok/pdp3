@@ -20,7 +20,6 @@
 #include "Bunch.h"
 #include "time.h"
 #include "particles_struct.h"
-#include "system_host.cuh"
 #include "Load_init_param.h"
 
 using namespace std;
@@ -31,7 +30,7 @@ Particles_struct specie;
 int main(int argc, char **argv)
 {
 	clock_t start, finish;
-	flcuda time_elapsed;
+	double time_elapsed;
 	Load_init_param init_param((char *) "parameters.xml");
 	init_param.read_xml();
 	init_param.load_system();
@@ -42,7 +41,7 @@ int main(int argc, char **argv)
 	PML pml1(0.0,0.0, 0.0, 0.000001, 0.07);
 	Geometry geom1(0.25,2.0, 255, 2047, &pml1);
 	//Geometry geom1(0.2,1.5, 63, 255, &pml1);
-	flcuda left_plasma_boundary = geom1.second_size*0.0;
+	double left_plasma_boundary = geom1.second_size*0.0;
 
 	Time time1(0,0,0,200000e-12,1e-12); // TODO: WTF?
 	E_field e_field1(&geom1);
@@ -110,19 +109,9 @@ int main(int argc, char **argv)
 	//out_vel.close();
 	//out_coords.close();
 
-	int cuda_particles_number = 0;
-	for (i = 0; i < p_list.part_list.size(); i++)
-		if (cuda_particles_number < p_list.part_list[i]->number)
-			cuda_particles_number = p_list.part_list[i]->number;
-
 	/*charge_density rho_elect(&geom1);
 		electrons.charge_weighting(&rho_elect);
 		out_class.out_data("rho",rho_elect.get_ro(),0,100,geom1.n_grid_1-1,geom1.n_grid_2-1);*/
-
-#ifdef BUILD_CUDA
-	InitCUDA();
-	SetupCUDA(geom1.n_grid_1, geom1.n_grid_2, cuda_particles_number);
-#endif
 
 	/////////////////////////////////
 	//0. Half step back
