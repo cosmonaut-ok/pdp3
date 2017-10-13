@@ -8,6 +8,7 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-7
+      - git
     env:
       - EXPORT_VARS_CMD="export CC=gcc-7 && export CXX=g++-7"
 
@@ -17,6 +18,7 @@ before_install:
 before_script:
   - echo 'Europe/Kiev' | sudo tee /etc/timezone
   - sudo dpkg-reconfigure --frontend noninteractive tzdata
+  - git submodule update --init
 
 script:
   - make test
