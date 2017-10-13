@@ -18,8 +18,8 @@ public:
 	~Bunch(void);
 public:
 	double duration; //bunch duration
-	flcuda n_bunch;// bunch density;
-	flcuda vel_bunch; //bunch velocity
+	double n_bunch;// bunch density;
+	double vel_bunch; //bunch velocity
 	double radius; //bunch radius
 public:
 	void calc_init_param(double n_b,double b_vel);
