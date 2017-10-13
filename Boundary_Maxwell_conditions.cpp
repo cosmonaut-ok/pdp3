@@ -17,9 +17,9 @@ Boundary_Maxwell_conditions::~Boundary_Maxwell_conditions(void)
 }
 
 void Boundary_Maxwell_conditions::specify_initial_field(Geometry* cyl_geom,
-                                                        flcuda E_fi_upper,
-                                                        flcuda E_fi_left,
-                                                        flcuda E_fi_right)
+                                                        double E_fi_upper,
+                                                        double E_fi_left,
+                                                        double E_fi_right)
 {
 	int i=0, k=0;
 	int n_grid1=cyl_geom->n_grid_1;
@@ -39,10 +39,10 @@ void Boundary_Maxwell_conditions::specify_initial_field(Geometry* cyl_geom,
 
 }
 void Boundary_Maxwell_conditions::radiation_source(Geometry* cyl_geom,
-                                                   flcuda region_size,
-                                                   flcuda frequency,
+                                                   double region_size,
+                                                   double frequency,
                                                    int wave_type,
-                                                   flcuda time)
+                                                   double time)
 {
 	int i_max =0, i=0;
 	i_max = (int) (region_size/cyl_geom->dr);
@@ -68,16 +68,16 @@ void Boundary_Maxwell_conditions::radiation_source(Geometry* cyl_geom,
 
 void Boundary_Maxwell_conditions::probe_mode_exitation(Geometry* cyl_geom,
                                                         current* j_input,
-                                                        flcuda n,
-                                                        flcuda frequency,
-                                                        flcuda time)
+                                                        double n,
+                                                        double frequency,
+                                                        double time)
 {
 	int k_max =0, k=0;
 	int k_start =0;
-	flcuda probe_lenght = LIGHT_SPEED*n/frequency; // TODO: light velicity?
+	double probe_lenght = LIGHT_SPEED*n/frequency; // TODO: light velicity?
 	k_max = (int) (probe_lenght/cyl_geom->dz)+k_start;
-	flcuda dz = cyl_geom->dz;
-	flcuda **j_p;
+	double dz = cyl_geom->dz;
+	double **j_p;
 	j_p = j_input->get_j3();
 	/*if (cyl_geom->dz*k<probe_lenght)
 		{
