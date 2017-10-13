@@ -7,5 +7,5 @@ public:
 	Test_class(void);
 	~Test_class(void);
 public:
-	flcuda get_energy(flcuda *,flcuda, int);
+	double get_energy(double *,double, int);
 };

@@ -16,10 +16,10 @@ boundary_neumann::boundary_neumann(void)
 boundary_neumann::~boundary_neumann(void)
 {
 }
-void boundary_neumann:: specify_boundary_conditions(flcuda E_fi_upper,
-                                                    flcuda E_fi_left,
-                                                    flcuda E_fi_right,
-                                                    flcuda fi_upper_wall)
+void boundary_neumann:: specify_boundary_conditions(double E_fi_upper,
+                                                    double E_fi_left,
+                                                    double E_fi_right,
+                                                    double fi_upper_wall)
 {
 	int i=0, k=0;
 	int n_grid1=cyl_geom->n_grid_1;
