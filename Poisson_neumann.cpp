@@ -7,10 +7,10 @@ Poisson_neumann::Poisson_neumann(Geometry* cyl_geom):Poisson(cyl_geom)
 {
 	//charge_density//
 ///////////////////////////////////////
-	t_charge_density = new flcuda*[cyl_geom->n_grid_1];
+	t_charge_density = new double*[cyl_geom->n_grid_1];
 	for (int i=0; i<(cyl_geom->n_grid_1);i++)
 	{
-		t_charge_density[i] = new flcuda[cyl_geom->n_grid_2];
+		t_charge_density[i] = new double[cyl_geom->n_grid_2];
 	}
 }
 
@@ -24,19 +24,19 @@ void Poisson_neumann::poisson_solve(E_field* input_e, charge_density* ro1)
 {
 	int i=0;
 	int k=0;
-	flcuda a=0;
-	flcuda c=0;
-	flcuda b=0;
-	flcuda d=0;
-	flcuda* alpha = new flcuda [cyl_geom->n_grid_1];
-	flcuda* beta = new flcuda [cyl_geom->n_grid_1];
+	double a=0;
+	double c=0;
+	double b=0;
+	double d=0;
+	double* alpha = new double [cyl_geom->n_grid_1];
+	double* beta = new double [cyl_geom->n_grid_1];
 	Fourier* four1=0;
-	flcuda** ro=ro1->get_ro();
-	flcuda** e1 = input_e->e1;
-	flcuda** e3 = input_e->e3;
-	flcuda** fi = input_e->fi;
-	flcuda dr = cyl_geom->dr;
-	flcuda dz = cyl_geom->dz;
+	double** ro=ro1->get_ro();
+	double** e1 = input_e->e1;
+	double** e3 = input_e->e3;
+	double** fi = input_e->fi;
+	double dr = cyl_geom->dr;
+	double dz = cyl_geom->dz;
 
 ///////////////////////////////////////////////
 	//copy charge_density array in to temp array//
