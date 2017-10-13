@@ -3,6 +3,8 @@
 // #include "kern_accessor.h"
 //extern KernAccessor *kern_access_global;
 
+using namespace tinyxml2;
+
 #define INITIAL_PARAMS_NAME "Initial_parameters"
 
 
@@ -21,7 +23,7 @@ Load_init_param::~Load_init_param(void)
 void Load_init_param::read_xml()
 {
 	// int i=1.2e7;
-	TiXmlDocument xml_f(xml_file);
+	XmlDocument xml_f(xml_file);
 	xml_f.LoadFile();
 	if(xml_f.Error())
 	{
@@ -29,10 +31,10 @@ void Load_init_param::read_xml()
 		return;
 	}
 
-	TiXmlElement* root = xml_f.FirstChildElement (INITIAL_PARAMS_NAME);
-	TiXmlElement* sub_root = root->FirstChildElement ("geometry");
+	XmlElement* root = xml_f.FirstChildElement (INITIAL_PARAMS_NAME);
+	XmlElement* sub_root = root->FirstChildElement ("geometry");
 	// char test [30];
-	TiXmlElement* ss_root = sub_root->FirstChildElement();
+	XmlElement* ss_root = sub_root->FirstChildElement();
 	const char* a = ss_root->GetText();
 
 	// strcpy( test, sub_root->GetText());
@@ -40,8 +42,8 @@ void Load_init_param::read_xml()
 
 	// cout << i;
 	// cin	>> i;
-	// TiXmlElement* sub_root = root->FirstChildElement ("geometry");
-	// TiXmlElement* value = sub_root->FirstChildElement ();
+	// XmlElement* sub_root = root->FirstChildElement ("geometry");
+	// XmlElement* value = sub_root->FirstChildElement ();
 	// double r_size	= get_double_value(value);
 	//double z_size	 = get_double_value(value->NextSiblingElement());
 
@@ -60,9 +62,9 @@ double Load_init_param:: get_double_value(const char* r_str)
 	return i;
 }
 
- char* Load_init_param:: read_char(char* p_name)
+char* Load_init_param:: read_char(char* p_name)
 {
-	TiXmlDocument	 xml_f(xml_file);
+	XmlDocument	 xml_f(xml_file);
 	xml_f.LoadFile();
 	if(xml_f.Error())
 	{
@@ -70,17 +72,17 @@ double Load_init_param:: get_double_value(const char* r_str)
 		return 0;
 	}
 	int number = 0;
-	TiXmlElement* root = xml_f.FirstChildElement (INITIAL_PARAMS_NAME);
-	TiXmlElement* sub_root =root->FirstChildElement (p_name);
+	XmlElement* root = xml_f.FirstChildElement (INITIAL_PARAMS_NAME);
+	XmlElement* sub_root =root->FirstChildElement (p_name);
 	char* vul_arr = new char [50];
 	strcpy(vul_arr, sub_root->GetText());
 
 	return vul_arr;
 }
 
-double* Load_init_param:: read_double_params(const char* p_name)
+double* Load_init_param::read_double_params(const char* p_name)
 {
-	TiXmlDocument	 xml_f(xml_file);
+	XmlDocument xml_f(xml_file);
 	xml_f.LoadFile();
 	if(xml_f.Error())
 	{
@@ -88,12 +90,11 @@ double* Load_init_param:: read_double_params(const char* p_name)
 		return 0;
 	}
 	int number = 0;
-	TiXmlElement* root = xml_f.FirstChildElement (INITIAL_PARAMS_NAME);
-	TiXmlElement* sub_root = root->FirstChildElement (p_name);
-	TiXmlElement* read_elem = sub_root->FirstChildElement ();
+	XmlElement* root = xml_f.FirstChildElement (INITIAL_PARAMS_NAME);
+	XmlElement* sub_root = root->FirstChildElement (p_name);
+	XmlElement* read_elem = sub_root->FirstChildElement ();
 	while(read_elem)
 	{
-
 		read_elem = read_elem->NextSiblingElement();
 		number++;
 	}
@@ -114,7 +115,7 @@ double* Load_init_param:: read_double_params(const char* p_name)
 
 void Load_init_param:: read_load_particles()
 {
-	TiXmlDocument	 xml_f(xml_file);
+	XmlDocument	 xml_f(xml_file);
 	xml_f.LoadFile();
 	if(xml_f.Error())
 	{
@@ -122,8 +123,8 @@ void Load_init_param:: read_load_particles()
 		return;
 	}
 	int number = 0;
-	TiXmlElement* root = xml_f.FirstChildElement (INITIAL_PARAMS_NAME);
-	TiXmlElement* sub_root =root->FirstChildElement ("Particle_Name");
+	XmlElement* root = xml_f.FirstChildElement (INITIAL_PARAMS_NAME);
+	XmlElement* sub_root =root->FirstChildElement ("Particle_Name");
 	double* params= 0;
 	char* p_name= new char [50];
 	Particles*	 prtls =0;
@@ -145,7 +146,7 @@ void Load_init_param:: read_load_particles()
 
 Bunch* Load_init_param:: read_load_bunch()
 {
-	TiXmlDocument	 xml_f(xml_file);
+	XmlDocument	 xml_f(xml_file);
 	xml_f.LoadFile();
 	if(xml_f.Error())
 	{
@@ -153,8 +154,8 @@ Bunch* Load_init_param:: read_load_bunch()
 		return 0;
 	}
 	int number = 0;
-	TiXmlElement* root = xml_f.FirstChildElement (INITIAL_PARAMS_NAME);
-	TiXmlElement* sub_root =root->FirstChildElement ("Inject_Particles");
+	XmlElement* root = xml_f.FirstChildElement (INITIAL_PARAMS_NAME);
+	XmlElement* sub_root =root->FirstChildElement ("Inject_Particles");
 	double* params= 0;
 	char* p_name= new char [50];
 	Bunch*	 prtls =0;
@@ -169,7 +170,7 @@ Bunch* Load_init_param:: read_load_bunch()
 }
 
 ////////////////////////////////////////////
-void Load_init_param:: load_system()
+void Load_init_param::load_system()
 {
 	// int i=0;
 	//load PML parameters///
