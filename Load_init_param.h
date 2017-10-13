@@ -19,8 +19,8 @@
 #include "time.h"
 #include "particles_struct.h"
 
-#include "tinystr.h"
-#include "tinyxml.h"
+// #include "tinystr.h"
+#include "tinyxml2.h"
 #include <fstream>
 #include<iostream>
 
