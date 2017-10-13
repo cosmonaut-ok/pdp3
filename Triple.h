@@ -4,12 +4,12 @@
 class Triple
 {
 public:
-	Triple(flcuda f, flcuda s, flcuda t);
+	Triple(double f, double s, double t);
 public:
 	~Triple(void);
 
 public:
-	flcuda first;
-	flcuda second;
-	flcuda third;
+	double first;
+	double second;
+	double third;
 };

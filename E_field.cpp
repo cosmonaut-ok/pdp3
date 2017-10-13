@@ -20,47 +20,47 @@ E_field::E_field(Geometry* geom1_t): geom1(geom1_t), epsilon0(EPSILON0)
 	//Er//
 	///////////////////////////////////
 	//n_grid - number of edges
-	e1 = new flcuda*[geom1->n_grid_1-1];
+	e1 = new double*[geom1->n_grid_1-1];
 	for (int i=0; i<(geom1->n_grid_1-1);i++)
 	{
-		e1[i]= new flcuda[geom1->n_grid_2];
+		e1[i]= new double[geom1->n_grid_2];
 	}
-	e1_1d = new flcuda[(geom1->n_grid_1-1)*geom1->n_grid_2];
+	e1_1d = new double[(geom1->n_grid_1-1)*geom1->n_grid_2];
 	///////////////////////////////////
 	//Ef//
-	e2 = new flcuda*[geom1->n_grid_1];
+	e2 = new double*[geom1->n_grid_1];
 
 	for (int i=0; i<(geom1->n_grid_1);i++)
 	{
-		e2[i]= new flcuda[geom1->n_grid_2];
+		e2[i]= new double[geom1->n_grid_2];
 	}
-	e2_1d = new flcuda[geom1->n_grid_1*geom1->n_grid_2];
+	e2_1d = new double[geom1->n_grid_1*geom1->n_grid_2];
 	//////////////////////////////////////
 	//Ez//
 	//////////////////////////////////////
-	e3 = new flcuda*[geom1->n_grid_1];
+	e3 = new double*[geom1->n_grid_1];
 
 	for (int i=0; i<(geom1->n_grid_1);i++)
 	{
-		e3[i]= new flcuda[geom1->n_grid_2-1];
+		e3[i]= new double[geom1->n_grid_2-1];
 	}
-	e3_1d = new flcuda[geom1->n_grid_1*(geom1->n_grid_2-1)];
+	e3_1d = new double[geom1->n_grid_1*(geom1->n_grid_2-1)];
 	//////////////////////////////////////////
 	//fi//
 	/////////////////////////////////////////
-	fi = new flcuda*[geom1->n_grid_1];
+	fi = new double*[geom1->n_grid_1];
 
 	for (int i=0; i<(geom1->n_grid_1);i++)
 	{
-		fi[i]= new flcuda[geom1->n_grid_2];
+		fi[i]= new double[geom1->n_grid_2];
 	}
 	////////////////////////////////////////
 	//charge_density//
 	///////////////////////////////////////
-	t_charge_density = new flcuda*[geom1->n_grid_1];
+	t_charge_density = new double*[geom1->n_grid_1];
 	for (int i=0; i<(geom1->n_grid_1);i++)
 	{
-		t_charge_density[i] = new flcuda[geom1->n_grid_2];
+		t_charge_density[i] = new double[geom1->n_grid_2];
 	}
 	/////////////////////////////////////
 	/////////////////////////////////////
@@ -98,7 +98,7 @@ E_field::~E_field()
 //initial E distribution//
 ////////////////////////////////////////////
 ///////////////////////////////////////////
-void E_field::set_homogeneous_efield(flcuda E1, flcuda E2, flcuda E3)
+void E_field::set_homogeneous_efield(double E1, double E2, double E3)
 {
 	////Er////
 	for(int i=0;i<(geom1->n_grid_1-1);i++)
@@ -171,16 +171,16 @@ void E_field::calc_field(H_field* h_field1,
 {
 	int i=0;
 	int k=0;
-	flcuda** j1= current1->get_j1();
-	flcuda** j2= current1->get_j2();
-	flcuda**j3= current1->get_j3();
-	flcuda koef_e = 0;
-	flcuda koef_h =0;
-	flcuda** h1 = h_field1->h1;
-	flcuda** h2 = h_field1->h2;
-	flcuda** h3 = h_field1->h3;
-	flcuda dr = geom1->dr;
-	flcuda dz = geom1->dz;
+	double** j1= current1->get_j1();
+	double** j2= current1->get_j2();
+	double**j3= current1->get_j3();
+	double koef_e = 0;
+	double koef_h =0;
+	double** h1 = h_field1->h1;
+	double** h2 = h_field1->h2;
+	double** h3 = h_field1->h3;
+	double dr = geom1->dr;
+	double dz = geom1->dz;
 
 	///////Er first[i] value////
 	for(k=1;k<(geom1->n_grid_2-1);k++)
@@ -229,14 +229,14 @@ void E_field::calc_field(H_field* h_field1, Time* time1, current* current1)
 {
 	int i=0;
 	int k=0;
-	flcuda** j1= current1->get_j1();
-	flcuda** j2= current1->get_j2();
-	flcuda**j3= current1->get_j3();
-	flcuda** h1 = h_field1->h1;
-	flcuda** h2 = h_field1->h2;
-	flcuda** h3 = h_field1->h3;
-	flcuda dr = geom1->dr;
-	flcuda dz = geom1->dz;
+	double** j1= current1->get_j1();
+	double** j2= current1->get_j2();
+	double**j3= current1->get_j3();
+	double** h1 = h_field1->h1;
+	double** h2 = h_field1->h2;
+	double** h3 = h_field1->h3;
+	double dr = geom1->dr;
+	double dz = geom1->dz;
 
 	///////Er first[i] value////
 	for(k=1;k<(geom1->n_grid_2-1);k++)
@@ -285,23 +285,23 @@ void E_field::set_fi_on_z()
 ///////////////////////////////////////////////////////////////////////////////
 void E_field::poisson_equation2(Geometry* geom1, charge_density* ro1)
 {
-	const flcuda epsilon0 = EPSILON0;
+	const double epsilon0 = EPSILON0;
 	int i=0;
 	int k=0;
-	flcuda phi0(0.0);
-	flcuda *a = new flcuda [geom1->n_grid_1];
-	flcuda *b = new flcuda [geom1->n_grid_1];
-	flcuda *c = new flcuda [geom1->n_grid_1];
-	flcuda *d = new flcuda [geom1->n_grid_1];
-	flcuda *c1 = new flcuda [geom1->n_grid_1];
-	flcuda *d1 = new flcuda [geom1->n_grid_1];
-	flcuda *phi = new flcuda [geom1->n_grid_1];
+	double phi0(0.0);
+	double *a = new double [geom1->n_grid_1];
+	double *b = new double [geom1->n_grid_1];
+	double *c = new double [geom1->n_grid_1];
+	double *d = new double [geom1->n_grid_1];
+	double *c1 = new double [geom1->n_grid_1];
+	double *d1 = new double [geom1->n_grid_1];
+	double *phi = new double [geom1->n_grid_1];
 	Fourier* four1=0;
 
-	// flcuda dr = geom1->dr;
-	flcuda dr2 = geom1->dr*geom1->dr;
+	// double dr = geom1->dr;
+	double dr2 = geom1->dr*geom1->dr;
 
-	flcuda** ro=ro1->get_ro();
+	double** ro=ro1->get_ro();
 
 	///////////////////////////////////////////////
 	//copy charge_density array in to temp array//
@@ -319,7 +319,7 @@ void E_field::poisson_equation2(Geometry* geom1, charge_density* ro1)
 
 	for (i=0;i<geom1->n_grid_1;i++)
 	{
-		four1->fast_cosine_transform((flcuda**)t_charge_density, temp, i, false);
+		four1->fast_cosine_transform((double**)t_charge_density, temp, i, false);
 		//four1->fast_fourier_transform(t_charge_density, temp, i, false);
 	}
 
@@ -333,12 +333,12 @@ void E_field::poisson_equation2(Geometry* geom1, charge_density* ro1)
 		d[0] = dr2/4.0/epsilon0*t_charge_density[0][k];
 		for (i = 1; i < geom1->n_grid_1 -1; i++)
 		{
-			a[i] = (1.0 - 1.0/2.0/(flcuda)i);
+			a[i] = (1.0 - 1.0/2.0/(double)i);
 			b[i] = -2.0 + 2.0*(cos(PI*k/(geom1->n_grid_2-1)) - 1)*geom1->dr*geom1->dr/(geom1->dz*geom1->dz);
 			//b[i] = -2.0 + 2.0*(cos(PI*k/geom1->n_grid_2) - 1)/(geom1->dz*geom1->dz);
-			c[i] = (1.0 + 1.0/2.0/(flcuda)i);
+			c[i] = (1.0 + 1.0/2.0/(double)i);
 			d[i] = t_charge_density[i][k]*dr2/epsilon0;
-			c1[i] = (1.0 - 1.0/2.0/(flcuda)i);
+			c1[i] = (1.0 - 1.0/2.0/(double)i);
 			d1[i] = t_charge_density[i][k]*dr2/epsilon0;
 		}
 		a[0] = 0;
@@ -358,7 +358,7 @@ void E_field::poisson_equation2(Geometry* geom1, charge_density* ro1)
 	for (i=0;i<geom1->n_grid_1;i++)
 	{
 		int temp=geom1->n_grid_2;
-		four1->fast_cosine_transform((flcuda**)fi, temp,i, true);
+		four1->fast_cosine_transform((double**)fi, temp,i, true);
 		//four1->fast_fourier_transform(fi, temp,i, true);
 	}
 ////////////////////////////////////////////////////////////
@@ -390,10 +390,10 @@ void E_field::poisson_equation2(Geometry* geom1, charge_density* ro1)
 }
 /////////////////////////////////////////////////////////////
 
-void E_field::TridiagonalSolve(const flcuda *a,
-                               const flcuda *b,
-                               flcuda *c,
-                               flcuda *d, flcuda *x,
+void E_field::TridiagonalSolve(const double *a,
+                               const double *b,
+                               double *c,
+                               double *d, double *x,
                                unsigned int n)
 {
 	int i;
@@ -402,7 +402,7 @@ void E_field::TridiagonalSolve(const flcuda *a,
 	c[0] /= b[0];				/* Division by zero risk. */
 	d[0] /= b[0];				/* Division by zero would imply a singular matrix. */
 	for(int i = 1; i < n; i++){
-		flcuda id = (b[i] - c[i-1] * a[i]);	/* Division by zero risk. */
+		double id = (b[i] - c[i-1] * a[i]);	/* Division by zero risk. */
 		c[i] /= id;				/* Last value calculated is redundant. */
 		d[i] = (d[i] - d[i-1] * a[i])/id;
 	}
@@ -415,23 +415,23 @@ void E_field::TridiagonalSolve(const flcuda *a,
 
 ////////////////////////////////////////////////////////////
 	//function for electric field weighting//
-Triple E_field::get_field(flcuda x1, flcuda x3)
+Triple E_field::get_field(double x1, double x3)
 {
 	int i_r=0;	// number of particle i cell
 	int k_z=0;	// number of particle k cell
 
-	// flcuda PI = 3.1415926535897932;
-	flcuda dr = geom1->dr;
-	flcuda dz = geom1->dz;
-	flcuda r1, r2, r3; // temp variables for calculation
-	flcuda dz1, dz2;	 //	 temp var.: width of k and k+1 cell
-	flcuda er =0;
-	flcuda efi =0;
-	flcuda ez =0;
-	flcuda vol_1 =0; //	 volume of i cell; Q/V, V - volume of elementary cell
-	flcuda vol_2 =0; //	 volume of i+1 cell;
+	// double PI = 3.1415926535897932;
+	double dr = geom1->dr;
+	double dz = geom1->dz;
+	double r1, r2, r3; // temp variables for calculation
+	double dz1, dz2;	 //	 temp var.: width of k and k+1 cell
+	double er =0;
+	double efi =0;
+	double ez =0;
+	double vol_1 =0; //	 volume of i cell; Q/V, V - volume of elementary cell
+	double vol_2 =0; //	 volume of i+1 cell;
 
-	// flcuda value =0;
+	// double value =0;
 ////////////////////////
 	r1 = x1-0.5*dr;
 	r3 = x1+0.5*dr;
@@ -536,13 +536,13 @@ Triple E_field::get_field(flcuda x1, flcuda x3)
 
 	return components;
 }
-flcuda accur =1e-12;
+double accur =1e-12;
 
 ///////////////////////////////////////////////
 
 ///////Return one dimensional field components///////////
 
-flcuda* E_field::get_1d_e1()
+double* E_field::get_1d_e1()
 {
 	//copy 2d field array into 1d array rowwise
 	for (int i = 0; i < geom1->n_grid_1 - 1; i++)
@@ -551,7 +551,7 @@ flcuda* E_field::get_1d_e1()
 	return e1_1d;
 }
 
-flcuda* E_field::get_1d_e2()
+double* E_field::get_1d_e2()
 {
 	//copy 2d field array into 1d array rowwise
 	for (int i = 0; i < geom1->n_grid_1; i++)
@@ -560,7 +560,7 @@ flcuda* E_field::get_1d_e2()
 	return e2_1d;
 }
 
-flcuda* E_field::get_1d_e3()
+double* E_field::get_1d_e3()
 {
 	//copy 2d field array into 1d array rowwise
 	for (int i = 0; i < geom1->n_grid_1; i++)

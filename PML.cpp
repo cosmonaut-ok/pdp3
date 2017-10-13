@@ -5,8 +5,8 @@ PML::PML(void)
 {
 }
 
-PML::PML(flcuda comp_l_1, flcuda comp_l_2, flcuda comp_l_3,
-				 flcuda sigma1_t, flcuda sigma2_t)
+PML::PML(double comp_l_1, double comp_l_2, double comp_l_3,
+				 double sigma1_t, double sigma2_t)
 {
 	comparative_l_1 = comp_l_1; // lenhgt sigma on left wall
 	comparative_l_2 = comp_l_2; //  lenhgt sigma on right_wall
@@ -39,13 +39,13 @@ void PML::calc_sigma(Geometry* geom1)
 //////////////////////////////////////////
 
   // defining lenght of sigma calculation ion left wall//
-	flcuda lenght_sigma_left =geom1->dz * (floor(geom1->n_grid_2*comparative_l_1));
+	double lenght_sigma_left =geom1->dz * (floor(geom1->n_grid_2*comparative_l_1));
 
 	// defining lenght of sigma calculation on right wall//
-	flcuda lenght_sigma_right =geom1->dz * (floor(geom1->n_grid_2*comparative_l_2));
+	double lenght_sigma_right =geom1->dz * (floor(geom1->n_grid_2*comparative_l_2));
 
 // defining lenght of sigma calculation on right wall//
-	flcuda lenght_sigma_extern =geom1->dr * (floor(geom1->n_grid_1*comparative_l_3));
+	double lenght_sigma_extern =geom1->dr * (floor(geom1->n_grid_1*comparative_l_3));
 
 /////////////////////////////////////////////////////////////////////////////////
 	//if pml is only on z walll//
