@@ -46,17 +46,17 @@ distribution.
 
 
 /*
-   TiXmlString is an emulation of a subset of the std::string template.
-   Its purpose is to allow compiling TinyXML on compilers with no or poor STL support.
-   Only the member functions relevant to the TinyXML project have been implemented.
-   The buffer allocation is made by a simplistic power of 2 like mechanism : if we increase
-   a string and there's no more room, we allocate a buffer twice as big as we need.
+	 TiXmlString is an emulation of a subset of the std::string template.
+	 Its purpose is to allow compiling TinyXML on compilers with no or poor STL support.
+	 Only the member functions relevant to the TinyXML project have been implemented.
+	 The buffer allocation is made by a simplistic power of 2 like mechanism : if we increase
+	 a string and there's no more room, we allocate a buffer twice as big as we need.
 */
 class TiXmlString
 {
-  public :
+public :
 	// The size type used
-  	typedef size_t size_type;
+	typedef size_t size_type;
 
 	// Error value for find primitive
 	static const size_type npos; // = -1;
@@ -95,14 +95,14 @@ class TiXmlString
 	}
 
 	TiXmlString& operator = (const char * copy)
-	{
-		return assign( copy, (size_type)strlen(copy));
-	}
+		{
+			return assign( copy, (size_type)strlen(copy));
+		}
 
 	TiXmlString& operator = (const TiXmlString & copy)
-	{
-		return assign(copy.start(), copy.length());
-	}
+		{
+			return assign(copy.start(), copy.length());
+		}
 
 
 	// += operator. Maps to append
@@ -170,7 +170,7 @@ class TiXmlString
 
 		for (const char* p = c_str() + offset; *p != '\0'; ++p)
 		{
-		   if (*p == tofind) return static_cast< size_type >( p - c_str() );
+			if (*p == tofind) return static_cast< size_type >( p - c_str() );
 		}
 		return npos;
 	}
@@ -186,7 +186,7 @@ class TiXmlString
 	}
 
 	/*	Function to reserve a big amount of data when we know we'll need it. Be aware that this
-		function DOES NOT clear the content of the TiXmlString if any exists.
+			function DOES NOT clear the content of the TiXmlString if any exists.
 	*/
 	void reserve (size_type cap);
 
@@ -201,7 +201,7 @@ class TiXmlString
 		other.rep_ = r;
 	}
 
-  private:
+private:
 
 	void init(size_type sz) { init(sz, sz); }
 	void set_size(size_type sz) { rep_->str[ rep_->size = sz ] = '\0'; }
@@ -224,7 +224,7 @@ class TiXmlString
 			// to the normal allocation, although use an 'int' for systems
 			// that are overly picky about structure alignment.
 			const size_type bytesNeeded = sizeof(Rep) + cap;
-			const size_type intsNeeded = ( bytesNeeded + sizeof(int) - 1 ) / sizeof( int ); 
+			const size_type intsNeeded = ( bytesNeeded + sizeof(int) - 1 ) / sizeof( int );
 			rep_ = reinterpret_cast<Rep*>( new int[ intsNeeded ] );
 
 			rep_->str[ rep_->size = sz ] = '\0';
@@ -254,8 +254,8 @@ class TiXmlString
 
 inline bool operator == (const TiXmlString & a, const TiXmlString & b)
 {
-	return    ( a.length() == b.length() )				// optimization on some platforms
-	       && ( strcmp(a.c_str(), b.c_str()) == 0 );	// actual compare
+	return		( a.length() == b.length() )				// optimization on some platforms
+				 && ( strcmp(a.c_str(), b.c_str()) == 0 );	// actual compare
 }
 inline bool operator < (const TiXmlString & a, const TiXmlString & b)
 {
@@ -263,7 +263,7 @@ inline bool operator < (const TiXmlString & a, const TiXmlString & b)
 }
 
 inline bool operator != (const TiXmlString & a, const TiXmlString & b) { return !(a == b); }
-inline bool operator >  (const TiXmlString & a, const TiXmlString & b) { return b < a; }
+inline bool operator >	(const TiXmlString & a, const TiXmlString & b) { return b < a; }
 inline bool operator <= (const TiXmlString & a, const TiXmlString & b) { return !(b < a); }
 inline bool operator >= (const TiXmlString & a, const TiXmlString & b) { return !(a < b); }
 
@@ -278,8 +278,8 @@ TiXmlString operator + (const char* a, const TiXmlString & b);
 
 
 /*
-   TiXmlOutStream is an emulation of std::ostream. It is based on TiXmlString.
-   Only the operators that we need for TinyXML have been developped.
+	 TiXmlOutStream is an emulation of std::ostream. It is based on TiXmlString.
+	 Only the operators that we need for TinyXML have been developped.
 */
 class TiXmlOutStream : public TiXmlString
 {

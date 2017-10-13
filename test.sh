@@ -120,6 +120,11 @@ for i in `find . -type f`; do
 done
 
 if [ "$success" == "false" ]; then
+    echo
     echo "Test failed. Generated data is not match control data"
     exit 1
+else
+    echo
+    echo "Test passed."
+    exit 0
 fi
