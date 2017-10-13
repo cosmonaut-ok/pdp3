@@ -1,6 +1,9 @@
 #include "Poisson.h"
+#include "Constant.h"
 
-Poisson::Poisson(Geometry*cyl_geom_t):cyl_geom(cyl_geom_t),epsilon0(8.85E-12)
+const double EPSILON0 = constant::EPSILON0;
+
+Poisson::Poisson(Geometry*cyl_geom_t):cyl_geom(cyl_geom_t),epsilon0(EPSILON0)
 {
 }
 

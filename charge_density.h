@@ -1,5 +1,5 @@
 #pragma once
-#include"Geometry.h"
+#include "Geometry.h"
 
 class charge_density
 {
@@ -10,8 +10,8 @@ public:
 	charge_density(void);
 	charge_density(Geometry* geom1_t);
 	void reset_rho();
-	
+
 	~charge_density(void);
 protected:
-		flcuda** ro;
+	flcuda** ro;
 };
