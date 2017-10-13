@@ -11,10 +11,10 @@ charge_density::charge_density(Geometry* geom1_t): geom1(geom1_t)
 {
 	///////////////////////////////////////
 
-	ro = new flcuda*[geom1->n_grid_1];
+	ro = new double*[geom1->n_grid_1];
 	for (int i=0; i<(geom1->n_grid_1);i++)
 	{
-		ro[i]= new flcuda[geom1->n_grid_2];
+		ro[i]= new double[geom1->n_grid_2];
 	}
 	///////////////////////////////////////
 
@@ -38,12 +38,12 @@ charge_density::~charge_density(void)
 
 /////////////////////////////////////////////
 
-flcuda** charge_density::get_ro() const
+double** charge_density::get_ro() const
 {
 	return ro;
 }
 
-void charge_density::set_ro_weighting(int i, int k, flcuda value)
+void charge_density::set_ro_weighting(int i, int k, double value)
 {
 	ro[i][k]=ro[i][k]+value;
 }

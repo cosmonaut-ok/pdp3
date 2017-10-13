@@ -9,7 +9,7 @@ public:
 	Poisson(Geometry* cyl_geom);
 	~Poisson(void);
 public:
-	const flcuda epsilon0;
+	const double epsilon0;
 	Geometry* cyl_geom;
 public:
 	virtual void poisson_solve(E_field* input_e, charge_density* ro1)=0;

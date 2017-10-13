@@ -18,7 +18,6 @@
 #include "Bunch.h"
 #include "time.h"
 #include "particles_struct.h"
-#include "system_host.cuh"
 
 #include "tinystr.h"
 #include "tinyxml.h"

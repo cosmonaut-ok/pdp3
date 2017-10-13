@@ -1,33 +1,33 @@
 #ifndef __PARTICLESSTRUCTH__
 #define __PARTICLESSTRUCTH__
 
-typedef double flcuda;
+// typedef double double;
 
 //#define BUILD_OPENCL
 
 struct Particles_struct
 {
 	// The specie charge
-	flcuda charge;
+	double charge;
 	// The specie mass
-	flcuda mass;
+	double mass;
 	// Number of particles
 	int number;
 	// Particles' coordinates
-	//flcuda* x1;	 //r
-	//flcuda* x3;	 //z
+	//double* x1;	 //r
+	//double* x3;	 //z
 	//// Particles' velocity
-	//flcuda* v1; //vr
-	//flcuda* v2; //vphi
-	//flcuda* v3; //vz
+	//double* v1; //vr
+	//double* v2; //vphi
+	//double* v3; //vz
 
 	//indicator if particle is still alive
 	bool* is_alive;
 	int grid_num1;
 	int grid_num3;
 
-	flcuda dr;
-	flcuda dz;
+	double dr;
+	double dz;
 };
 
 struct Particle
@@ -40,12 +40,12 @@ struct Particle
 	bool is_active;
 };
 
-Particles_struct CreateParticles_struct(flcuda charge,
-                                        flcuda mass,
+Particles_struct CreateParticles_struct(double charge,
+                                        double mass,
                                         int number,
                                         int grid_num1,
                                         int grid_num3,
-                                        flcuda dr,
-                                        flcuda dz);
+                                        double dr,
+                                        double dz);
 
 #endif

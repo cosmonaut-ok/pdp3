@@ -117,16 +117,16 @@ void particles_list::create_coord_arrays(void)
 {
 	//creates arrays for storing old particles coordinates
 	int kinds_number = part_list.size();
-	x1_old = new flcuda* [kinds_number];
+	x1_old = new double* [kinds_number];
 	for(int k=0;k<kinds_number;k++)
 	{
-		x1_old[k]= new flcuda[part_list[k]->number];
+		x1_old[k]= new double[part_list[k]->number];
 	}
 
-	x3_old = new flcuda* [kinds_number];
+	x3_old = new double* [kinds_number];
 	for(int k=0;k<kinds_number;k++)
 	{
-		x3_old[k]= new flcuda[part_list[k]->number];
+		x3_old[k]= new double[part_list[k]->number];
 	}
 	for(int k=0;k<kinds_number;k++)
 		for(int i=0;i<part_list[k]->number;i++)

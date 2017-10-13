@@ -20,7 +20,7 @@ input_output_class::~input_output_class(void)
 }
 
 void input_output_class::out_data(char const *comp_name,
-                                  flcuda** out_value,
+                                  double** out_value,
                                   int step_number,
                                   int number,
                                   int r_step,
@@ -67,7 +67,7 @@ void input_output_class::out_data(char const *comp_name,
 	out_val.close();
 }
 void input_output_class::out_field_dump(char* comp_name,
-                                        flcuda** out_value,
+                                        double** out_value,
                                         int r_step,
                                         int z_step)
 {
@@ -91,8 +91,8 @@ void input_output_class::out_field_dump(char* comp_name,
 
 /////
 void input_output_class::out_coord(char* comp_name,
-                                   flcuda* coord_r,
-                                   flcuda* coord_z,
+                                   double* coord_r,
+                                   double* coord_z,
                                    int step_number,
                                    int number,
                                    int particles_number)
@@ -139,8 +139,8 @@ void input_output_class::out_coord(char* comp_name,
 }
 
 void input_output_class::out_coord_dump(char* comp_name ,
-                                        flcuda* coord_r,
-                                        flcuda* coord_z,
+                                        double* coord_r,
+                                        double* coord_z,
                                         int particles_number)
 {
 	char st_name[100] ;
@@ -161,9 +161,9 @@ void input_output_class::out_coord_dump(char* comp_name ,
 }
 
 void input_output_class:: out_velocity_dump(char* comp_name,
-                                            flcuda* v1,
-                                            flcuda* v2,
-                                            flcuda* v3,
+                                            double* v1,
+                                            double* v2,
+                                            double* v3,
                                             int particles_number)
 {
 	char st_name[100] ;
