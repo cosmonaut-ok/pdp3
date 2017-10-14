@@ -33,7 +33,6 @@ int main(int argc, char **argv)
 	double time_elapsed;
 	Load_init_param init_param((char *) "parameters.xml");
 
-	printf("Loaded parameters. Launching Run...\n");
 	init_param.Run();
 
 	PML pml1(0.0,0.0, 0.0, 0.000001, 0.07);
@@ -192,7 +191,6 @@ int main(int argc, char **argv)
 		if	((((int)(time1.current_time/time1.delta_t))%100==0))
 			//if	( abs(time1.current_time - time1.end_time + time1.delta_t) < 1e-13)
 		{
-			cout<<time1.current_time<<" ";
 			electron_bunch.charge_weighting(&rho_beam);
 			//rho_old.reset_rho();
 			//electrons.charge_weighting(&rho_old);
