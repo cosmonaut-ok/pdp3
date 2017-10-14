@@ -18,6 +18,7 @@ set(SOURCE_FILES
     Bunch.h
     charge_density.cpp
     charge_density.h
+    Constant.h
     current.cpp
     current.h
     E_field.cpp
