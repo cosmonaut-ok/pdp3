@@ -13,7 +13,8 @@ using namespace tinyxml2;
 #define GEOMETRY_PARAMS_NAME "geometry"
 #define TIME_PARAMS_NAME "Time"
 #define PARTICLES_PARAMS_NAME "Particles"
-#define BUNCH_PARAMS_NAME "Inject_Particles"
+#define BUNCH_PARAMS_NAME "Particles_bunch"
+#define BOUNDARY_MAXWELL_PARAMS_NAME "Boundary_Maxwell_conditions"
 
 Load_init_param::Load_init_param(void)
 {
@@ -23,7 +24,7 @@ Load_init_param::Load_init_param(char* xml_file_name)
 {
 		// NOTE: all system init is too huge, so
 		// so we use several "subconstructors"
-		// to initialize different parts of system
+		// to initialise different parts of system
 
 	// read XML config file
 	read_xml (xml_file_name);
@@ -48,9 +49,7 @@ Load_init_param::Load_init_param(char* xml_file_name)
 	c_bunch = init_bunch();
 
 	//Maxwell initial conditions///
-	double * r_params = read_double_params("Boundary_Maxwell_conditions");
-	Boundary_Maxwell_conditions maxwell_rad(efield);
-	maxwell_rad.specify_initial_field(c_geom,r_params[0],r_params[1],r_params[2]);
+	init_boundary_maxwell();
 
 	// creating rho and current arrays
 	c_rho_new = new charge_density(c_geom);
@@ -60,7 +59,7 @@ Load_init_param::Load_init_param(char* xml_file_name)
 
 	// boundary conditions
 	char* a = read_char("Boundary_conditions");
-	if (get_int_value(a)==0)
+	if (atoi(a)==0)
 	{
 		p_list->charge_weighting(c_rho_new);
 		Fourier four1(0);
@@ -78,6 +77,8 @@ Load_init_param::Load_init_param(char* xml_file_name)
 	//	KernAccessor *kern_access = new KernAccessor(c_geom->n_grid_1, c_geom->n_grid_2);
 	//	kern_access_global = kern_access;
 	//
+
+	cout << "Initialisation complete\n";
 }
 
 Load_init_param::~Load_init_param(void)
@@ -98,19 +99,6 @@ void Load_init_param::read_xml(const char* xml_file_name)
 	}
 }
 
-int Load_init_param:: get_int_value(const char* r_str)
-{
-	int i =0;
-	i = atoi(r_str);
-	return i;
-}
-
-double Load_init_param:: get_double_value(const char* r_str)
-{
-	double i = atof(r_str);
-	return i;
-}
-
 char* Load_init_param:: read_char(char* p_name)
 {
 	int number = 0;
@@ -122,33 +110,7 @@ char* Load_init_param:: read_char(char* p_name)
 	return vul_arr;
 }
 
-double* Load_init_param::read_double_params(const char* p_name)
-{
-	int number = 0;
-	XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
-	XMLElement* sub_root = root->FirstChildElement (p_name);
-	XMLElement* read_elem = sub_root->FirstChildElement ();
-	while(read_elem)
-	{
-		read_elem = read_elem->NextSiblingElement();
-		number++;
-	}
-	double* vul_arr = new double [number];
-	for (int i=0;i<(number);i++)
-		read_elem =sub_root->FirstChildElement ();
-
-	// TODO: here is linux segfault got
-	for(int i=0;i<(number);i++)
-	{
-		vul_arr[i] = get_double_value(read_elem->GetText());
-		read_elem=read_elem->NextSiblingElement();
-	}
-	// /TODO: here is linux segfault got
-	return vul_arr;
-}
-///////////////////////////////////////////
-
-void Load_init_param:: init_particles()
+void Load_init_param::init_particles()
 {
 	const char* p_king_section_name = "particle_kind";
 	XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
@@ -170,7 +132,7 @@ void Load_init_param:: init_particles()
 	while(particle_kind)
 	{
 		strcpy (p_name,particle_kind->FirstChildElement("name")->GetText());
-		cout << "Initializing " << p_name << " data\n";
+		cout << "Initialising " << p_name << " data\n";
 
 		charge = atof(particle_kind->FirstChildElement("charge")->GetText());
 		mass = atof(particle_kind->FirstChildElement("mass")->GetText());
@@ -195,29 +157,69 @@ void Load_init_param:: init_particles()
 
 	return;
 }
-/////////////////////////////////////////
 
-Bunch* Load_init_param:: init_bunch()
+Bunch* Load_init_param::init_bunch()
 {
-	int number = 0;
+	// initialise particles bunch data
 	XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
 	XMLElement* sub_root =root->FirstChildElement (BUNCH_PARAMS_NAME);
-	double* params= 0;
+	cout << "Initialising particle bunch data\n";
+	Bunch* prtls = 0;
 	char* p_name= new char [50];
-	Bunch* prtls =0;
+	strcpy (p_name, sub_root->FirstChildElement("name")->GetText());
+	double charge = atof(sub_root->
+                         FirstChildElement("charge")->
+                         GetText());
+	double mass = atof(sub_root->
+                         FirstChildElement("mass")->
+                         GetText());
+	double number = atof(sub_root->
+                         FirstChildElement("number")->
+                         GetText());
+  double duration = atof(sub_root->
+                          FirstChildElement("duration")->
+                          GetText());
+	double radius = atof(sub_root->
+                          FirstChildElement("radius")->
+                          GetText());
+	double density = atof(sub_root->
+                          FirstChildElement("density")->
+                          GetText());
+	double initial_velocity = atof(sub_root->
+                          FirstChildElement("initial_velocity")->
+                          GetText());
 
-	const char* test = sub_root->GetText();
-	strcpy (p_name,sub_root->GetText());
-	params = read_double_params(p_name);
+	prtls = new Bunch(p_name,charge,mass,number,c_geom, p_list,duration,radius);
 
-	prtls = new Bunch(p_name,params[0],params[1],params[2],c_geom, p_list,params[3],params[4]);
-	prtls->calc_init_param(params[5],params[6]);
+	// prtls = new Bunch(p_name,params[0],params[1],params[2],c_geom, p_list,params[3],params[4]);
+	prtls->calc_init_param(density, initial_velocity);
 
 	return prtls;
 }
 
+void Load_init_param::init_boundary_maxwell ()
+{
+	cout << "Initialising bounrary maxwell conditions data\n";
+	XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
+	XMLElement* sub_root =root->FirstChildElement (BOUNDARY_MAXWELL_PARAMS_NAME);
+	//
+	double e_fi_upper = atof(sub_root->
+                          FirstChildElement("e_fi_upper")->
+                          GetText());
+	double e_fi_left = atof(sub_root->
+                          FirstChildElement("e_fi_left")->
+                          GetText());
+	double e_fi_right = atof(sub_root->
+                           FirstChildElement("e_fi_right")->
+                           GetText());
+
+	Boundary_Maxwell_conditions maxwell_rad(efield);
+	maxwell_rad.specify_initial_field(c_geom, e_fi_upper, e_fi_left, e_fi_right);
+}
+
 void Load_init_param::init_pml ()
 {
+	cout << "Initialising PML data\n";
 	XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
 	XMLElement* sub_root =root->FirstChildElement (PML_PARAMS_NAME);
 	//
@@ -275,6 +277,7 @@ void Load_init_param::init_fields ()
 
 void Load_init_param::init_time ()
 {
+	cout << "Initialising time data\n";
 	XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
 	XMLElement* sub_root =root->FirstChildElement (TIME_PARAMS_NAME);
 	//

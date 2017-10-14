@@ -35,8 +35,6 @@ public:
 	~Load_init_param(void);
 
 public:
-	int get_int_value(const char* r_str);
-	double get_double_value(const char* r_str);
 	char* read_char(char* p_name);
 	double* read_double_params(const char* p_name);
 	bool SaveSystemState(void);
@@ -65,6 +63,7 @@ private:
 	void init_geometry ();
 	void init_fields ();
 	void init_time ();
-	void init_particles();
+	void init_particles ();
+	void init_boundary_maxwell ();
 	Bunch* init_bunch();
 };
