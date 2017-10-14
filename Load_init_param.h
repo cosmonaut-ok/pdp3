@@ -25,28 +25,22 @@
 #include<iostream>
 
 using namespace std;
+using namespace tinyxml2;
 
 class Load_init_param
 {
 public:
 	Load_init_param(void);
-	Load_init_param(char* xml_file_l);
+	Load_init_param(char* xml_file_name);
 	~Load_init_param(void);
+
 public:
-	void read_xml( );
-	int get_int_value(const char* r_str);
-	double get_double_value(const char* r_str);
 	char* read_char(char* p_name);
 	double* read_double_params(const char* p_name);
-	void read_load_particles();
-	Bunch*  read_load_bunch();
-	void load_system();
-	bool SaveSystemState(void);
-	void Run(void);
+	bool save_system_state(void);
+	void run(void);
 
 public:
-	char* xml_file;
-
 	PML * c_pml;
 	Geometry * c_geom;
 	Time * c_time;
@@ -60,4 +54,16 @@ public:
 	charge_density * c_rho_old;
 	charge_density * c_rho_beam;
 	current * c_current;
+	XMLDocument* xml_data;
+	int testnumber;
+
+private:
+	void read_xml(const char* xml_file_name);
+	void init_pml ();
+	void init_geometry ();
+	void init_fields ();
+	void init_time ();
+	void init_particles ();
+	void init_boundary_maxwell ();
+	Bunch* init_bunch();
 };
