@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -85,6 +85,9 @@
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)/lib/tinyxml2</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
@@ -96,7 +99,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(AMDAPPSDKROOT)/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\WORK\PDP3\PDP3\pdp3\lib\tinyxml2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -106,6 +109,7 @@
       </DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
       <AdditionalDependencies>$(AMDAPPSDKROOT)/lib/x86/OpenCL.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\WORK\PDP3\PDP3\pdp3\lib\tinyxml2;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -118,7 +122,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(AMDAPPSDKROOT)/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\WORK\PDP3\PDP3\pdp3\lib\tinyxml2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -127,6 +131,7 @@
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <AdditionalDependencies>$(AMDAPPSDKROOT)/lib/x86/OpenCL.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\WORK\PDP3\PDP3\pdp3\lib\tinyxml2;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -137,6 +142,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>C:\WORK\PDP3\PDP3\pdp3\lib\tinyxml2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -147,6 +153,7 @@
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalLibraryDirectories>C:\WORK\PDP3\PDP3\pdp3\lib\tinyxml2;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -157,6 +164,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>C:\WORK\PDP3\PDP3\pdp3\lib\tinyxml2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -166,6 +174,8 @@
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
+      <AdditionalLibraryDirectories>$(SolutionDir)\bin\tinyxml2\x64-Release-Lib;$(SolutionDir)\lib\tinyxml2;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>tinyxml2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -205,6 +215,7 @@
     <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="H_field.cpp" />
     <ClCompile Include="input_output_class.cpp" />
+    <ClCompile Include="lib\tinyxml2\tinyxml2.cpp" />
     <ClCompile Include="Load_init_param.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Particles.cpp" />
@@ -215,10 +226,6 @@
     <ClCompile Include="Poisson_neumann.cpp" />
     <ClCompile Include="Test_class.cpp" />
     <ClCompile Include="Time.cpp" />
-    <ClCompile Include="tinystr.cpp" />
-    <ClCompile Include="tinyxml.cpp" />
-    <ClCompile Include="tinyxmlerror.cpp" />
-    <ClCompile Include="tinyxmlparser.cpp" />
     <ClCompile Include="Triple.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -237,6 +244,7 @@
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="H_field.h" />
     <ClInclude Include="input_output_class.h" />
+    <ClInclude Include="lib\tinyxml2\tinyxml2.h" />
     <ClInclude Include="Load_init_param.h" />
     <ClInclude Include="Particles.h" />
     <ClInclude Include="particles_list.h" />
@@ -249,8 +257,6 @@
     <ClInclude Include="resource1.h" />
     <ClInclude Include="Test_class.h" />
     <ClInclude Include="Time.h" />
-    <ClInclude Include="tinystr.h" />
-    <ClInclude Include="tinyxml.h" />
     <ClInclude Include="Triple.h" />
     <ClInclude Include="wrapper.h" />
   </ItemGroup>
