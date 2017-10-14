@@ -22,12 +22,12 @@ cat<<EOF>${TESTDIR}/parameters.xml
     <comparative_l_1>0</comparative_l_1>
     <comparative_l_2> 0 </comparative_l_2>
     <comparative_l_3> 0 </comparative_l_3>
-    <Sigma_1> 0.00001 </Sigma_1>
-    <Sigma_2> 0.07 </Sigma_2>
+    <sigma_1> 0.00001 </sigma_1>
+    <sigma_2> 0.07 </sigma_2>
   </PML>
 
   <Time>
-    <Start_time> 0 </Start_time>
+    <start_time> 0 </start_time>
     <relaxation_time> 0 </relaxation_time>
     <current_time> 0 </current_time>
     <end_time>2.2e-11</end_time>

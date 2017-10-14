@@ -8,37 +8,93 @@
 using namespace tinyxml2;
 
 #define INITIAL_PARAMS_NAME "Initial_parameters"
-
+#define PML_PARAMS_NAME "PML"
+#define GEOMETRY_PARAMS_NAME "geometry"
+#define TIME_PARAMS_NAME "Time"
+#define PARTICLES_PARAMS_NAME "Particles"
 
 Load_init_param::Load_init_param(void)
 {
 }
 
-Load_init_param::Load_init_param(char* xml_file_l):xml_file(xml_file_l)
+Load_init_param::Load_init_param(char* xml_file_name)
 {
-	cout << "Reading configuration file ``" << xml_file_l << "``\n";
+		// NOTE: all system init is too huge, so
+		// so we use several "subconstructors"
+		// to initialize different parts of system
 
-	xml_data = new XMLDocument(true, COLLAPSE_WHITESPACE);
+	cout << "Reading configuration file ``" << xml_file_name << "``\n";
+	// read XML config file
+	read_xml (xml_file_name);
 
-	XMLError e_result = xml_data->LoadFile(xml_file_l);
-	if (e_result != XML_SUCCESS)
+	// load PML parameters
+	init_pml ();
+
+	// load Geometry parameters
+	init_geometry ();
+
+	// creating field objects
+	init_fields ();
+
+	// load time parameters
+	init_time ();
+
+	// load particle parameters
+	p_list = new particles_list(0);
+	read_load_particles();
+
+	// load bunch
+	c_bunch = read_load_bunch();
+
+	//Maxwell initial conditions///
+	double * r_params = read_double_params("Boundary_Maxwell_conditions");
+	Boundary_Maxwell_conditions maxwell_rad(efield);
+	maxwell_rad.specify_initial_field(c_geom,r_params[0],r_params[1],r_params[2]);
+
+	// creating rho and current arrays
+	c_rho_new = new charge_density(c_geom);
+	c_rho_old = new charge_density (c_geom);
+	c_rho_beam = new charge_density (c_geom);
+	c_current = new current(c_geom);
+
+	// boundary conditions
+	char* a = read_char("Boundary_conditions");
+	if (get_int_value(a)==0)
 	{
-		cerr << "Can not read configuration file ``" << xml_file_l << "``\n";
-		exit (78);
+		p_list->charge_weighting(c_rho_new);
+		Fourier four1(0);
+		Poisson_dirichlet dirih(c_geom);
+		dirih.poisson_solve(efield, c_rho_new);
 	}
+
+	// load File Path
+	char* path_res	=	 read_char("PathtoResult");
+	char* path_dump	 =	read_char("PathtoSaveState");
+	c_io_class	= new input_output_class (path_res , path_dump);
+
+	//////////////////////////////////////////////////
+
+	//	KernAccessor *kern_access = new KernAccessor(c_geom->n_grid_1, c_geom->n_grid_2);
+	//	kern_access_global = kern_access;
+	//
 }
 
 Load_init_param::~Load_init_param(void)
 {
 }
 
-void Load_init_param::read_xml()
+void Load_init_param::read_xml(const char* xml_file_name)
 {
-	XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
-	XMLElement* sub_root = root->FirstChildElement ("geometry");
-	char test [30];
-	XMLElement* ss_root = sub_root->FirstChildElement();
-	const char* a = ss_root->GetText();
+	cout << "Reading configuration file ``" << xml_file_name << "``\n";
+
+	xml_data = new XMLDocument(true, COLLAPSE_WHITESPACE);
+
+	XMLError e_result = xml_data->LoadFile(xml_file_name);
+	if (e_result != XML_SUCCESS)
+	{
+		cerr << "Can not read configuration file ``" << xml_file_name << "``\n";
+		exit (78);
+	}
 }
 
 int Load_init_param:: get_int_value(const char* r_str)
@@ -132,87 +188,91 @@ Bunch* Load_init_param:: read_load_bunch()
 	prtls = new Bunch(p_name,params[0],params[1],params[2],c_geom, p_list,params[3],params[4]);
 	prtls->calc_init_param(params[5],params[6]);
 
-	return	 prtls;
+	return prtls;
 }
 
-////////////////////////////////////////////
-void Load_init_param::load_system()
+void Load_init_param::init_pml ()
 {
-	// int i=0;
-	//load PML parameters///
-	///////////////////////////////////
-	double * r_params = read_double_params("PML");
-	c_pml = new PML(r_params);
+	XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
+	XMLElement* sub_root =root->FirstChildElement (PML_PARAMS_NAME);
+	//
+	double comp_l_1 = atof(sub_root->
+                         FirstChildElement("comparative_l_1")->
+                         GetText());
+	double comp_l_2 = atof(sub_root->
+                         FirstChildElement("comparative_l_2")->
+                         GetText());
+	double comp_l_3 = atof(sub_root->
+                         FirstChildElement("comparative_l_3")->
+                         GetText());
+  double sigma_1_t = atof(sub_root->
+                          FirstChildElement("sigma_1")->
+                          GetText());
+	double sigma_2_t = atof(sub_root->
+                          FirstChildElement("sigma_2")->
+                          GetText());
 
-	//load Geometry parameters///
-	/////////////////////////////////////
-	r_params = read_double_params("geometry");
-	c_geom	= new Geometry (r_params ,c_pml);
+	c_pml = new PML(comp_l_1, comp_l_2, comp_l_3, sigma_1_t, sigma_2_t);
+}
+
+void Load_init_param::init_geometry ()
+{
+	XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
+	XMLElement* sub_root =root->FirstChildElement (GEOMETRY_PARAMS_NAME);
+	//
+	double r_size = atof(sub_root->
+                       FirstChildElement("r_size")->
+                       GetText());
+	double z_size = atof(sub_root->
+                       FirstChildElement("z_size")->
+                       GetText());
+	int n_grid_r = atoi(sub_root->
+                      FirstChildElement("n_grid_r")->
+                      GetText());
+  int n_grid_z = atoi(sub_root->
+                      FirstChildElement("n_grid_z")->
+                      GetText());
+
+	// TODO: load_pml should be first. Avoid it
+	c_geom = new Geometry(r_size, z_size, n_grid_r, n_grid_z, c_pml);
 	c_geom->set_epsilon();
-	//delete r_params;
-	//////////////////////////////////////////////////
-	///////////////////////
-	///creating field objects
+}
 
+void Load_init_param::init_fields ()
+{
 	efield = new E_field(c_geom);
 	hfield = new H_field(c_geom);
 	efield->boundary_conditions();
-	efield->set_homogeneous_efield(0.0, 0.0, 0);
-	hfield->set_homogeneous_h(0.0, 0.0, 0.0);
+	efield->set_homogeneous_efield(0.0, 0.0, 0); // TODO: unhardcode
+	hfield->set_homogeneous_h(0.0, 0.0, 0.0); // TODO: unhardcode
 	efield->set_fi_on_z();
-
-	//load time parameters///
-	/////////////////////////////////////
-	r_params = read_double_params("Time");
-
-	c_time = new Time(r_params);
-
-	//load particle parameters///
-	/////////////////////////////////////
-	p_list = new particles_list(0);
-	read_load_particles();
-	//////////////////////////////////////
-
-	//load bunch///
-	/////////////////////////////////////
-	c_bunch = read_load_bunch();
-
-	//////////////////////////////////////
-	//Maxwell initial conditions///
-	r_params = read_double_params("Boundary_Maxwell_conditions");
-	Boundary_Maxwell_conditions maxwell_rad(efield);
-	maxwell_rad.specify_initial_field(c_geom,r_params[0],r_params[1],r_params[2]);
-
-	/////////////////////////////////////
-	// creating rho and current arrays
-	c_rho_new = new charge_density(c_geom);
-	c_rho_old = new charge_density (c_geom);
-	c_rho_beam = new charge_density (c_geom);
-	c_current = new current(c_geom);
-
-	////////////////////////////////////
-	// boundary conditions///
-	char* a = read_char("Boundary_conditions");
-	if (get_int_value(a)==0)
-	{
-		p_list->charge_weighting(c_rho_new);
-		Fourier four1(0);
-		Poisson_dirichlet dirih(c_geom);
-		dirih.poisson_solve(efield, c_rho_new);
-	}
-
-	//load File Path///
-	/////////////////////////////////////
-	char* path_res	=	 read_char("PathtoResult");
-	char* path_dump	 =	read_char("PathtoSaveState");
-	c_io_class	= new input_output_class (path_res , path_dump);
-
-	//////////////////////////////////////////////////
-
-	//	KernAccessor *kern_access = new KernAccessor(c_geom->n_grid_1, c_geom->n_grid_2);
-	//	kern_access_global = kern_access;
-	//
 }
+
+void Load_init_param::init_time ()
+{
+	XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
+	XMLElement* sub_root =root->FirstChildElement (TIME_PARAMS_NAME);
+	//
+	double start_time = atof(sub_root->
+                           FirstChildElement("start_time")->
+                           GetText());
+	double relaxation_time = atof(sub_root->
+                                FirstChildElement("relaxation_time")->
+                                GetText());
+  double current_time = atof(sub_root->
+                         FirstChildElement("current_time")->
+                         GetText());
+	double end_time = atof(sub_root->
+                         FirstChildElement("end_time")->
+                         GetText());
+	double delta_t = atof(sub_root->
+                        FirstChildElement("delta_t")->
+                        GetText());
+
+	c_time = new Time(current_time, start_time,
+                    relaxation_time, end_time, delta_t);
+}
+
 bool Load_init_param:: SaveSystemState()
 {
 	c_io_class->out_field_dump("e1",efield->e1,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
