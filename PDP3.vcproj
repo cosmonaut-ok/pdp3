@@ -325,6 +325,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Constant.h"
+				>
+			</File>
+			<File
 				RelativePath=".\current.h"
 				>
 			</File>
