@@ -88,7 +88,7 @@ cat<<EOF>${TESTDIR}/parameters.xml
     <time_step>100</time_step>
     <number>100</number>
   </file_save_paramters>
-  <out_folder>pdp3_result/</out_folder>
+
   <e1>true</e1>
   <e2>true</e2>
   <e3>false</e3>
