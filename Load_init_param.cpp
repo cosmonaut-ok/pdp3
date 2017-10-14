@@ -68,8 +68,8 @@ Load_init_param::Load_init_param(char* xml_file_name)
 	}
 
 	// load File Path
-	char* path_res	=	 read_char("PathtoResult");
-	char* path_dump	 =	read_char("PathtoSaveState");
+	char* path_res = read_char("PathtoResult");
+	char* path_dump = read_char("PathtoSaveState");
 	c_io_class	= new input_output_class (path_res , path_dump);
 
 	//////////////////////////////////////////////////
@@ -99,7 +99,7 @@ void Load_init_param::read_xml(const char* xml_file_name)
 	}
 }
 
-char* Load_init_param:: read_char(char* p_name)
+char* Load_init_param::read_char(char* p_name)
 {
 	int number = 0;
 	XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
@@ -301,7 +301,7 @@ void Load_init_param::init_time ()
                     relaxation_time, end_time, delta_t);
 }
 
-bool Load_init_param:: SaveSystemState()
+bool Load_init_param::save_system_state()
 {
 	c_io_class->out_field_dump("e1",efield->e1,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
 	c_io_class->out_field_dump("e2",efield->e2,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
@@ -318,8 +318,10 @@ bool Load_init_param:: SaveSystemState()
 	return true;
 }
 
-void Load_init_param:: Run(void)
+void Load_init_param::run(void)
 {
+	cout << "Launching simulation\n";
+
 	this->c_time->current_time = 0.0 ;
 	p_list->charge_weighting(c_rho_new);
 
@@ -360,7 +362,7 @@ void Load_init_param:: Run(void)
 		c_rho_new->reset_rho();
 
 		p_list->charge_weighting(c_rho_new);	//continuity equation
-		//bool res =	continuity_equation(c_time, c_geom, c_current, c_rho_old, c_rho_new);
+		//bool res = continuity_equation(c_time, c_geom, c_current, c_rho_old, c_rho_new);
 
 		if	((((int)(c_time->current_time/c_time->delta_t))%5==0))
 			//if	((((int)(c_time->current_time/c_time->delta_t)) < 10))
@@ -391,7 +393,7 @@ void Load_init_param:: Run(void)
 			step_number=step_number+1;
 			t1 = clock();
 			if	((((int)(c_time->current_time/c_time->delta_t))%1000==0)&&(step_number!=1))
-				this->SaveSystemState();
+				this->save_system_state();
 
 		}
 

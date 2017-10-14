@@ -37,8 +37,8 @@ public:
 public:
 	char* read_char(char* p_name);
 	double* read_double_params(const char* p_name);
-	bool SaveSystemState(void);
-	void Run(void);
+	bool save_system_state(void);
+	void run(void);
 
 public:
 	PML * c_pml;
