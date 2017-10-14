@@ -33,7 +33,7 @@ int main(int argc, char **argv)
 	double time_elapsed;
 	Load_init_param init_param((char *) "parameters.xml");
 
-	init_param.Run();
+	init_param.run();
 
 	PML pml1(0.0,0.0, 0.0, 0.000001, 0.07);
 	Geometry geom1(0.25,2.0, 255, 2047, &pml1);
