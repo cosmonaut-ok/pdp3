@@ -32,11 +32,8 @@ int main(int argc, char **argv)
 	clock_t start, finish;
 	double time_elapsed;
 	Load_init_param init_param((char *) "parameters.xml");
-	init_param.read_xml(); // TODO: is it works?
-	init_param.load_system();
 
-	printf("Loaded parameters. Launching Run...\n");
-	init_param.Run();
+	init_param.run();
 
 	PML pml1(0.0,0.0, 0.0, 0.000001, 0.07);
 	Geometry geom1(0.25,2.0, 255, 2047, &pml1);
@@ -194,7 +191,6 @@ int main(int argc, char **argv)
 		if	((((int)(time1.current_time/time1.delta_t))%100==0))
 			//if	( abs(time1.current_time - time1.end_time + time1.delta_t) < 1e-13)
 		{
-			cout<<time1.current_time<<" ";
 			electron_bunch.charge_weighting(&rho_beam);
 			//rho_old.reset_rho();
 			//electrons.charge_weighting(&rho_old);
