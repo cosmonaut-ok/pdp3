@@ -16,6 +16,16 @@ Load_init_param::Load_init_param(void)
 
 Load_init_param::Load_init_param(char* xml_file_l):xml_file(xml_file_l)
 {
+	cout << "Reading configuration file ``" << xml_file_l << "``\n";
+
+	xml_data = new XMLDocument(true, COLLAPSE_WHITESPACE);
+
+	XMLError e_result = xml_data->LoadFile(xml_file_l);
+	if (e_result != XML_SUCCESS)
+	{
+		cerr << "Can not read configuration file ``" << xml_file_l << "``\n";
+		exit (78);
+	}
 }
 
 Load_init_param::~Load_init_param(void)
@@ -24,31 +34,11 @@ Load_init_param::~Load_init_param(void)
 
 void Load_init_param::read_xml()
 {
-	// int i=1.2e7;
-  XMLDocument xml_f(true, COLLAPSE_WHITESPACE);
-	xml_f.LoadFile(xml_file);
-	if(xml_f.Error())
-	{
-		cout<< "can't read file!\n";
-		return;
-	}
-
-	XMLElement* root = xml_f.FirstChildElement (INITIAL_PARAMS_NAME);
+	XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
 	XMLElement* sub_root = root->FirstChildElement ("geometry");
-	// char test [30];
+	char test [30];
 	XMLElement* ss_root = sub_root->FirstChildElement();
 	const char* a = ss_root->GetText();
-
-	// strcpy( test, sub_root->GetText());
-	//	 i = get_int_value(sub_root->FirstChildElement( ));
-
-	// cout << i;
-	// cin	>> i;
-	// XMLElement* sub_root = root->FirstChildElement ("geometry");
-	// XMLElement* value = sub_root->FirstChildElement ();
-	// double r_size	= get_double_value(value);
-	//double z_size	 = get_double_value(value->NextSiblingElement());
-
 }
 
 int Load_init_param:: get_int_value(const char* r_str)
@@ -66,15 +56,8 @@ double Load_init_param:: get_double_value(const char* r_str)
 
 char* Load_init_param:: read_char(char* p_name)
 {
-	XMLDocument xml_f(true, COLLAPSE_WHITESPACE);
-	xml_f.LoadFile(xml_file);
-	if(xml_f.Error())
-	{
-		cout<< "couldn't read file!\n";
-		return 0;
-	}
 	int number = 0;
-	XMLElement* root = xml_f.FirstChildElement (INITIAL_PARAMS_NAME);
+	XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
 	XMLElement* sub_root =root->FirstChildElement (p_name);
 	char* vul_arr = new char [50];
 	strcpy(vul_arr, sub_root->GetText());
@@ -84,15 +67,8 @@ char* Load_init_param:: read_char(char* p_name)
 
 double* Load_init_param::read_double_params(const char* p_name)
 {
-	XMLDocument xml_f(true, COLLAPSE_WHITESPACE);
-	xml_f.LoadFile(xml_file);
-	if(xml_f.Error())
-	{
-		cout<< "couldn't read file!\n";
-		return 0;
-	}
 	int number = 0;
-	XMLElement* root = xml_f.FirstChildElement (INITIAL_PARAMS_NAME);
+	XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
 	XMLElement* sub_root = root->FirstChildElement (p_name);
 	XMLElement* read_elem = sub_root->FirstChildElement ();
 	while(read_elem)
@@ -117,15 +93,8 @@ double* Load_init_param::read_double_params(const char* p_name)
 
 void Load_init_param:: read_load_particles()
 {
-	XMLDocument xml_f(true, COLLAPSE_WHITESPACE);
-	xml_f.LoadFile(xml_file);
-	if(xml_f.Error())
-	{
-		cout<< "couldn't read file! \n";
-		return;
-	}
 	int number = 0;
-	XMLElement* root = xml_f.FirstChildElement (INITIAL_PARAMS_NAME);
+	XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
 	XMLElement* sub_root =root->FirstChildElement ("Particle_Name");
 	double* params= 0;
 	char* p_name= new char [50];
@@ -135,7 +104,7 @@ void Load_init_param:: read_load_particles()
 	{
 		const char* test = sub_root->GetText();
 		strcpy (p_name,sub_root->GetText());
-		
+
 		params = read_double_params(p_name);
 		prtls = new Particles(strcpy(new char [50],p_name),params,c_geom, p_list);
 		prtls->load_spatial_distribution_with_variable_mass(params[3],params[4],0,0);
@@ -150,15 +119,8 @@ void Load_init_param:: read_load_particles()
 
 Bunch* Load_init_param:: read_load_bunch()
 {
-	XMLDocument xml_f(true, COLLAPSE_WHITESPACE);
-	xml_f.LoadFile(xml_file);
-	if(xml_f.Error())
-	{
-		cout<< "couldn't read file!\n";
-		return 0;
-	}
 	int number = 0;
-	XMLElement* root = xml_f.FirstChildElement (INITIAL_PARAMS_NAME);
+	XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
 	XMLElement* sub_root =root->FirstChildElement ("Inject_Particles");
 	double* params= 0;
 	char* p_name= new char [50];

@@ -25,6 +25,7 @@
 #include<iostream>
 
 using namespace std;
+using namespace tinyxml2;
 
 class Load_init_param
 {
@@ -60,4 +61,6 @@ public:
 	charge_density * c_rho_old;
 	charge_density * c_rho_beam;
 	current * c_current;
+	XMLDocument* xml_data;
+	int testnumber;
 };
