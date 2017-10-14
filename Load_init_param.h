@@ -39,12 +39,8 @@ public:
 	double get_double_value(const char* r_str);
 	char* read_char(char* p_name);
 	double* read_double_params(const char* p_name);
-	void read_load_particles();
-	Bunch*  read_load_bunch();
 	bool SaveSystemState(void);
 	void Run(void);
-private:
-	void read_xml(const char* xml_file_name);
 
 public:
 	PML * c_pml;
@@ -64,8 +60,11 @@ public:
 	int testnumber;
 
 private:
+	void read_xml(const char* xml_file_name);
 	void init_pml ();
 	void init_geometry ();
 	void init_fields ();
 	void init_time ();
+	void init_particles();
+	Bunch* init_bunch();
 };
