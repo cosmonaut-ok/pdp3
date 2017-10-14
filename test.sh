@@ -60,23 +60,22 @@ cat<<EOF>${TESTDIR}/parameters.xml
   </Particles>
 
 
-  <Inject_Particles>  Electrons_bunch </Inject_Particles>
-  <Electrons_bunch>
+  <Particles_bunch>
+    <name> Electrons </name>
     <charge> -1 </charge>
     <mass> 1 </mass>
     <number> 1e6</number>
     <duration>1e-8</duration>
-    <Radius>0.02</Radius>
+    <radius>0.02</radius>
     <density> 1e13 </density>
     <initial_velocity> 3e7 </initial_velocity>
-
-  </Electrons_bunch>
+  </Particles_bunch>
 
 
   <Boundary_Maxwell_conditions>
-    <E_fi_upper> 0  </E_fi_upper>
-    <E_fi_left> 0 </E_fi_left>
-    <E_fi_right> 0 </E_fi_right>
+    <e_fi_upper> 0  </e_fi_upper>
+    <e_fi_left> 0 </e_fi_left>
+    <e_fi_right> 0 </e_fi_right>
   </Boundary_Maxwell_conditions>
 
   <Boundary_conditions type = "dirichlet">0</Boundary_conditions>
