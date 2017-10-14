@@ -107,7 +107,7 @@ cat<<EOF>${TESTDIR}/parameters.xml
 EOF
 
 cd ${TESTDIR}
-mkdir -p pdp3_files pdp3_result/Dump
+mkdir -p pdp3_files/_results_ocl pdp3_result/Dump pdp3_result/dump
 ./pdp3
 
 ## compare with testing data
