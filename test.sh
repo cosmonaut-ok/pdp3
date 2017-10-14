@@ -36,25 +36,28 @@ cat<<EOF>${TESTDIR}/parameters.xml
 
   <Number_of_part_kinds>  2 </Number_of_part_kinds>
 
-  <Particle_Name>  Electrons </Particle_Name>
-  <Electrons>
-    <charge> -1 </charge>
-    <mass> 1 </mass>
-    <number> 1e6</number>
-    <left_density> 2e14</left_density>
-    <right_density>2.05e14  </right_density>
-    <temperature> 1.0 </temperature>
-  </Electrons>
 
-  <Particle_Name> ions </Particle_Name>
-  <ions>
-    <charge> 1 </charge>
-    <mass> 1836 </mass>
-    <number> 1e6 </number>
-    <left_density> 2e14 </left_density>
-    <right_density> 2.05e14 </right_density>
-    <temperature> 0.1 </temperature>
-  </ions>
+    <Particles>
+    <particle_kind>
+      <name>Electrons</name>
+      <charge> -1 </charge>
+      <mass> 1 </mass>
+      <number> 1e6</number>
+      <left_density> 2e14</left_density>
+      <right_density>2.05e14  </right_density>
+      <temperature> 1.0 </temperature>
+    </particle_kind>
+
+    <particle_kind>
+      <name>Ions</name>
+      <charge> 1 </charge>
+      <mass> 1836 </mass>
+      <number> 1e6 </number>
+      <left_density> 2e14 </left_density>
+      <right_density> 2.05e14 </right_density>
+      <temperature> 0.1 </temperature>
+    </particle_kind>
+  </Particles>
 
 
   <Inject_Particles>  Electrons_bunch </Inject_Particles>

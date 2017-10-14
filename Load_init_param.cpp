@@ -1,6 +1,7 @@
 #include "Load_init_param.h"
 #include "time.h"
 #include "tinyxml2.h"
+#include <typeinfo>
 
 // #include "kern_accessor.h"
 //extern KernAccessor *kern_access_global;
@@ -12,6 +13,7 @@ using namespace tinyxml2;
 #define GEOMETRY_PARAMS_NAME "geometry"
 #define TIME_PARAMS_NAME "Time"
 #define PARTICLES_PARAMS_NAME "Particles"
+#define BUNCH_PARAMS_NAME "Inject_Particles"
 
 Load_init_param::Load_init_param(void)
 {
@@ -23,7 +25,6 @@ Load_init_param::Load_init_param(char* xml_file_name)
 		// so we use several "subconstructors"
 		// to initialize different parts of system
 
-	cout << "Reading configuration file ``" << xml_file_name << "``\n";
 	// read XML config file
 	read_xml (xml_file_name);
 
@@ -41,10 +42,10 @@ Load_init_param::Load_init_param(char* xml_file_name)
 
 	// load particle parameters
 	p_list = new particles_list(0);
-	read_load_particles();
+	init_particles();
 
 	// load bunch
-	c_bunch = read_load_bunch();
+	c_bunch = init_bunch();
 
 	//Maxwell initial conditions///
 	double * r_params = read_double_params("Boundary_Maxwell_conditions");
@@ -147,44 +148,68 @@ double* Load_init_param::read_double_params(const char* p_name)
 }
 ///////////////////////////////////////////
 
-void Load_init_param:: read_load_particles()
+void Load_init_param:: init_particles()
 {
-	int number = 0;
+	const char* p_king_section_name = "particle_kind";
 	XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
-	XMLElement* sub_root =root->FirstChildElement ("Particle_Name");
-	double* params= 0;
+	XMLElement* particle_kind = root
+		->FirstChildElement (PARTICLES_PARAMS_NAME)
+		->FirstChildElement (p_king_section_name);
+
 	char* p_name= new char [50];
-	Particles*	 prtls =0;
+	double charge = 0;
+	double mass = 0; // TODO: should it be double?
+	double number = 0;
+	double left_density = 0;
+	double right_density = 0;
+	double temperature = 0;
 
-	while(sub_root)
+	double params [5]= {};
+	Particles* prtls = 0;
+
+	while(particle_kind)
 	{
-		const char* test = sub_root->GetText();
-		strcpy (p_name,sub_root->GetText());
+		strcpy (p_name,particle_kind->FirstChildElement("name")->GetText());
+		cout << "Initializing " << p_name << " data\n";
 
-		params = read_double_params(p_name);
+		charge = atof(particle_kind->FirstChildElement("charge")->GetText());
+		mass = atof(particle_kind->FirstChildElement("mass")->GetText());
+		number = atof(particle_kind->FirstChildElement("number")->GetText());
+		left_density = atof(particle_kind->FirstChildElement("left_density")->GetText());
+		right_density = atof(particle_kind->FirstChildElement("right_density")->GetText());
+		temperature = atof(particle_kind->FirstChildElement("temperature")->GetText());
+
+		params[0] = charge;
+		params[1] = mass;
+		params[2] = number;
+		params[3] = left_density;
+		params[4] = right_density;
+		params[5] = temperature;
+
 		prtls = new Particles(strcpy(new char [50],p_name),params,c_geom, p_list);
 		prtls->load_spatial_distribution_with_variable_mass(params[3],params[4],0,0);
 		// prtls->load_spatial_distribution(params[3],params[4],0,0);
 		prtls->velocity_distribution_v2(params[5]);
-		sub_root = sub_root->NextSiblingElement("Particle_Name");
+		particle_kind = particle_kind->NextSiblingElement(p_king_section_name);
 	}
 
 	return;
 }
 /////////////////////////////////////////
 
-Bunch* Load_init_param:: read_load_bunch()
+Bunch* Load_init_param:: init_bunch()
 {
 	int number = 0;
 	XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
-	XMLElement* sub_root =root->FirstChildElement ("Inject_Particles");
+	XMLElement* sub_root =root->FirstChildElement (BUNCH_PARAMS_NAME);
 	double* params= 0;
 	char* p_name= new char [50];
-	Bunch*	 prtls =0;
+	Bunch* prtls =0;
 
 	const char* test = sub_root->GetText();
 	strcpy (p_name,sub_root->GetText());
 	params = read_double_params(p_name);
+
 	prtls = new Bunch(p_name,params[0],params[1],params[2],c_geom, p_list,params[3],params[4]);
 	prtls->calc_init_param(params[5],params[6]);
 
