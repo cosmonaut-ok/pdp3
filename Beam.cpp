@@ -1,7 +1,7 @@
 #include "Beam.h"
 #include "pdp3_time.h"
 #include "poisson_dirichlet.h"
-#include <Constant.h>
+#include "Constant.h"
 
 using namespace std;
 
