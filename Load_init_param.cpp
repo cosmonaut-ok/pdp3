@@ -1,7 +1,6 @@
 #include "Load_init_param.h"
 #include "time.h"
 #include "tinyxml2.h"
-#include <typeinfo>
 
 // #include "kern_accessor.h"
 //extern KernAccessor *kern_access_global;
