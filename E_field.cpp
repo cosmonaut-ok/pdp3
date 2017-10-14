@@ -3,7 +3,7 @@
 #include "math.h"
 #include "Fourier.h"
 #include <fstream>
-#include <Constant.h>
+#include "Constant.h"
 
 using namespace std;
 // using namespace constant;

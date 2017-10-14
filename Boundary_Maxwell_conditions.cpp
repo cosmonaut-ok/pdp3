@@ -1,5 +1,5 @@
 #include "Boundary_Maxwell_conditions.h"
-#include <Constant.h>
+#include "Constant.h"
 
 const double PI = constant::PI;
 const double LIGHT_SPEED = constant::LIGHT_SPEED;
