@@ -1425,7 +1425,6 @@ bool continuity_equation(Time *input_time,
 			if (res > tolerance)
 			{
 				ok = false;
-				std::cout<<i<<" "<<k;
 				// i = input_geometry->n_grid_1;
 
 			}
