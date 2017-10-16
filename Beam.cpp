@@ -5,7 +5,7 @@
 
 using namespace std;
 
-const double PI = constant::PI; // prevent "magic numbers"
+const double PI = constant::PI;
 
 Beam::Beam(char* p_name,
            double p_charge,
@@ -39,7 +39,7 @@ void Beam::calc_init_param(Time* time,
 	}
 }
 
-void Beam::beam_inject(Time* time,int particles_in_step, double fi, double koef)
+void Beam::beam_inject(Time* time, int particles_in_step, double fi, double koef)
 {
 	double dl = vel_beam*time->delta_t;
 	double dr = geom1->dr*1.00000001; // TODO: WTF?
