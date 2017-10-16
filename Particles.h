@@ -29,10 +29,10 @@ public:
 public:
 	// The specie name
 	char* name;
-	// The specie charge
+	// The specie charge in electron charges
 	double charge;
 	// The specie * mass
-	double mass;
+	double mass; // in electron in electron masses
 	double * mass_array;
 	double * charge_array;
 	double init_const_mass;

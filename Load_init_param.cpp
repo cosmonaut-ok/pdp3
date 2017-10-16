@@ -125,7 +125,6 @@ void Load_init_param::init_particles()
 	double right_density = 0;
 	double temperature = 0;
 
-	double params [5]= {};
 	Particles* prtls = 0;
 
 	while(particle_kind)
@@ -140,17 +139,13 @@ void Load_init_param::init_particles()
 		right_density = atof(particle_kind->FirstChildElement("right_density")->GetText());
 		temperature = atof(particle_kind->FirstChildElement("temperature")->GetText());
 
-		params[0] = charge;
-		params[1] = mass;
-		params[2] = number;
-		params[3] = left_density;
-		params[4] = right_density;
-		params[5] = temperature;
+		prtls = new Particles(strcpy(new char [50],p_name), charge, mass, number,
+                          c_geom, p_list);
 
-		prtls = new Particles(strcpy(new char [50],p_name),params,c_geom, p_list);
-		prtls->load_spatial_distribution_with_variable_mass(params[3],params[4],0,0);
+		prtls->load_spatial_distribution_with_variable_mass(
+      left_density,right_density,0,0);
 		// prtls->load_spatial_distribution(params[3],params[4],0,0);
-		prtls->velocity_distribution_v2(params[5]);
+		prtls->velocity_distribution_v2(temperature);
 		particle_kind = particle_kind->NextSiblingElement(p_king_section_name);
 	}
 
