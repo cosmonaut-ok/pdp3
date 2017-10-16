@@ -56,7 +56,7 @@ set(SOURCE_FILES
     resource1.h
     Test_class.cpp
     Test_class.h
-    Time.cpp
+    pdp3_time.cpp
     tinystr.cpp
     tinystr.h
     tinyxml.cpp

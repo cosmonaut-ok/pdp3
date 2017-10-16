@@ -5,7 +5,7 @@
 
 using namespace std;
 
-const double PI = constant::PI; // prevent "magic numbers"
+const double PI = constant::PI;
 
 Beam::Beam(char* p_name,
            double p_charge,
@@ -19,6 +19,10 @@ Beam::Beam(char* p_name,
 	radius = b_radius;
 }
 
+Beam::~Beam(void)
+{
+}
+
 void Beam::calc_init_param(Time* time,
                            int particles_in_step,
                            double n_b,
@@ -27,10 +31,10 @@ void Beam::calc_init_param(Time* time,
 	n_beam = n_b;
 	vel_beam = b_vel;
 	double dl = vel_beam*time->delta_t;
-	double n_in_big = PI*radius*radius*dl*n_beam/particles_in_step;
+	double n_in_big = PI * pow(radius, 2) * dl * n_beam / particles_in_step;
 	charge *= n_in_big;
 	mass *= n_in_big;
-	for(int i=0;i<number;i++)
+	for(int i=0; i<number; i++)
 	{
 		is_alive[i]=false;
 		v1[i]=0;
@@ -39,11 +43,12 @@ void Beam::calc_init_param(Time* time,
 	}
 }
 
-void Beam::beam_inject(Time* time,int particles_in_step, double fi, double koef)
+// TODO: not used?
+void Beam::beam_inject(Time* time, int particles_in_step, double fi, double koef)
 {
 	double dl = vel_beam*time->delta_t;
-	double dr = geom1->dr*1.00000001; // TODO: WTF?
-	double dz = geom1->dz*1.00000001;
+	double dr = geom1->dr; // *1.00000001; // TODO: WTF?
+	double dz = geom1->dz; // *1.00000001;
 	double mod_n = (1 - koef/2.0 + koef/2.0*sin(2*PI*fi*time->current_time));
 	int n=0;
 	int i=0;
@@ -112,10 +117,4 @@ void Beam::half_step_coord(Time* t)
 				//v3[i] = -v3[i];
 			}
 		}
-}
-
-//////////////////////////////////////////////////
-
-Beam::~Beam(void)
-{
 }

@@ -7,9 +7,9 @@ class Geometry;
 class PML
 {
 public:
-	double comparative_l_1;
-	double comparative_l_2;
-	double comparative_l_3;
+	double comparative_l_1; // length to left wall TODO: orly?
+	double comparative_l_2; // length to right wall TODO: orly?
+	double comparative_l_3; // length to z-wall
 	double sigma1;
 	double sigma2;
 
