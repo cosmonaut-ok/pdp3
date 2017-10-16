@@ -19,6 +19,10 @@ Beam::Beam(char* p_name,
 	radius = b_radius;
 }
 
+Beam::~Beam(void)
+{
+}
+
 void Beam::calc_init_param(Time* time,
                            int particles_in_step,
                            double n_b,
@@ -113,10 +117,4 @@ void Beam::half_step_coord(Time* t)
 				//v3[i] = -v3[i];
 			}
 		}
-}
-
-//////////////////////////////////////////////////
-
-Beam::~Beam(void)
-{
 }

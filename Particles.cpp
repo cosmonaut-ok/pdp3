@@ -18,8 +18,7 @@ using namespace std;
 Particles::Particles(void)
 {
 }
-	////////constructor//////
-////////////////////////////////////////////////
+// constructor
 Particles::Particles(char const *p_name,
                      double p_charge,
                      double p_mass,
@@ -27,12 +26,12 @@ Particles::Particles(char const *p_name,
                      Geometry* geom,
                      particles_list* t_p_list):geom1(geom),
                                                p_list(t_p_list),
-                                               // TODO: make global const
                                                c_light(LIGHT_SPEED),
+																							 // TODO: make global const?
                                                c2(9.0e16)
 {
 	name = (char *) p_name;
-	init_const_mass =p_mass;
+	init_const_mass = p_mass;
 	charge = (double)p_charge*(double)EL_CHARGE;
 
 	mass = (double)p_mass*(double)EL_MASS;
@@ -42,7 +41,6 @@ Particles::Particles(char const *p_name,
 	mass_array = new double[number];
 	charge_array= new double [number];
 	x1 = new double[number];
-	x3 = new double[number];
 	x3 = new double[number];
 	v1 = new double[number];
 	v2 = new double[number];
