@@ -15,7 +15,7 @@
 
 #include "Boundary_Maxwell_conditions.h"
 #include "input_output_class.h"
-#include "Beam.h"
+// #include "Beam.h"
 #include "Bunch.h"
 #include "time.h"
 #include "particles_struct.h"
