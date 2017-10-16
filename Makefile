@@ -45,7 +45,7 @@ pdp3_CXX_SRCS         = Beam.cpp \
 			Poisson_dirichlet.cpp \
 			Poisson_neumann.cpp \
 			Test_class.cpp \
-			Time.cpp \
+			pdp3_time.cpp \
 			Triple.cpp \
 			boundary_dirichlet.cpp \
 			boundary_neumann.cpp \

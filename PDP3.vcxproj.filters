@@ -74,7 +74,7 @@
     <ClCompile Include="Poisson_neumann.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Time.cpp">
+    <ClCompile Include="pdp3_time.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Triple.cpp">

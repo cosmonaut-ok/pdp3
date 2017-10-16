@@ -28,17 +28,17 @@ void Bunch::calc_init_param(double n_b, double b_vel)
 	n_bunch = n_b;
 	vel_bunch = b_vel;
 	double b_lenght = duration*vel_bunch;
-	double n_in_big = PI*radius*radius*b_lenght*n_bunch/number;
+	double n_in_big = PI * pow(radius, 2) * b_lenght * n_bunch / number;
 	charge *= n_in_big;
 	mass *= n_in_big;
-	for(int i=0;i<number;i++)
+	for(int i=0; i<number; i++)
 	{
 		is_alive[i] = 0;
 		v1[i]=0;
 		v2[i]=0;
 		v3[i]=0;
-		mass_array[i]=mass;
-		charge_array[i]=charge;
+		mass_array[i] = mass;
+		charge_array[i] = charge;
 	}
 }
 
@@ -48,13 +48,14 @@ void Bunch::bunch_inject( Time* time)
 	int step_num =	duration/time->delta_t;
 	int particles_in_step =	 number/step_num;
 	int start_number = time->current_time/time->delta_t*particles_in_step;
+	// exit (1);
 	double dr = geom1->dr*1.00000001; // TODO: WTF?
 	double dz = geom1->dz*1.00000001;
 	if (time->current_time<duration)
 		for(int i = 0; i <	particles_in_step; i++)
 		{
 			// double	 rand_r = random_reverse(i,9);
-			double	rand_z = random_reverse(i,11);
+			double rand_z = random_reverse(i,11);
 			//x1[i+start_number] = (radius)*sqrt(rand_r) + dr/2.0;
 			//double rand_i = (double)i / particles_in_step;
 			//double rand_i = rand()/(double)RAND_MAX;
@@ -63,7 +64,7 @@ void Bunch::bunch_inject( Time* time)
 			double rand_i = random_reverse(start_number + i, 9);
 			rand_z = random_reverse(start_number + i, 11);
 
-			x1[i+start_number] = sqrt(dr * dr / 4.0 + radius * (radius - dr ) * rand_i);
+			x1[i+start_number] = sqrt(dr * dr / 4.0 + radius * (radius - dr) * rand_i);
 
 			x3[i+start_number] = dl*(rand_z)+dz/2.0;
 			v3[i+start_number] = vel_bunch;
