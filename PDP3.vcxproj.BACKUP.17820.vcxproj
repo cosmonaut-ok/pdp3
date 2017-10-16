@@ -138,7 +138,7 @@
     <ClCompile Include="Poisson_dirichlet.cpp" />
     <ClCompile Include="Poisson_neumann.cpp" />
     <ClCompile Include="Test_class.cpp" />
-    <ClCompile Include="Time.cpp" />
+    <ClCompile Include="pdp3_time.cpp" />
     <ClCompile Include="tinystr.cpp" />
     <ClCompile Include="tinyxml.cpp" />
     <ClCompile Include="tinyxmlerror.cpp" />
@@ -324,7 +324,7 @@
     <ClCompile Include="Poisson_dirichlet.cpp" />
     <ClCompile Include="Poisson_neumann.cpp" />
     <ClCompile Include="Test_class.cpp" />
-    <ClCompile Include="Time.cpp" />
+    <ClCompile Include="pdp3_time.cpp" />
     <ClCompile Include="tinystr.cpp" />
     <ClCompile Include="tinyxml.cpp" />
     <ClCompile Include="tinyxmlerror.cpp" />

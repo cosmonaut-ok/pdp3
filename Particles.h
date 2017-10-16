@@ -22,25 +22,25 @@ public:
 	Particles(void);
 	Particles(Particles& cp_particles);
 	Particles(char const *p_name, double p_charge, double p_mass, int p_number,
-						Geometry* geom, particles_list* p_list);
+            Geometry* geom, particles_list* p_list);
 	Particles(char* p_name, double* params,
-						Geometry* geom, particles_list* p_list);
+            Geometry* geom, particles_list* p_list);
 	~Particles();
 public:
 	// The specie name
 	char* name;
-	// The specie charge
+	// The specie charge in electron charges
 	double charge;
 	// The specie * mass
-	double	mass;
+	double mass; // in electron in electron masses
 	double * mass_array;
 	double * charge_array;
 	double init_const_mass;
 	// Number of particles
 	int number;
 	// Particles' coordinates
-	double* x1;	 //r
-	double* x3;	 //z
+	double* x1; //r
+	double* x3; //z
 	// Particles' velocity
 	double* v1; //vr
 	double* v2; //vphi
@@ -49,8 +49,8 @@ public:
 	//indicator if particle is still alive
 	int* is_alive;
 
-	double c_light ;
-	double c2 ;
+	double c_light;
+	double c2; // TODO: WAT
 
 	//current density
 	//temporaty member of Particle class
