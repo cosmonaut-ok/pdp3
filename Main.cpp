@@ -1,9 +1,3 @@
-// #pragma once
-
-// #include<iostream>
-// #include <fstream>
-// #include <math.h>
-
 #include "Load_init_param.h"
 
 using namespace std;
