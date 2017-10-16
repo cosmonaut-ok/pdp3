@@ -225,7 +225,7 @@
     <ClCompile Include="Poisson_dirichlet.cpp" />
     <ClCompile Include="Poisson_neumann.cpp" />
     <ClCompile Include="Test_class.cpp" />
-    <ClCompile Include="Time.cpp" />
+    <ClCompile Include="pdp3_time.cpp" />
     <ClCompile Include="Triple.cpp" />
   </ItemGroup>
   <ItemGroup>

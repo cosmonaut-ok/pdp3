@@ -2,8 +2,7 @@
 #include "Particles.h"
 #include "pdp3_time.h"
 
-class Bunch :
-	public Particles
+class Bunch : public Particles
 {
 public:
 	Bunch(char* p_name,
@@ -19,8 +18,8 @@ public:
 public:
 	double duration; //bunch duration
 	double n_bunch;// bunch density;
-	double vel_bunch; //bunch velocity
-	double radius; //bunch radius
+	double vel_bunch; // bunch velocity
+	double radius; // bunch radius
 public:
 	void calc_init_param(double n_b,double b_vel);
 	void bunch_inject(Time* time);
