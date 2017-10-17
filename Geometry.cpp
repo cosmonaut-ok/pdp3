@@ -4,10 +4,10 @@
 // class constructor with sigma //
 /////////////////////////////////////////////
 Geometry::Geometry(double fs,
-                   double ss,
-                   int ng1,
-                   int ng2,
-                   PML* pml1_t): pml1(pml1_t)//, geom1(geom1_t)
+									 double ss,
+									 int ng1,
+									 int ng2,
+									 PML* pml1_t): pml1(pml1_t)//, geom1(geom1_t)
 {
 	first_size=fs;
 	second_size=ss;

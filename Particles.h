@@ -22,9 +22,9 @@ public:
 	Particles(void);
 	Particles(Particles& cp_particles);
 	Particles(char const *p_name, double p_charge, double p_mass, int p_number,
-            Geometry* geom, particles_list* p_list);
+						Geometry* geom, particles_list* p_list);
 	Particles(char* p_name, double* params,
-            Geometry* geom, particles_list* p_list);
+						Geometry* geom, particles_list* p_list);
 	~Particles();
 public:
 	// The specie name
@@ -70,69 +70,69 @@ public:
 	void velocity_distribution(double therm_vel);
 	void velocity_distribution_v2 (double therm_vel);
 	void load_spatial_distribution(double n1,
-                                 double n2,
-                                 double left_plasma_boundary,
-                                 int type);
+																 double n2,
+																 double left_plasma_boundary,
+																 int type);
 	void load_spatial_distribution_with_variable_mass(double n1,
-                                                    double n2,
-                                                    double left_plasma_boundary,
-                                                    int type);
+																										double n2,
+																										double left_plasma_boundary,
+																										int type);
 	void load_velocity_distribution(double v_thermal);
 	void simple_j_weighting(Time* time1,
-                          current *j1,
-                          double x1_new,
-                          double x3_new,
-                          double x1_old,
-                          double x3_old,
-                          int i_n,
-                          int k_n,
-                          int p_number);
+													current *j1,
+													double x1_new,
+													double x3_new,
+													double x1_old,
+													double x3_old,
+													int i_n,
+													int k_n,
+													int p_number);
 	void simple_constrho_j_weighting(Time* time1,
-                                   current *j1,
-                                   double x1_new,
-                                   double x3_new,
-                                   double x1_old,
-                                   double x3_old,
-                                   int i_n,
-                                   int k_n,
-                                   int p_number);
+																	 current *j1,
+																	 double x1_new,
+																	 double x3_new,
+																	 double x1_old,
+																	 double x3_old,
+																	 int i_n,
+																	 int k_n,
+																	 int p_number);
 	void j_weighting(Time* time1,
-                   current *j1,
-                   double* x1,double* x3);
+									 current *j1,
+									 double* x1,double* x3);
 	void strict_motion_weighting(Time* time1,
-                               current *j1,
-                               double x1_new,
-                               double x3_new,
-                               double x1_old,
-                               double x3_old,
-                               int p_number);
+															 current *j1,
+															 double x1_new,
+															 double x3_new,
+															 double x1_old,
+															 double x3_old,
+															 int p_number);
 	void azimuthal_j_weighting(Time* time1,
-                             current *j1);
-	double  random_reverse(double vel, int power);
+														 current *j1);
+	double	random_reverse(double vel, int power);
 	void set_simple_cell(int** cell_arr_jr,
-                       int** cell_arr_jz,
-                       int start_number,
-                       int i_new,
-                       int k_new);
+											 int** cell_arr_jz,
+											 int start_number,
+											 int i_new,
+											 int k_new);
 	void get_cell_numbers_jr_2(double x1_new,
-                             double x3_new,
-                             double x1_old,
-                             double x3_old,
-                             int **cell_arr_jr,
-                             int **cell_arr_jz,
-                             int* number);
+														 double x3_new,
+														 double x1_old,
+														 double x3_old,
+														 int **cell_arr_jr,
+														 int **cell_arr_jz,
+														 int* number);
 	void get_cell_numbers_jr_1(double x1_new,
-                             double x3_new,
-                             double x1_old,
-                             double x3_old,
-                             int *i_return,
-                             int* k_return,
-                             int* accur);
+														 double x3_new,
+														 double x1_old,
+														 double x3_old,
+														 int *i_return,
+														 int* k_return,
+														 int* accur);
 
 };
 
 bool continuity_equation(Time *input_time,
-                         Geometry *input_geometry,
-                         current *input_J,
-                         charge_density *rho_start,
-                         charge_density *rho_end);
+												 Geometry *input_geometry,
+												 current *input_J,
+												 charge_density *rho_start,
+												 charge_density *rho_end);

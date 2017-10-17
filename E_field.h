@@ -38,11 +38,11 @@ public:
 	Triple get_field(double x1, double x3);
 	bool test_poisson_equation(charge_density* rho);
 	void TridiagonalSolve(const double *a,
-                        const double *b,
-                        double *c,
-                        double *d,
-                        double *x,
-                        unsigned int n);
+												const double *b,
+												double *c,
+												double *d,
+												double *x,
+												unsigned int n);
 	double* get_1d_e1();
 	double* get_1d_e2();
 	double* get_1d_e3();

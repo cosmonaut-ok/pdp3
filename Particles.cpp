@@ -21,15 +21,15 @@ Particles::Particles(void)
 }
 // constructor
 Particles::Particles(char const *p_name,
-                     double p_charge,
-                     double p_mass,
-                     int p_number,
-                     Geometry* geom,
-                     particles_list* t_p_list):geom1(geom),
-                                               p_list(t_p_list),
-                                               c_light(LIGHT_SPEED),
+										 double p_charge,
+										 double p_mass,
+										 int p_number,
+										 Geometry* geom,
+										 particles_list* t_p_list):geom1(geom),
+																							 p_list(t_p_list),
+																							 c_light(LIGHT_SPEED),
 																							 // TODO: make global const?
-                                               c2(9.0e16)
+																							 c2(9.0e16)
 {
 	name = (char *) p_name;
 	charge = (double)p_charge*(double)EL_CHARGE;
@@ -127,7 +127,7 @@ double Particles::get_gamma_inv(int i)
 
 void Particles::step_v(E_field *e_fld, H_field *h_fld, Time* t)
 {
- 	double gamma, b1, b2, b3, e1, e2, e3, vv1, vv2, vv3;
+	double gamma, b1, b2, b3, e1, e2, e3, vv1, vv2, vv3;
 	Triple E_compon(0.0, 0.0, 0.0), B_compon(0.0, 0.0, 0.0);
 	double const1, const2;
 	//if (t->current_time == t->start_time) const1 = const1/2.0;
@@ -358,7 +358,7 @@ void Particles::charge_weighting(charge_density* ro1)
 // function for initial (Maxwell) distribution
 void Particles::velocity_distribution(double therm_vel)
 {
- 	int j = 0;
+	int j = 0;
 	double R =0; // number from [0;1]
 	double dv = therm_vel/1e7; // velocity step in calculation integral
 	double s =0;
@@ -399,7 +399,7 @@ void Particles::velocity_distribution(double therm_vel)
 void Particles::velocity_distribution_v2(double tempr_ev)
 {
 	double therm_vel = sqrt(tempr_ev*2.0*EL_CHARGE/
-                          (this->init_const_mass*EL_MASS));
+													(this->init_const_mass*EL_MASS));
 	int j=0;
 	double R =0; // number from [0;1]
 	double dv = therm_vel/0.5e7; // velocity step in calculation integral
@@ -520,7 +520,7 @@ double Particles::random_reverse(double vel, int power)
 
 void Particles::load_spatial_distribution(double n1, double n2, double left_plasma_boundary,int type)
 {
- 	// calculate number of electrons in a big particle
+	// calculate number of electrons in a big particle
 	double rand_r;
 	double rand_z;
 	double dr = geom1->dr*1.00000001;
@@ -630,11 +630,11 @@ void Particles::load_spatial_distribution(double n1, double n2, double left_plas
 }
 
 void Particles::load_spatial_distribution_with_variable_mass(double n1,
-                                                             double n2,
-                                                             double left_plasma_boundary,
-                                                             int type)
+																														 double n2,
+																														 double left_plasma_boundary,
+																														 int type)
 {
- 	// calculate number of electrons in a big particle
+	// calculate number of electrons in a big particle
 	double rand_r;
 	double rand_z;
 	double dr = geom1->dr*1.00000001;
@@ -668,7 +668,7 @@ void Particles::load_spatial_distribution_with_variable_mass(double n1,
 
 void Particles::load_velocity_distribution(double v_thermal)
 {
- 	for (int n=0; n<number; n++)
+	for (int n=0; n<number; n++)
 	{
 		v1[n] = 0.0;
 		v2[n] = 0.0;
@@ -677,14 +677,14 @@ void Particles::load_velocity_distribution(double v_thermal)
 }
 
 void Particles::simple_j_weighting(Time* time1,
-                                   current *j1,
-                                   double x1_new,
-                                   double x3_new,
-                                   double x1_old,
-                                   double x3_old,
-                                   int i_n,
-                                   int k_n,
-                                   int p_number)
+																	 current *j1,
+																	 double x1_new,
+																	 double x3_new,
+																	 double x1_old,
+																	 double x3_old,
+																	 int i_n,
+																	 int k_n,
+																	 int p_number)
 {
 	double dr = geom1->dr;
 	double dz = geom1->dz;
@@ -1172,12 +1172,12 @@ void Particles::azimuthal_j_weighting(Time* time1, current *this_j)
 }
 
 void Particles:: strict_motion_weighting(Time *time1,
-                                         current *this_j,
-                                         double x1_new,
-                                         double x3_new,
-                                         double x1_old,
-                                         double x3_old,
-                                         int p_number)
+																				 current *this_j,
+																				 double x1_new,
+																				 double x3_new,
+																				 double x1_old,
+																				 double x3_old,
+																				 int p_number)
 {
 	double dr = geom1->dr;
 	double dz = geom1->dz;
@@ -1335,10 +1335,10 @@ void Particles:: strict_motion_weighting(Time *time1,
 
 
 bool continuity_equation(Time *input_time,
-                         Geometry *input_geometry,
-                         current *input_J,
-                         charge_density *rho_old,
-                         charge_density *rho_new)
+												 Geometry *input_geometry,
+												 current *input_J,
+												 charge_density *rho_old,
+												 charge_density *rho_new)
 {
 	double **rho_old_array = rho_old->get_ro() ;
 	double **rho_new_array = rho_new->get_ro() ;
