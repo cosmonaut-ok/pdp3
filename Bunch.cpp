@@ -74,8 +74,8 @@ void Bunch::bunch_inject(Time* time)
 }
 
 void Bunch::bunch_inject_calc_E(Geometry* geom,
-																E_field*E_beam,
-																E_field*E,
+																E_field* E_beam,
+																E_field* E,
 																Time* time)
 {
 	double dl = vel_bunch*time->delta_t;
@@ -87,13 +87,13 @@ void Bunch::bunch_inject_calc_E(Geometry* geom,
 	if (time->current_time<duration)
 		for(int i = 0; i < particles_in_step; i++)
 		{
-			double	rand_r = random_reverse(i,3);
-			double	rand_z = random_reverse(i,5);
+			double	rand_r = random_reverse(i, 3); // TODO: why 3 and 5?
+			double	rand_z = random_reverse(i, 5);
 			x1[i+start_number] = (radius)*sqrt(rand_r) + dr/2.0;
 
 			x3[i+start_number] = dl*(rand_z)+dz/2.0;;
 			v3[i+start_number] =vel_bunch;
-			v1[i+start_number] = 1e5;
+			v1[i+start_number] = 1e5; // TODO: magic number
 			is_alive[i+start_number] = true;
 		}
 	if (time->current_time==0)
