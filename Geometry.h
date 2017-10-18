@@ -23,9 +23,9 @@ public:
 
 	void set_epsilon();
 //	friend void calc_sigma(Geometry *geom1);
-	Geometry(double fs, double ss,  int ng1, int ng2, PML* pml1_t);
+	Geometry(double fs, double ss, int ng1, int ng2, PML* pml1_t);
 	Geometry(double * param, PML* pml1_t);
-	Geometry(double fs, double ss,  int ng1, int ng2);
+	Geometry(double fs, double ss, int ng1, int ng2);
 	Geometry( PML* pml1_t);
 	Geometry();
 
