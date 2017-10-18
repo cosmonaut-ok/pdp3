@@ -1,9 +1,7 @@
 #!/bin/sh
 
 test -z $TESTDIR && TESTDIR=testingdir
-test -z $TRUE_MD5 && TRUE_MD5=true_md5sums
 test -z $TESTING_DATA_ARCHIVE && TESTING_DATA_ARCHIVE=test_true_data.tar.gz
-
 
 mkdir -p ${TESTDIR}
 cp pdp3 ${TESTDIR}
@@ -120,9 +118,7 @@ tar -xf ../../${TESTING_DATA_ARCHIVE}
 success="true"
 for i in `find . -type f`; do
     bn=`basename $i`
-    true_md5sum="$(grep ${bn} ../../${TRUE_MD5} | cut -d';' -f1)"
-    actual_md5sum="$(md5sum ${bn} | cut -d' ' -f1)"
-    test "${true_md5sum}" == "${actual_md5sum}" || success="false"
+    test -z "$(diff ${bn} ../pdp3_result/${bn} 2>&1)" || success="false"
 done
 
 if [ "$success" == "false" ]; then
