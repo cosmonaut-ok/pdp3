@@ -49,9 +49,6 @@ public:
 	//indicator if particle is still alive
 	int* is_alive;
 
-	double c_light;
-	double c2; // TODO: WAT
-
 	//current density
 	//temporaty member of Particle class
 	//created for the purpose of integration
