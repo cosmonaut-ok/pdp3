@@ -3,10 +3,10 @@
 #include "poisson_dirichlet.h"
 
 boundary_dirichlet::boundary_dirichlet(E_field* ef_t,
-                                       charge_density* rho_t,
-                                       Geometry *geom_t): e_f(ef_t),
-                                                          rho(rho_t),
-                                                          cyl_geom(geom_t)
+																			 charge_density* rho_t,
+																			 Geometry *geom_t): e_f(ef_t),
+																													rho(rho_t),
+																													cyl_geom(geom_t)
 {
 }
 
@@ -19,9 +19,9 @@ boundary_dirichlet::~boundary_dirichlet(void)
 }
 
 void boundary_dirichlet::specify_boundary_conditions(double e_fi_upper,
-                                                     double e_fi_left,
-                                                     double e_fi_right,
-                                                     double fi_upper_wall)
+																										 double e_fi_left,
+																										 double e_fi_right,
+																										 double fi_upper_wall)
 {
 	int n_grid1 = cyl_geom->n_grid_1;
 	int n_grid2 = cyl_geom->n_grid_2;

@@ -8,13 +8,13 @@ using namespace std;
 const double PI = constant::PI;
 
 Beam::Beam(char* p_name,
-           double p_charge,
-           double p_mass,
-           int p_number,
-           Geometry* geom,
-           particles_list* p_list,
-           double b_radius):Particles(p_name, p_charge, p_mass, p_number,
-                                      geom, p_list)
+					 double p_charge,
+					 double p_mass,
+					 int p_number,
+					 Geometry* geom,
+					 particles_list* p_list,
+					 double b_radius):Particles(p_name, p_charge, p_mass, p_number,
+																			geom, p_list)
 {
 	radius = b_radius;
 }
@@ -24,9 +24,9 @@ Beam::~Beam(void)
 }
 
 void Beam::calc_init_param(Time* time,
-                           int particles_in_step,
-                           double n_b,
-                           double b_vel)
+													 int particles_in_step,
+													 double n_b,
+													 double b_vel)
 {
 	n_beam = n_b;
 	vel_beam = b_vel;

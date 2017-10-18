@@ -79,7 +79,7 @@ void Poisson_dirichlet::poisson_solve(E_field* input_e, charge_density* ro1)
 			d = dr*dr*t_charge_density[i][k]/epsilon0;
 
 			alpha[i+1] = c/(b-alpha[i]*a);
-			beta[i+1]  = (d+beta[i]*a)/(b-alpha[i]*a);
+			beta[i+1]	 = (d+beta[i]*a)/(b-alpha[i]*a);
 		}
 
 		//fi[geom1->n_grid_1-2][k]= -d-c*fi[geom1->n_grid_1-1][k]-a*beta[geom1->n_grid_1-2]/(a*alpha[geom1->n_grid_1-2]-b);
