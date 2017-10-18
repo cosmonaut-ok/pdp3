@@ -136,7 +136,10 @@ run: bootstrap
 	./pdp3
 
 test: mrproper all
-	TESTDIR=$(TESTDIR) /bin/bash ./test.sh
+	TESTDIR=$(TESTDIR) /bin/bash ./test/test.sh
+
+test-ext: mrproper all
+	TESTDIR=$(TESTDIR) /bin/bash ./test/test.sh extended
 
 .PHONY: check-syntax
 
