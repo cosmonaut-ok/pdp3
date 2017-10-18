@@ -21,7 +21,7 @@ before_script:
   - git submodule update --init
 
 script:
-  - make test
+  - make test-ext
 
 after_script:
   - make mrproper
