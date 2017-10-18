@@ -6,12 +6,12 @@ class Beam :
 {
 public:
 	Beam(char* p_name,
-       double p_charge,
-       double p_mass,
-       int p_number,
-       Geometry* geom,
-       particles_list* p_list,
-       double b_radius);
+			 double p_charge,
+			 double p_mass,
+			 int p_number,
+			 Geometry* geom,
+			 particles_list* p_list,
+			 double b_radius);
 
 	~Beam(void);
 

@@ -1,6 +1,6 @@
 namespace constant
 {
-  const double PI = 3.1415926535897932;
+	const double PI = 3.1415926535897932;
 	// Vacuum permittivity (electric constant), F*m(e-1)
 	const double EPSILON0 = 8.85E-12;
 	// Electron mass, kg

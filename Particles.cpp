@@ -14,22 +14,23 @@ const double EL_MASS = constant::EL_MASS;
 const double LIGHT_SPEED = constant::LIGHT_SPEED;
 const double MAGN_CONST = constant::MAGN_CONST;
 
+// C^2 define c^2 to decrease number of operations
+const double LIGHT_SPEED_POW_2 = pow (constant::LIGHT_SPEED, 2);
+
 using namespace std;
 
 Particles::Particles(void)
 {
 }
+
 // constructor
 Particles::Particles(char const *p_name,
-                     double p_charge,
-                     double p_mass,
-                     int p_number,
-                     Geometry* geom,
-                     particles_list* t_p_list):geom1(geom),
-                                               p_list(t_p_list),
-                                               c_light(LIGHT_SPEED),
-																							 // TODO: make global const?
-                                               c2(9.0e16)
+										 double p_charge,
+										 double p_mass,
+										 int p_number,
+										 Geometry* geom,
+										 particles_list* t_p_list):geom1(geom),
+																							 p_list(t_p_list)
 {
 	name = (char *) p_name;
 	charge = (double)p_charge*(double)EL_CHARGE;
@@ -39,7 +40,7 @@ Particles::Particles(char const *p_name,
 
 	//allocate memory for coordinates and velocities of particles
 	mass_array = new double[number];
-	charge_array= new double[number];
+	charge_array = new double[number];
 	x1 = new double[number];
 	x3 = new double[number];
 	v1 = new double[number];
@@ -54,7 +55,6 @@ Particles::Particles(char const *p_name,
 
 	// insert to particles_lists
 	p_list->part_list.push_back(this);
-
 }
 
 // copy constructor
@@ -64,8 +64,6 @@ Particles::Particles(Particles &cp_particles)
 	strcpy(name,cp_particles.name);
 	charge = cp_particles.charge;
 	mass = cp_particles.mass;
-	c_light = cp_particles.c_light;
-	c2 = cp_particles.c2;
 
 	x1 = new double[number];
 	x3 = new double[number];
@@ -73,7 +71,7 @@ Particles::Particles(Particles &cp_particles)
 	v2 = new double[number];
 	v3 = new double[number];
 	is_alive = new int[number];
-	for (int i=0;i<cp_particles.number;i++)
+	for (int i=0; i<cp_particles.number; i++)
 	{
 		x1[i] = cp_particles.x1[i];
 		x3[i] = cp_particles.x3[i];
@@ -101,7 +99,7 @@ void Particles::set_v_0()
 	for(int i=0; i<number; i++)
 	{
 		v1[i] = 0.0;
-		v2[i] = 1.0e5;
+		v2[i] = 1.0e5; // TODO: WHY?
 		v3[i] = 0.0;
 	}
 }
@@ -110,28 +108,32 @@ void Particles::set_x_0()
 {
 	for(int i=0; i<number; i++)
 	{
-		x1[i] = 0.5;
-		x3[i] = 0.5;
+		x1[i] = 0.5; // TODO: WHY?
+		x3[i] = 0.5; // TODO: WHY?
 	}
 }
 
+// calculate Lorentz factor
 double Particles::get_gamma(int i)
 {
-	return pow(1.0 - (v1[i]*v1[i] + v2[i]*v2[i] + v3[i]*v3[i])/c2, -0.5);
+	return pow(1.0 - (pow(v1[i], 2) + pow(v2[i], 2) + pow(v3[i], 2))
+						 / LIGHT_SPEED_POW_2, -0.5);
 }
 
-double Particles::get_gamma_inv(int i)
+// clculate reciprocal Lorentz factor (1/gamma), aka ``alpha''
+double Particles::get_gamma_inv(int i) // TODO: it is not alpha
 {
-	return pow((v1[i]*v1[i] + v2[i]*v2[i] + v3[i]*v3[i])/c2 + 1.0, (double)0.5);
+	return pow(1.0 + (pow(v1[i], 2) + pow(v2[i], 2) + pow(v3[i], 2))
+						 / LIGHT_SPEED_POW_2, (double)0.5);
 }
 
 void Particles::step_v(E_field *e_fld, H_field *h_fld, Time* t)
 {
- 	double gamma, b1, b2, b3, e1, e2, e3, vv1, vv2, vv3;
+	double gamma, b1, b2, b3, e1, e2, e3, vv1, vv2, vv3;
 	Triple E_compon(0.0, 0.0, 0.0), B_compon(0.0, 0.0, 0.0);
 	double const1, const2;
 	//if (t->current_time == t->start_time) const1 = const1/2.0;
-	for(int i=0;i<number;i++)
+	for(int i=0; i<number; i++)
 		if (is_alive[i])
 		{
 			const1 = charge_array[i]*t->delta_t/2.0/mass_array[i];
@@ -143,23 +145,24 @@ void Particles::step_v(E_field *e_fld, H_field *h_fld, Time* t)
 			b1 = B_compon.first*MAGN_CONST*const1;
 			b2 = B_compon.second*MAGN_CONST*const1;
 			b3 = B_compon.third*MAGN_CONST*const1;
-			//1. Multiplication by relativistic factor
-			//u(n-1/2) = gamma(n-1/2)*v(n-1/)
+
+			// 1. Multiplication by relativistic factor
+			// u(n-1/2) = gamma(n-1/2)*v(n-1/2)
 			gamma = get_gamma(i);
 			v1[i] = gamma*v1[i];
 			v2[i] = gamma*v2[i];
 			v3[i] = gamma*v3[i];
 
-			//2. Half acceleration in the electric field
-			//u'(n) = u(n-1/2) + q*dt/2/m*E(n)
+			// 2. Half acceleration in the electric field
+			// u'(n) = u(n-1/2) + q*dt/2/m*E(n)
 
 			v1[i] = v1[i] + e1;
 			v2[i] = v2[i] + e2;
 			v3[i] = v3[i] + e3;
 
-			//3. Rotation in the magnetic field
-			//u" = u' + 2/(1+B'^2)[(u' + [u'xB'(n)])xB'(n)]
-			//B'(n) = B(n)*q*dt/2/mass/gamma(n)
+			// 3. Rotation in the magnetic field
+			// u" = u' + 2/(1+B'^2)[(u' + [u'xB'(n)])xB'(n)]
+			// B'(n) = B(n)*q*dt/2/mass/gamma(n)
 			gamma = get_gamma_inv(i);
 			b1 = b1/gamma;
 			b2 = b2/gamma;
@@ -172,13 +175,13 @@ void Particles::step_v(E_field *e_fld, H_field *h_fld, Time* t)
 			v2[i] = vv2 + const2*(-(vv1 + vv2*b3 - vv3*b2)*b3 + (vv3 + vv1*b2 - vv2*b1)*b1);
 			v3[i] = vv3 + const2*((vv1 + vv2*b3 - vv3*b2)*b2 - (vv2 - vv1*b3 + vv3*b1)*b1);
 
-			//4. Half acceleration in the electric field
-			//u(n+1/2) = u(n) + q*dt/2/m*E(n)
+			// 4. Half acceleration in the electric field
+			// u(n+1/2) = u(n) + q*dt/2/m*E(n)
 			v1[i] = v1[i] + e1;
 			v2[i] = v2[i] + e2;
 			v3[i] = v3[i] + e3;
 
-			//5. Division by relativistic factor
+			// 5. Division by relativistic factor
 			gamma = get_gamma_inv(i);
 			v1[i] = v1[i]/gamma;
 			v2[i] = v2[i]/gamma;
@@ -358,7 +361,7 @@ void Particles::charge_weighting(charge_density* ro1)
 // function for initial (Maxwell) distribution
 void Particles::velocity_distribution(double therm_vel)
 {
- 	int j = 0;
+	int j = 0;
 	double R =0; // number from [0;1]
 	double dv = therm_vel/1e7; // velocity step in calculation integral
 	double s =0;
@@ -399,7 +402,7 @@ void Particles::velocity_distribution(double therm_vel)
 void Particles::velocity_distribution_v2(double tempr_ev)
 {
 	double therm_vel = sqrt(tempr_ev*2.0*EL_CHARGE/
-                          (this->init_const_mass*EL_MASS));
+													(this->init_const_mass*EL_MASS));
 	int j=0;
 	double R =0; // number from [0;1]
 	double dv = therm_vel/0.5e7; // velocity step in calculation integral
@@ -520,7 +523,7 @@ double Particles::random_reverse(double vel, int power)
 
 void Particles::load_spatial_distribution(double n1, double n2, double left_plasma_boundary,int type)
 {
- 	// calculate number of electrons in a big particle
+	// calculate number of electrons in a big particle
 	double rand_r;
 	double rand_z;
 	double dr = geom1->dr*1.00000001;
@@ -630,11 +633,11 @@ void Particles::load_spatial_distribution(double n1, double n2, double left_plas
 }
 
 void Particles::load_spatial_distribution_with_variable_mass(double n1,
-                                                             double n2,
-                                                             double left_plasma_boundary,
-                                                             int type)
+																														 double n2,
+																														 double left_plasma_boundary,
+																														 int type)
 {
- 	// calculate number of electrons in a big particle
+	// calculate number of electrons in a big particle
 	double rand_r;
 	double rand_z;
 	double dr = geom1->dr*1.00000001;
@@ -668,7 +671,7 @@ void Particles::load_spatial_distribution_with_variable_mass(double n1,
 
 void Particles::load_velocity_distribution(double v_thermal)
 {
- 	for (int n=0; n<number; n++)
+	for (int n=0; n<number; n++)
 	{
 		v1[n] = 0.0;
 		v2[n] = 0.0;
@@ -677,14 +680,14 @@ void Particles::load_velocity_distribution(double v_thermal)
 }
 
 void Particles::simple_j_weighting(Time* time1,
-                                   current *j1,
-                                   double x1_new,
-                                   double x3_new,
-                                   double x1_old,
-                                   double x3_old,
-                                   int i_n,
-                                   int k_n,
-                                   int p_number)
+																	 current *j1,
+																	 double x1_new,
+																	 double x3_new,
+																	 double x1_old,
+																	 double x3_old,
+																	 int i_n,
+																	 int k_n,
+																	 int p_number)
 {
 	double dr = geom1->dr;
 	double dz = geom1->dz;
@@ -1171,13 +1174,13 @@ void Particles::azimuthal_j_weighting(Time* time1, current *this_j)
 		}
 }
 
-void Particles:: strict_motion_weighting(Time *time1,
-                                         current *this_j,
-                                         double x1_new,
-                                         double x3_new,
-                                         double x1_old,
-                                         double x3_old,
-                                         int p_number)
+void Particles::strict_motion_weighting(Time *time1,
+																				 current *this_j,
+																				 double x1_new,
+																				 double x3_new,
+																				 double x1_old,
+																				 double x3_old,
+																				 int p_number)
 {
 	double dr = geom1->dr;
 	double dz = geom1->dz;
@@ -1335,10 +1338,10 @@ void Particles:: strict_motion_weighting(Time *time1,
 
 
 bool continuity_equation(Time *input_time,
-                         Geometry *input_geometry,
-                         current *input_J,
-                         charge_density *rho_old,
-                         charge_density *rho_new)
+												 Geometry *input_geometry,
+												 current *input_J,
+												 charge_density *rho_old,
+												 charge_density *rho_new)
 {
 	double **rho_old_array = rho_old->get_ro() ;
 	double **rho_new_array = rho_new->get_ro() ;

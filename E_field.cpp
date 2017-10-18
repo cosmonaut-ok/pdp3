@@ -165,9 +165,9 @@ void E_field::boundary_conditions()
 //Electric field calculation with absorbing fields on walls//
 ///////////////////////////////////////////////////////////////////////////////
 void E_field::calc_field(H_field* h_field1,
-                         Time* time1,
-                         current* current1,
-                         PML* pml1)
+												 Time* time1,
+												 current* current1,
+												 PML* pml1)
 {
 	int i=0;
 	int k=0;
@@ -391,10 +391,10 @@ void E_field::poisson_equation2(Geometry* geom1, charge_density* ro1)
 /////////////////////////////////////////////////////////////
 
 void E_field::TridiagonalSolve(const double *a,
-                               const double *b,
-                               double *c,
-                               double *d, double *x,
-                               unsigned int n)
+															 const double *b,
+															 double *c,
+															 double *d, double *x,
+															 unsigned int n)
 {
 	int i;
 

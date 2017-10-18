@@ -41,11 +41,11 @@ struct Particle
 };
 
 Particles_struct CreateParticles_struct(double charge,
-                                        double mass,
-                                        int number,
-                                        int grid_num1,
-                                        int grid_num3,
-                                        double dr,
-                                        double dz);
+																				double mass,
+																				int number,
+																				int grid_num1,
+																				int grid_num3,
+																				double dr,
+																				double dz);
 
 #endif
