@@ -1,7 +1,18 @@
-#!/bin/sh
+#!/bin/bash
+
+set -e
 
 test -z $TESTDIR && TESTDIR=testingdir
-test -z $TESTING_DATA_ARCHIVE && TESTING_DATA_ARCHIVE=test_true_data.tar.gz
+test -z $TRUE_MD5 && TRUE_MD5=test/true_md5sums
+test -z $TRUE_EXT_MD5 && TRUE_EXT_MD5=test/true_ext_md5sums
+test -z $TESTING_DATA_ARCHIVE && TESTING_DATA_ARCHIVE=test/test_true_data.tar.gz
+
+if [ -n "$1" ] && [ "$1" == "extended" ]; then
+    END_TIME=1.05e-10
+    TRUE_MD5=$TRUE_EXT_MD5
+else
+    END_TIME=2.2e-11
+fi
 
 mkdir -p ${TESTDIR}
 cp pdp3 ${TESTDIR}
@@ -30,7 +41,7 @@ cat<<EOF>${TESTDIR}/parameters.xml
     <start_time> 0 </start_time>
     <relaxation_time> 0 </relaxation_time>
     <current_time> 0 </current_time>
-    <end_time>2.2e-11</end_time>
+    <end_time>${END_TIME}</end_time>
     <delta_t>1e-12</delta_t>
   </Time>
 
@@ -107,18 +118,18 @@ cat<<EOF>${TESTDIR}/parameters.xml
 EOF
 
 cd ${TESTDIR}
-mkdir -p pdp3_files/_results_ocl pdp3_result/Dump pdp3_result/dump
+mkdir -p pdp3_result/Dump
 ./pdp3
 
-## compare with testing data
-mkdir -p true_data
-cd true_data
-tar -xf ../../${TESTING_DATA_ARCHIVE}
+cd pdp3_result
 
+## compare with testing data
 success="true"
 for i in `find . -type f`; do
     bn=`basename $i`
-    test -z "$(diff ${bn} ../pdp3_result/${bn} 2>&1)" || success="false"
+    true_md5sum="$(grep ${bn} ../../${TRUE_MD5} | cut -d';' -f1)"
+    actual_md5sum="$(md5sum ${bn} | cut -d' ' -f1)"
+    test "${true_md5sum}" == "${actual_md5sum}" || success="false"
 done
 
 if [ "$success" == "false" ]; then
