@@ -20,17 +20,17 @@ input_output_class::~input_output_class(void)
 }
 
 void input_output_class::out_data(char const *comp_name,
-                                  double** out_value,
-                                  int step_number,
-                                  int number,
-                                  int r_step,
-                                  int z_step)
+																	double** out_value,
+																	int step_number,
+																	int number,
+																	int r_step,
+																	int z_step)
 {
 	//static variable for defining number of function calling
 	//static int count =0;
 	//static variable. increase text file name
 	int inc_value = 0;
-	// 	if (step_number/number)
+	//	if (step_number/number)
 	//{
 	//	i=i+1;
 	////char operations
@@ -56,7 +56,7 @@ void input_output_class::out_data(char const *comp_name,
 	strcpy(path,this->path_result);
 	strcat(path,st_name);
 	ofstream out_val(path,ios::app);
-	// write  values  into file
+	// write	values	into file
 	for (int i=0; i<r_step;i++)
 	{
 		for(int k=0;k<z_step;k++)
@@ -67,9 +67,9 @@ void input_output_class::out_data(char const *comp_name,
 	out_val.close();
 }
 void input_output_class::out_field_dump(char* comp_name,
-                                        double** out_value,
-                                        int r_step,
-                                        int z_step)
+																				double** out_value,
+																				int r_step,
+																				int z_step)
 {
 	char st_name[100];
 
@@ -78,7 +78,7 @@ void input_output_class::out_field_dump(char* comp_name,
 	//char path[50] = "D:/pdp3 files/_results/";
 	strcat(st_name,comp_name);
 	ofstream out_val(st_name);
-	// write  values  into file
+	// write	values	into file
 	for (int i=0; i<r_step;i++)
 	{
 		for(int k=0;k<z_step;k++)
@@ -91,11 +91,11 @@ void input_output_class::out_field_dump(char* comp_name,
 
 /////
 void input_output_class::out_coord(char* comp_name,
-                                   double* coord_r,
-                                   double* coord_z,
-                                   int step_number,
-                                   int number,
-                                   int particles_number)
+																	 double* coord_r,
+																	 double* coord_z,
+																	 int step_number,
+																	 int number,
+																	 int particles_number)
 {
 	//static variable for defining number of function calling
 	//static int count =0;
@@ -125,7 +125,7 @@ void input_output_class::out_coord(char* comp_name,
 	strcpy(path,this->path_result);
 	strcat(path,st_name);
 	ofstream out_val(path,ios::app);
-	// write  values  into file
+	// write	values	into file
 	out_val.setf(std::ios_base::scientific);
 	out_val.precision(14);
 	for (int i=0; i<particles_number;i++)
@@ -139,9 +139,9 @@ void input_output_class::out_coord(char* comp_name,
 }
 
 void input_output_class::out_coord_dump(char* comp_name ,
-                                        double* coord_r,
-                                        double* coord_z,
-                                        int particles_number)
+																				double* coord_r,
+																				double* coord_z,
+																				int particles_number)
 {
 	char st_name[100] ;
 
@@ -161,10 +161,10 @@ void input_output_class::out_coord_dump(char* comp_name ,
 }
 
 void input_output_class:: out_velocity_dump(char* comp_name,
-                                            double* v1,
-                                            double* v2,
-                                            double* v3,
-                                            int particles_number)
+																						double* v1,
+																						double* v2,
+																						double* v3,
+																						int particles_number)
 {
 	char st_name[100] ;
 

@@ -14,7 +14,7 @@ public:
 	E_field * e_f;
 	charge_density *rho;
 	void specify_boundary_conditions(double E_fi_upper,
-                                   double E_fi_left,
-                                   double E_fi_right,
-                                   double fi_upper_wall);
+																	 double E_fi_left,
+																	 double E_fi_right,
+																	 double fi_upper_wall);
 };
