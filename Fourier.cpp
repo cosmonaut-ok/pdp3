@@ -238,9 +238,9 @@ void Fourier::fast_fourier_transform(double**a,int lenght_n,int ir, bool inv)
 // tnn=2^n//
 // array [0..tnn], number of function vulues = 2^n+1 //
 void Fourier::fastcosinetransform_old(double** a,
-                                      int tnn,
-                                      bool inversefct,
-                                      int ir)
+																			int tnn,
+																			bool inversefct,
+																			int ir)
 {
 	// double pi = 3.14159265;
 	int j;
@@ -424,9 +424,9 @@ void Fourier::fastcosinetransform_old(double** a,
 //tnn=2^n//
 // array [0..tnn-1], number of function vulues = 2^n//
 void Fourier::fastsinetransform_old(double** a,
-                                    int tnn,
-                                    bool inversefst,
-                                    int ir)
+																		int tnn,
+																		bool inversefst,
+																		int ir)
 {
 	// double pi = 3.14159265;
 	int jj;

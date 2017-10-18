@@ -140,10 +140,10 @@ void Load_init_param::init_particles()
 		temperature = atof(particle_kind->FirstChildElement("temperature")->GetText());
 
 		prtls = new Particles(strcpy(new char [50],p_name), charge, mass, number,
-                          c_geom, p_list);
+													c_geom, p_list);
 
 		prtls->load_spatial_distribution_with_variable_mass(
-      left_density,right_density,0,0);
+			left_density,right_density,0,0);
 		// prtls->load_spatial_distribution(params[3],params[4],0,0);
 		prtls->velocity_distribution_v2(temperature);
 		particle_kind = particle_kind->NextSiblingElement(p_king_section_name);
@@ -161,32 +161,30 @@ Bunch* Load_init_param::init_bunch()
 	Bunch* prtls = 0;
 	char* p_name= new char [50];
 	strcpy (p_name, sub_root->FirstChildElement("name")->GetText());
-	double charge = atof(sub_root->
-                         FirstChildElement("charge")->
-                         GetText());
-	double mass = atof(sub_root->
-                         FirstChildElement("mass")->
-                         GetText());
-	double number = atof(sub_root->
-                         FirstChildElement("number")->
-                         GetText());
-  double duration = atof(sub_root->
-                          FirstChildElement("duration")->
-                          GetText());
-	double radius = atof(sub_root->
-                          FirstChildElement("radius")->
-                          GetText());
-	double density = atof(sub_root->
-                          FirstChildElement("density")->
-                          GetText());
-	double initial_velocity = atof(sub_root->
-                          FirstChildElement("initial_velocity")->
-                          GetText());
+	double charge = atof(sub_root
+											 ->FirstChildElement("charge")
+											 ->GetText());
+	double mass = atof(sub_root
+										 ->FirstChildElement("mass")
+										 ->GetText());
+	double number = atof(sub_root
+											 ->FirstChildElement("number")
+											 ->GetText());
+	double duration = atof(sub_root
+												 ->FirstChildElement("duration")
+												 ->GetText());
+	double radius = atof(sub_root
+											 ->FirstChildElement("radius")
+											 ->GetText());
+	double density = atof(sub_root
+												->FirstChildElement("density")
+												->GetText());
+	double initial_velocity = atof(sub_root
+																 ->FirstChildElement("initial_velocity")
+																 ->GetText());
 
-	prtls = new Bunch(p_name,charge,mass,number,c_geom, p_list,duration,radius);
-
-	// prtls = new Bunch(p_name,params[0],params[1],params[2],c_geom, p_list,params[3],params[4]);
-	prtls->calc_init_param(density, initial_velocity);
+	prtls = new Bunch(p_name, charge, mass,number, c_geom, p_list,
+										duration, radius, density, initial_velocity);
 
 	return prtls;
 }
@@ -198,14 +196,14 @@ void Load_init_param::init_boundary_maxwell ()
 	XMLElement* sub_root =root->FirstChildElement (BOUNDARY_MAXWELL_PARAMS_NAME);
 	//
 	double e_fi_upper = atof(sub_root->
-                          FirstChildElement("e_fi_upper")->
-                          GetText());
+													 FirstChildElement("e_fi_upper")->
+													 GetText());
 	double e_fi_left = atof(sub_root->
-                          FirstChildElement("e_fi_left")->
-                          GetText());
+													FirstChildElement("e_fi_left")->
+													GetText());
 	double e_fi_right = atof(sub_root->
-                           FirstChildElement("e_fi_right")->
-                           GetText());
+													 FirstChildElement("e_fi_right")->
+													 GetText());
 
 	Boundary_Maxwell_conditions maxwell_rad(efield);
 	maxwell_rad.specify_initial_field(c_geom, e_fi_upper, e_fi_left, e_fi_right);
@@ -218,20 +216,20 @@ void Load_init_param::init_pml ()
 	XMLElement* sub_root =root->FirstChildElement (PML_PARAMS_NAME);
 	//
 	double comp_l_1 = atof(sub_root->
-                         FirstChildElement("comparative_l_1")->
-                         GetText());
+												 FirstChildElement("comparative_l_1")->
+												 GetText());
 	double comp_l_2 = atof(sub_root->
-                         FirstChildElement("comparative_l_2")->
-                         GetText());
+												 FirstChildElement("comparative_l_2")->
+												 GetText());
 	double comp_l_3 = atof(sub_root->
-                         FirstChildElement("comparative_l_3")->
-                         GetText());
-  double sigma_1_t = atof(sub_root->
-                          FirstChildElement("sigma_1")->
-                          GetText());
+												 FirstChildElement("comparative_l_3")->
+												 GetText());
+	double sigma_1_t = atof(sub_root->
+													FirstChildElement("sigma_1")->
+													GetText());
 	double sigma_2_t = atof(sub_root->
-                          FirstChildElement("sigma_2")->
-                          GetText());
+													FirstChildElement("sigma_2")->
+													GetText());
 
 	c_pml = new PML(comp_l_1, comp_l_2, comp_l_3, sigma_1_t, sigma_2_t);
 }
@@ -242,17 +240,17 @@ void Load_init_param::init_geometry ()
 	XMLElement* sub_root =root->FirstChildElement (GEOMETRY_PARAMS_NAME);
 	//
 	double r_size = atof(sub_root->
-                       FirstChildElement("r_size")->
-                       GetText());
+											 FirstChildElement("r_size")->
+											 GetText());
 	double z_size = atof(sub_root->
-                       FirstChildElement("z_size")->
-                       GetText());
+											 FirstChildElement("z_size")->
+											 GetText());
 	int n_grid_r = atoi(sub_root->
-                      FirstChildElement("n_grid_r")->
-                      GetText());
-  int n_grid_z = atoi(sub_root->
-                      FirstChildElement("n_grid_z")->
-                      GetText());
+											FirstChildElement("n_grid_r")->
+											GetText());
+	int n_grid_z = atoi(sub_root->
+											FirstChildElement("n_grid_z")->
+											GetText());
 
 	// TODO: load_pml should be first. Avoid it
 	c_geom = new Geometry(r_size, z_size, n_grid_r, n_grid_z, c_pml);
@@ -276,23 +274,23 @@ void Load_init_param::init_time ()
 	XMLElement* sub_root =root->FirstChildElement (TIME_PARAMS_NAME);
 	//
 	double start_time = atof(sub_root->
-                           FirstChildElement("start_time")->
-                           GetText());
+													 FirstChildElement("start_time")->
+													 GetText());
 	double relaxation_time = atof(sub_root->
-                                FirstChildElement("relaxation_time")->
-                                GetText());
-  double current_time = atof(sub_root->
-                         FirstChildElement("current_time")->
-                         GetText());
+																FirstChildElement("relaxation_time")->
+																GetText());
+	double current_time = atof(sub_root->
+												 FirstChildElement("current_time")->
+												 GetText());
 	double end_time = atof(sub_root->
-                         FirstChildElement("end_time")->
-                         GetText());
+												 FirstChildElement("end_time")->
+												 GetText());
 	double delta_t = atof(sub_root->
-                        FirstChildElement("delta_t")->
-                        GetText());
+												FirstChildElement("delta_t")->
+												GetText());
 
 	c_time = new Time(current_time, start_time,
-                    relaxation_time, end_time, delta_t);
+										relaxation_time, end_time, delta_t);
 }
 
 bool Load_init_param::save_system_state()
@@ -388,9 +386,7 @@ void Load_init_param::run(void)
 			t1 = clock();
 			if	((((int)(c_time->current_time/c_time->delta_t))%1000==0)&&(step_number!=1))
 				this->save_system_state();
-
 		}
-
 		c_time->current_time = c_time->current_time + c_time->delta_t;
 		//if (!res)
 		//	cout<<"Error:"<<c_time->current_time<<"! ";

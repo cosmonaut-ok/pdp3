@@ -29,8 +29,7 @@ LDFLAGS := $(LDFLAGS) -L$(tinyxml2_SUBDIR)
 ### pdp3 sources and settings
 pdp3_MODULE           = pdp3
 pdp3_C_SRCS           =
-pdp3_CXX_SRCS         = Beam.cpp \
-			Boundary_Maxwell_conditions.cpp \
+pdp3_CXX_SRCS         = Boundary_Maxwell_conditions.cpp \
 			Boundary_conditions.cpp \
 			Bunch.cpp \
 			E_field.cpp \
