@@ -8,8 +8,8 @@ data_file1 = strcat(data_path, '/', 'e1');
 data_file2 = strcat(data_path, '/', 'e3');
 data_file3 = strcat(data_path, '/', 'rho_beam');
 
-w = 1.0e9;
-Tmod = 2*pi/w;
+% w = 1.0e9;
+% Tmod = 2*pi/w;
 
 filter = ones(3,12)/3/12;
 
@@ -58,64 +58,70 @@ N = file_delta;
 
 %clim = [-2 2];
 
+movie_filename = strcat(video_path,'field_movie','.avi');
+movie_object = VideoWriter(movie_filename);
+open(movie_object);
+
 for k = 0:100
+  disp(['Processing frame ', num2str(k)])
+  
+  tstart = (k)*N;
+  tend = ((k+1)*N-1);
+  i = 1;
 
-    tstart = (k)*N;
-    tend = ((k+1)*N-1);
-    i = 1;
+  fidh1 = fopen([data_file1 num2str(k)], 'r');
+  fidh2 = fopen([data_file2 num2str(k)], 'r');
+  fidh3 = fopen([data_file3 num2str(k)], 'r');
+  h_field1 = fscanf(fidh1,'%e',size_1*size_3*file_delta);
+  h_field2 = fscanf(fidh2,'%e',size_1*size_3*file_delta);
+  h_field3 = fscanf(fidh3,'%e',size_1*size_3*file_delta);
+  %% size(h_field)
+  fclose(fidh1);
+  fclose(fidh2);
+  fclose(fidh3);
+  length(h_field1)
 
-        fidh1 = fopen([data_file1 num2str(k)], 'r');
-        fidh2 = fopen([data_file2 num2str(k)], 'r');
-        fidh3 = fopen([data_file3 num2str(k)], 'r');
-        h_field1 = fscanf(fidh1,'%e',size_1*size_3*file_delta);
-        h_field2 = fscanf(fidh2,'%e',size_1*size_3*file_delta);
-        h_field3 = fscanf(fidh3,'%e',size_1*size_3*file_delta);
-%         size(h_field)
-        fclose(fidh1);
-        fclose(fidh2);
-        fclose(fidh3);
-        length(h_field1)
-    for t = tstart:tend
-%         t
-        local_step = mod(t,file_delta)
-        h_field_shot1 = h_field1(size_1*size_3*local_step+1:size_1*size_3*(local_step+1));
-        h_field_matrix1 = fliplr(reshape(h_field_shot1,size_3,size_1))';
-        
-        h_field_shot2 = h_field2(size_1*size_3*local_step+1:size_1*size_3*(local_step+1));
-        h_field_matrix2 = fliplr(reshape(h_field_shot2,size_3,size_1))';
-        
-        h_field_shot3 = h_field3(size_1*size_3*local_step+1:size_1*size_3*(local_step+1));
-        h_field_matrix3 = fliplr(reshape(h_field_shot3,size_3,size_1))';        
-            
-        
-        set(im1, 'CData', imfilter(h_field_matrix1,filter));        
-        set(im2, 'CData', imfilter(h_field_matrix2,filter));       
-        set(im3, 'CData', imfilter(h_field_matrix3,filter));
-%         imshow(imfilter(h_field_matrix,filter),clim)
-       % figure, surf(h_field_matrix)
-
-        figHandle = gcf;
-        frame = getframe(figHandle);
-        D(:,:,:,i)   = frame.cdata;
-        D(:,:,:,i+1) = frame.cdata;
-        D(:,:,:,i+2) = frame.cdata;
-        i = i + 3;
-        
-   drawnow;
-        
-    end
-    f2 = figure('Position', [20 20 100 100]);
-    at = axes('Parent', f2);
-    mov = immovie(D);
-    movie_filename = strcat(path4wr,'field_movie_',num2str(t/1e-7,'%3.2f'),'.avi');
+  for t = tstart:tend
+    local_step = mod(t,file_delta);
+    h_field_shot1 = h_field1(size_1*size_3*local_step+1:size_1*size_3*(local_step+1));
+    h_field_matrix1 = fliplr(reshape(h_field_shot1,size_3,size_1))';
     
-    % movie2avi(mov, strcat(path4wr,'field_movie_',num2str(t/1e-7,'%3.2f'),'.avi'));
-	movie_object = VideoWriter(movie_filename);
-    open(movie_object);
-    writeVideo(movie_object, mov);
-    clear mov
-    close(movie_object)
-    close(f2)
-    pack
+    h_field_shot2 = h_field2(size_1*size_3*local_step+1:size_1*size_3*(local_step+1));
+    h_field_matrix2 = fliplr(reshape(h_field_shot2,size_3,size_1))';
+    
+    h_field_shot3 = h_field3(size_1*size_3*local_step+1:size_1*size_3*(local_step+1));
+    h_field_matrix3 = fliplr(reshape(h_field_shot3,size_3,size_1))';        
+    
+    
+    set(im1, 'CData', imfilter(h_field_matrix1,filter));        
+    set(im2, 'CData', imfilter(h_field_matrix2,filter));       
+    set(im3, 'CData', imfilter(h_field_matrix3,filter));
+    %% imshow(imfilter(h_field_matrix,filter),clim)
+    %% figure, surf(h_field_matrix)
+
+    figHandle = gcf;
+    frame = getframe(figHandle);
+    D(:,:,:,i)   = frame.cdata;
+    D(:,:,:,i+1) = frame.cdata;
+    D(:,:,:,i+2) = frame.cdata;
+    i = i + 3;
+    
+    drawnow;
+    
+  end
+  
+  f2 = figure('Position', [20 20 100 100]);
+  at = axes('Parent', f2);
+  mov = immovie(D);
+  %% movie_filename = strcat(video_path,'field_movie_',num2str(t/1e-7,'%3.2f'),'.avi');
+  %% movie_object = VideoWriter(movie_filename);
+  %% open(movie_object);
+  writeVideo(movie_object, mov);
+  clear mov
+  %% close(movie_object)
+  close(f2)
+  %% pack
 end
+
+close(movie_object)
 
