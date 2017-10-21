@@ -1,11 +1,19 @@
-function var = rho_movie_create_light3(data_file1, data_file2, data_file3, file_delta, size_1, size_3, clim1, clim2, clim3);
+% rho_movie_create_light3('~/pdp3_modeling/model5/pdp3_result/', '~/pdp3_modeling/model5/movie/',100,254,2046,[0 1],[0 1],[-1e-7 0])
+
+function var = rho_movie_create_light3(data_path, video_path, file_delta, size_1, size_3, clim1, clim2, clim3);
+
+% function var = rho_movie_create_light3(data_file1, data_file2, data_file3, file_delta, size_1, size_3, clim1, clim2, clim3);
+
+data_file1 = strcat(data_path, '/', 'e1');
+data_file2 = strcat(data_path, '/', 'e3');
+data_file3 = strcat(data_path, '/', 'rho_beam');
 
 w = 1.0e9;
 Tmod = 2*pi/w;
 
 filter = ones(3,12)/3/12;
 
-path4wr = '~/dev/pdp3/movie/';
+path4wr = video_path;
 name4wr = 'h2';
 
 t_begin = 1.6e-6;
@@ -86,8 +94,6 @@ for k = 0:100
 %         imshow(imfilter(h_field_matrix,filter),clim)
        % figure, surf(h_field_matrix)
 
-
-
         figHandle = gcf;
         frame = getframe(figHandle);
         D(:,:,:,i)   = frame.cdata;
@@ -95,8 +101,6 @@ for k = 0:100
         D(:,:,:,i+2) = frame.cdata;
         i = i + 3;
         
-
-
    drawnow;
         
     end
