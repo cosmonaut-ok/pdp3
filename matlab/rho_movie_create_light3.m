@@ -63,7 +63,7 @@ movie_object = VideoWriter(movie_filename);
 open(movie_object);
 
 for k = 0:100
-  disp(['Processing frame ', num2str(k)])
+  disp(['Processing frame ', num2str(k)]);
   
   tstart = (k)*N;
   tend = ((k+1)*N-1);
@@ -79,7 +79,7 @@ for k = 0:100
   fclose(fidh1);
   fclose(fidh2);
   fclose(fidh3);
-  length(h_field1)
+  length(h_field1);
 
   for t = tstart:tend
     local_step = mod(t,file_delta);
@@ -117,9 +117,9 @@ for k = 0:100
   %% movie_object = VideoWriter(movie_filename);
   %% open(movie_object);
   writeVideo(movie_object, mov);
-  clear mov
+  clear mov;
   %% close(movie_object)
-  close(f2)
+  close(f2);
   %% pack
 end
 
