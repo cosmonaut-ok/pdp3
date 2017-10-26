@@ -3,7 +3,7 @@
 class field
 {
 public:
-	virtual ~field(void);
-	field(void);
-	virtual void calc_field()=0;
+  virtual ~field(void);
+  field(void);
+  virtual void calc_field()=0;
 };
