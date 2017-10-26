@@ -6,8 +6,8 @@
 class Boundary_conditions
 {
 public:
-	Boundary_conditions(void);
-	~Boundary_conditions(void);
+  Boundary_conditions(void);
+  ~Boundary_conditions(void);
 
-	virtual void specify_boundary_conditions()=0;
+  virtual void specify_boundary_conditions()=0;
 };
