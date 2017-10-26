@@ -14,8 +14,8 @@ Bunch::Bunch(char* p_name,
              double b_duration,
              double b_radius,
              double b_density,
-             double b_init_velocity):Particles(p_name, p_charge, p_mass, p_number,
-                                        geom, p_list)
+             double b_init_velocity):Particles(p_name, p_charge, p_mass,
+                                               p_number, geom, p_list)
 {
   // fill object fields
   duration = b_duration;
@@ -127,7 +127,7 @@ void Bunch::bunch_inject_calc_E(Geometry* geom,
 
 void Bunch::half_step_coord(Time* t)
 {
-	double dr = geom1->dr;
+  double dr = geom1->dr;
   double dz = geom1->dz;
   double x1_wall = geom1->first_size - dr/2.0;
   double x3_wall = geom1->second_size - dz/2.0;
