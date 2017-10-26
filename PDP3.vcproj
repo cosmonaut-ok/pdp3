@@ -199,10 +199,6 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\Beam.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\Boundary_conditions.cpp"
 				>
 			</File>
@@ -297,10 +293,6 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\Beam.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Boundary_conditions.h"
 				>
 			</File>
@@ -393,7 +385,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Time.h"
+				RelativePath=".\pdp3_time.h"
 				>
 			</File>
 			<File

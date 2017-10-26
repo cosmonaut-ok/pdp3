@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
@@ -11,9 +11,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Beam.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Boundary_conditions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -80,9 +77,6 @@
     <ClCompile Include="Triple.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Test_class.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Load_init_param.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -91,9 +85,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Beam.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Boundary_conditions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -157,13 +148,10 @@
     <ClInclude Include="resource1.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Time.h">
+    <ClInclude Include="pdp3_time.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Triple.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Test_class.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Load_init_param.h">

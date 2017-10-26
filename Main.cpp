@@ -7,10 +7,8 @@ Particles_struct specie;
 
 int main(int argc, char **argv)
 {
-	clock_t start, finish;
-	double time_elapsed;
-	Load_init_param init_param((char *) "parameters.xml");
+  Load_init_param init_param((char *) "parameters.xml");
 
-	init_param.run();
+  init_param.run();
 
 }
