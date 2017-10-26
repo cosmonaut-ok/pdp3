@@ -103,11 +103,8 @@ void particles_list::j_weighting(Time* time1, current *j1)
 
 void particles_list::azimuthal_j_weighting(Time* time1, current *j1)
 {
-  std::size_t i = 0;
-  for(i = 0; i < part_list.size(); i++)
-  {
+  for(std::size_t i=0; i<part_list.size(); i++)
     part_list[i]->azimuthal_j_weighting(time1,j1);
-  }
 }
 
 void particles_list::create_coord_arrays(void)
@@ -135,12 +132,10 @@ void particles_list::create_coord_arrays(void)
 
 void particles_list:: copy_coords()
 {
-  //fuction for copying particles coordinates
-  int i=0;
-  int k=0;
+  // fuction for copying particles coordinates
   int kinds_number = part_list.size();
-  for (k=0;k<kinds_number;k++)
-    for(i=0;i<part_list[k]->number;i++)
+  for (int k=0;k<kinds_number;k++)
+    for(int i=0;i<part_list[k]->number;i++)
     {
       x1_old[k][i]=part_list[k]->x1[i];
       x3_old[k][i]=part_list[k]->x3[i];

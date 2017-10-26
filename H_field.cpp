@@ -153,7 +153,6 @@ void H_field::set_homogeneous_h(double H1, double H2, double H3)
 void H_field::calc_field(E_field* e_field1, Time* time1)
 {
   double alpha;
-  int i=0;
 
   // Hr - last i value
   for(int k=0;k<(geom1->n_grid_2-1);k++)

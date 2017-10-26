@@ -127,8 +127,7 @@ void Bunch::bunch_inject_calc_E(Geometry* geom,
 
 void Bunch::half_step_coord(Time* t)
 {
-  int i;
-  double dr = geom1->dr;
+	double dr = geom1->dr;
   double dz = geom1->dz;
   double x1_wall = geom1->first_size - dr/2.0;
   double x3_wall = geom1->second_size - dz/2.0;
@@ -138,7 +137,7 @@ void Bunch::half_step_coord(Time* t)
   // double x3_wallX2 = x3_wall*2.0;
   double half_dt = t->delta_t/2.0;
 
-  for( i=0;i<number;i++)
+  for(int i=0;i<number;i++)
     if (is_alive[i])
     {
       x1[i] = x1[i] + v1[i]*half_dt;

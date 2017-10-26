@@ -21,17 +21,16 @@ void Boundary_Maxwell_conditions::specify_initial_field(Geometry* cyl_geom,
                                                         double E_fi_left,
                                                         double E_fi_right)
 {
-  int i=0, k=0;
   int n_grid1=cyl_geom->n_grid_1;
   int n_grid2 = cyl_geom->n_grid_2;
 // setazimuthal component electric field initial value
 /////////////////////////////////////////////
-  for (i=0;i<(n_grid1);i++)
+  for (int i=0;i<(n_grid1);i++)
   {
     e_fld->e2[i][0]=E_fi_left;
     e_fld->e2[i][n_grid2-1]=E_fi_right;
   }
-  for(k=0;k<n_grid2;k++)
+  for(int k=0;k<n_grid2;k++)
   {
     e_fld->e2[n_grid1-1][k]=E_fi_upper;
   }
