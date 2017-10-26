@@ -201,11 +201,11 @@ void Particles::half_step_coord(Time* t)
 	double x3_wallX2 = x3_wall*2.0;
 	double half_dt = t->delta_t/2.0;
 
-	for(int i=0;i<number;i++)
+	for(int i=0; i<number; i++)
 		if (is_alive[i])
 		{
-			x1[i] = x1[i] + v1[i]*half_dt;
-			x3[i] = x3[i] + v3[i]*half_dt;
+			x1[i] = x1[i] + v1[i] * half_dt;
+			x3[i] = x3[i] + v3[i] * half_dt;
 
 			if (x1[i] > x1_wall)
 			{
@@ -233,10 +233,8 @@ void Particles::half_step_coord(Time* t)
 		}
 }
 
-////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////
-	//function for charge density weighting///
+// function for charge density weighting
 void Particles::charge_weighting(charge_density* ro1)
 {
 	int r_i=0;	// number of particle i cell
@@ -245,29 +243,26 @@ void Particles::charge_weighting(charge_density* ro1)
 	double dr = geom1->dr;
 	double dz = geom1->dz;
 	double r1, r2, r3; // temp variables for calculation
-	double dz1, dz2;	 // temp var.: width of k and k+1 cell
+	double dz1, dz2; // temp var.: width of k and k+1 cell
 
-	double ro_v =0; // charge density Q/V, V - volume of particle
-	double v_1 =0; // volume of [i][k] cell
-	double v_2= 0; // volume of [i+1][k] cell
-	//double ro_v_2=0; // charge density in i+1 cell
+	double ro_v = 0; // charge density Q/V, V - volume of particle
+	double v_1 = 0; // volume of [i][k] cell
+	double v_2 = 0; // volume of [i+1][k] cell
+	//double ro_v_2 = 0; // charge density in i+1 cell
 
 	double value =0;
-	double **temp = ro1->get_ro();
+	// double **temp = ro1->get_ro();
 
-	for(int i=0;i<number;i++)
+	for(int i=0; i<number; i++)
 		if (is_alive[i])
 		{
 			// finding number of i and k cell. example: dr = 0.5; r = 0.4; i =0
-			////////////////////////////
 			r_i = (int)ceil((x1[i])/dr)-1;
 			z_k =	 (int)ceil((x3[i])/dz)-1;
-			///////////////////////////
 
 			// in first cell other alg. of ro_v calc
 			if(x1[i]>dr)
 			{
-				///////////////////////////
 				r1 =	 x1[i] - 0.5*dr;
 				r2 = (r_i+0.5)*dr;
 				r3 = x1[i] + 0.5*dr;
@@ -276,7 +271,6 @@ void Particles::charge_weighting(charge_density* ro1)
 				v_2 = PI*dz*dr*dr*2.0*(r_i+1);
 				dz1 = (z_k+1)*dz-x3[i];
 				dz2 = x3[i] - z_k*dz;
-				///////////////////////////
 
 				// weighting in ro[i][k] cell
 				value = ro_v*PI*dz1*(r2*r2-r1*r1)/v_1;
@@ -1013,8 +1007,7 @@ void Particles::j_weighting(Time* time1, current *j1, double* x1_o,double* x3_o)
 							}
 						}
 					}
-					////////////////////////////////////////////////////////////////////////////
-					/// case, when particle move from [i+1] cell to [i] cell
+					// case, when particle move from [i+1] cell to [i] cell
 					else if (i_o>i_n)
 					{
 						// case, when particle move from [i+1][k-1] -> [i][k] cell
@@ -1069,11 +1062,11 @@ void Particles::j_weighting(Time* time1, current *j1, double* x1_o,double* x3_o)
 							}
 						}
 					}
-				} //close case;
+				}
 				break;
-				} //close switch
-			} //close condition
-		}//close cycle
+				}
+			}
+		}
 
 }
 void Particles::azimuthal_j_weighting(Time* time1, current *this_j)
