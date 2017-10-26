@@ -157,7 +157,7 @@ void H_field::calc_field(E_field* e_field1, Time* time1)
   // Hr - last i value
   for(int k=0;k<(geom1->n_grid_2-1);k++)
   {
-    i=geom1->n_grid_1-1;
+    int i=geom1->n_grid_1-1;
     alpha=((e_field1->e2[i][k+1]-e_field1->e2[i][k])/geom1->dz)/MAGN_CONST;
 
     this->h1_half_time[i][k]=this->h1[i][k]+alpha*time1->delta_t/2;
