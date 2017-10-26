@@ -1,13 +1,28 @@
-% rho_movie_create_light3('~/pdp3_modeling/model5/pdp3_result/', '~/pdp3_modeling/model5/movie/',100,254,2046,[0 1],[0 1],[-1e-7 0])
+function var = rho_movie_create_light3(data_path, video_path, file_delta, size_1, size_3, clim1, clim2, clim3);
 
-function var = rho_movie_create_light3(data_path,
-				       video_path,
-				       file_delta=100,
-				       size_1=254,
-				       size_3=2046,
-				       clim1=[0 1],
-				       clim2=[0 1],
-				       clim3=[-1e-7 0]);
+if ~exist('file_delta', 'var')
+    file_delta = 100;
+end
+
+if ~exist('size_1', 'var')
+    size_1 = 254;
+end
+
+if ~exist('size_3', 'var')
+    size_3 = 2046;
+end
+
+if ~exist('clim1', 'var')
+    clim1 = [0 1];
+end
+
+if ~exist('clim2', 'var')
+    clim2 = [0 1];
+end
+
+if ~exist('clim3', 'var')
+    clim3 = [-1e-7 0];
+end
 
 data_file1 = strcat(data_path, '/', 'e1');
 data_file2 = strcat(data_path, '/', 'e3');
