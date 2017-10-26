@@ -223,7 +223,6 @@
     <ClCompile Include="Poisson.cpp" />
     <ClCompile Include="Poisson_dirichlet.cpp" />
     <ClCompile Include="Poisson_neumann.cpp" />
-    <ClCompile Include="Test_class.cpp" />
     <ClCompile Include="pdp3_time.cpp" />
     <ClCompile Include="Triple.cpp" />
   </ItemGroup>
@@ -253,8 +252,7 @@
     <ClInclude Include="poisson_dirichlet.h" />
     <ClInclude Include="Poisson_neumann.h" />
     <ClInclude Include="resource1.h" />
-    <ClInclude Include="Test_class.h" />
-    <ClInclude Include="Time.h" />
+    <ClInclude Include="pdp3_time.h" />
     <ClInclude Include="Triple.h" />
     <ClInclude Include="wrapper.h" />
   </ItemGroup>

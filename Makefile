@@ -43,7 +43,6 @@ pdp3_CXX_SRCS         = Boundary_Maxwell_conditions.cpp \
 			Poisson.cpp \
 			Poisson_dirichlet.cpp \
 			Poisson_neumann.cpp \
-			Test_class.cpp \
 			pdp3_time.cpp \
 			Triple.cpp \
 			boundary_dirichlet.cpp \

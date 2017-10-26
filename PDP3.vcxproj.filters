@@ -77,9 +77,6 @@
     <ClCompile Include="Triple.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Test_class.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Load_init_param.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -151,13 +148,10 @@
     <ClInclude Include="resource1.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Time.h">
+    <ClInclude Include="pdp3_time.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Triple.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Test_class.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Load_init_param.h">
