@@ -21,7 +21,7 @@ before_script:
   - git submodule update --init
 
 script:
-  - make test-ext
+  - if [ $TRAVIS_BRANCH = 'master' ]; then make test-ext; else make test; fi
 
 after_script:
   - make mrproper
