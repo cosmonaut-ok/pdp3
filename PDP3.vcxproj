@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -201,7 +201,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Beam.cpp" />
     <ClCompile Include="Boundary_conditions.cpp" />
     <ClCompile Include="boundary_dirichlet.cpp" />
     <ClCompile Include="Boundary_Maxwell_conditions.cpp" />
@@ -229,7 +228,6 @@
     <ClCompile Include="Triple.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Beam.h" />
     <ClInclude Include="Boundary_conditions.h" />
     <ClInclude Include="boundary_dirichlet.h" />
     <ClInclude Include="Boundary_Maxwell_conditions.h" />

@@ -1,6 +1,6 @@
 #pragma once
 
-#include<iostream>
+#include <iostream>
 #include "field.h"
 #include "E_field.h"
 #include "H_field.h"
@@ -14,15 +14,13 @@
 #include <math.h>
 #include "Boundary_Maxwell_conditions.h"
 #include "input_output_class.h"
-// #include "Beam.h"
 #include "Bunch.h"
 #include "time.h"
 #include "particles_struct.h"
 
-// #include "tinystr.h"
 #include "tinyxml2.h"
 #include <fstream>
-#include<iostream>
+#include <iostream>
 
 using namespace std;
 using namespace tinyxml2;
