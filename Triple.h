@@ -4,12 +4,12 @@
 class Triple
 {
 public:
-	Triple(double f, double s, double t);
+  Triple(double f, double s, double t);
 public:
-	~Triple(void);
+  ~Triple(void);
 
 public:
-	double first;
-	double second;
-	double third;
+  double first;
+  double second;
+  double third;
 };

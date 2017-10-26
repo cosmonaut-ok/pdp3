@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -201,7 +201,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Beam.cpp" />
     <ClCompile Include="Boundary_conditions.cpp" />
     <ClCompile Include="boundary_dirichlet.cpp" />
     <ClCompile Include="Boundary_Maxwell_conditions.cpp" />
@@ -224,12 +223,10 @@
     <ClCompile Include="Poisson.cpp" />
     <ClCompile Include="Poisson_dirichlet.cpp" />
     <ClCompile Include="Poisson_neumann.cpp" />
-    <ClCompile Include="Test_class.cpp" />
     <ClCompile Include="pdp3_time.cpp" />
     <ClCompile Include="Triple.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Beam.h" />
     <ClInclude Include="Boundary_conditions.h" />
     <ClInclude Include="boundary_dirichlet.h" />
     <ClInclude Include="Boundary_Maxwell_conditions.h" />
@@ -255,8 +252,7 @@
     <ClInclude Include="poisson_dirichlet.h" />
     <ClInclude Include="Poisson_neumann.h" />
     <ClInclude Include="resource1.h" />
-    <ClInclude Include="Test_class.h" />
-    <ClInclude Include="Time.h" />
+    <ClInclude Include="pdp3_time.h" />
     <ClInclude Include="Triple.h" />
     <ClInclude Include="wrapper.h" />
   </ItemGroup>

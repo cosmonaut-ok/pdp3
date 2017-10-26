@@ -2,9 +2,9 @@
 //#include "stdafx.h"
 Triple::Triple(double f, double s, double t)
 {
-	first = f;
-	second = s;
-	third = t;
+  first = f;
+  second = s;
+  third = t;
 
 }
 
