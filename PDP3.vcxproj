@@ -252,7 +252,6 @@
     <ClInclude Include="poisson_dirichlet.h" />
     <ClInclude Include="Poisson_neumann.h" />
     <ClInclude Include="resource1.h" />
-    <ClInclude Include="pdp3_time.h" />
     <ClInclude Include="Triple.h" />
     <ClInclude Include="wrapper.h" />
   </ItemGroup>
