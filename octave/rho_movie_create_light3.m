@@ -108,7 +108,7 @@ function var = rho_movie_create_light3(data_path, video_path, file_delta, size_1
       %% figure, surf(h_field_matrix)
 
       figHandle = gcf;
-      ## frame = getframe(figHandle);
+      frame = getframe(figHandle);
 
       ## D(:,:,:,i)   = figHandle; % frame.cdata;
       ## D(:,:,:,i+1) = figHandle; % frame.cdata;
