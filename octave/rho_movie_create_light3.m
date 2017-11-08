@@ -24,8 +24,16 @@ function var = rho_movie_create_light3(data_path, video_path, file_delta, size_1
     clim3 = [-1e-7 0];
   end
 
-  pkg load 'image';
-  pkg load 'video';
+  isOctave = exist('OCTAVE_VERSION', 'builtin') ~= 0;
+
+  if isOctave
+    try
+      pkg load image;
+    catch
+      pkg install -forge image;
+      pkg load image;
+    end
+  end
 
   data_file_e1 = strcat(data_path, '/', 'e1');
   data_file_e3 = strcat(data_path, '/', 'e3');
@@ -33,7 +41,12 @@ function var = rho_movie_create_light3(data_path, video_path, file_delta, size_1
 
   filter = ones(3,12)/3/12;
 
-  f = figure;
+  if isOctave
+    f = figure('visible','off');
+  else
+    f = figure;
+  end
+
   set(f, 'Position', [50 60 1050 700], 'Color', 'white');
 
   a1 = axes('Parent', f);
@@ -43,7 +56,6 @@ function var = rho_movie_create_light3(data_path, video_path, file_delta, size_1
   set(a1, 'Unit', 'normalized', 'Position', [0.06 0.25 0.8 0.2]);
   set(a2, 'Unit', 'normalized', 'Position', [0.06 0.49 0.8 0.2]);
   set(a3, 'Unit', 'normalized', 'Position', [0.06 0.73 0.8 0.2]);
-  %% set(a4, 'Unit', 'normalized', 'Position', [0.06 0.02 0.8 0.2]);
 
   %% initial---
   z = zeros(size_1, size_3);
@@ -55,10 +67,13 @@ function var = rho_movie_create_light3(data_path, video_path, file_delta, size_1
   im3 = image(z,'Parent',a3, 'CDataMapping', 'scaled');
   set(a3, 'Clim', clim3);
   %%---------------
-  %% colormap('gray');
+  colormap('gray');
 
-  movie_filename = strcat(video_path,'/field_movie.avi');
-  movie_file = avifile(movie_filename, 'codec', 'msmpeg4v2');
+	if ~isOctave
+		movie_filename = strcat(video_path,'field_movie.avi');
+		movie_object = VideoWriter(movie_filename);
+		open(movie_object);
+    end
 
   N = file_delta;
 
@@ -67,7 +82,10 @@ function var = rho_movie_create_light3(data_path, video_path, file_delta, size_1
 
     tstart = (k)*N;
     tend = ((k+1)*N-1);
-    i = 1;
+
+		if ~isOctave
+			i = 1;
+        end
 
     fidh_e1 = fopen([data_file_e1 num2str(k)], 'r');
     fidh_e3 = fopen([data_file_e3 num2str(k)], 'r');
@@ -101,38 +119,41 @@ function var = rho_movie_create_light3(data_path, video_path, file_delta, size_1
       set(im1, 'CData', imfilter(h_field_matrix1,filter));
       set(im2, 'CData', imfilter(h_field_matrix2,filter));
       set(im3, 'CData', imfilter(h_field_matrix3,filter));
-      %% imshow(imfilter(h_field_matrix,filter),clim)
-      %% figure, surf(h_field_matrix)
 
       figHandle = gcf;
-      frame = getframe(figHandle);
 
-      ## D(:,:,:,i)   = figHandle; % frame.cdata;
-      ## D(:,:,:,i+1) = figHandle; % frame.cdata;
-      ## D(:,:,:,i+2) = figHandle; % frame.cdata;
-      %% i = i + 3;
-      addframe(movie_file, figHandle);
-
-      drawnow;
-
+      %% octave can not write video animation properly
+      %% we should just get set of images and then
+      %% process it with some other software as video frames
+      if isOctave
+        img_filename = strcat(video_path, 'field_movie_', int2str(k), '_', int2str(t), '.png');
+				print(figHandle, img_filename, '-dpng');
+      else
+        frame = getframe(figHandle);
+				D(:,:,:,i)   = frame.cdata;
+				D(:,:,:,i+1) = frame.cdata;
+				D(:,:,:,i+2) = frame.cdata;
+				i = i + 3;
+				drawnow;
+      end
     end
 
-    %% f2 = figure('Position', [20 20 100 100]);
-    %% at = axes('Parent', f2);
-    %% mov = immovie(D);
-    %% movie_filename = strcat(video_path,'field_movie_',num2str(t/1e-7,'%3.2f'),'.avi');
-    %% movie_object = VideoWriter(movie_filename);
-    %% open(movie_object);
-    %% writeVideo(movie_object, mov);
+		if ~isOctave
+			f2 = figure('Position', [20 20 100 100]);
+			at = axes('Parent', f2);
+			mov = immovie(D);
+			%% movie_filename = strcat(video_path,'field_movie_',num2str(t/1e-7,'%3.2f'),'.avi');
+			%% movie_object = VideoWriter(movie_filename);
+			%% open(movie_object);
+			writeVideo(movie_object, mov);
+			clear mov;
+			%% close(movie_object)
+			close(f2);
+			%% pack
+        end
 
-    addframe(movie_file, mov);
+		if isOctave
+			drawnow;
+        end
 
-    %% clear mov;
-    %% close(movie_object)
-    %% close(f2);
-    %% pack
   end
-
-  clear movie_file
-
-endfunction
