@@ -84,13 +84,10 @@ function var = rho_movie_create_light3(data_path, video_path, file_delta, size_1
     fclose(fidh_rho_beam);
     length(h_field_e1);
 
-    disp(['Loaded files set ', num2str(k)]);
-
-    disp(['Processng files set ', num2str(k)]);
     for t = tstart:tend
       local_step = mod(t, file_delta);
 
-      disp(['Processing ', num2str(t)]);
+      disp(['Processing frame ', num2str(local_step)]);
 
       h_field_shot1 = h_field_e1(size_1*size_3*local_step+1:size_1*size_3*(local_step+1));
       h_field_matrix1 = fliplr(reshape(h_field_shot1,size_3,size_1))';
