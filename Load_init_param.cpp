@@ -1,7 +1,15 @@
+// #include <sstream>
+// #include <string>
+// #include <iomanip>
+#include <algorithm>
+// #include <cctype>
+
+
 #include "Load_init_param.h"
 #include "time.h"
 #include "tinyxml2.h"
 
+using namespace std;
 using namespace tinyxml2;
 
 #define INITIAL_PARAMS_NAME "Initial_parameters"
@@ -11,6 +19,7 @@ using namespace tinyxml2;
 #define PARTICLES_PARAMS_NAME "Particles"
 #define BUNCH_PARAMS_NAME "Particles_bunch"
 #define BOUNDARY_MAXWELL_PARAMS_NAME "Boundary_Maxwell_conditions"
+#define FILE_SAVE_PARAMS_NAME "file_save_paramters"
 
 Load_init_param::Load_init_param(void)
 {
@@ -64,15 +73,7 @@ Load_init_param::Load_init_param(char* xml_file_name)
   }
 
   // load File Path
-  char* path_res = read_char("PathtoResult");
-  char* path_dump = read_char("PathtoSaveState");
-  c_io_class  = new input_output_class (path_res , path_dump);
-
-  //////////////////////////////////////////////////
-
-  //  KernAccessor *kern_access = new KernAccessor(c_geom->n_grid_1, c_geom->n_grid_2);
-  //  kern_access_global = kern_access;
-  //
+	init_file_saving_parameters();
 
   cout << "Initialisation complete\n";
 }
@@ -103,6 +104,14 @@ char* Load_init_param::read_char(char* p_name)
   strcpy(vul_arr, sub_root->GetText());
 
   return vul_arr;
+}
+
+bool Load_init_param::to_bool(string str) {
+	std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+	std::istringstream is(str);
+	bool b;
+	is >> std::boolalpha >> b;
+	return b;
 }
 
 void Load_init_param::init_particles()
@@ -289,8 +298,35 @@ void Load_init_param::init_time ()
                     relaxation_time, end_time, delta_t);
 }
 
+void Load_init_param::init_file_saving_parameters ()
+{
+  cout << "Initialising file saving parameters\n";
+
+  XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
+  XMLElement* sub_root =root->FirstChildElement (FILE_SAVE_PARAMS_NAME);
+
+  char* path_res = new char[50];
+  strcpy(path_res, sub_root->FirstChildElement("path_to_result")->GetText());
+
+  char* path_dump = new char[50];
+  strcpy(path_dump, sub_root->FirstChildElement("path_to_save_state")->GetText());
+
+  data_dump_interval = atoi(sub_root->
+			    FirstChildElement("data_dump_interval")->
+			    GetText());
+
+  system_state_dump_interval = atoi(sub_root->
+				    FirstChildElement("system_state_dump_interval")->
+				    GetText());
+
+  c_io_class = new input_output_class (path_res, path_dump);
+}
+
+
+
 bool Load_init_param::save_system_state()
 {
+	cout << "Saving system state\n";
   c_io_class->out_field_dump("e1",efield->e1,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
   c_io_class->out_field_dump("e2",efield->e2,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
   c_io_class->out_field_dump("e3",efield->e3,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
@@ -352,7 +388,7 @@ void Load_init_param::run(void)
     p_list->charge_weighting(c_rho_new);  //continuity equation
     //bool res = continuity_equation(c_time, c_geom, c_current, c_rho_old, c_rho_new);
 
-    if  ((((int)(c_time->current_time/c_time->delta_t))%5==0))
+    if  ((((int)(c_time->current_time/c_time->delta_t))%data_dump_interval==0))
       //if  ((((int)(c_time->current_time/c_time->delta_t)) < 10))
       //if  ( abs(time1.current_time - time1.end_time + time1.delta_t) < 1e-13)
     {
@@ -380,7 +416,7 @@ void Load_init_param::run(void)
       c_io_class->out_data("h2",hfield->h2,step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
       step_number=step_number+1;
       t1 = clock();
-      if  ((((int)(c_time->current_time/c_time->delta_t))%1000==0)&&(step_number!=1))
+			if  ((((int)(c_time->current_time/c_time->delta_t))%system_state_dump_interval==0)&&(step_number!=1))
         this->save_system_state();
     }
     c_time->current_time = c_time->current_time + c_time->delta_t;

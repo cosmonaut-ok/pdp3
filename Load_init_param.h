@@ -1,6 +1,9 @@
 #pragma once
 
+#include <fstream>
 #include <iostream>
+#include <math.h>
+
 #include "field.h"
 #include "E_field.h"
 #include "H_field.h"
@@ -11,7 +14,6 @@
 #include "poisson_neumann.h"
 #include "poisson_dirichlet.h"
 #include "particles_list.h"
-#include <math.h>
 #include "Boundary_Maxwell_conditions.h"
 #include "input_output_class.h"
 #include "Bunch.h"
@@ -19,8 +21,6 @@
 #include "particles_struct.h"
 
 #include "tinyxml2.h"
-#include <fstream>
-#include <iostream>
 
 using namespace std;
 using namespace tinyxml2;
@@ -54,6 +54,8 @@ public:
   current * c_current;
   XMLDocument* xml_data;
   int testnumber;
+  int data_dump_interval;
+  int system_state_dump_interval;
 
 private:
   void read_xml(const char* xml_file_name);
@@ -64,4 +66,6 @@ private:
   void init_particles ();
   void init_boundary_maxwell ();
   Bunch* init_bunch();
+  void init_file_saving_parameters ();
+  bool to_bool (string str);
 };
