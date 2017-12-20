@@ -91,13 +91,15 @@ cat<<EOF>${TESTDIR}/parameters.xml
 
   <Boundary_conditions type = "dirichlet">0</Boundary_conditions>
 
-
-  <PathtoResult>pdp3_result/</PathtoResult>
-  <PathtoSaveState>pdp3_result/Dump/</PathtoSaveState>
-
   <file_save_paramters>
-    <time_step>100</time_step>
-    <number>100</number>
+    <path_to_result>pdp3_result/</path_to_result>
+    <path_to_save_state>pdp3_result/Dump/</path_to_save_state>
+    <compress_result>true</compress_result> <!-- Not implemented -->
+    <!-- -->
+    <data_dump_interval>5</data_dump_interval>
+    <system_state_dump_interval>1000</system_state_dump_interval>
+    <!-- <time_step>100</time_step> -->
+    <!-- <number>100</number> -->
   </file_save_paramters>
 
   <e1>true</e1>
@@ -108,10 +110,6 @@ cat<<EOF>${TESTDIR}/parameters.xml
   <h3>false</h3>
   <rho_plasma>true</rho_plasma>
   <rho_beam>true</rho_beam>
-
-
-
-
 
 </Initial_parameters>
 
