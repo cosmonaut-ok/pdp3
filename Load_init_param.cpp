@@ -19,7 +19,7 @@ using namespace tinyxml2;
 #define PARTICLES_PARAMS_NAME "Particles"
 #define BUNCH_PARAMS_NAME "Particles_bunch"
 #define BOUNDARY_MAXWELL_PARAMS_NAME "Boundary_Maxwell_conditions"
-#define FILE_SAVE_PARAMS_NAME "file_save_paramters"
+#define FILE_SAVE_PARAMS_NAME "file_save_parameters"
 
 Load_init_param::Load_init_param(void)
 {
