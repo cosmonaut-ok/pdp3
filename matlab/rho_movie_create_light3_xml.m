@@ -40,11 +40,11 @@ function var = rho_movie_create_light3_xml(xml_config_file, video_path, file_del
     data_path = [ config_path '/' char(local_data_path) ];
   end
   
-  data_file_e1 = strcat(data_path, '/', 'e1');
-  data_file_e3 = strcat(data_path, '/', 'e3');
-  data_file_rho_beam = strcat(data_path, '/', 'rho_beam');
+  data_file_e1 = strcat(data_path, '/', 'e1')
+  data_file_e3 = strcat(data_path, '/', 'e3')
+  data_file_rho_beam = strcat(data_path, '/', 'rho_beam')
 
-  filter = ones(3,12); % /3/12; % matrix 12x3, all elements equal to 0.027778
+  filter = ones(3,12)/3/12; % matrix 12x3, all elements equal to 0.027778
 
   % create figure window (and place it as current figure)
   f = figure;
