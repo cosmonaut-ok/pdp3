@@ -1,26 +1,22 @@
-% function var = rho_movie_create_light3(data_path, video_path, file_delta, size_1, size_3, clim1, clim2, clim3);
-function var = rho_movie_create_light3_xml(xml_config_file, video_path, file_delta, clim1, clim2, clim3)
-  if ~exist('file_delta', 'var')
-    file_delta = 100;
+function var = rho_movie_create_light3_from_parameters(xml_config_file, clim_e1, clim_e3, clim_rho_beam)
+
+  if ~exist('clim_e1', 'var')
+    clim_e1 = [0 1];
   end
 
-  if ~exist('clim1', 'var')
-    clim1 = [0 1];
+  if ~exist('clim_e3', 'var')
+    clim_e3 = [0 1];
   end
 
-  if ~exist('clim2', 'var')
-    clim2 = [0 1];
-  end
-
-  if ~exist('clim3', 'var')
-    clim3 = [-1e-7 0];
+  if ~exist('clim_rho_beam', 'var')
+    clim_rho_beam = [-1e-7 0];
   end
   
   config_path = fileparts(xml_config_file);
   
-  if ~exist('video_path', 'var')
-      video_path = config_path;
-  end
+  video_path = config_path;
+  
+  file_delta = 100;
   
   dom_node = xmlread(xml_config_file);
   dom_root = dom_node.getDocumentElement;
@@ -28,6 +24,9 @@ function var = rho_movie_create_light3_xml(xml_config_file, video_path, file_del
   geometry = dom_root.getElementsByTagName('geometry');
   size_1 = str2double(geometry.item(0).getElementsByTagName('n_grid_r').item(0).getFirstChild.getData)-1;
   size_3 = str2double(geometry.item(0).getElementsByTagName('n_grid_z').item(0).getFirstChild.getData)-1;
+
+  y_tick_max = str2double(geometry.item(0).getElementsByTagName('r_size').item(0).getFirstChild.getData);
+  x_tick_max = str2double(geometry.item(0).getElementsByTagName('z_size').item(0).getFirstChild.getData);
   
   %% get file to save parameters
   file_save_parameters = dom_root.getElementsByTagName('file_save_paramters');
@@ -40,14 +39,14 @@ function var = rho_movie_create_light3_xml(xml_config_file, video_path, file_del
     data_path = [ config_path '/' char(local_data_path) ];
   end
   
-  data_file_e1 = strcat(data_path, '/', 'e1')
-  data_file_e3 = strcat(data_path, '/', 'e3')
-  data_file_rho_beam = strcat(data_path, '/', 'rho_beam')
+  data_file_e1 = strcat(data_path, '/', 'e1');
+  data_file_e3 = strcat(data_path, '/', 'e3');
+  data_file_rho_beam = strcat(data_path, '/', 'rho_beam');
 
-  filter = ones(3,12)/3/12; % matrix 12x3, all elements equal to 0.027778
+  %% filter = ones(3,12)/3/12; % matrix 12x3, all elements equal to 0.027778
 
   % create figure window (and place it as current figure)
-  f = figure;
+  f = figure('Name', 'PIC Plasma Electron Bunch Modeling Wakefield', 'NumberTitle', 'off');
 
   % position: left, bottom, width, height; white background
   set(f, 'Position', [50 60 1050 700], 'Color', 'white');
@@ -58,34 +57,87 @@ function var = rho_movie_create_light3_xml(xml_config_file, video_path, file_del
   a3 = axes('Parent', f);
   
   %% place axes on figure (normalized to whole figure window)
-  set(a1, 'Unit', 'normalized', 'Position', [0.06 0.25 0.8 0.2]);
-  set(a2, 'Unit', 'normalized', 'Position', [0.06 0.49 0.8 0.2]);
-  set(a3, 'Unit', 'normalized', 'Position', [0.06 0.73 0.8 0.2]);
+  set(a1, 'Unit', 'normalized', 'Position', [0.1 0.74 0.8 0.2]);
+  set(a2, 'Unit', 'normalized', 'Position', [0.1 0.41 0.8 0.2]);
+  set(a3, 'Unit', 'normalized', 'Position', [0.1 0.08 0.8 0.2]);
 
+  %%
   %% initial---
+  %%
+  
+  %%%% initializing images and axes
   z = zeros(size_1, size_3);
 
-  im1 = image(z,'Parent',a1, 'CDataMapping', 'scaled');
-  set(a1, 'Clim', clim1);
-  im2 = image(z,'Parent',a2, 'CDataMapping', 'scaled');
-  set(a2, 'Clim', clim2);
-  im3 = image(z,'Parent',a3, 'CDataMapping', 'scaled');
-  set(a3, 'Clim', clim3);
+  %% set number of marks with names in X and Y axes
+  x_ticks_number = 10;
+  y_ticks_number = 4;
+  
+  im1 = image(z,'Parent', a1, 'CDataMapping', 'scaled');
+  %% set color limits
+  a1.CLim = clim_e1;
+  a1.CLimMode = 'manual';
+  %% set title and axes labels
+  a1.Title.String = 'E_z';
+  a1.XLabel.String = 'z, M';
+  a1.YLabel.String = 'r, M';
+  a1.TickDir = 'out';
+  %% add color bar
+  colorbar(a1);
+  %% translate gird to real meters in X an Y axes
+  a1.XTick = 0:size_3/x_ticks_number:size_3;
+  a1.XTickLabel = 0:x_tick_max/x_ticks_number:x_tick_max;
+  a1.YTick = 0:size_1/y_ticks_number:size_1;
+  a1.YTickLabel = 0:y_tick_max/y_ticks_number:y_tick_max;
+  
+  im2 = image(z,'Parent', a2, 'CDataMapping', 'scaled');
+  %% set color limits
+  a2.CLim = clim_e3;
+  a2.CLimMode = 'manual';
+  %% set title and axes labels
+  a2.Title.String = 'E_r';
+  a2.XLabel.String = 'z, M';
+  a2.YLabel.String = 'r, M';
+  a2.TickDir = 'out';
+  %% add color bar
+  colorbar(a2);
+  %% translate gird to real meters in X an Y axes
+  a2.XTick = 0:size_3/x_ticks_number:size_3;
+  a2.XTickLabel = 0:x_tick_max/x_ticks_number:x_tick_max;
+  a2.YTick = 0:size_1/y_ticks_number:size_1;
+  a2.YTickLabel = 0:y_tick_max/y_ticks_number:y_tick_max;
+  
+  im3 = image(z,'Parent', a3, 'CDataMapping', 'scaled');
+  %% set color limits
+  a3.CLim = clim_rho_beam;
+  a3.CLimMode = 'manual';
+  %% set title and axes labels
+  a3.Title.String = 'E_{bunch}';
+  a3.XLabel.String = 'z, M';
+  a3.YLabel.String = 'r, M';
+  a3.TickDir = 'out';
+  %% add color bar
+  colorbar(a3);
+  %% translate gird to real meters in X an Y axes
+  a3.XTick = 0:size_3/x_ticks_number:size_3;
+  a3.XTickLabel = 0:x_tick_max/x_ticks_number:x_tick_max;
+  a3.YTick = 0:size_1/y_ticks_number:size_1;
+  a3.YTickLabel = 0:y_tick_max/y_ticks_number:y_tick_max;
+  
   %%---------------
   colormap('gray');
 
-    movie_filename = fullfile(video_path,'field_movie.avi');
-    movie_object = VideoWriter(movie_filename);
-    open(movie_object);
+  movie_filename = fullfile(video_path,'field_movie.avi');
+  movie_object = VideoWriter(movie_filename);
+  open(movie_object);
 
   N = file_delta; % 100 by default
 
   for k = 0:100 % TODO: why to 100?
     disp(['Loading files set ', num2str(k)]);
-
+    
     tstart = k*N; % k=2 -> 200
     tend = ((k+1)*N-1); % k=2 -> 3*100-1 -> 299
-
+    
       i = 1;
     
     %% Open data files
@@ -118,14 +170,13 @@ function var = rho_movie_create_light3_xml(xml_config_file, video_path, file_del
       h_field_shot3 = h_field_rho_beam(size_1*size_3*local_step+1:size_1*size_3*(local_step+1));
       h_field_matrix3 = fliplr(reshape(h_field_shot3,size_3,size_1))';
 
-      set(im1, 'CData', imfilter(h_field_matrix1,filter));
-      set(im2, 'CData', imfilter(h_field_matrix2,filter));
-      set(im3, 'CData', imfilter(h_field_matrix3,filter));
-
-      %% add colorbar to axes
-      colorbar(a1);
-      colorbar(a2);
-      colorbar(a3);
+      %% set(im1, 'CData', imfilter(h_field_matrix1,filter));
+      %% set(im2, 'CData', imfilter(h_field_matrix2,filter));
+      %% set(im3, 'CData', imfilter(h_field_matrix3,filter));
+      
+      set(im1, 'CData', h_field_matrix1);
+      set(im2, 'CData', h_field_matrix2);
+      set(im3, 'CData', h_field_matrix3);
 
       figHandle = gcf;
 
