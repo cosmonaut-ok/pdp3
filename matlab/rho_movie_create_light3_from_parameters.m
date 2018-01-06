@@ -15,6 +15,7 @@ function var = rho_movie_create_light3_from_parameters(xml_config_file, clim_e1,
   config_path = fileparts(xml_config_file);
   
   video_path = config_path;
+  video_file_name = 'field_movie.avi';
   
   file_delta = 100;
   
@@ -67,10 +68,17 @@ function var = rho_movie_create_light3_from_parameters(xml_config_file, clim_e1,
   
   %%%% initializing images and axes
   z = zeros(size_1, size_3);
-
+  
   %% set number of marks with names in X and Y axes
   x_ticks_number = 10;
   y_ticks_number = 4;
+  %% Titles and Ticks
+  x_axe_title = 'Z(m)';
+  y_axe_title = 'R(m)';
+  x_tick_range = 0:x_tick_max/x_ticks_number:x_tick_max; % we need 10 (or x_ticks_number) ticks
+  x_tick_gird_size = 0:size_3/x_ticks_number:size_3;     % from 0 to x_tick_max. it's required 
+  y_tick_range = 0:y_tick_max/y_ticks_number:y_tick_max; % to convert gird to real size (meters)
+  y_tick_gird_size = 0:size_1/y_ticks_number:size_1;     % Same for X and Y axes
   
   im1 = image(z,'Parent', a1, 'CDataMapping', 'scaled');
   %% set color limits
@@ -78,16 +86,16 @@ function var = rho_movie_create_light3_from_parameters(xml_config_file, clim_e1,
   a1.CLimMode = 'manual';
   %% set title and axes labels
   a1.Title.String = 'E_z';
-  a1.XLabel.String = 'z, M';
-  a1.YLabel.String = 'r, M';
+  a1.XLabel.String = x_axe_title;
+  a1.YLabel.String = y_axe_title;
   a1.TickDir = 'out';
   %% add color bar
   colorbar(a1);
   %% translate gird to real meters in X an Y axes
-  a1.XTick = 0:size_3/x_ticks_number:size_3;
-  a1.XTickLabel = 0:x_tick_max/x_ticks_number:x_tick_max;
-  a1.YTick = 0:size_1/y_ticks_number:size_1;
-  a1.YTickLabel = 0:y_tick_max/y_ticks_number:y_tick_max;
+  a1.XTick = x_tick_gird_size;
+  a1.XTickLabel = x_tick_range;
+  a1.YTick = y_tick_gird_size;
+  a1.YTickLabel = y_tick_range;
   
   im2 = image(z,'Parent', a2, 'CDataMapping', 'scaled');
   %% set color limits
@@ -95,16 +103,16 @@ function var = rho_movie_create_light3_from_parameters(xml_config_file, clim_e1,
   a2.CLimMode = 'manual';
   %% set title and axes labels
   a2.Title.String = 'E_r';
-  a2.XLabel.String = 'z, M';
-  a2.YLabel.String = 'r, M';
+  a2.XLabel.String = x_axe_title;
+  a2.YLabel.String = y_axe_title;
   a2.TickDir = 'out';
   %% add color bar
   colorbar(a2);
   %% translate gird to real meters in X an Y axes
-  a2.XTick = 0:size_3/x_ticks_number:size_3;
-  a2.XTickLabel = 0:x_tick_max/x_ticks_number:x_tick_max;
-  a2.YTick = 0:size_1/y_ticks_number:size_1;
-  a2.YTickLabel = 0:y_tick_max/y_ticks_number:y_tick_max;
+  a2.XTick = x_tick_gird_size;
+  a2.XTickLabel = x_tick_range;
+  a2.YTick = y_tick_gird_size;
+  a2.YTickLabel = y_tick_range;
   
   im3 = image(z,'Parent', a3, 'CDataMapping', 'scaled');
   %% set color limits
@@ -112,21 +120,21 @@ function var = rho_movie_create_light3_from_parameters(xml_config_file, clim_e1,
   a3.CLimMode = 'manual';
   %% set title and axes labels
   a3.Title.String = 'E_{bunch}';
-  a3.XLabel.String = 'z, M';
-  a3.YLabel.String = 'r, M';
+  a3.XLabel.String = x_axe_title;
+  a3.YLabel.String = y_axe_title;
   a3.TickDir = 'out';
   %% add color bar
   colorbar(a3);
   %% translate gird to real meters in X an Y axes
-  a3.XTick = 0:size_3/x_ticks_number:size_3;
-  a3.XTickLabel = 0:x_tick_max/x_ticks_number:x_tick_max;
-  a3.YTick = 0:size_1/y_ticks_number:size_1;
-  a3.YTickLabel = 0:y_tick_max/y_ticks_number:y_tick_max;
+  a3.XTick = x_tick_gird_size;
+  a3.XTickLabel = x_tick_range;
+  a3.YTick = y_tick_gird_size;
+  a3.YTickLabel = y_tick_range;
   
   %%---------------
   colormap('gray');
 
-  movie_filename = fullfile(video_path,'field_movie.avi');
+  movie_filename = fullfile(video_path,video_file_name);
   movie_object = VideoWriter(movie_filename);
   open(movie_object);
 
