@@ -39,11 +39,11 @@ function var = rho_movie_create_light3_from_parameters(xml_config_file, clim_e1,
   else
     data_path = [ config_path '/' char(local_data_path) ];
   end
-  
+
   data_file_e1 = strcat(data_path, '/', 'e1');
   data_file_e3 = strcat(data_path, '/', 'e3');
   data_file_rho_beam = strcat(data_path, '/', 'rho_beam');
-
+  
   %% filter = ones(3,12)/3/12; % matrix 12x3, all elements equal to 0.027778
 
   % create figure window (and place it as current figure)
@@ -146,8 +146,13 @@ function var = rho_movie_create_light3_from_parameters(xml_config_file, clim_e1,
     tstart = k*N; % k=2 -> 200
     tend = ((k+1)*N-1); % k=2 -> 3*100-1 -> 299
     
-      i = 1;
-    
+    i = 1;
+
+    if ~(exist([data_file_e1 num2str(k)], 'file') == 2) || ~(exist([data_file_e3 num2str(k)], 'file') == 2) || ~(exist([data_file_rho_beam num2str(k)], 'file') == 2)
+      disp('No more data files exists. Exiting');
+      return
+    end
+
     %% Open data files
     fidh_e1 = fopen([data_file_e1 num2str(k)], 'r');
     fidh_e3 = fopen([data_file_e3 num2str(k)], 'r');
