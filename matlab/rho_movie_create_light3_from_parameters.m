@@ -1,11 +1,11 @@
 function var = rho_movie_create_light3_from_parameters(xml_config_file, clim_e1, clim_e3, clim_rho_beam)
 
   if ~exist('clim_e1', 'var')
-    clim_e1 = [0 1];
+    clim_e1 = [-2e3 2e3];
   end
 
   if ~exist('clim_e3', 'var')
-    clim_e3 = [0 1];
+    clim_e3 = [-2e3 2e3];
   end
   
   config_path = fileparts(xml_config_file);
