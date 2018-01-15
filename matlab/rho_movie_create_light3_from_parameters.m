@@ -30,7 +30,7 @@ function var = rho_movie_create_light3_from_parameters(xml_config_file, clim_e1,
   x_tick_max = str2double(geometry.item(0).getElementsByTagName('z_size').item(0).getFirstChild.getData);
   
   %% get file to save parameters
-  file_save_parameters = dom_root.getElementsByTagName('file_save_paramters');
+  file_save_parameters = dom_root.getElementsByTagName('file_save_parameters');
   local_data_path = file_save_parameters.item(0).getElementsByTagName('path_to_result').item(0).getFirstChild.getData;
 
   %% disp(class(char(local_data_path)));
