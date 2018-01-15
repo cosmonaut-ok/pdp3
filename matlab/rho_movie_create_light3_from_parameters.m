@@ -104,7 +104,6 @@ function var = rho_movie_create_light3_from_parameters(xml_config_file, clim_e1,
   c1 = colorbar(a1);
   c1.TickLabelInterpreter = 'latex';
   c1.Label.String = colorbar_title;
-  c1.TickDirection = 'out';
   %% translate gird to real meters in X an Y axes
   a1.XTick = x_tick_gird_size;
   a1.XTickLabel = x_tick_range;
@@ -125,7 +124,6 @@ function var = rho_movie_create_light3_from_parameters(xml_config_file, clim_e1,
   c2 = colorbar(a2);
   c2.TickLabelInterpreter = 'latex';
   c2.Label.String = colorbar_title;
-  c2.TickDirection = 'out';
   %% translate gird to real meters in X an Y axes
   a2.XTick = x_tick_gird_size;
   a2.XTickLabel = x_tick_range;
@@ -146,8 +144,10 @@ function var = rho_movie_create_light3_from_parameters(xml_config_file, clim_e1,
   c3 = colorbar(a3);
   c3.TickLabelInterpreter = 'latex';
   c3.Label.String = 'm^{-3}';
-  c3.TickDirection = 'out';
-  c3.TickLabels = [0:bunch_density/3:bunch_density];
+   % translate e_bunch to electrons density and set custom tick labels
+   % and direction (because electron charge is negative). Also, round
+   % tick labels array to nearest rounded values for short marks
+  c3.TickLabels = round(0:bunch_density/3:bunch_density, 2, 'significant');
   c3.Direction = 'reverse';
   %% translate gird to real meters in X an Y axes
   a3.XTick = x_tick_gird_size;
