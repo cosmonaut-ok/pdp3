@@ -25,7 +25,7 @@ class Pdp3Movie:
         self.__config_path = os.path.dirname(xml_config_file)
         # calculate movie path
         video_path = os.path.dirname(video_file) if video_file else self.__config_path
-        video_file_name = os.path.basename(video_file) if video_file else 'field_movie.avi'
+        video_file_name = os.path.basename(video_file) if video_file else 'field_movie_python.avi'
         self.__movie_filename = os.path.join(video_path, video_file_name)
 
         ## read xml_config_file
@@ -110,19 +110,20 @@ class Pdp3Movie:
             local_step = n % self.file_delta ## mod(t, file_delta)
             print("Processing frame %d" % (local_step))
             
-            h_field_shot1 = data[self.__size_1*self.__size_3*local_step:self.__size_1*self.__size_3*(local_step+1)]
+            h_field_shot1 = data1[self.__size_1*self.__size_3*local_step:self.__size_1*self.__size_3*(local_step+1)]
             h_field_matrix1 = fliplr(reshape(h_field_shot1, (self.__size_1,self.__size_3)))
             
-            h_field_shot2 = h_field_e3[self.__size_1*self.__size_3*local_step:self.__size_1*self.__size_3*(local_step+1)]
+            h_field_shot2 = data2[self.__size_1*self.__size_3*local_step:self.__size_1*self.__size_3*(local_step+1)]
             h_field_matrix2 = fliplr(reshape(h_field_shot2, (self.__size_1,self.__size_3)))
 
-            h_field_shot3 = data[self.__size_1*self.__size_3*local_step:self.__size_1*self.__size_3*(local_step+1)]
+            h_field_shot3 = data3[self.__size_1*self.__size_3*local_step:self.__size_1*self.__size_3*(local_step+1)]
             h_field_matrix3 = fliplr(reshape(h_field_shot3, (self.__size_1,self.__size_3)))
 
 
             # tmp = rand(300,300)
             im1.set_data(h_field_matrix1)
-            im1.set_data(h_field_matrix2)
+            im2.set_data(h_field_matrix1)
+            im3.set_data(h_field_matrix2)
             return im
         
         #legend(loc=0)
