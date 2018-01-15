@@ -393,10 +393,10 @@ void Load_init_param::run(void)
       //if  ( abs(time1.current_time - time1.end_time + time1.delta_t) < 1e-13)
     {
       // Logging after step
-      cout << "Model step: " << step_number
+      cout << "Model step: " << step_number * data_dump_interval
            << ", Execution time: "
            << 1000 * (clock() - t1) / CLOCKS_PER_SEC << " ms"
-           << ", Current time: "
+           << ", Current model time: "
            << c_time->current_time << "\n";
       c_bunch->charge_weighting(c_rho_beam);
       c_rho_old->reset_rho();
@@ -416,12 +416,12 @@ void Load_init_param::run(void)
       c_io_class->out_data("h2",hfield->h2,step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
       step_number=step_number+1;
       t1 = clock();
-			if  ((((int)(c_time->current_time/c_time->delta_t))%system_state_dump_interval==0)&&(step_number!=1))
+      if  ((((int)(c_time->current_time/c_time->delta_t))%system_state_dump_interval==0)&&(step_number!=1))
         this->save_system_state();
     }
     c_time->current_time = c_time->current_time + c_time->delta_t;
     //if (!res)
     //  cout<<"Error:"<<c_time->current_time<<"! ";
-
+    
   }
 }
