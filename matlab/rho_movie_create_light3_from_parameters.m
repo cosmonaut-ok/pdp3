@@ -7,10 +7,6 @@ function var = rho_movie_create_light3_from_parameters(xml_config_file, clim_e1,
   if ~exist('clim_e3', 'var')
     clim_e3 = [0 1];
   end
-
-  if ~exist('clim_rho_beam', 'var')
-    clim_rho_beam = [-1e-7 0];
-  end
   
   config_path = fileparts(xml_config_file);
   
@@ -28,6 +24,16 @@ function var = rho_movie_create_light3_from_parameters(xml_config_file, clim_e1,
 
   y_tick_max = str2double(geometry.item(0).getElementsByTagName('r_size').item(0).getFirstChild.getData);
   x_tick_max = str2double(geometry.item(0).getElementsByTagName('z_size').item(0).getFirstChild.getData);
+
+  %% get normalization parameters
+  particles = dom_root.getElementsByTagName('Particles_bunch');
+  bunch = dom_root.getElementsByTagName('Particles_bunch');
+
+  %% particles_left_density = str2double(particles.item(0).getElementsByTagName('left_density').item(0).getFirstChild.getData);
+  %% particles_right_density = str2double(particles.item(0).getElementsByTagName('right_density').item(0).getFirstChild.getData);
+  bunch_density = str2double(particles.item(0).getElementsByTagName('density').item(0).getFirstChild.getData);
+
+  clim_rho_beam = [-(bunch_density*1.6e-19) 0];
   
   %% get file to save parameters
   file_save_parameters = dom_root.getElementsByTagName('file_save_parameters');
@@ -58,6 +64,9 @@ function var = rho_movie_create_light3_from_parameters(xml_config_file, clim_e1,
   a3 = axes('Parent', f);
   
   %% place axes on figure (normalized to whole figure window)
+  %% set(a1, 'Unit', 'normalized', 'Position', [0.1 0.74 0.8 0.2]);
+  %% set(a2, 'Unit', 'normalized', 'Position', [0.1 0.41 0.8 0.2]);
+  %% set(a3, 'Unit', 'normalized', 'Position', [0.1 0.08 0.8 0.2]);
   set(a1, 'Unit', 'normalized', 'Position', [0.1 0.74 0.8 0.2]);
   set(a2, 'Unit', 'normalized', 'Position', [0.1 0.41 0.8 0.2]);
   set(a3, 'Unit', 'normalized', 'Position', [0.1 0.08 0.8 0.2]);
@@ -75,6 +84,7 @@ function var = rho_movie_create_light3_from_parameters(xml_config_file, clim_e1,
   %% Titles and Ticks
   x_axe_title = 'Z(m)';
   y_axe_title = 'R(m)';
+  colorbar_title = 'V/m';
   x_tick_range = 0:x_tick_max/x_ticks_number:x_tick_max; % we need 10 (or x_ticks_number) ticks
   x_tick_gird_size = 0:size_3/x_ticks_number:size_3;     % from 0 to x_tick_max. it's required 
   y_tick_range = 0:y_tick_max/y_ticks_number:y_tick_max; % to convert gird to real size (meters)
@@ -84,13 +94,17 @@ function var = rho_movie_create_light3_from_parameters(xml_config_file, clim_e1,
   %% set color limits
   a1.CLim = clim_e1;
   a1.CLimMode = 'manual';
+  a1.Box = 'off';
   %% set title and axes labels
   a1.Title.String = 'E_z';
   a1.XLabel.String = x_axe_title;
   a1.YLabel.String = y_axe_title;
   a1.TickDir = 'out';
   %% add color bar
-  colorbar(a1);
+  c1 = colorbar(a1);
+  c1.TickLabelInterpreter = 'latex';
+  c1.Label.String = colorbar_title;
+  c1.TickDirection = 'out';
   %% translate gird to real meters in X an Y axes
   a1.XTick = x_tick_gird_size;
   a1.XTickLabel = x_tick_range;
@@ -101,13 +115,17 @@ function var = rho_movie_create_light3_from_parameters(xml_config_file, clim_e1,
   %% set color limits
   a2.CLim = clim_e3;
   a2.CLimMode = 'manual';
+  a2.Box = 'off';
   %% set title and axes labels
   a2.Title.String = 'E_r';
   a2.XLabel.String = x_axe_title;
   a2.YLabel.String = y_axe_title;
   a2.TickDir = 'out';
   %% add color bar
-  colorbar(a2);
+  c2 = colorbar(a2);
+  c2.TickLabelInterpreter = 'latex';
+  c2.Label.String = colorbar_title;
+  c2.TickDirection = 'out';
   %% translate gird to real meters in X an Y axes
   a2.XTick = x_tick_gird_size;
   a2.XTickLabel = x_tick_range;
@@ -118,13 +136,19 @@ function var = rho_movie_create_light3_from_parameters(xml_config_file, clim_e1,
   %% set color limits
   a3.CLim = clim_rho_beam;
   a3.CLimMode = 'manual';
+  a3.Box = 'off';
   %% set title and axes labels
-  a3.Title.String = 'E_{bunch}';
+  a3.Title.String = 'Electrons density';
   a3.XLabel.String = x_axe_title;
   a3.YLabel.String = y_axe_title;
   a3.TickDir = 'out';
   %% add color bar
-  colorbar(a3);
+  c3 = colorbar(a3);
+  c3.TickLabelInterpreter = 'latex';
+  c3.Label.String = 'm^{-3}';
+  c3.TickDirection = 'out';
+  c3.TickLabels = [0:bunch_density/3:bunch_density];
+  c3.Direction = 'reverse';
   %% translate gird to real meters in X an Y axes
   a3.XTick = x_tick_gird_size;
   a3.XTickLabel = x_tick_range;
@@ -141,7 +165,6 @@ function var = rho_movie_create_light3_from_parameters(xml_config_file, clim_e1,
   N = file_delta; % 100 by default
 
   for k = 0:100 % TODO: why to 100?
-    disp(['Loading files set ', num2str(k)]);
     
     tstart = k*N; % k=2 -> 200
     tend = ((k+1)*N-1); % k=2 -> 3*100-1 -> 299
@@ -153,6 +176,8 @@ function var = rho_movie_create_light3_from_parameters(xml_config_file, clim_e1,
       return
     end
 
+    disp(['Loading files set ', num2str(k)]);
+    
     %% Open data files
     fidh_e1 = fopen([data_file_e1 num2str(k)], 'r');
     fidh_e3 = fopen([data_file_e3 num2str(k)], 'r');
