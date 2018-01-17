@@ -4,8 +4,7 @@
 #include "Constant.h"
 
 using namespace std;
-
-const double PI = constant::PI;
+using namespace constant;
 
 Fourier::Fourier(int t=0)
 {

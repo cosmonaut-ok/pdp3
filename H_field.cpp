@@ -4,8 +4,7 @@
 #include <math.h>
 #include "Constant.h"
 
-const double PI = constant::PI;
-const double MAGN_CONST = constant::MAGN_CONST;
+using namespace constant;
 
 // Constructor
 H_field::H_field(Geometry* geom1_l):geom1(geom1_l)
