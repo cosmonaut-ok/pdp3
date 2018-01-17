@@ -1,8 +1,7 @@
 #include "poisson_neumann.h"
 #include "Constant.h"
 
-const double PI = constant::PI;
-const double EPSILON0 = constant::EPSILON0;
+using namespace constant;
 
 Poisson_neumann::Poisson_neumann(Geometry* cyl_geom):Poisson(cyl_geom)
 {

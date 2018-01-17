@@ -7,17 +7,11 @@
 #include <string.h>
 #include "Constant.h"
 
-// use constants from Constant.h
-const double PI = constant::PI;
-const double EL_CHARGE = constant::EL_CHARGE;
-const double EL_MASS = constant::EL_MASS;
-const double LIGHT_SPEED = constant::LIGHT_SPEED;
-const double MAGN_CONST = constant::MAGN_CONST;
+using namespace std;
+using namespace constant;
 
 // C^2 define c^2 to decrease number of operations
-const double LIGHT_SPEED_POW_2 = pow (constant::LIGHT_SPEED, 2);
-
-using namespace std;
+const double LIGHT_SPEED_POW_2 = pow (LIGHT_SPEED, 2);
 
 Particles::Particles(void)
 {
