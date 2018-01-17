@@ -79,7 +79,7 @@ CXX = g++
 # CXX = wineg++
 RC = wrc
 AR = ar
-CFLAGS = -O0 -Wall -g # -fopenmp
+CFLAGS = -O2 -Wall
 CXXFLAGS = ${CFLAGS}
 
 ### Generic targets
