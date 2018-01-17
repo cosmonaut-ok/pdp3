@@ -6,9 +6,7 @@
 #include "Constant.h"
 
 using namespace std;
-// using namespace constant;
-const double PI = constant::PI; // reuse to prevent "magic numbers"
-const double EPSILON0 = constant::EPSILON0; // reuse to prevent "magic numbers"
+using namespace constant;
 
 E_field::E_field(): epsilon0(EPSILON0)
 {
