@@ -326,14 +326,14 @@ void Load_init_param::init_file_saving_parameters ()
 
 bool Load_init_param::save_system_state()
 {
-	cout << "Saving system state\n";
+  cout << "Saving system state\n";
   c_io_class->out_field_dump("e1",efield->e1,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
   c_io_class->out_field_dump("e2",efield->e2,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
   c_io_class->out_field_dump("e3",efield->e3,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
   c_io_class->out_field_dump("h1",hfield->h1,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
   c_io_class->out_field_dump("h2",hfield->h2,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
   c_io_class->out_field_dump("h3",hfield->h3,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-  for(int i=0;i<p_list->part_list.size();i++)
+  for(unsigned int i=0;i<p_list->part_list.size();i++)
   {
     c_io_class->out_coord_dump(p_list->part_list[i]->name,p_list->part_list[i]->x1, p_list->part_list[i]->x3, p_list->part_list[i]->number);
     c_io_class->out_velocity_dump(p_list->part_list[i]->name,p_list->part_list[i]->v1, p_list->part_list[i]->v2,p_list->part_list[i]->v3, p_list->part_list[i]->number);

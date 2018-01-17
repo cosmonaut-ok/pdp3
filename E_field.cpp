@@ -354,7 +354,7 @@ void E_field::TridiagonalSolve(const double *a,
                                const double *b,
                                double *c,
                                double *d, double *x,
-                               unsigned int n)
+                               int n)
 {
   // Modify the coefficients
   c[0] /= b[0]; // Division by zero risk
