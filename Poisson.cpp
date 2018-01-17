@@ -1,7 +1,7 @@
 #include "Poisson.h"
 #include "Constant.h"
 
-const double EPSILON0 = constant::EPSILON0;
+using namespace constant;
 
 Poisson::Poisson(Geometry*cyl_geom_t):cyl_geom(cyl_geom_t)
 {
