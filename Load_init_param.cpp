@@ -356,7 +356,7 @@ void Load_init_param::run(void)
   p_list->create_coord_arrays();
   int step_number= 0;
   clock_t t1 = clock();
-
+  
   while (c_time->current_time < c_time->end_time)
   {
     c_bunch->bunch_inject(c_time);
@@ -388,20 +388,26 @@ void Load_init_param::run(void)
     p_list->charge_weighting(c_rho_new);  //continuity equation
     //bool res = continuity_equation(c_time, c_geom, c_current, c_rho_old, c_rho_new);
 
+    // print header on every 20 logging steps
+    if  ((((int)(c_time->current_time/c_time->delta_t))%(data_dump_interval*20)==0))
+      {
+	cout << "\nStep\t"
+	     << "Saved Frame\t"
+	     << "Current Time (sec)\t"
+	     << "Real Step Execution Time (sec)\n";
+      }
+    
     if  ((((int)(c_time->current_time/c_time->delta_t))%data_dump_interval==0))
-      //if  ((((int)(c_time->current_time/c_time->delta_t)) < 10))
-      //if  ( abs(time1.current_time - time1.end_time + time1.delta_t) < 1e-13)
     {
-      // Logging after step
-      cout << "Model step: " << step_number * data_dump_interval
-           << ", Execution time: "
-           << 1000 * (clock() - t1) / CLOCKS_PER_SEC << " ms"
-           << ", Current model time: "
-           << c_time->current_time << "\n";
+      cout << step_number * data_dump_interval << "\t"
+	   << step_number << "\t\t"
+	   << c_time->current_time << "\t\t\t"
+	   << (double)(clock() - t1) / CLOCKS_PER_SEC << "\n";
+
       c_bunch->charge_weighting(c_rho_beam);
       c_rho_old->reset_rho();
       p_list[0].charge_weighting(c_rho_old);
-      c_io_class->out_data("rho_el", c_rho_old->get_ro(),step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+      //c_io_class->out_data("rho_el", c_rho_old->get_ro(),step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
       //out_class.out_data("e1",e_field1.e1,100,128,2048);
       c_io_class->out_data("rho_beam", c_rho_beam->get_ro(),step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
       c_io_class->out_data("e3",efield->e3,step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
