@@ -1,7 +1,7 @@
 #include "poisson_dirichlet.h"
 #include "Constant.h"
 
-const double PI = constant::PI;
+using namespace constant;
 
 Poisson_dirichlet::Poisson_dirichlet(Geometry* cyl_geom):Poisson(cyl_geom)
 {
@@ -53,7 +53,7 @@ void Poisson_dirichlet::poisson_solve(E_field* input_e, charge_density* ro1)
   {
     //b=2.0+ pow((geom1->dr*PI*k/(geom1->dz*geom1->n_grid_2)),2);
     b = 2.0*(1.0 - dr*dr/(dz*dz)*(cos(PI*(k+1)/(cyl_geom->n_grid_2+1)) - 1));
-    d=dr*dr*t_charge_density[0][k]/epsilon0;
+    d=dr*dr*t_charge_density[0][k]/EPSILON0;
     alpha[1]=4.0/(2.0+b);
     beta[1]=d/(2.0+b);
 
@@ -63,7 +63,7 @@ void Poisson_dirichlet::poisson_solve(E_field* input_e, charge_density* ro1)
 
       a = 1.0-1.0/(2.0*(i));
       c = 1.0+1.0/(2.0*(i));
-      d = dr*dr*t_charge_density[i][k]/epsilon0;
+      d = dr*dr*t_charge_density[i][k]/EPSILON0;
 
       alpha[i+1] = c/(b-alpha[i]*a);
       beta[i+1]    = (d+beta[i]*a)/(b-alpha[i]*a);

@@ -42,7 +42,7 @@ public:
                         double *c,
                         double *d,
                         double *x,
-                        unsigned int n);
+                        int n);
   double* get_1d_e1();
   double* get_1d_e2();
   double* get_1d_e3();
