@@ -7,17 +7,11 @@
 #include <string.h>
 #include "Constant.h"
 
-// use constants from Constant.h
-const double PI = constant::PI;
-const double EL_CHARGE = constant::EL_CHARGE;
-const double EL_MASS = constant::EL_MASS;
-const double LIGHT_SPEED = constant::LIGHT_SPEED;
-const double MAGN_CONST = constant::MAGN_CONST;
+using namespace std;
+using namespace constant;
 
 // C^2 define c^2 to decrease number of operations
-const double LIGHT_SPEED_POW_2 = pow (constant::LIGHT_SPEED, 2);
-
-using namespace std;
+const double LIGHT_SPEED_POW_2 = pow (LIGHT_SPEED, 2);
 
 Particles::Particles(void)
 {
@@ -116,15 +110,33 @@ void Particles::set_x_0()
 // calculate Lorentz factor
 double Particles::get_gamma(int i)
 {
-  return pow(1.0 - (pow(v1[i], 2) + pow(v2[i], 2) + pow(v3[i], 2))
-             / LIGHT_SPEED_POW_2, -0.5);
+  double gamma;
+  gamma = pow(1.0 - ((pow(v1[i], 2) + pow(v2[i], 2) + pow(v3[i], 2)) / LIGHT_SPEED_POW_2), -0.5);
+  if (isinf(gamma) == 1) { // avoid infinity values
+    cout << "WARNING! gamma (Lorenz factor) girects to infinity for [v1, v2, v3, i]: ["
+         << v1[i] << ", " << v2[i] << ", " << v3[i] << ", " << i << "]\n";
+    return 1e100; // just return some very big value
+  }
+  else
+    {
+      return gamma;
+    }
 }
 
 // clculate reciprocal Lorentz factor (1/gamma), aka ``alpha''
 double Particles::get_gamma_inv(int i) // TODO: it is not alpha
 {
-  return pow(1.0 + (pow(v1[i], 2) + pow(v2[i], 2) + pow(v3[i], 2))
-             / LIGHT_SPEED_POW_2, (double)0.5);
+  double gamma;
+  gamma = pow(1.0 + ((pow(v1[i], 2) + pow(v2[i], 2) + pow(v3[i], 2)) / LIGHT_SPEED_POW_2), 0.5);
+  if (isinf(gamma) == 1) { // avoid infinity values
+    cout << "WARNING! reciprocal gamma (Lorenz factor) directs to infinity for [v1, v2, v3, i]: ["
+         << v1[i] << ", " << v2[i] << ", " << v3[i] << ", " << i << "]\n";
+    return 1e100; // just return some very big value
+  }
+  else
+    {
+      return gamma;
+    }
 }
 
 void Particles::step_v(E_field *e_fld, H_field *h_fld, Time* t)
