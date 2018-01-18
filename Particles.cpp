@@ -270,7 +270,7 @@ void Particles::charge_weighting(charge_density* ro1)
     {
       // finding number of i and k cell. example: dr = 0.5; r = 0.4; i =0
       r_i = (int)ceil((x1[i])/dr)-1;
-      z_k =    (int)ceil((x3[i])/dz)-1;
+      z_k = (int)ceil((x3[i])/dz)-1;
 
       // in first cell other alg. of ro_v calc
       if(x1[i]>dr)
@@ -1102,13 +1102,13 @@ void Particles::azimuthal_j_weighting(Time* time1, current *this_j)
     {
       // finding number of i and k cell. example: dr = 0.5; r = 0.4; i =0
       r_i = (int)ceil((x1[i])/dr)-1;
-      z_k =    (int)ceil((x3[i])/dz)-1;
+      z_k = (int)ceil((x3[i])/dz)-1;
       ///////////////////////////
 
       // in first cell other alg. of ro_v calc
       if(x1[i]>dr)
       {
-        r1 =   x1[i] - 0.5*dr;
+        r1 = x1[i] - 0.5*dr;
         r2 = (r_i+0.5)*dr;
         r3 = x1[i] + 0.5*dr;
         ro_v = charge_array[i]/(2.0*PI*dz*dr*x1[i]);
@@ -1125,7 +1125,7 @@ void Particles::azimuthal_j_weighting(Time* time1, current *this_j)
         // weighting in j[i+1][k] cell
         rho = ro_v*PI*dz1*(r3*r3-r2*r2)/v_2;
         current = rho*v2[i];
-        this_j->set_j2(r_i+1,z_k,    current);
+        this_j->set_j2(r_i+1,z_k, current);
 
         // weighting in j[i][k+1] cell
         rho = ro_v*PI*dz2*(r2*r2-r1*r1)/v_1;
@@ -1135,12 +1135,12 @@ void Particles::azimuthal_j_weighting(Time* time1, current *this_j)
         // weighting in j[i+1][k+1] cell
         rho = ro_v*PI*dz2*(r3*r3-r2*r2)/v_2;
         current = rho*v2[i];
-        this_j->set_j2(r_i+1, z_k+1,  current);
+        this_j->set_j2(r_i+1, z_k+1, current);
 
       }
       else
       {
-        r1 =   x1[i] - 0.5*dr;
+        r1 = x1[i] - 0.5*dr;
         r2 = (r_i+0.5)*dr;
         r3 = x1[i]+0.5*dr;
         dz1 = (z_k+1)*dz-x3[i];
