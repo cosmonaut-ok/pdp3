@@ -79,7 +79,13 @@ CXX = g++
 # CXX = wineg++
 RC = wrc
 AR = ar
-CFLAGS = -O2 -Wall
+CFLAGS = -O2
+CFLAGS_DEBUG = -O0 -Wall -g -ggdb -fvar-tracking -ggnu-pubnames
+
+ifeq ($(DEBUG), yes)
+CFLAGS = $(CFLAGS_DEBUG)
+endif
+
 CXXFLAGS = ${CFLAGS}
 
 ### Generic targets
@@ -122,7 +128,7 @@ $(EXTRASUBDIRS:%=%/__clean__): dummy
 DEFLIB = $(LIBRARY_PATH) $(LIBRARIES) $(DLL_PATH) $(DLL_IMPORTS:%=-l%)
 
 $(pdp3_MODULE): $(pdp3_OBJS)
-	$(CXX) $(LDFLAGS) -o $@ $(pdp3_OBJS) $(pdp3_LIBRARY_PATH) $(pdp3_DLL_PATH) $(DEFLIB) $(pdp3_DLLS:%=-l%) $(pdp3_LIBRARIES:%=-l%)
+	$(CXX) $(CXXFLAGS) $(CXXEXTRA) $(DEFINCL) $(LDFLAGS) -o $@ $(pdp3_OBJS) $(pdp3_LIBRARY_PATH) $(pdp3_DLL_PATH) $(DEFLIB) $(pdp3_DLLS:%=-l%) $(pdp3_LIBRARIES:%=-l%)
 
 bootstrap:
 	mkdir -p pdp3_files pdp3_result/Dump
