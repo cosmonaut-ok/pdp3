@@ -2,6 +2,7 @@
 // #include <string>
 // #include <iomanip>
 #include <algorithm>
+#include <iomanip>
 // #include <cctype>
 
 
@@ -391,18 +392,21 @@ void Load_init_param::run(void)
     // print header on every 20 logging steps
     if  ((((int)(c_time->current_time/c_time->delta_t))%(data_dump_interval*20)==0))
       {
-	cout << "\nStep\t"
-	     << "Saved Frame\t"
-	     << "Current Time (sec)\t"
-	     << "Real Step Execution Time (sec)\n";
+	cout << endl
+	     << left << setw(8) << "Step"
+	     << left << setw(13) << "Saved Frame"
+	     << left << setw(20) << "Current Time (sec)"
+	     << left << setw(32) << "Real Step Execution Time (sec)"
+	     << endl;
       }
     
     if  ((((int)(c_time->current_time/c_time->delta_t))%data_dump_interval==0))
     {
-      cout << step_number * data_dump_interval << "\t"
-	   << step_number << "\t\t"
-	   << c_time->current_time << "\t\t\t"
-	   << (double)(clock() - t1) / CLOCKS_PER_SEC << "\n";
+      cout << left << setw(8) << step_number * data_dump_interval
+	   << left << setw(13) << step_number
+	   << left << setw(20) << c_time->current_time
+	   << left << setw(32) << (double)(clock() - t1) / CLOCKS_PER_SEC
+	   << endl;
 
       c_bunch->charge_weighting(c_rho_beam);
       c_rho_old->reset_rho();
