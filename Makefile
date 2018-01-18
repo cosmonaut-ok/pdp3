@@ -55,7 +55,7 @@ pdp3_CXX_SRCS         = Boundary_Maxwell_conditions.cpp \
 			particles_struct.cpp
 pdp3_RC_SRCS          = pdp3.rc \
 			pdp31.rc
-pdp3_LDFLAGS          =
+pdp3_LDFLAGS          = -m64
 pdp3_ARFLAGS          =
 pdp3_DLL_PATH         =
 pdp3_DLLS             =
@@ -79,8 +79,8 @@ CXX = g++
 # CXX = wineg++
 RC = wrc
 AR = ar
-CFLAGS = -O2
-CFLAGS_DEBUG = -O0 -Wall -g -ggdb -fvar-tracking -ggnu-pubnames -std=c++11 -pedantic
+CFLAGS = -O2 -m64 -mcmodel=large
+CFLAGS_DEBUG = -O0 -Wall -g -ggdb -fvar-tracking -ggnu-pubnames -std=c++11 -pedantic -m64 -mcmodel=large
 
 ifeq ($(DEBUG), yes)
 CFLAGS = $(CFLAGS_DEBUG)
@@ -89,7 +89,7 @@ endif
 CXXFLAGS = ${CFLAGS}
 
 ### Generic targets
-all: $(SUBDIRS) $(DLLS:%=%.so) $(LIBS) $(EXES) bootstrap
+all: $(SUBDIRS) $(DLLS:%=%.so) $(LIBS) $(EXES)
 
 ### Build rules
 .PHONY: all clean dummy
@@ -130,7 +130,7 @@ DEFLIB = $(LIBRARY_PATH) $(LIBRARIES) $(DLL_PATH) $(DLL_IMPORTS:%=-l%)
 $(pdp3_MODULE): $(pdp3_OBJS)
 	$(CXX) $(CXXFLAGS) $(CXXEXTRA) $(DEFINCL) $(LDFLAGS) -o $@ $(pdp3_OBJS) $(pdp3_LIBRARY_PATH) $(pdp3_DLL_PATH) $(DEFLIB) $(pdp3_DLLS:%=-l%) $(pdp3_LIBRARIES:%=-l%)
 
-bootstrap:
+bootstrap: all
 	mkdir -p pdp3_files pdp3_result/Dump
 
 mrproper: clean
