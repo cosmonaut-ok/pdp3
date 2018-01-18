@@ -1,3 +1,7 @@
+// WARNING!
+// This header file used only to store
+// physical and mathematical constants
+
 namespace constant
 {
   const double PI = 3.1415926535897932;
