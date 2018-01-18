@@ -65,7 +65,7 @@ user@host$ git pull origin master ## get latest stable code
 ### Begining work
 
 1. Checkout to new branch
-```
+```bash
 user@host$ git checkout -b your-branch-name # use only `-` as delimiters for better compatability
 ```
 
@@ -88,3 +88,23 @@ When you end some logical step of your working, you should merge your changes to
 3. When all ok, press "Create pull request" and confirm.
 
 4. Wait for travis testing ends and (if they passed), merge your changes to master branch
+
+### Debug
+
+Linux:
+1. build project with DEBUG option
+
+```bash
+user@host$ DEBUG=yes make
+```
+or
+```bash
+user@host$ make DEBUG=yes
+```
+
+2. run with gdb
+
+```bash
+user@host$ gdb ./pdp3
+(gdb) run ## or perform some modifications first than run, e.g. set breakpoints
+```

@@ -80,7 +80,7 @@ CXX = g++
 RC = wrc
 AR = ar
 CFLAGS = -O2
-CFLAGS_DEBUG = -O0 -Wall -g -ggdb -fvar-tracking -ggnu-pubnames
+CFLAGS_DEBUG = -O0 -Wall -g -ggdb -fvar-tracking -ggnu-pubnames -std=c++11 -pedantic
 
 ifeq ($(DEBUG), yes)
 CFLAGS = $(CFLAGS_DEBUG)
