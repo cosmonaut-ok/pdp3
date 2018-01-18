@@ -3,7 +3,7 @@
 #include "poisson_dirichlet.h"
 #include "Constant.h"
 
-const double PI = constant::PI;
+using namespace constant;
 
 Bunch::Bunch(char* p_name,
              double p_charge,

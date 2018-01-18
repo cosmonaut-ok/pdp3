@@ -1,8 +1,7 @@
 #include "Boundary_Maxwell_conditions.h"
 #include "Constant.h"
 
-const double PI = constant::PI;
-const double LIGHT_SPEED = constant::LIGHT_SPEED;
+using namespace constant;
 
 Boundary_Maxwell_conditions::Boundary_Maxwell_conditions(E_field* e_fld_t):e_fld(e_fld_t)
 {
