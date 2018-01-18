@@ -32,7 +32,7 @@ void PML::calc_sigma(Geometry* geom1)
   double lenght_sigma_extern =geom1->dr * (floor(geom1->n_grid_1*comparative_l_3));
 
   // if pml is only on z walll
-  if ((comparative_l_1==0.0) && (comparative_l_2==0.0))
+  if ((comparative_l_1 == 0) && (comparative_l_2 == 0) && (comparative_l_3 != 0))
   {
     for(int i=0; i<geom1->n_grid_1; i++)
       for(int k=0; k<geom1->n_grid_2; k++)
@@ -59,7 +59,7 @@ void PML::calc_sigma(Geometry* geom1)
 
 ////////////////////////////////////////////////////////////
 
-  if(comparative_l_3==0)
+  if (comparative_l_3 == 0)
   {
   }
   else
