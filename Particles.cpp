@@ -5,6 +5,7 @@
 #include "Triple.h"
 #include <math.h>
 #include <string.h>
+#include <cstdlib>
 #include "Constant.h"
 
 using namespace std;
