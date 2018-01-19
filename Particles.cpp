@@ -93,9 +93,9 @@ void Particles::set_v_0()
 {
   for(int i=0; i<number; i++)
   {
-    v1[i] = 0.0;
-    v2[i] = 1.0e5; // TODO: WHY?
-    v3[i] = 0.0;
+    v1[i] = 0;
+    v2[i] = 1e5; // TODO: WHY?
+    v3[i] = 0;
   }
 }
 
@@ -111,9 +111,21 @@ void Particles::set_x_0()
 // calculate Lorentz factor
 double Particles::get_gamma(int i)
 {
-  double gamma;
-  // pow(v[i], 2) works incorrect in some cases
-  gamma = pow(1.0 - ((v1[i]*v1[i] + v2[i]*v2[i] + v3[i]*v3[i]) / LIGHT_SPEED_POW_2), -0.5);
+  double gamma, v_1, v_2, v_3, beta;
+
+  // round very small velicities to avoid exceptions
+  v_1 = (abs(v1[i]) < 1e-15) ? 0 : v1[i];
+  v_2 = (abs(v2[i]) < 1e-15) ? 0 : v2[i];
+  v_3 = (abs(v3[i]) < 1e-15) ? 0 : v3[i];
+
+  beta = (pow(v_1, 2) + pow(v_2, 2) + pow(v_3, 2)) / LIGHT_SPEED_POW_2;
+
+  // FIXME: find out, why velocities calculates incorrect (e.g. we can get v^2 > c^2)
+  // TODO: workaround: avoid incorrect calculation
+  if (beta > 1) // it's VERY BAD! Beta should not be more, than 1
+    beta = 1;
+
+  gamma = pow(1.0 - beta, -0.5);
 
   if (isinf(gamma) == 1) { // avoid infinity values
     cerr << "WARNING(get_gamma): gamma (Lorenz factor) girects to infinity for [v1, v2, v3, i]: ["
@@ -129,9 +141,21 @@ double Particles::get_gamma(int i)
 // clculate reciprocal Lorentz factor (1/gamma), aka ``alpha''
 double Particles::get_gamma_inv(int i) // TODO: it is not alpha
 {
-  double gamma;
-  // pow(v[i], 2) works incorrect in some cases
-  gamma = pow(1.0 + ((v1[i]*v1[i] + v2[i]*v2[i] + v3[i]*v3[i]) / LIGHT_SPEED_POW_2), 0.5);
+  double gamma, v_1, v_2, v_3, beta;
+
+  // round very small velicities to avoid exceptions
+  v_1 = (abs(v1[i]) < 1e-15) ? 0 : v1[i];
+  v_2 = (abs(v2[i]) < 1e-15) ? 0 : v2[i];
+  v_3 = (abs(v3[i]) < 1e-15) ? 0 : v3[i];
+
+  beta = (pow(v_1, 2) + pow(v_2, 2) + pow(v_3, 2)) / LIGHT_SPEED_POW_2;
+
+  // FIXME: find out, why velocities calculates incorrect (e.g. we can get v^2 > c^2)
+  // TODO: workaround: avoid incorrect calculation
+  if (beta > 1) // it's VERY BAD! Beta should not be more, than 1
+    beta = 1;
+
+  gamma = pow(1.0 + (pow(v1[i], 2) + pow(v2[i], 2) + pow(v3[i], 2)) / LIGHT_SPEED_POW_2, 0.5);
   if (isinf(gamma) == 1) { // avoid infinity values
     cerr << "WARNING(get_gamma_inv): reciprocal gamma (Lorenz factor) directs to infinity for [v1, v2, v3, i]: ["
          << v1[i] << ", " << v2[i] << ", " << v3[i] << ", " << i << "]\n";
@@ -158,7 +182,7 @@ void Particles::step_v(E_field *e_fld, H_field *h_fld, Time* t)
         cerr << "ERROR(step_v): x1[" << i << "] or x3[" << i << "] is not valid number. Can not continue." << endl;
         exit(1);
       }
-      //
+      // q*t/2*m TODO: what constant is it?
       const1 = charge_array[i]*t->delta_t/2.0/mass_array[i];
       E_compon = e_fld->get_field(x1[i],x3[i]);
       B_compon = h_fld->get_field(x1[i],x3[i]);
@@ -169,12 +193,18 @@ void Particles::step_v(E_field *e_fld, H_field *h_fld, Time* t)
       b2 = B_compon.second*MAGN_CONST*const1;
       b3 = B_compon.third*MAGN_CONST*const1;
 
+      // round very small velicities to avoid exceptions
+      vv1 = (abs(v1[i]) < 1e-15) ? 0 : v1[i];
+      vv2 = (abs(v2[i]) < 1e-15) ? 0 : v2[i];
+      vv3 = (abs(v3[i]) < 1e-15) ? 0 : v3[i];
+
       // 1. Multiplication by relativistic factor
       // u(n-1/2) = gamma(n-1/2)*v(n-1/2)
       gamma = get_gamma(i);
-      v1[i] = gamma*v1[i];
-      v2[i] = gamma*v2[i];
-      v3[i] = gamma*v3[i];
+      //
+      v1[i] = gamma*vv1;
+      v2[i] = gamma*vv2;
+      v3[i] = gamma*vv3;
 
       // 2. Half acceleration in the electric field
       // u'(n) = u(n-1/2) + q*dt/2/m*E(n)
