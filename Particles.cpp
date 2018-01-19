@@ -111,7 +111,9 @@ void Particles::set_x_0()
 double Particles::get_gamma(int i)
 {
   double gamma;
-  gamma = pow(1.0 - ((pow(v1[i], 2) + pow(v2[i], 2) + pow(v3[i], 2)) / LIGHT_SPEED_POW_2), -0.5);
+	// pow(v[i], 2) works incorrect in some cases
+	gamma = pow(1.0 - ((v1[i]*v1[i] + v2[i]*v2[i] + v3[i]*v3[i]) / LIGHT_SPEED_POW_2), -0.5);
+
   if (isinf(gamma) == 1) { // avoid infinity values
     cerr << "WARNING(get_gamma): gamma (Lorenz factor) girects to infinity for [v1, v2, v3, i]: ["
          << v1[i] << ", " << v2[i] << ", " << v3[i] << ", " << i << "]\n";
@@ -127,7 +129,8 @@ double Particles::get_gamma(int i)
 double Particles::get_gamma_inv(int i) // TODO: it is not alpha
 {
   double gamma;
-  gamma = pow(1.0 + ((pow(v1[i], 2) + pow(v2[i], 2) + pow(v3[i], 2)) / LIGHT_SPEED_POW_2), 0.5);
+	// pow(v[i], 2) works incorrect in some cases
+  gamma = pow(1.0 + ((v1[i]*v1[i] + v2[i]*v2[i] + v3[i]*v3[i]) / LIGHT_SPEED_POW_2), 0.5);
   if (isinf(gamma) == 1) { // avoid infinity values
     cerr << "WARNING(get_gamma_inv): reciprocal gamma (Lorenz factor) directs to infinity for [v1, v2, v3, i]: ["
          << v1[i] << ", " << v2[i] << ", " << v3[i] << ", " << i << "]\n";
