@@ -5,7 +5,6 @@
 #include <iomanip>
 // #include <cctype>
 
-
 #include "Load_init_param.h"
 #include "time.h"
 #include "tinyxml2.h"
@@ -74,7 +73,7 @@ Load_init_param::Load_init_param(char* xml_file_name)
   }
 
   // load File Path
-	init_file_saving_parameters();
+  init_file_saving_parameters();
 
   cout << "Initialisation complete\n";
 }
@@ -108,11 +107,11 @@ char* Load_init_param::read_char(char* p_name)
 }
 
 bool Load_init_param::to_bool(string str) {
-	std::transform(str.begin(), str.end(), str.begin(), ::tolower);
-	std::istringstream is(str);
-	bool b;
-	is >> std::boolalpha >> b;
-	return b;
+  std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+  std::istringstream is(str);
+  bool b;
+  is >> std::boolalpha >> b;
+  return b;
 }
 
 void Load_init_param::init_particles()
@@ -147,7 +146,6 @@ void Load_init_param::init_particles()
 
     prtls = new Particles(strcpy(new char [50],p_name), charge, mass, number,
                           c_geom, p_list);
-
     prtls->load_spatial_distribution_with_variable_mass(
       left_density,right_density,0,0);
     // prtls->load_spatial_distribution(params[3],params[4],0,0);
@@ -313,12 +311,12 @@ void Load_init_param::init_file_saving_parameters ()
   strcpy(path_dump, sub_root->FirstChildElement("path_to_save_state")->GetText());
 
   data_dump_interval = atoi(sub_root->
-			    FirstChildElement("data_dump_interval")->
-			    GetText());
+          FirstChildElement("data_dump_interval")->
+          GetText());
 
   system_state_dump_interval = atoi(sub_root->
-				    FirstChildElement("system_state_dump_interval")->
-				    GetText());
+            FirstChildElement("system_state_dump_interval")->
+            GetText());
 
   c_io_class = new input_output_class (path_res, path_dump);
 }
@@ -357,7 +355,7 @@ void Load_init_param::run(void)
   p_list->create_coord_arrays();
   int step_number= 0;
   clock_t t1 = clock();
-  
+
   while (c_time->current_time < c_time->end_time)
   {
     c_bunch->bunch_inject(c_time);
@@ -392,21 +390,21 @@ void Load_init_param::run(void)
     // print header on every 20 logging steps
     if  ((((int)(c_time->current_time/c_time->delta_t))%(data_dump_interval*20)==0))
       {
-	cout << endl
-	     << left << setw(8) << "Step"
-	     << left << setw(13) << "Saved Frame"
-	     << left << setw(20) << "Current Time (sec)"
-	     << left << setw(32) << "Real Step Execution Time (sec)"
-	     << endl;
+  cout << endl
+       << left << setw(8) << "Step"
+       << left << setw(13) << "Saved Frame"
+       << left << setw(20) << "Current Time (sec)"
+       << left << setw(32) << "Real Step Execution Time (sec)"
+       << endl;
       }
-    
+
     if  ((((int)(c_time->current_time/c_time->delta_t))%data_dump_interval==0))
     {
       cout << left << setw(8) << step_number * data_dump_interval
-	   << left << setw(13) << step_number
-	   << left << setw(20) << c_time->current_time
-	   << left << setw(32) << (double)(clock() - t1) / CLOCKS_PER_SEC
-	   << endl;
+     << left << setw(13) << step_number
+     << left << setw(20) << c_time->current_time
+     << left << setw(32) << (double)(clock() - t1) / CLOCKS_PER_SEC
+     << endl;
 
       c_bunch->charge_weighting(c_rho_beam);
       c_rho_old->reset_rho();
@@ -416,6 +414,7 @@ void Load_init_param::run(void)
       c_io_class->out_data("rho_beam", c_rho_beam->get_ro(),step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
       c_io_class->out_data("e3",efield->e3,step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
       c_io_class->out_data("e1",efield->e1,step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+
       //c_io_class->out_data("j1",c_current->get_j1(),step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
       //c_io_class->out_data("j3",c_current->get_j3(),step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
       //c_io_class->out_coord("vels",c_bunch->v1, c_bunch->v3, step_number, 100, c_bunch->number);
@@ -423,7 +422,8 @@ void Load_init_param::run(void)
       //out_class.out_coord("vels",electron_bunch.v1, electron_bunch.v3, step_number, 100, electron_bunch.number);
       //out_class.out_coord("coords",electrons.x1, electrons.x3, step_number, 100, electrons.number);
       //out_class.out_coord("vels",electrons.v1, electrons.v3, step_number, 100, electrons.number);
-      c_io_class->out_data("h2",hfield->h2,step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+
+      // c_io_class->out_data("h2",hfield->h2,step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
       step_number=step_number+1;
       t1 = clock();
       if  ((((int)(c_time->current_time/c_time->delta_t))%system_state_dump_interval==0)&&(step_number!=1))
@@ -432,6 +432,6 @@ void Load_init_param::run(void)
     c_time->current_time = c_time->current_time + c_time->delta_t;
     //if (!res)
     //  cout<<"Error:"<<c_time->current_time<<"! ";
-    
+
   }
 }
