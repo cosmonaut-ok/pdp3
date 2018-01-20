@@ -111,25 +111,25 @@ void Particles::set_x_0()
 // calculate Lorentz factor
 double Particles::get_gamma(int i)
 {
-  double gamma, v_1, v_2, v_3, beta;
+  double gamma, beta;
 
-  // round very small velicities to avoid exceptions
-  v_1 = (abs(v1[i]) < 1e-15) ? 0 : v1[i];
-  v_2 = (abs(v2[i]) < 1e-15) ? 0 : v2[i];
-  v_3 = (abs(v3[i]) < 1e-15) ? 0 : v3[i];
+  beta = (pow(v1[i], 2) + pow(v2[i], 2) + pow(v3[i], 2)) / LIGHT_SPEED_POW_2;
 
-  beta = (pow(v_1, 2) + pow(v_2, 2) + pow(v_3, 2)) / LIGHT_SPEED_POW_2;
-
-  // FIXME: find out, why velocities calculates incorrect (e.g. we can get v^2 > c^2)
-  // TODO: workaround: avoid incorrect calculation
   if (beta > 1) // it's VERY BAD! Beta should not be more, than 1
-    beta = 1;
+	{
+		cerr << "CRITICAL!(get_gamma): Lorentz factor aka gamma is comples. Can not continue." << endl
+				 << "\tUsually it happens, when <Time> -> <delta_t> value is too big." << endl
+				 << "\tv1[" << i << "] = " << v1[i]
+				 << "\tv2[" << i << "] = " << v2[i]
+				 << "\tv3[" << i << "] = " << v3[i];
+		exit(1);
+	}
 
   gamma = pow(1.0 - beta, -0.5);
 
   if (isinf(gamma) == 1) { // avoid infinity values
     cerr << "WARNING(get_gamma): gamma (Lorenz factor) girects to infinity for [v1, v2, v3, i]: ["
-         << v1[i] << ", " << v2[i] << ", " << v3[i] << ", " << i << "]\n";
+         << v1[i] << ", " << v2[i] << ", " << v3[i] << ", " << i << "]" << endl;
     return 1e100; // just return some very big value
   }
   else
@@ -141,21 +141,22 @@ double Particles::get_gamma(int i)
 // clculate reciprocal Lorentz factor (1/gamma), aka ``alpha''
 double Particles::get_gamma_inv(int i) // TODO: it is not alpha
 {
-  double gamma, v_1, v_2, v_3, beta;
+  double gamma, beta;
 
-  // round very small velicities to avoid exceptions
-  v_1 = (abs(v1[i]) < 1e-15) ? 0 : v1[i];
-  v_2 = (abs(v2[i]) < 1e-15) ? 0 : v2[i];
-  v_3 = (abs(v3[i]) < 1e-15) ? 0 : v3[i];
+  beta = (pow(v1[i], 2) + pow(v2[i], 2) + pow(v3[i], 2)) / LIGHT_SPEED_POW_2;
 
-  beta = (pow(v_1, 2) + pow(v_2, 2) + pow(v_3, 2)) / LIGHT_SPEED_POW_2;
-
-  // FIXME: find out, why velocities calculates incorrect (e.g. we can get v^2 > c^2)
-  // TODO: workaround: avoid incorrect calculation
   if (beta > 1) // it's VERY BAD! Beta should not be more, than 1
-    beta = 1;
+	{
+		cerr << "CRITICAL!(get_gamma_inv): Lorentz factor aka gamma is comples. Can not continue." << endl
+				 << "\tUsually it happens, when <Time> -> <delta_t> value is too big." << endl
+				 << "\tv1[" << i << "] = " << v1[i]
+				 << "\tv2[" << i << "] = " << v2[i]
+				 << "\tv3[" << i << "] = " << v3[i];
+		exit(1);
+	}
 
-  gamma = pow(1.0 + (pow(v1[i], 2) + pow(v2[i], 2) + pow(v3[i], 2)) / LIGHT_SPEED_POW_2, 0.5);
+  gamma = pow(1.0 + beta, 0.5);
+
   if (isinf(gamma) == 1) { // avoid infinity values
     cerr << "WARNING(get_gamma_inv): reciprocal gamma (Lorenz factor) directs to infinity for [v1, v2, v3, i]: ["
          << v1[i] << ", " << v2[i] << ", " << v3[i] << ", " << i << "]\n";
@@ -292,7 +293,6 @@ void Particles::half_step_coord(Time* t)
       }
     }
 }
-
 
 // function for charge density weighting
 void Particles::charge_weighting(charge_density* ro1)
