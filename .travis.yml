@@ -10,7 +10,7 @@ addons:
       - g++-6
       - git
     env:
-      - EXPORT_VARS_CMD="export CC=gcc-7 && export CXX=g++-6"
+      - EXPORT_VARS_CMD="export CC=gcc-6 && export CXX=g++-6"
 
 before_install:
   - eval "${EXPORT_VARS_CMD}"
