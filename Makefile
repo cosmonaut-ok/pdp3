@@ -91,10 +91,10 @@ else
 CFLAGS += -O2
 endif
 
-ifeq ($(MULTITHREADING), yes)
-CFLAGS += $(CFLAGS_OPENMP)
-else
+ifeq ($(SINGLETHREAD), yes)
 CFLAGS += $(CFLAGS_NO_OPENMP)
+else
+CFLAGS += $(CFLAGS_OPENMP)
 endif
 
 CXXFLAGS = ${CFLAGS}

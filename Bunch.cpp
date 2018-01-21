@@ -27,6 +27,8 @@ Bunch::Bunch(char* p_name,
   double n_in_big = PI * pow(radius, 2) * b_lenght * n_bunch / number;
   charge *= n_in_big;
   mass *= n_in_big;
+
+#pragma omp parallel shared(v1, v2, v3, mass_array, charge_array, is_alive, mass, charge)
   for(int i=0; i<number; i++)
   {
     is_alive[i] = 0;
