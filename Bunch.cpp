@@ -27,6 +27,8 @@ Bunch::Bunch(char* p_name,
   double n_in_big = PI * pow(radius, 2) * b_lenght * n_bunch / number;
   charge *= n_in_big;
   mass *= n_in_big;
+
+#pragma omp parallel shared(v1, v2, v3, mass_array, charge_array, is_alive, mass, charge)
   for(int i=0; i<number; i++)
   {
     is_alive[i] = 0;
@@ -51,11 +53,17 @@ void Bunch::bunch_inject(Time* time)
   // exit (1);
   double dr = geom1->dr*1.00000001; // TODO: WTF?
   double dz = geom1->dz*1.00000001;
+  double rand_i;
+  double rand_z;
+
   if (time->current_time<duration)
+#pragma omp parallel shared(start_number, x1, x3, v1, v2, v3, dr, dz, dl, is_alive, vel_bunch, time, geom1) private(rand_i, rand_z)
+  {
+#pragma omp for
     for(int i = 0; i <  particles_in_step; i++)
     {
-      double rand_i = random_reverse(start_number + i, 9);
-      double rand_z = random_reverse(start_number + i, 11);
+      rand_i = random_reverse(start_number + i, 9);
+      rand_z = random_reverse(start_number + i, 11);
 
       x1[i+start_number] = sqrt(dr * dr / 4.0 + radius * (radius - dr) * rand_i);
 
@@ -66,13 +74,16 @@ void Bunch::bunch_inject(Time* time)
       is_alive[i+start_number] = true;
     }
 
-  for(int i = 0; i <  number; i++)
-    if(x3[i]>(geom1->second_size - dz/2.0))
-    {
-      is_alive[i]=false;
-    }
+#pragma omp for
+    for(int i = 0; i <  number; i++)
+      if(x3[i]>(geom1->second_size - dz/2.0))
+      {
+        is_alive[i]=false;
+      }
+  }
 }
 
+// TODO: seems, not used
 void Bunch::bunch_inject_calc_E(Geometry* geom,
                                 E_field* E_beam,
                                 E_field* E,
@@ -136,7 +147,7 @@ void Bunch::half_step_coord(Time* t)
   double x1_wallX2 = x1_wall*2.0;
   // double x3_wallX2 = x3_wall*2.0;
   double half_dt = t->delta_t/2.0;
-
+#pragma omp parallel for shared(x1, x3, v1, v2, v3, dr, dz, x1_wall, x3_wall, half_dr, half_dz, half_dt, x1_wallX2)
   for(int i=0;i<number;i++)
     if (is_alive[i])
     {

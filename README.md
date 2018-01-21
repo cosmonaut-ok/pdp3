@@ -7,13 +7,11 @@ RoadMap:
 
 - Refactoring:
   - move to modern tinyxml2 [ DONE ]
-  - remove CUDA
+  - remove CUDA [ DONE ]
   - algorhythm simplification and optimization
-- paralellize (CAF?)
+- paralellize (openMP) [ DONE ]
 - add openCL support
-- wrappers for octave (CLI) to build images
-
-https://github.com/leethomason/tinyxml2
+- migrate image processing from matlab to python+scipy/numpy/etc.
 
 ## HOWTO
 
@@ -28,17 +26,19 @@ user@host$ git submodule update --init # require to enable external libraries
 
 2. compile
 
+NOTE: gcc/g++ version 6.x or higher recommended
+
 ```bash
 # change your current directory to project's root directory
 user@host$ cd /path/to/pdp3/root/directory
-user@host$ make ## optional, you can set: DEBUG=yes
+user@host$ make ## optional, you can set: DEBUG=yes and/or SINGLETHREAD=yes (to disable openMP)
 ```
 You need just file `pdp3` and `parameters.xml`. You can copy this files to somewhere, edit `parameters.xml` and run pdp3
 
 3. test
 
 ```bash
-user@host$ make test
+user@host$ make test # or test-ext for extended testing (require more time)
 ```
 
 ## Hacking
