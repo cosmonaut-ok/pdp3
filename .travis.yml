@@ -1,4 +1,5 @@
-language: c++
+language: cpp
+compiler: gcc
 sudo: required
 os: linux
 dist: trusty
@@ -7,10 +8,11 @@ addons:
     sources:
       - ubuntu-toolchain-r-test
     packages:
-      - g++-6
+      - g++-7
       - git
+      - make
     env:
-      - EXPORT_VARS_CMD="export CC=gcc-6 && export CXX=g++-6"
+      - EXPORT_VARS_CMD="export CC=gcc-7 && export CXX=g++-7"
 
 before_install:
   - eval "${EXPORT_VARS_CMD}"
@@ -18,6 +20,8 @@ before_install:
 before_script:
   - echo 'Europe/Kiev' | sudo tee /etc/timezone
   - sudo dpkg-reconfigure --frontend noninteractive tzdata
+  - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 90
+  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 90
   - git submodule update --init
 
 script:

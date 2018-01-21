@@ -28,7 +28,7 @@ Bunch::Bunch(char* p_name,
   charge *= n_in_big;
   mass *= n_in_big;
 
-#pragma omp parallel shared(v1, v2, v3, mass_array, charge_array, is_alive, mass, charge)
+#pragma omp parallel for
   for(int i=0; i<number; i++)
   {
     is_alive[i] = 0;
@@ -57,7 +57,7 @@ void Bunch::bunch_inject(Time* time)
   double rand_z;
 
   if (time->current_time<duration)
-#pragma omp parallel shared(start_number, x1, x3, v1, v2, v3, dr, dz, dl, is_alive, vel_bunch, time, geom1) private(rand_i, rand_z)
+#pragma omp parallel shared(start_number, dr, dz, dl) private(rand_i, rand_z)
   {
 #pragma omp for
     for(int i = 0; i <  particles_in_step; i++)
@@ -147,7 +147,7 @@ void Bunch::half_step_coord(Time* t)
   double x1_wallX2 = x1_wall*2.0;
   // double x3_wallX2 = x3_wall*2.0;
   double half_dt = t->delta_t/2.0;
-#pragma omp parallel for shared(x1, x3, v1, v2, v3, dr, dz, x1_wall, x3_wall, half_dr, half_dz, half_dt, x1_wallX2)
+#pragma omp parallel for shared(dr, dz, x1_wall, x3_wall, half_dr, half_dz, half_dt, x1_wallX2)
   for(int i=0;i<number;i++)
     if (is_alive[i])
     {

@@ -26,7 +26,7 @@ user@host$ git submodule update --init # require to enable external libraries
 
 2. compile
 
-NOTE: gcc/g++ version 6.x recommended
+NOTE: gcc/g++ version 6.x or higher recommended
 
 ```bash
 # change your current directory to project's root directory
