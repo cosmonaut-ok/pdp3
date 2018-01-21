@@ -97,7 +97,7 @@ function var = rho_movie_create_light3_from_parameters(xml_config_file, clim_e1,
   a1.CLimMode = 'manual';
   a1.Box = 'off';
   %% set title and axes labels
-  a1.Title.String = 'E_z';
+  a1.Title.String = 'E_r';
   a1.XLabel.String = x_axe_title;
   a1.YLabel.String = y_axe_title;
   a1.TickDir = 'out';
@@ -117,7 +117,7 @@ function var = rho_movie_create_light3_from_parameters(xml_config_file, clim_e1,
   a2.CLimMode = 'manual';
   a2.Box = 'off';
   %% set title and axes labels
-  a2.Title.String = 'E_r';
+  a2.Title.String = 'E_z';
   a2.XLabel.String = x_axe_title;
   a2.YLabel.String = y_axe_title;
   a2.TickDir = 'out';
