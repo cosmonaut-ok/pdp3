@@ -31,7 +31,7 @@ user@host$ git submodule update --init # require to enable external libraries
 ```bash
 # change your current directory to project's root directory
 user@host$ cd /path/to/pdp3/root/directory
-user@host$ make
+user@host$ make ## optional, you can set: DEBUG=yes
 ```
 You need just file `pdp3` and `parameters.xml`. You can copy this files to somewhere, edit `parameters.xml` and run pdp3
 
@@ -63,6 +63,8 @@ user@host$ git pull origin master ## get latest stable code
 ```
 
 ### Begining work
+
+NOTE: c++ style coding is BSD-style with spaces (not tabs) indentications, offset 2
 
 1. Checkout to new branch
 ```bash
