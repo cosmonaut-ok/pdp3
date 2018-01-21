@@ -94,22 +94,19 @@ cat<<EOF>${TESTDIR}/parameters.xml
   <file_save_parameters>
     <path_to_result>pdp3_result/</path_to_result>
     <path_to_save_state>pdp3_result/Dump/</path_to_save_state>
-    <compress_result>true</compress_result> <!-- Not implemented -->
-    <!-- -->
     <data_dump_interval>5</data_dump_interval>
+    <frames_per_file>100</frames_per_file>
     <system_state_dump_interval>1000</system_state_dump_interval>
-    <!-- <time_step>100</time_step> -->
-    <!-- <number>100</number> -->
+    <dump_data>
+      <e1>true</e1>
+      <e2>false</e2>
+      <e3>true</e3>
+      <h1>false</h1>
+      <h2>false</h2>
+      <h3>false</h3>
+      <rho_beam>true</rho_beam>
+    </dump_data>
   </file_save_parameters>
-
-  <e1>true</e1>
-  <e2>true</e2>
-  <e3>false</e3>
-  <h1>true</h1>
-  <h2>true</h2>
-  <h3>false</h3>
-  <rho_plasma>true</rho_plasma>
-  <rho_beam>true</rho_beam>
 
 </Initial_parameters>
 
