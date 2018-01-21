@@ -114,7 +114,7 @@ EOF
 
 cd ${TESTDIR}
 mkdir -p pdp3_result/Dump
-EXEC_TIME=$(time ./pdp3 > /dev/null)
+time ./pdp3 > /dev/null
 
 cd pdp3_result
 
@@ -135,7 +135,5 @@ else
     echo
     echo "Test passed."
     echo
-    echo "Execution time:"
-    echo $EXEC_TIME
     exit 0
 fi
