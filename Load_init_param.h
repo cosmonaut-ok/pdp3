@@ -35,7 +35,7 @@ public:
 public:
   char* read_char(char* p_name);
   double* read_double_params(const char* p_name);
-  bool save_system_state(void);
+  bool save_system_state(double t);
   void run(void);
 
 public:
@@ -56,6 +56,15 @@ public:
   int testnumber;
   int data_dump_interval;
   int system_state_dump_interval;
+  int frames_per_file;
+  // dump data
+  bool dump_e1;
+  bool dump_e2;
+  bool dump_e3;
+  bool dump_h1;
+  bool dump_h2;
+  bool dump_h3;
+  bool dump_rho_beam;
 
 private:
   void read_xml(const char* xml_file_name);
