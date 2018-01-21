@@ -130,11 +130,12 @@ void particles_list::create_coord_arrays(void)
     }
 }
 
-void particles_list:: copy_coords()
+void particles_list::copy_coords()
 {
   // fuction for copying particles coordinates
   int kinds_number = part_list.size();
   for (int k=0;k<kinds_number;k++)
+#pragma omp parallel for shared(x1_old, x3_old, part_list)
     for(int i=0;i<part_list[k]->number;i++)
     {
       x1_old[k][i]=part_list[k]->x1[i];
