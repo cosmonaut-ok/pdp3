@@ -43,6 +43,7 @@ Particles::Particles(char const *p_name,
   v3 = new double[number];
   is_alive = new int[number];
 
+#pragma omp parallel for shared(is_alive)
   for (int i = 0; i < number; i++)
   {
     is_alive[i] = 1;
@@ -170,13 +171,15 @@ double Particles::get_gamma_inv(int i) // TODO: it is not alpha
 
 void Particles::step_v(E_field *e_fld, H_field *h_fld, Time* t)
 {
-  double gamma, b1, b2, b3, e1, e2, e3, vv1, vv2, vv3;
-  Triple E_compon(0.0, 0.0, 0.0), B_compon(0.0, 0.0, 0.0);
-  double const1, const2;
-  //if (t->current_time == t->start_time) const1 = const1/2.0;
+
+#pragma omp parallel for shared(e_fld, h_fld, t, x1, x3)
   for(int i=0; i<number; i++)
     if (is_alive[i])
     {
+      // define vars directly in cycle, because of multithreading
+      double gamma, b1, b2, b3, e1, e2, e3, vv1, vv2, vv3, const1, const2;
+      Triple E_compon(0.0, 0.0, 0.0), B_compon(0.0, 0.0, 0.0);
+
       // check if x1 and x3 are correct
       if (isnan(x1[i]) || isinf(x1[i]) != 0 || isnan(x3[i]) || isinf(x3[i]) != 0)
       {
@@ -255,6 +258,7 @@ void Particles::half_step_coord(Time* t)
   double x3_wallX2 = x3_wall*2.0;
   double half_dt = t->delta_t/2.0;
 
+#pragma omp parallel for shared(x1, x3, v1, v2, v3, dr, dz, x1_wall, x3_wall, half_dr, half_dz, x1_wallX2, x3_wallX2, half_dt)
   for(int i=0; i<number; i++)
     if (is_alive[i])
     {
@@ -468,7 +472,6 @@ void Particles::velocity_distribution_v2(double tempr_ev)
 {
   double therm_vel = sqrt(tempr_ev*2.0*EL_CHARGE/
                           (this->init_const_mass*EL_MASS));
-  int j=0;
   // double R =0; // number from [0;1]
   double dv = therm_vel/0.5e7; // velocity step in calculation integral
   double cutoff_vel = 9.0*therm_vel; //cutoff velocity
@@ -480,17 +483,17 @@ void Particles::velocity_distribution_v2(double tempr_ev)
   double const1 = 2*therm_vel*therm_vel;
   // double temp1;
   // part of numerical integral calculation//
-  int i = 0;
-  while (i<lenght_arr)
+// #pragma omp parallel for shared(integ_array, dv, const1) private(s, ds)
+  for (int i=0; i<lenght_arr; i++)
   {
     /*temp1 = dv*i*dv*i;
       ds = temp1 * exp(-temp1 / const1 ) * dv;*/
     ds = exp(-dv*i*dv*i/const1)*dv;
     s=s+ds;
     integ_array[i] = s;
-    i=i+1;
   }
 
+#pragma omp parallel for shared(integ_array, lenght_arr, v1, v2, v3, const1, dv)
   for(int i_n=0;i_n<number;i_n++)
   {
     double Rr = random_reverse(i_n,3);
@@ -507,7 +510,7 @@ void Particles::velocity_distribution_v2(double tempr_ev)
 
     // binary search
     int i=0;
-    j=lenght_arr;
+    int j=lenght_arr;
     int k=0;
     while(i<=j)
     {
@@ -711,6 +714,8 @@ void Particles::load_spatial_distribution_with_variable_mass(double n1,
     double N_big_for_cell=(double) number/( (double) geom1->n_grid_1*geom1->n_grid_2);
     double N_real_i = 8.0*PI*(n2+n1)/2.0*dr*dz;
     double n_in_big =0;
+
+#pragma omp parallel for shared(x1, x3, dr, dz, dn, charge_array, mass_array, geom1, left_plasma_boundary, n1, n2) private(rand_r, rand_z, n_in_big)
     for(int n = 0; n < number; n++)
     {
       // check if x1 and x3 are correct

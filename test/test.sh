@@ -114,7 +114,7 @@ EOF
 
 cd ${TESTDIR}
 mkdir -p pdp3_result/Dump
-./pdp3
+EXEC_TIME=$(time ./pdp3 > /dev/null)
 
 cd pdp3_result
 
@@ -134,5 +134,8 @@ if [ "$success" == "false" ]; then
 else
     echo
     echo "Test passed."
+    echo
+    echo "Execution time:"
+    echo $EXEC_TIME
     exit 0
 fi
