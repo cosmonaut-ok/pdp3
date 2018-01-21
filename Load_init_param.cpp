@@ -302,7 +302,8 @@ void Load_init_param::init_file_saving_parameters ()
   cout << "Initialising file saving parameters\n";
 
   XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
-  XMLElement* sub_root =root->FirstChildElement (FILE_SAVE_PARAMS_NAME);
+  XMLElement* sub_root = root->FirstChildElement (FILE_SAVE_PARAMS_NAME);
+  XMLElement* dump_data_root = sub_root->FirstChildElement ("dump_data");
 
   char* path_res = new char[50];
   strcpy(path_res, sub_root->FirstChildElement("path_to_result")->GetText());
@@ -318,14 +319,27 @@ void Load_init_param::init_file_saving_parameters ()
             FirstChildElement("system_state_dump_interval")->
             GetText());
 
+  frames_per_file = atoi(sub_root->
+       FirstChildElement("frames_per_file")->
+       GetText());
+
+  // dump data configuration
+  dump_e1 = to_bool(dump_data_root->FirstChildElement("e1")->GetText());
+  dump_e2 = to_bool(dump_data_root->FirstChildElement("e2")->GetText());
+  dump_e3 = to_bool(dump_data_root->FirstChildElement("e3")->GetText());
+  dump_h1 = to_bool(dump_data_root->FirstChildElement("h1")->GetText());
+  dump_h2 = to_bool(dump_data_root->FirstChildElement("h2")->GetText());
+  dump_h3 = to_bool(dump_data_root->FirstChildElement("h3")->GetText());
+  dump_rho_beam = to_bool(dump_data_root->FirstChildElement("rho_beam")->GetText());
+
   c_io_class = new input_output_class (path_res, path_dump);
 }
 
 
 
-bool Load_init_param::save_system_state()
+bool Load_init_param::save_system_state(double t)
 {
-  cout << "Saving system state\n";
+  cout << "Saving system state at " << t << endl;
   c_io_class->out_field_dump("e1",efield->e1,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
   c_io_class->out_field_dump("e2",efield->e2,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
   c_io_class->out_field_dump("e3",efield->e3,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
@@ -409,25 +423,21 @@ void Load_init_param::run(void)
       c_bunch->charge_weighting(c_rho_beam);
       c_rho_old->reset_rho();
       p_list[0].charge_weighting(c_rho_old);
-      //c_io_class->out_data("rho_el", c_rho_old->get_ro(),step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-      //out_class.out_data("e1",e_field1.e1,100,128,2048);
-      c_io_class->out_data("rho_beam", c_rho_beam->get_ro(),step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-      c_io_class->out_data("e3",efield->e3,step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-      c_io_class->out_data("e1",efield->e1,step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
 
-      //c_io_class->out_data("j1",c_current->get_j1(),step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-      //c_io_class->out_data("j3",c_current->get_j3(),step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-      //c_io_class->out_coord("vels",c_bunch->v1, c_bunch->v3, step_number, 100, c_bunch->number);
-      //out_class.out_data("rho",rho_elect.get_ro(),step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
-      //out_class.out_coord("vels",electron_bunch.v1, electron_bunch.v3, step_number, 100, electron_bunch.number);
-      //out_class.out_coord("coords",electrons.x1, electrons.x3, step_number, 100, electrons.number);
-      //out_class.out_coord("vels",electrons.v1, electrons.v3, step_number, 100, electrons.number);
+      if (dump_e1) c_io_class->out_data("e1",efield->e1,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+      if (dump_e2) c_io_class->out_data("e2",efield->e2,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+      if (dump_e3) c_io_class->out_data("e3",efield->e3,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
 
-      // c_io_class->out_data("h2",hfield->h2,step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+      if (dump_h1) c_io_class->out_data("h1",hfield->h1,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+      if (dump_h2) c_io_class->out_data("h2",hfield->h2,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+      if (dump_h3) c_io_class->out_data("h3",hfield->h3,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+
+      if (dump_rho_beam) c_io_class->out_data("rho_beam", c_rho_beam->get_ro(),step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+
       step_number=step_number+1;
       t1 = clock();
       if  ((((int)(c_time->current_time/c_time->delta_t))%system_state_dump_interval==0)&&(step_number!=1))
-        this->save_system_state();
+        this->save_system_state(c_time->current_time);
     }
     c_time->current_time = c_time->current_time + c_time->delta_t;
     //if (!res)
