@@ -4,6 +4,12 @@
 #include <algorithm>
 #include <iomanip>
 // #include <cctype>
+// enable openmp optional
+#ifdef _OPENMP
+#include <omp.h>
+#else
+#define omp_get_thread_num() 0
+#endif
 
 #include "Load_init_param.h"
 #include "time.h"
@@ -30,6 +36,11 @@ Load_init_param::Load_init_param(char* xml_file_name)
     // NOTE: all system init is too huge,
     // so we use several "subconstructors"
     // to initialise different parts of system
+
+  // define openmp-related options when openmp enabled
+#ifdef _OPENMP
+  omp_set_dynamic(0); // Explicitly disable dynamic teams
+#endif
 
   // read XML config file
   read_xml (xml_file_name);
