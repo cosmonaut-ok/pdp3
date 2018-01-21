@@ -79,11 +79,22 @@ CXX = g++
 # CXX = wineg++
 RC = wrc
 AR = ar
-CFLAGS = -O2 -m64 -mcmodel=large
-CFLAGS_DEBUG = -O0 -Wall -g -ggdb -fvar-tracking -ggnu-pubnames -std=c++11 -pedantic -m64 -mcmodel=large
+
+CFLAGS = -m64 -mcmodel=large -std=c++11
+CFLAGS_NO_OPENMP=-Wno-unknown-pragmas
+CFLAGS_OPENMP=-fopenmp
+CFLAGS_DEBUG = -O0 -Wall -g -ggdb -fvar-tracking -ggnu-pubnames -pedantic
 
 ifeq ($(DEBUG), yes)
-CFLAGS = $(CFLAGS_DEBUG)
+CFLAGS += $(CFLAGS_DEBUG)
+else
+CFLAGS += -O2
+endif
+
+ifeq ($(SINGLETHREAD), yes)
+CFLAGS += $(CFLAGS_NO_OPENMP)
+else
+CFLAGS += $(CFLAGS_OPENMP)
 endif
 
 CXXFLAGS = ${CFLAGS}
