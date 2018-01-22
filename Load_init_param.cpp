@@ -102,7 +102,7 @@ void Load_init_param::read_xml(const char* xml_file_name)
   XMLError e_result = xml_data->LoadFile(xml_file_name);
   if (e_result != XML_SUCCESS)
   {
-    cerr << "Can not read configuration file ``" << xml_file_name << "``\n";
+    cerr << "ERROR: Can not read configuration file ``" << xml_file_name << "``\n";
     exit (78);
   }
 }
