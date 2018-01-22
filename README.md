@@ -16,14 +16,14 @@ RoadMap:
 ## System And Software Requirements
 
 - Common:
-  - C++ compiler: gcc 6.x+ or LLVM/clang 3.9+ or Intel C++ compiler 18.0+ (experimental) or MSVS 2013 (single thread only)
-  - OpenMP spec. version 4.5+ (see compiler requirements. As usual, openMP is a part of standard compiler libraries)
+  - C++ compiler: gcc 4.9+ or LLVM/clang 3.9+ or Intel C++ compiler 18.0+ (experimental) or MSVS 2013 (single thread only)
+  - OpenMP spec. version 3.0+ (see compiler requirements. As usual, openMP is a part of standard compiler libraries)
   - git (to get sources)
 - Linux:
   - 'make' util
   - libgomp or libgomp (for clang or gcc)
 - Windows:
-  - MS Visual Studio 2013 or Cygwin with 'make' util
+  - MS Visual Studio 2013 or Cygwin with 'make' util (for gcc/clang/icc)
 
 ## HOWTO
 
