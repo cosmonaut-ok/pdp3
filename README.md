@@ -13,18 +13,17 @@ RoadMap:
 - add openCL support
 - migrate image processing from matlab to python+scipy/numpy/etc.
 
-## System Requirements
+## System And Software Requirements
 
-- C++ compiler: gcc 6.x+, Intel C++ compiler 18.0+, LLVM/clang 3.9+ (experimental support)
-- OpenMP spec. version 4.5+ (see compiler requirements)
-- git (to get sources)
+- Common:
+  - C++ compiler: gcc 6.x+ or LLVM/clang 3.9+ or Intel C++ compiler 18.0+ (experimental) or MSVS 2013 (single thread only)
+  - OpenMP spec. version 4.5+ (see compiler requirements. As usual, openMP is a part of standard compiler libraries)
+  - git (to get sources)
 - Linux:
-  - make util (to build on linux)
+  - 'make' util
+  - libgomp or libgomp (for clang or gcc)
 - Windows:
-  - Visual Studio 2013 (optional)
-  - Cygwin with make util and gcc (optional)
-
-NOTE: Visual Studio is supported only in singlethread mode
+  - MS Visual Studio 2013 or Cygwin with 'make' util
 
 ## HOWTO
 
@@ -42,7 +41,7 @@ user@host$ git submodule update --init # require to enable external libraries
 ```bash
 # change your current directory to project's root directory
 user@host$ cd /path/to/pdp3/root/directory
-user@host$ make ## optional, you can set: DEBUG=yes and/or SINGLETHREAD=yes (to disable openMP)
+user@host$ make ## optional, you can set: DEBUG=yes and/or SINGLETHREAD=yes (to disable openMP) AND C++ compiler: CXX=/usr/bin/clang++-3.9
 ```
 You need just file `pdp3` and `parameters.xml`. You can copy this files to somewhere, edit `parameters.xml` and run pdp3
 

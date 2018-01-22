@@ -169,7 +169,7 @@ void current::set_j3(int i, int k, double value)
 
 void current::reset_j()
 {
-#pragma omp parallel shared (geom1, j1, j2, j3)
+#pragma omp parallel
   {
 #pragma omp for
     for (int i=0; i<(geom1->n_grid_1-1); i++)
