@@ -46,9 +46,9 @@ matrix:
             - llvm-toolchain-trusty-3.9
           packages:
             - clang-3.9
-            - libomp5
+            - libiomp5
       env:
-        - MATRIX_EVAL="CC=clang-3.9 && CXX=clang++-3.9"
+        - MATRIX_EVAL="CC=clang-3.9 && CXX=clang++-3.9 && CFLAGS_OPENMP=-fopenmp=libiomp5"
 
     # works on Trusty
     - os: linux
@@ -58,9 +58,9 @@ matrix:
             - llvm-toolchain-trusty-4.0
           packages:
             - clang-4.0
-            - libomp5
+            - libiomp5
       env:
-        - MATRIX_EVAL="CC=clang-4.0 && CXX=clang++-4.0"
+        - MATRIX_EVAL="CC=clang-4.0 && CXX=clang++-4.0 && CFLAGS_OPENMP=-fopenmp=libiomp5"
 
     # works on Trusty
     - os: linux
@@ -70,9 +70,9 @@ matrix:
             - llvm-toolchain-trusty-5.0
           packages:
             - clang-5.0
-            - libomp5
+            - libiomp5
       env:
-        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
+        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0 && CFLAGS_OPENMP=-fopenmp=libiomp5"
 
 
 before_install:
