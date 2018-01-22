@@ -43,7 +43,7 @@ Particles::Particles(char const *p_name,
   v3 = new double[number];
   is_alive = new int[number];
 
-#pragma omp parallel for shared(is_alive)
+#pragma omp parallel for
   for (int i = 0; i < number; i++)
   {
     is_alive[i] = 1;
@@ -172,7 +172,7 @@ double Particles::get_gamma_inv(int i) // TODO: it is not alpha
 void Particles::step_v(E_field *e_fld, H_field *h_fld, Time* t)
 {
 
-#pragma omp parallel for shared(e_fld, h_fld, t, x1, x3)
+#pragma omp parallel for shared(e_fld, h_fld, t)
   for(int i=0; i<number; i++)
     if (is_alive[i])
     {
@@ -258,7 +258,7 @@ void Particles::half_step_coord(Time* t)
   double x3_wallX2 = x3_wall*2.0;
   double half_dt = t->delta_t/2.0;
 
-#pragma omp parallel for shared(x1, x3, v1, v2, v3, dr, dz, x1_wall, x3_wall, half_dr, half_dz, x1_wallX2, x3_wallX2, half_dt)
+#pragma omp parallel for shared(dr, dz, x1_wall, x3_wall, half_dr, half_dz, x1_wallX2, x3_wallX2, half_dt)
   for(int i=0; i<number; i++)
     if (is_alive[i])
     {
@@ -493,7 +493,7 @@ void Particles::velocity_distribution_v2(double tempr_ev)
     integ_array[i] = s;
   }
 
-#pragma omp parallel for shared(integ_array, lenght_arr, v1, v2, v3, const1, dv)
+#pragma omp parallel for shared(integ_array, lenght_arr, const1, dv)
   for(int i_n=0;i_n<number;i_n++)
   {
     double Rr = random_reverse(i_n,3);
@@ -715,7 +715,7 @@ void Particles::load_spatial_distribution_with_variable_mass(double n1,
     double N_real_i = 8.0*PI*(n2+n1)/2.0*dr*dz;
     double n_in_big =0;
 
-#pragma omp parallel for shared(x1, x3, dr, dz, dn, charge_array, mass_array, geom1, left_plasma_boundary, n1, n2) private(rand_r, rand_z, n_in_big)
+#pragma omp parallel for shared(dr, dz, dn, left_plasma_boundary, n1, n2) private(rand_r, rand_z, n_in_big)
     for(int n = 0; n < number; n++)
     {
       // check if x1 and x3 are correct
