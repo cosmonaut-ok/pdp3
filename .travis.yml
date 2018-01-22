@@ -1,27 +1,102 @@
 language: cpp
 compiler: gcc
-sudo: required
-os: linux
-dist: trusty
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - g++-7
-      - git
-      - make
-    env:
-      - EXPORT_VARS_CMD="export CC=gcc-7 && export CXX=g++-7"
+sudo: false # required
+
+matrix:
+  include:
+    ## GCC
+    # works on Precise and Trusty
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+      env:
+         - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
+
+    # works on Precise and Trusty
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-6
+      env:
+        - MATRIX_EVAL="CC=gcc-6 && CXX=g++-6"
+
+    # works on Precise and Trusty
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-7
+      env:
+        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
+    ## CLANG
+    # works on Trusty
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-trusty-3.9
+          packages:
+            - clang-3.9
+            - libomp5
+      env:
+        - MATRIX_EVAL="CC=clang-3.9 && CXX=clang++-3.9"
+
+    # works on Trusty
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-trusty-4.0
+          packages:
+            - clang-4.0
+            - libomp5
+      env:
+        - MATRIX_EVAL="CC=clang-4.0 && CXX=clang++-4.0"
+
+    # works on Trusty
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-trusty-5.0
+          packages:
+            - clang-5.0
+            - libomp5
+      env:
+        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
+
 
 before_install:
-  - eval "${EXPORT_VARS_CMD}"
+    - eval "${MATRIX_EVAL}"
+
+# addons:
+#   apt:
+#     sources:
+#       - ubuntu-toolchain-r-test
+#     packages:
+#       - g++-7
+#       - git
+#       - make
+#     env:
+#       - EXPORT_VARS_CMD="export CC=gcc-7 && export CXX=g++-7"
+
+# before_install:
+#   - eval "${EXPORT_VARS_CMD}"
 
 before_script:
   - echo 'Europe/Kiev' | sudo tee /etc/timezone
-  - sudo dpkg-reconfigure --frontend noninteractive tzdata
-  - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 90
-  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 90
+# - sudo dpkg-reconfigure --frontend noninteractive tzdata
+# - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 90
+# - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 90
   - git submodule update --init
 
 script:
