@@ -45,7 +45,7 @@ user@host$ make ## optional, you can set: DEBUG=yes and/or SINGLETHREAD=yes (to 
 ```
 You need just file `pdp3` and `parameters.xml`. You can copy this files to somewhere, edit `parameters.xml` and run pdp3
 
-2.1 Compile with pgc++ (uses different openmp flag)
+2.1. Compile with pgc++ (uses different openmp flag)
 ```bash
 user@host$ make CXX=/path/to/your/pgc++ CFLAGS_OPENMP=-openmp
 ```
