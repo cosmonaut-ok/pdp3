@@ -73,10 +73,9 @@ CXX_SRCS              = $(pdp3_CXX_SRCS)
 RC_SRCS               = $(pdp3_RC_SRCS)
 
 ### Tools
-CC = gcc
-CXX = g++
-# CC = winegcc
-# CXX = wineg++
+CC ?= gcc
+CXX ?= g++
+
 RC = wrc
 AR = ar
 
