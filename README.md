@@ -125,3 +125,20 @@ user@host$ make DEBUG=yes
 user@host$ gdb ./pdp3
 (gdb) run ## or perform some modifications first than run, e.g. set breakpoints
 ```
+
+### Built-in make flags
+
+#### Usage
+```bash
+user@host$ make [action] FLAG_1=value1 FLAG_2=value2
+# or
+user@host$ FLAG=value make [action]
+```
+
+#### List
+
+- 'CXX=/foo/bar++' - Use custom c++ compiler (see supported c++ compilers list)
+- 'DEBUG=yes/no' - Compile binary with debug symbols, prepared to use with GDB
+- 'SPEEDUP=yes/no' - Increase speed up to 30%, by using unsafe math operations. WARNING! it decreases calculations accuracy and can cause incorrect program working
+- 'SINGLETHREAD=yes/no' - Compile binary without multithreading support. Disables all parallelization features
+- 'CFLAGS="foo bar" - list of custom CFLAGS (and CXXFLAGS), used by compiler
