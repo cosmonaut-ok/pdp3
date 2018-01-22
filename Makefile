@@ -162,7 +162,3 @@ test-ext: mrproper all
 
 check-syntax:
 	$(CXX) $(LIBRARY_PATH) $(INCLUDE_PATH) -Wall -Wextra -pedantic -fsyntax-only $(CHK_SOURCES)
-
-echo:
-	@echo $(INCLUDE_PATH)
-	@echo $(LIBRARY_PATH)
