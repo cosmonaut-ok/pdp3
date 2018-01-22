@@ -1,6 +1,6 @@
 #include "particles_list.h"
 
-particles_list::particles_list(int i=0)
+particles_list::particles_list(int i)
 {
   x1_old = 0;
   x3_old = 0;
