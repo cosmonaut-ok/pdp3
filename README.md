@@ -50,10 +50,17 @@ You need just file `pdp3` and `parameters.xml`. You can copy this files to somew
 user@host$ make CXX=/path/to/your/pgc++ CFLAGS_OPENMP=-openmp
 ```
 
-3. test
+3. test (optional)
 
 ```bash
 user@host$ make test # or test-ext for extended testing (require more time)
+```
+
+4. run
+
+```bash
+user@host$ mkdir pdp_result # or whatewer you defined in configfile
+user@host$ ./pdp3 [ -h ] | [ -f /path/to/parameters.xml ] # used parameters.xml from current directory, if calling without any options
 ```
 
 ## Hacking
