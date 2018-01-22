@@ -80,12 +80,15 @@ RC = wrc
 AR = ar
 
 CFLAGS ?= -m64 -mcmodel=medium -std=c++11
+CFLAGS_SPEEDUP = -funsafe-math-optimizations -O3 -ffast-math
 CFLAGS_NO_OPENMP ?= -Wno-unknown-pragmas
 CFLAGS_OPENMP ?= -fopenmp
 CFLAGS_DEBUG ?= -O0 -Wall -g -ggdb -fvar-tracking -ggnu-pubnames -pedantic
 
 ifeq ($(DEBUG), yes)
 CFLAGS += $(CFLAGS_DEBUG)
+else ifeq ($(SPEEDUP), yes)
+CFLAGS += $(CFLAGS_SPEEDUP)
 else
 CFLAGS += -O2
 endif
