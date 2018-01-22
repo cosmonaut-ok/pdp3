@@ -13,6 +13,19 @@ RoadMap:
 - add openCL support
 - migrate image processing from matlab to python+scipy/numpy/etc.
 
+## System Requirements
+
+- C++ compiler: gcc 6.x+, Intel C++ compiler 18.0+, LLVM/clang 3.9+ (experimental support)
+- OpenMP spec. version 4.5+ (see compiler requirements)
+- git (to get sources)
+- Linux:
+  - make util (to build on linux)
+- Windows:
+  - Visual Studio 2013 (optional)
+  - Cygwin with make util and gcc (optional)
+
+NOTE: Visual Studio is supported only in singlethread mode
+
 ## HOWTO
 
 ### Linux
@@ -25,8 +38,6 @@ user@host$ git submodule update --init # require to enable external libraries
 ```
 
 2. compile
-
-NOTE: gcc/g++ version 6.x or higher recommended
 
 ```bash
 # change your current directory to project's root directory
