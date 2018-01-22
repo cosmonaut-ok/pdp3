@@ -79,10 +79,10 @@ CXX ?= g++
 RC = wrc
 AR = ar
 
-CFLAGS = -m64 -mcmodel=large -std=c++11
-CFLAGS_NO_OPENMP=-Wno-unknown-pragmas
-CFLAGS_OPENMP=-fopenmp
-CFLAGS_DEBUG = -O0 -Wall -g -ggdb -fvar-tracking -ggnu-pubnames -pedantic
+CFLAGS ?= -m64 -mcmodel=medium -std=c++11
+CFLAGS_NO_OPENMP ?= -Wno-unknown-pragmas
+CFLAGS_OPENMP ?= -fopenmp
+CFLAGS_DEBUG ?= -O0 -Wall -g -ggdb -fvar-tracking -ggnu-pubnames -pedantic
 
 ifeq ($(DEBUG), yes)
 CFLAGS += $(CFLAGS_DEBUG)

@@ -16,7 +16,7 @@ RoadMap:
 ## System And Software Requirements
 
 - Common:
-  - C++ compiler: gcc 4.9+ or LLVM/clang 3.9+ or Intel C++ compiler 18.0+ (experimental, tests fails, but still working) or PGC (experimental) or MSVS 2013 (single thread only)
+  - C++ compiler: gcc 4.9+ or LLVM/clang 3.9+ or Intel C++ compiler 18.0+ (experimental, tests fails, but still working) or PGI compiler (experimental) or MSVS 2013 (single thread only)
   - OpenMP spec. version 3.0+ (see compiler requirements. As usual, openMP is a part of standard compiler libraries)
   - git (to get sources)
 - Linux:
@@ -44,6 +44,11 @@ user@host$ cd /path/to/pdp3/root/directory
 user@host$ make ## optional, you can set: DEBUG=yes and/or SINGLETHREAD=yes (to disable openMP) AND C++ compiler: CXX=/usr/bin/clang++-3.9
 ```
 You need just file `pdp3` and `parameters.xml`. You can copy this files to somewhere, edit `parameters.xml` and run pdp3
+
+2.1 Compile with pgc++ (uses different openmp flag)
+```bash
+user@host$ make CXX=/path/to/your/pgc++ CFLAGS_OPENMP=-openmp
+```
 
 3. test
 
