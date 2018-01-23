@@ -16,7 +16,6 @@ matrix:
       env:
         - REAL_CC=gcc-4.9
         - REAL_CXX=g++-4.9
-        - CFLAGS=-m64
 
     # works on Precise and Trusty
     - os: linux
@@ -30,6 +29,20 @@ matrix:
       env:
         - REAL_CC=gcc-7
         - REAL_CXX=g++-7
+
+    # works on Precise and Trusty
+    - os: linux
+      compiler: gcc-6
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-6
+      env:
+        - SPEEDUP=yes
+        - REAL_CC=gcc-6
+        - REAL_CXX=g++-6
 
     ## CLANG
     # works on Trusty
@@ -47,7 +60,6 @@ matrix:
         - REAL_CC=clang-3.9
         - REAL_CXX=clang++-3.9
         - CFLAGS_OPENMP=-fopenmp=libiomp5
-        - CFLAGS=-m64
 
     # works on Trusty
     - os: linux
@@ -64,7 +76,6 @@ matrix:
         - REAL_CC=clang-5.0
         - REAL_CXX=clang++-5.0
         - CFLAGS_OPENMP=-fopenmp=libiomp5
-        - CFLAGS=-m64
 
 install:
   - git submodule update --init
@@ -79,10 +90,17 @@ before_script:
 script:
   - |
     if [ $TRAVIS_BRANCH = 'master' ]; then
-      make test-ext CFLAGS_OPENMP=${CFLAGS_OPENMP} CFLAGS=${CFLAGS};
+      make test-ext CFLAGS_OPENMP=${CFLAGS_OPENMP} SPEEDUP=${SPEEDUP};
     else
-      make test CFLAGS_OPENMP=${CFLAGS_OPENMP} CFLAGS=${CFLAGS};
+      make test CFLAGS_OPENMP=${CFLAGS_OPENMP} SPEEDUP=${SPEEDUP};
     fi
 
 after_script:
   - make mrproper
+
+allow_failures:
+  - compiler: gcc-6
+    env:
+      - SPEEDUP=yes
+      - REAL_CC=gcc-6
+      - REAL_CXX=g++-6
