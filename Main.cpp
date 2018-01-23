@@ -44,7 +44,7 @@ int main(int argc, char **argv)
     }
   else
     {
-      filename = "parameters.xml";
+      filename = (char*)"parameters.xml";
     }
 
   Load_init_param init_param(filename);
