@@ -114,7 +114,7 @@ EOF
 
 cd ${TESTDIR}
 mkdir -p pdp3_result/Dump
-time ./pdp3 > /dev/null
+time ./pdp3
 
 cd pdp3_result
 
