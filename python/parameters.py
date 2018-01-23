@@ -16,7 +16,7 @@ from xml.dom import minidom
 # import matplotlib.animation as ani
 
 class Parameters:
-    def __init__(self, parameters_file, clim_e1=[0,1], clim_e3=[0,1], movie_file=None):
+    def __init__(self, parameters_file, clim_e_field_r=[0,1], clim_e_field_z=[0,1], movie_file=None):
         '''
         + r_size
         + z_size
@@ -29,20 +29,20 @@ class Parameters:
         ===
         + config_path
         + data_path
-        system_state_path
+        + system_state_path
         + movie_file
         ===
-        bunch_density
+        + bunch_density
         ===
-        clim_e1
-        clim_e3
-        clim_rho_beam
+        + clim_e_field_r     # r-component of E field
+        + clim_e_field_z     # z-component of E field
+        + clim_e_field_bunch # E field of electron/ion bunch
         ===
         frames_per_file
         '''
 
-        # self.clim_e1 = clim_e1
-        # self.clim_e3 = clim_e3
+        # self.clim_e_field_r = clim_e_field_r
+        # self.clim_e_field_z = clim_e_field_z
         # self.clim_rho_beam = clim_rho_beam
 
         self.config_path = os.path.dirname(parameters_file)
@@ -65,9 +65,9 @@ class Parameters:
         # self.__x_axe_title = 'Z(m)';
         # self.__y_axe_title = 'R(m)';
         # self.__x_tick_range = linspace(0, x_tick_max, x_ticks_number) # we need 10 (or x_ticks_number) ticks
-        # self.__x_tick_gird_size = linspace(0, self.__size_3, x_ticks_number) # from 0 to x_tick_max. it's required
+        # self.__x_tick_gird_size = linspace(0, self.__size_field_z, x_ticks_number) # from 0 to x_tick_max. it's required
         # self.__y_tick_range = linspace(0, y_tick_max, y_ticks_number) # to convert gird to real size (meters)
-        # self.__y_tick_gird_size = linspace(0, self.__size_1, y_ticks_number) # Same for X and Y axes
+        # self.__y_tick_gird_size = linspace(0, self.__size_field_r, y_ticks_number) # Same for X and Y axes
 
         # get file to save parameters
         file_save_parameters = dom_root.getElementsByTagName('file_save_parameters')[0]
@@ -84,17 +84,30 @@ class Parameters:
         # get system state path
         local_system_state_path = file_save_parameters.getElementsByTagName('path_to_save_state')[0].firstChild.data
 
+        # getData frame number per data file
+        self.frames_per_file = int(file_save_parameters.getElementsByTagName('frames_per_file')[0].firstChild.data)
+
         # calculate data path
         if str.startswith(local_system_state_path, '/'):
             self.system_state_path = local_system_state_path
         else:
             self.system_state_path = os.path.join(self.config_path, local_system_state_path)
 
+        ## get normalization parameters
+        bunch = dom_root.getElementsByTagName('Particles_bunch');
+        bunch_density = float(bunch.item(0).getElementsByTagName('density')[0].firstChild.data);
+
+        self.bunch_density = bunch_density # particles density of electron/ion bunch
+
+        self.clim_e_field_r = clim_e_field_r # r-component of E field
+        self.clim_e_field_z = clim_e_field_z # z-component of E field
+        self.clim_e_field_bunch = [-(bunch_density*1.6e-19), 0] # E field of electron/ion bunch
 
 
+        # clim_rho_beam = [-(bunch_density*1.6e-19) 0];
 
 
-        # self.__data_file_e1 = os.path.join(self.__data_path, 'e1')
-        # self.__data_file_e3 = os.path.join(self.__data_path, 'e3')
+        # self.__data_file_e_field_r = os.path.join(self.__data_path, 'e_field_r')
+        # self.__data_file_e_field_z = os.path.join(self.__data_path, 'e_field_z')
         # self.__data_file_rho_beam = os.path.join(self.__data_path, 'rho_beam')
         # self.__figure = plt.figure()
