@@ -74,7 +74,7 @@ Load_init_param::Load_init_param(char* xml_file_name)
   c_current = new current(c_geom);
 
   // boundary conditions
-  char* a = read_char("Boundary_conditions");
+  char* a = read_char((char*)"Boundary_conditions");
   if (atoi(a)==0)
   {
     p_list->charge_weighting(c_rho_new);
@@ -351,12 +351,12 @@ void Load_init_param::init_file_saving_parameters ()
 bool Load_init_param::save_system_state(double t)
 {
   cout << "Saving system state at " << t << endl;
-  c_io_class->out_field_dump("e1",efield->e1,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-  c_io_class->out_field_dump("e2",efield->e2,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-  c_io_class->out_field_dump("e3",efield->e3,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-  c_io_class->out_field_dump("h1",hfield->h1,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-  c_io_class->out_field_dump("h2",hfield->h2,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-  c_io_class->out_field_dump("h3",hfield->h3,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+  c_io_class->out_field_dump((char*)"e1",efield->e1,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+  c_io_class->out_field_dump((char*)"e2",efield->e2,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+  c_io_class->out_field_dump((char*)"e3",efield->e3,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+  c_io_class->out_field_dump((char*)"h1",hfield->h1,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+  c_io_class->out_field_dump((char*)"h2",hfield->h2,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+  c_io_class->out_field_dump((char*)"h3",hfield->h3,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
   for(unsigned int i=0;i<p_list->part_list.size();i++)
   {
     c_io_class->out_coord_dump(p_list->part_list[i]->name,p_list->part_list[i]->x1, p_list->part_list[i]->x3, p_list->part_list[i]->number);
