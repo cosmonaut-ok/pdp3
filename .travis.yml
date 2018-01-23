@@ -23,28 +23,6 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - g++-5
-      env:
-        - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5 && CFLAGS=-m64"
-
-    # works on Precise and Trusty
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-6
-      env:
-        - MATRIX_EVAL="CC=gcc-6 && CXX=g++-6"
-
-    # works on Precise and Trusty
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
             - g++-7
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
@@ -62,19 +40,6 @@ matrix:
             - libiomp-dev
       env:
         - MATRIX_EVAL="CC=clang-3.9 && CXX=clang++-3.9 && CFLAGS_OPENMP=-fopenmp=libiomp5 && CFLAGS=-m64"
-
-    # works on Trusty
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - llvm-toolchain-trusty-4.0
-          packages:
-            - clang-4.0
-            - libiomp5
-            - libiomp-dev
-      env:
-        - MATRIX_EVAL="CC=clang-4.0 && CXX=clang++-4.0 && CFLAGS_OPENMP=-fopenmp=libiomp5 && CFLAGS=-m64"
 
     # works on Trusty
     - os: linux
