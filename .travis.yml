@@ -1,27 +1,91 @@
-language: c++
-sudo: required
-os: linux
-dist: trusty
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - g++-7
-      - git
-    env:
-      - EXPORT_VARS_CMD="export CC=gcc-7 && export CXX=g++-7"
+language: cpp
+sudo: false
 
-before_install:
-  - eval "${EXPORT_VARS_CMD}"
+branches:
+  only:
+    - master
+    - /^.*-with-ci$/
 
-before_script:
-  - echo 'Europe/Kiev' | sudo tee /etc/timezone
-  - sudo dpkg-reconfigure --frontend noninteractive tzdata
+matrix:
+  fast_finish: true
+  include:
+    ## GCC
+    # works on Precise and Trusty
+    - os: linux
+      compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-4.9
+      env:
+        - REAL_CC=gcc-4.9
+        - REAL_CXX=g++-4.9
+
+    # works on Precise and Trusty
+    - os: linux
+      compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-7
+      env:
+        - REAL_CC=gcc-7
+        - REAL_CXX=g++-7
+
+    ## CLANG
+    # works on Trusty
+    - os: linux
+      compiler: clang
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-trusty-3.9
+          packages:
+            - clang-3.9
+            - libiomp5
+            - libiomp-dev
+      env:
+        - REAL_CC=clang-3.9
+        - REAL_CXX=clang++-3.9
+        - CFLAGS_OPENMP=-fopenmp=libiomp5
+
+    # works on Trusty
+    - os: linux
+      compiler: clang
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-trusty-5.0
+          packages:
+            - clang-5.0
+            - libiomp5
+            - libiomp-dev
+      env:
+        - REAL_CC=clang-5.0
+        - REAL_CXX=clang++-5.0
+        - CFLAGS_OPENMP=-fopenmp=libiomp5
+
+install:
   - git submodule update --init
 
+before_install:
+  - echo 'Europe/Kiev' | sudo tee /etc/timezone
+
+before_script:
+  - export CC=${REAL_CC}
+  - export CXX=${REAL_CXX}
+
 script:
-  - if [ $TRAVIS_BRANCH = 'master' ]; then make test-ext; else make test; fi
+  - |
+    if [ $TRAVIS_BRANCH = 'master' ]; then
+      make test-ext CFLAGS_OPENMP=${CFLAGS_OPENMP};
+    else
+      make test CFLAGS_OPENMP=${CFLAGS_OPENMP};
+    fi
 
 after_script:
   - make mrproper

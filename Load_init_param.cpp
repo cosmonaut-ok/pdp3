@@ -2,8 +2,14 @@
 // #include <string>
 // #include <iomanip>
 #include <algorithm>
+#include <iomanip>
 // #include <cctype>
-
+// enable openmp optional
+#ifdef _OPENMP
+#include <omp.h>
+#else
+#define omp_get_thread_num() 0
+#endif
 
 #include "Load_init_param.h"
 #include "time.h"
@@ -30,6 +36,11 @@ Load_init_param::Load_init_param(char* xml_file_name)
     // NOTE: all system init is too huge,
     // so we use several "subconstructors"
     // to initialise different parts of system
+
+  // define openmp-related options when openmp enabled
+#ifdef _OPENMP
+  omp_set_dynamic(0); // Explicitly disable dynamic teams
+#endif
 
   // read XML config file
   read_xml (xml_file_name);
@@ -63,7 +74,7 @@ Load_init_param::Load_init_param(char* xml_file_name)
   c_current = new current(c_geom);
 
   // boundary conditions
-  char* a = read_char("Boundary_conditions");
+  char* a = read_char((char*)"Boundary_conditions");
   if (atoi(a)==0)
   {
     p_list->charge_weighting(c_rho_new);
@@ -73,7 +84,7 @@ Load_init_param::Load_init_param(char* xml_file_name)
   }
 
   // load File Path
-	init_file_saving_parameters();
+  init_file_saving_parameters();
 
   cout << "Initialisation complete\n";
 }
@@ -91,7 +102,7 @@ void Load_init_param::read_xml(const char* xml_file_name)
   XMLError e_result = xml_data->LoadFile(xml_file_name);
   if (e_result != XML_SUCCESS)
   {
-    cerr << "Can not read configuration file ``" << xml_file_name << "``\n";
+    cerr << "ERROR: Can not read configuration file ``" << xml_file_name << "``\n";
     exit (78);
   }
 }
@@ -107,11 +118,11 @@ char* Load_init_param::read_char(char* p_name)
 }
 
 bool Load_init_param::to_bool(string str) {
-	std::transform(str.begin(), str.end(), str.begin(), ::tolower);
-	std::istringstream is(str);
-	bool b;
-	is >> std::boolalpha >> b;
-	return b;
+  std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+  std::istringstream is(str);
+  bool b;
+  is >> std::boolalpha >> b;
+  return b;
 }
 
 void Load_init_param::init_particles()
@@ -146,7 +157,6 @@ void Load_init_param::init_particles()
 
     prtls = new Particles(strcpy(new char [50],p_name), charge, mass, number,
                           c_geom, p_list);
-
     prtls->load_spatial_distribution_with_variable_mass(
       left_density,right_density,0,0);
     // prtls->load_spatial_distribution(params[3],params[4],0,0);
@@ -303,7 +313,8 @@ void Load_init_param::init_file_saving_parameters ()
   cout << "Initialising file saving parameters\n";
 
   XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
-  XMLElement* sub_root =root->FirstChildElement (FILE_SAVE_PARAMS_NAME);
+  XMLElement* sub_root = root->FirstChildElement (FILE_SAVE_PARAMS_NAME);
+  XMLElement* dump_data_root = sub_root->FirstChildElement ("dump_data");
 
   char* path_res = new char[50];
   strcpy(path_res, sub_root->FirstChildElement("path_to_result")->GetText());
@@ -312,28 +323,41 @@ void Load_init_param::init_file_saving_parameters ()
   strcpy(path_dump, sub_root->FirstChildElement("path_to_save_state")->GetText());
 
   data_dump_interval = atoi(sub_root->
-			    FirstChildElement("data_dump_interval")->
-			    GetText());
+          FirstChildElement("data_dump_interval")->
+          GetText());
 
   system_state_dump_interval = atoi(sub_root->
-				    FirstChildElement("system_state_dump_interval")->
-				    GetText());
+            FirstChildElement("system_state_dump_interval")->
+            GetText());
+
+  frames_per_file = atoi(sub_root->
+       FirstChildElement("frames_per_file")->
+       GetText());
+
+  // dump data configuration
+  dump_e1 = to_bool(dump_data_root->FirstChildElement("e1")->GetText());
+  dump_e2 = to_bool(dump_data_root->FirstChildElement("e2")->GetText());
+  dump_e3 = to_bool(dump_data_root->FirstChildElement("e3")->GetText());
+  dump_h1 = to_bool(dump_data_root->FirstChildElement("h1")->GetText());
+  dump_h2 = to_bool(dump_data_root->FirstChildElement("h2")->GetText());
+  dump_h3 = to_bool(dump_data_root->FirstChildElement("h3")->GetText());
+  dump_rho_beam = to_bool(dump_data_root->FirstChildElement("rho_beam")->GetText());
 
   c_io_class = new input_output_class (path_res, path_dump);
 }
 
 
 
-bool Load_init_param::save_system_state()
+bool Load_init_param::save_system_state(double t)
 {
-	cout << "Saving system state\n";
-  c_io_class->out_field_dump("e1",efield->e1,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-  c_io_class->out_field_dump("e2",efield->e2,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-  c_io_class->out_field_dump("e3",efield->e3,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-  c_io_class->out_field_dump("h1",hfield->h1,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-  c_io_class->out_field_dump("h2",hfield->h2,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-  c_io_class->out_field_dump("h3",hfield->h3,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-  for(int i=0;i<p_list->part_list.size();i++)
+  cout << "Saving system state at " << t << endl;
+  c_io_class->out_field_dump((char*)"e1",efield->e1,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+  c_io_class->out_field_dump((char*)"e2",efield->e2,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+  c_io_class->out_field_dump((char*)"e3",efield->e3,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+  c_io_class->out_field_dump((char*)"h1",hfield->h1,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+  c_io_class->out_field_dump((char*)"h2",hfield->h2,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+  c_io_class->out_field_dump((char*)"h3",hfield->h3,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+  for(unsigned int i=0;i<p_list->part_list.size();i++)
   {
     c_io_class->out_coord_dump(p_list->part_list[i]->name,p_list->part_list[i]->x1, p_list->part_list[i]->x3, p_list->part_list[i]->number);
     c_io_class->out_velocity_dump(p_list->part_list[i]->name,p_list->part_list[i]->v1, p_list->part_list[i]->v2,p_list->part_list[i]->v3, p_list->part_list[i]->number);
@@ -388,36 +412,43 @@ void Load_init_param::run(void)
     p_list->charge_weighting(c_rho_new);  //continuity equation
     //bool res = continuity_equation(c_time, c_geom, c_current, c_rho_old, c_rho_new);
 
+    // print header on every 20 logging steps
+    if  ((((int)(c_time->current_time/c_time->delta_t))%(data_dump_interval*20)==0))
+      {
+  cout << endl
+       << left << setw(8) << "Step"
+       << left << setw(13) << "Saved Frame"
+       << left << setw(20) << "Current Time (sec)"
+       << left << setw(32) << "Real Step Execution Time (sec)"
+       << endl;
+      }
+
     if  ((((int)(c_time->current_time/c_time->delta_t))%data_dump_interval==0))
-      //if  ((((int)(c_time->current_time/c_time->delta_t)) < 10))
-      //if  ( abs(time1.current_time - time1.end_time + time1.delta_t) < 1e-13)
     {
-      // Logging after step
-      cout << "Model step: " << step_number
-           << ", Execution time: "
-           << 1000 * (clock() - t1) / CLOCKS_PER_SEC << " ms"
-           << ", Current time: "
-           << c_time->current_time << "\n";
+      cout << left << setw(8) << step_number * data_dump_interval
+     << left << setw(13) << step_number
+     << left << setw(20) << c_time->current_time
+     << left << setw(32) << (double)(clock() - t1) / CLOCKS_PER_SEC
+     << endl;
+
       c_bunch->charge_weighting(c_rho_beam);
       c_rho_old->reset_rho();
       p_list[0].charge_weighting(c_rho_old);
-      c_io_class->out_data("rho_el", c_rho_old->get_ro(),step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-      //out_class.out_data("e1",e_field1.e1,100,128,2048);
-      c_io_class->out_data("rho_beam", c_rho_beam->get_ro(),step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-      c_io_class->out_data("e3",efield->e3,step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-      c_io_class->out_data("e1",efield->e1,step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-      //c_io_class->out_data("j1",c_current->get_j1(),step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-      //c_io_class->out_data("j3",c_current->get_j3(),step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-      //c_io_class->out_coord("vels",c_bunch->v1, c_bunch->v3, step_number, 100, c_bunch->number);
-      //out_class.out_data("rho",rho_elect.get_ro(),step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
-      //out_class.out_coord("vels",electron_bunch.v1, electron_bunch.v3, step_number, 100, electron_bunch.number);
-      //out_class.out_coord("coords",electrons.x1, electrons.x3, step_number, 100, electrons.number);
-      //out_class.out_coord("vels",electrons.v1, electrons.v3, step_number, 100, electrons.number);
-      c_io_class->out_data("h2",hfield->h2,step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+
+      if (dump_e1) c_io_class->out_data("e1",efield->e1,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+      if (dump_e2) c_io_class->out_data("e2",efield->e2,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+      if (dump_e3) c_io_class->out_data("e3",efield->e3,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+
+      if (dump_h1) c_io_class->out_data("h1",hfield->h1,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+      if (dump_h2) c_io_class->out_data("h2",hfield->h2,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+      if (dump_h3) c_io_class->out_data("h3",hfield->h3,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+
+      if (dump_rho_beam) c_io_class->out_data("rho_beam", c_rho_beam->get_ro(),step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+
       step_number=step_number+1;
       t1 = clock();
-			if  ((((int)(c_time->current_time/c_time->delta_t))%system_state_dump_interval==0)&&(step_number!=1))
-        this->save_system_state();
+      if  ((((int)(c_time->current_time/c_time->delta_t))%system_state_dump_interval==0)&&(step_number!=1))
+        this->save_system_state(c_time->current_time);
     }
     c_time->current_time = c_time->current_time + c_time->delta_t;
     //if (!res)

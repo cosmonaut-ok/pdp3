@@ -55,7 +55,7 @@ pdp3_CXX_SRCS         = Boundary_Maxwell_conditions.cpp \
 			particles_struct.cpp
 pdp3_RC_SRCS          = pdp3.rc \
 			pdp31.rc
-pdp3_LDFLAGS          =
+pdp3_LDFLAGS          = -m64
 pdp3_ARFLAGS          =
 pdp3_DLL_PATH         =
 pdp3_DLLS             =
@@ -73,17 +73,41 @@ CXX_SRCS              = $(pdp3_CXX_SRCS)
 RC_SRCS               = $(pdp3_RC_SRCS)
 
 ### Tools
-CC = gcc
-CXX = g++
-# CC = winegcc
-# CXX = wineg++
+CC ?= gcc
+CXX ?= g++
+
 RC = wrc
 AR = ar
-CFLAGS = -O2 -Wall
+
+CFLAGS ?= -m64 -mcmodel=medium
+CFLAGS_SPEEDUP = -funsafe-math-optimizations -ffast-math
+CFLAGS_NO_OPENMP ?= -Wno-unknown-pragmas
+CFLAGS_OPENMP ?= -fopenmp
+CFLAGS_DEBUG ?= -O0 -Wall -g -ggdb -fvar-tracking -ggnu-pubnames -pedantic
+
+## set debug options
+ifeq ($(DEBUG), yes)
+CFLAGS += $(CFLAGS_DEBUG)
+else
+CFLAGS += -O2
+endif
+
+## set speedup options
+ifeq ($(SPEEDUP), yes)
+CFLAGS += $(CFLAGS_SPEEDUP)
+endif
+
+## set single thread options
+ifeq ($(SINGLETHREAD), yes)
+CFLAGS += $(CFLAGS_NO_OPENMP)
+else
+CFLAGS += $(CFLAGS_OPENMP)
+endif
+
 CXXFLAGS = ${CFLAGS}
 
 ### Generic targets
-all: $(SUBDIRS) $(DLLS:%=%.so) $(LIBS) $(EXES) bootstrap
+all: $(SUBDIRS) $(DLLS:%=%.so) $(LIBS) $(EXES)
 
 ### Build rules
 .PHONY: all clean dummy
@@ -122,9 +146,9 @@ $(EXTRASUBDIRS:%=%/__clean__): dummy
 DEFLIB = $(LIBRARY_PATH) $(LIBRARIES) $(DLL_PATH) $(DLL_IMPORTS:%=-l%)
 
 $(pdp3_MODULE): $(pdp3_OBJS)
-	$(CXX) $(LDFLAGS) -o $@ $(pdp3_OBJS) $(pdp3_LIBRARY_PATH) $(pdp3_DLL_PATH) $(DEFLIB) $(pdp3_DLLS:%=-l%) $(pdp3_LIBRARIES:%=-l%)
+	$(CXX) $(CXXFLAGS) $(CXXEXTRA) $(DEFINCL) $(LDFLAGS) -o $@ $(pdp3_OBJS) $(pdp3_LIBRARY_PATH) $(pdp3_DLL_PATH) $(DEFLIB) $(pdp3_DLLS:%=-l%) $(pdp3_LIBRARIES:%=-l%)
 
-bootstrap:
+bootstrap: all
 	mkdir -p pdp3_files pdp3_result/Dump
 
 mrproper: clean
@@ -143,7 +167,3 @@ test-ext: mrproper all
 
 check-syntax:
 	$(CXX) $(LIBRARY_PATH) $(INCLUDE_PATH) -Wall -Wextra -pedantic -fsyntax-only $(CHK_SOURCES)
-
-echo:
-	@echo $(INCLUDE_PATH)
-	@echo $(LIBRARY_PATH)

@@ -169,21 +169,25 @@ void current::set_j3(int i, int k, double value)
 
 void current::reset_j()
 {
-  for (int i=0; i<(geom1->n_grid_1-1); i++)
-    for (int k=0; k<(geom1->n_grid_2-1); k++)
-    {
-      j1[i][k]=0;
-      j3[i][k]=0;
-    }
+#pragma omp parallel
+  {
+#pragma omp for
+    for (int i=0; i<(geom1->n_grid_1-1); i++)
+      for (int k=0; k<(geom1->n_grid_2-1); k++)
+      {
+        j1[i][k]=0;
+        j3[i][k]=0;
+      }
+#pragma omp for
+    for (int i=0; i<geom1->n_grid_1; i++)
+      for (int k=0; k<geom1->n_grid_2; k++)
+        j2[i][k] = 0.0;
+#pragma omp for
+    for (int i=0; i<(geom1->n_grid_1-1); i++)
+      j1[i][geom1->n_grid_2-1]=0;
 
-  for (int i=0; i<geom1->n_grid_1; i++)
-    for (int k=0; k<geom1->n_grid_2; k++)
-      j2[i][k] = 0.0;
-
-  for (int i=0; i<(geom1->n_grid_1-1); i++)
-    j1[i][geom1->n_grid_2-1]=0;
-
-
-  for(int i=0; i<(geom1->n_grid_2-1); i++)
-    j3[geom1->n_grid_1-1][i]=0;
+#pragma omp for
+    for(int i=0; i<(geom1->n_grid_2-1); i++)
+      j3[geom1->n_grid_1-1][i]=0;
+  }
 }

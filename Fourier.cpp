@@ -4,10 +4,9 @@
 #include "Constant.h"
 
 using namespace std;
+using namespace constant;
 
-const double PI = constant::PI;
-
-Fourier::Fourier(int t=0)
+Fourier::Fourier(int t)
 {
 }
 

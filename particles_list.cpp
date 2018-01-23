@@ -1,6 +1,6 @@
 #include "particles_list.h"
 
-particles_list::particles_list(int i=0)
+particles_list::particles_list(int i)
 {
   x1_old = 0;
   x3_old = 0;
@@ -130,11 +130,12 @@ void particles_list::create_coord_arrays(void)
     }
 }
 
-void particles_list:: copy_coords()
+void particles_list::copy_coords()
 {
   // fuction for copying particles coordinates
   int kinds_number = part_list.size();
   for (int k=0;k<kinds_number;k++)
+#pragma omp parallel for
     for(int i=0;i<part_list[k]->number;i++)
     {
       x1_old[k][i]=part_list[k]->x1[i];

@@ -5,19 +5,14 @@
 #include "Triple.h"
 #include <math.h>
 #include <string.h>
+#include <cstdlib>
 #include "Constant.h"
 
-// use constants from Constant.h
-const double PI = constant::PI;
-const double EL_CHARGE = constant::EL_CHARGE;
-const double EL_MASS = constant::EL_MASS;
-const double LIGHT_SPEED = constant::LIGHT_SPEED;
-const double MAGN_CONST = constant::MAGN_CONST;
+using namespace std;
+using namespace constant;
 
 // C^2 define c^2 to decrease number of operations
-const double LIGHT_SPEED_POW_2 = pow (constant::LIGHT_SPEED, 2);
-
-using namespace std;
+const double LIGHT_SPEED_POW_2 = pow (LIGHT_SPEED, 2);
 
 Particles::Particles(void)
 {
@@ -48,6 +43,7 @@ Particles::Particles(char const *p_name,
   v3 = new double[number];
   is_alive = new int[number];
 
+#pragma omp parallel for
   for (int i = 0; i < number; i++)
   {
     is_alive[i] = 1;
@@ -98,9 +94,9 @@ void Particles::set_v_0()
 {
   for(int i=0; i<number; i++)
   {
-    v1[i] = 0.0;
-    v2[i] = 1.0e5; // TODO: WHY?
-    v3[i] = 0.0;
+    v1[i] = 0;
+    v2[i] = 1e5; // TODO: WHY?
+    v3[i] = 0;
   }
 }
 
@@ -116,26 +112,81 @@ void Particles::set_x_0()
 // calculate Lorentz factor
 double Particles::get_gamma(int i)
 {
-  return pow(1.0 - (pow(v1[i], 2) + pow(v2[i], 2) + pow(v3[i], 2))
-             / LIGHT_SPEED_POW_2, -0.5);
+  double gamma, beta;
+
+  beta = (pow(v1[i], 2) + pow(v2[i], 2) + pow(v3[i], 2)) / LIGHT_SPEED_POW_2;
+
+  if (beta > 1) // it's VERY BAD! Beta should not be more, than 1
+	{
+		cerr << "CRITICAL!(get_gamma): Lorentz factor aka gamma is comples. Can not continue." << endl
+				 << "\tUsually it happens, when <Time> -> <delta_t> value is too big." << endl
+				 << "\tv1[" << i << "] = " << v1[i]
+				 << "\tv2[" << i << "] = " << v2[i]
+				 << "\tv3[" << i << "] = " << v3[i];
+		exit(1);
+	}
+
+  gamma = pow(1.0 - beta, -0.5);
+
+  if (isinf(gamma) == 1) { // avoid infinity values
+    cerr << "WARNING(get_gamma): gamma (Lorenz factor) girects to infinity for [v1, v2, v3, i]: ["
+         << v1[i] << ", " << v2[i] << ", " << v3[i] << ", " << i << "]" << endl;
+    return 1e100; // just return some very big value
+  }
+  else
+  {
+    return gamma;
+  }
 }
 
 // clculate reciprocal Lorentz factor (1/gamma), aka ``alpha''
 double Particles::get_gamma_inv(int i) // TODO: it is not alpha
 {
-  return pow(1.0 + (pow(v1[i], 2) + pow(v2[i], 2) + pow(v3[i], 2))
-             / LIGHT_SPEED_POW_2, (double)0.5);
+  double gamma, beta;
+
+  beta = (pow(v1[i], 2) + pow(v2[i], 2) + pow(v3[i], 2)) / LIGHT_SPEED_POW_2;
+
+  if (beta > 1) // it's VERY BAD! Beta should not be more, than 1
+	{
+		cerr << "CRITICAL!(get_gamma_inv): Lorentz factor aka gamma is comples. Can not continue." << endl
+				 << "\tUsually it happens, when <Time> -> <delta_t> value is too big." << endl
+				 << "\tv1[" << i << "] = " << v1[i]
+				 << "\tv2[" << i << "] = " << v2[i]
+				 << "\tv3[" << i << "] = " << v3[i];
+		exit(1);
+	}
+
+  gamma = pow(1.0 + beta, 0.5);
+
+  if (isinf(gamma) == 1) { // avoid infinity values
+    cerr << "WARNING(get_gamma_inv): reciprocal gamma (Lorenz factor) directs to infinity for [v1, v2, v3, i]: ["
+         << v1[i] << ", " << v2[i] << ", " << v3[i] << ", " << i << "]\n";
+    return 1e100; // just return some very big value
+  }
+  else
+  {
+    return gamma;
+  }
 }
 
 void Particles::step_v(E_field *e_fld, H_field *h_fld, Time* t)
 {
-  double gamma, b1, b2, b3, e1, e2, e3, vv1, vv2, vv3;
-  Triple E_compon(0.0, 0.0, 0.0), B_compon(0.0, 0.0, 0.0);
-  double const1, const2;
-  //if (t->current_time == t->start_time) const1 = const1/2.0;
+
+#pragma omp parallel for shared(e_fld, h_fld, t)
   for(int i=0; i<number; i++)
     if (is_alive[i])
     {
+      // define vars directly in cycle, because of multithreading
+      double gamma, b1, b2, b3, e1, e2, e3, vv1, vv2, vv3, const1, const2;
+      Triple E_compon(0.0, 0.0, 0.0), B_compon(0.0, 0.0, 0.0);
+
+      // check if x1 and x3 are correct
+      if (isnan(x1[i]) || isinf(x1[i]) != 0 || isnan(x3[i]) || isinf(x3[i]) != 0)
+      {
+        cerr << "ERROR(step_v): x1[" << i << "] or x3[" << i << "] is not valid number. Can not continue." << endl;
+        exit(1);
+      }
+      // q*t/2*m TODO: what constant is it?
       const1 = charge_array[i]*t->delta_t/2.0/mass_array[i];
       E_compon = e_fld->get_field(x1[i],x3[i]);
       B_compon = h_fld->get_field(x1[i],x3[i]);
@@ -146,12 +197,18 @@ void Particles::step_v(E_field *e_fld, H_field *h_fld, Time* t)
       b2 = B_compon.second*MAGN_CONST*const1;
       b3 = B_compon.third*MAGN_CONST*const1;
 
+      // round very small velicities to avoid exceptions
+      vv1 = (abs(v1[i]) < 1e-15) ? 0 : v1[i];
+      vv2 = (abs(v2[i]) < 1e-15) ? 0 : v2[i];
+      vv3 = (abs(v3[i]) < 1e-15) ? 0 : v3[i];
+
       // 1. Multiplication by relativistic factor
       // u(n-1/2) = gamma(n-1/2)*v(n-1/2)
       gamma = get_gamma(i);
-      v1[i] = gamma*v1[i];
-      v2[i] = gamma*v2[i];
-      v3[i] = gamma*v3[i];
+      //
+      v1[i] = gamma*vv1;
+      v2[i] = gamma*vv2;
+      v3[i] = gamma*vv3;
 
       // 2. Half acceleration in the electric field
       // u'(n) = u(n-1/2) + q*dt/2/m*E(n)
@@ -201,9 +258,17 @@ void Particles::half_step_coord(Time* t)
   double x3_wallX2 = x3_wall*2.0;
   double half_dt = t->delta_t/2.0;
 
+#pragma omp parallel for shared(dr, dz, x1_wall, x3_wall, half_dr, half_dz, x1_wallX2, x3_wallX2, half_dt)
   for(int i=0; i<number; i++)
     if (is_alive[i])
     {
+      // check if x1 and x3 are correct
+      if (isnan(x1[i]) || isinf(x1[i]) != 0 || isnan(x3[i]) || isinf(x3[i]) != 0)
+      {
+        cerr << "ERROR(half_step_coord): x1[" << i << "] or x3[" << i << "] is not valid number. Can not continue." << endl;
+        exit(1);
+      }
+      //
       x1[i] = x1[i] + v1[i] * half_dt;
       x3[i] = x3[i] + v3[i] * half_dt;
 
@@ -233,7 +298,6 @@ void Particles::half_step_coord(Time* t)
     }
 }
 
-
 // function for charge density weighting
 void Particles::charge_weighting(charge_density* ro1)
 {
@@ -256,9 +320,20 @@ void Particles::charge_weighting(charge_density* ro1)
   for(int i=0; i<number; i++)
     if (is_alive[i])
     {
+      // check if x1 and x3 are correct
+      if (isnan(x1[i]) || isinf(x1[i]) != 0 || isnan(x3[i]) || isinf(x3[i]) != 0)
+      {
+        cerr << "ERROR(charge_weighting): x1[" << i << "] or x3[" << i << "] is not valid number. Can not continue." << endl;
+        exit(1);
+      }
+
       // finding number of i and k cell. example: dr = 0.5; r = 0.4; i =0
       r_i = (int)ceil((x1[i])/dr)-1;
-      z_k =    (int)ceil((x3[i])/dz)-1;
+      z_k = (int)ceil((x3[i])/dz)-1;
+      // TODO: workaround: sometimes it gives -1.
+      // Just get 0 cell if it happence
+      if (r_i < 0) { r_i = 0; }
+      if (z_k < 0) { z_k = 0; }
 
       // in first cell other alg. of ro_v calc
       if(x1[i]>dr)
@@ -397,7 +472,6 @@ void Particles::velocity_distribution_v2(double tempr_ev)
 {
   double therm_vel = sqrt(tempr_ev*2.0*EL_CHARGE/
                           (this->init_const_mass*EL_MASS));
-  int j=0;
   // double R =0; // number from [0;1]
   double dv = therm_vel/0.5e7; // velocity step in calculation integral
   double cutoff_vel = 9.0*therm_vel; //cutoff velocity
@@ -409,17 +483,17 @@ void Particles::velocity_distribution_v2(double tempr_ev)
   double const1 = 2*therm_vel*therm_vel;
   // double temp1;
   // part of numerical integral calculation//
-  int i = 0;
-  while (i<lenght_arr)
+// #pragma omp parallel for shared(integ_array, dv, const1) private(s, ds)
+  for (int i=0; i<lenght_arr; i++)
   {
     /*temp1 = dv*i*dv*i;
       ds = temp1 * exp(-temp1 / const1 ) * dv;*/
     ds = exp(-dv*i*dv*i/const1)*dv;
     s=s+ds;
     integ_array[i] = s;
-    i=i+1;
   }
 
+#pragma omp parallel for shared(integ_array, lenght_arr, const1, dv)
   for(int i_n=0;i_n<number;i_n++)
   {
     double Rr = random_reverse(i_n,3);
@@ -436,7 +510,7 @@ void Particles::velocity_distribution_v2(double tempr_ev)
 
     // binary search
     int i=0;
-    j=lenght_arr;
+    int j=lenght_arr;
     int k=0;
     while(i<=j)
     {
@@ -640,8 +714,17 @@ void Particles::load_spatial_distribution_with_variable_mass(double n1,
     double N_big_for_cell=(double) number/( (double) geom1->n_grid_1*geom1->n_grid_2);
     double N_real_i = 8.0*PI*(n2+n1)/2.0*dr*dz;
     double n_in_big =0;
+
+#pragma omp parallel for shared(dr, dz, dn, left_plasma_boundary, n1, n2) private(rand_r, rand_z, n_in_big)
     for(int n = 0; n < number; n++)
     {
+      // check if x1 and x3 are correct
+      if (isnan(x1[n]) || isinf(x1[n]) != 0 || isnan(x3[n]) || isinf(x3[n]) != 0)
+      {
+        cerr << "ERROR(load_spatial_distribution_with_variable_mass): x1[" << n << "] or x3[" << n << "] is not valid number. Can not continue." << endl;
+        exit(1);
+      }
+
       rand_r = random_reverse(n,13);
       rand_z = random_reverse(number - 1 - n,11);
       x1[n] = (geom1->first_size - dr)*(rand_r) + dr/2.0;
@@ -772,26 +855,26 @@ void Particles::simple_constrho_j_weighting(Time* time1, current *j1, double x1_
   double wj = 0;
   double delta_t = time1->delta_t;
 
-    // distance of particle moving//
-    double delta_r = x1_new - x1_old;
-    double delta_z = x3_new - x3_old;
+  // distance of particle moving//
+  double delta_r = x1_new - x1_old;
+  double delta_z = x3_new - x3_old;
 
-    // if i cell is not equal 0
-    if (i_n>=1)
-    {
+  // if i cell is not equal 0
+  if (i_n>=1)
+  {
     ///////////////////////////////////
     // equation y = k*x+b;//
     // finding k & b//
     // double k = delta_r/delta_z;
     // double b = x1_old-dr/2.0;
 //    double r0 = (i_n+0.5)*dr;
-      //calculate current jz in [i,k] cell//
-  //  wj = particle_rho*PI*delta_z/(delta_t*2*PI*i_n*dr*dr) * (r0*r0 - b*b -a*a*delta_z*delta_z/3.0 - a*b*delta_z);
+    //calculate current jz in [i,k] cell//
+    //  wj = particle_rho*PI*delta_z/(delta_t*2*PI*i_n*dr*dr) * (r0*r0 - b*b -a*a*delta_z*delta_z/3.0 - a*b*delta_z);
     // set new weighting current value
     j1->set_j3(i_n,k_n, wj);
 
-        //calculate current in [i+1,k] cell//
-  //  wj = particle_rho*PI*delta_z/(delta_t*2*PI*(i_n+1)*dr*dr) * (a*a*delta_z*delta_z/3.0 + a*b*delta_z+b*b-r0*r0);
+    //calculate current in [i+1,k] cell//
+    //  wj = particle_rho*PI*delta_z/(delta_t*2*PI*(i_n+1)*dr*dr) * (a*a*delta_z*delta_z/3.0 + a*b*delta_z+b*b-r0*r0);
     // set new weighting current value
     j1->set_j3(i_n+1,k_n, wj);
 
@@ -812,10 +895,10 @@ void Particles::simple_constrho_j_weighting(Time* time1, current *j1, double x1_
     //weighting jr in [i][k+1] cell
     //   wj = charge/(2*PI*r0*dz*dz*dr*delta_t) * ();
     j1->set_j1(i_n, k_n+1, wj);
-    }
-    // if i cell is equal 0
-    else
-    {
+  }
+  // if i cell is equal 0
+  else
+  {
     // equation y = k*x+b;
     // finding k & b
     double k = delta_r/delta_z;
@@ -839,7 +922,7 @@ void Particles::simple_constrho_j_weighting(Time* time1, current *j1, double x1_
     double r1 =   x1_old;
     b= (k_n+1.0)*dz - x3_old;
 
-        //weighting jr in [i][k] cell
+    //weighting jr in [i][k] cell
     wj = charge_array[p_number]/(2*PI*r0*dz*dz*dr*delta_t) *(r0*k*delta_r+k/2.0 * delta_r*(x1_old+delta_r/2.0)+0.5*delta_r*(b-k*(2*r0+r1))+ delta_r*(b-k*r1)*(4*r0*r0-dr*dr)/(8*x1_old*(x1_old+delta_r)) + (k*(r0*r0/2.0-dr*dr/8.0))*log((x1_old+delta_r)/x1_old));
     j1->set_j1(i_n,k_n, wj);
 
@@ -847,7 +930,7 @@ void Particles::simple_constrho_j_weighting(Time* time1, current *j1, double x1_
     //weighting jr in [i][k+1] cell
     wj = charge_array[p_number]/(2*PI*r0*dz*dz*dr*delta_t) * (-r0*k*delta_r - k/2.0*delta_r*(x1_old+delta_r/2.0)+0.5*delta_r*(b+k*(2*r0+r1))+ delta_r*(b+k*r1)*(4*r0*r0-dr*dr)/(8*x1_old*(x1_old+delta_r)) - (k*(r0*r0/2.0-dr*dr/8.0))*log((x1_old+delta_r)/x1_old));
     j1->set_j1(i_n, k_n+1, wj);
-    }
+  }
 
   //}
 }
@@ -872,6 +955,13 @@ void Particles::j_weighting(Time* time1, current *j1, double* x1_o,double* x3_o)
       int k_n =(int)ceil((x3[i])/dz)-1;
       int i_o = (int)ceil((x1_old)/dr)-1;
       int k_o =(int)ceil((x3_old)/dz)-1;
+      // TODO: workaround: sometimes it gives -1.
+      // Just get 0 cell if it happence
+      if (i_n < 0) { i_n = 0; }
+      if (k_n < 0) { k_n = 0; }
+      if (i_o < 0) { i_o = 0; }
+      if (k_o < 0) { k_o = 0; }
+
       if (x1_old==(i_o+1)*dr)
         i_o=i_n;
       if(x3_old==(k_o+1)*dz)
@@ -1090,13 +1180,16 @@ void Particles::azimuthal_j_weighting(Time* time1, current *this_j)
     {
       // finding number of i and k cell. example: dr = 0.5; r = 0.4; i =0
       r_i = (int)ceil((x1[i])/dr)-1;
-      z_k =    (int)ceil((x3[i])/dz)-1;
-      ///////////////////////////
+      z_k = (int)ceil((x3[i])/dz)-1;
+      // TODO: workaround: sometimes it gives -1.
+      // Just get 0 cell if it happence
+      if (r_i < 0) { r_i = 0; }
+      if (z_k < 0) { z_k = 0; }
 
       // in first cell other alg. of ro_v calc
       if(x1[i]>dr)
       {
-        r1 =   x1[i] - 0.5*dr;
+        r1 = x1[i] - 0.5*dr;
         r2 = (r_i+0.5)*dr;
         r3 = x1[i] + 0.5*dr;
         ro_v = charge_array[i]/(2.0*PI*dz*dr*x1[i]);
@@ -1113,7 +1206,7 @@ void Particles::azimuthal_j_weighting(Time* time1, current *this_j)
         // weighting in j[i+1][k] cell
         rho = ro_v*PI*dz1*(r3*r3-r2*r2)/v_2;
         current = rho*v2[i];
-        this_j->set_j2(r_i+1,z_k,    current);
+        this_j->set_j2(r_i+1,z_k, current);
 
         // weighting in j[i][k+1] cell
         rho = ro_v*PI*dz2*(r2*r2-r1*r1)/v_1;
@@ -1123,12 +1216,12 @@ void Particles::azimuthal_j_weighting(Time* time1, current *this_j)
         // weighting in j[i+1][k+1] cell
         rho = ro_v*PI*dz2*(r3*r3-r2*r2)/v_2;
         current = rho*v2[i];
-        this_j->set_j2(r_i+1, z_k+1,  current);
+        this_j->set_j2(r_i+1, z_k+1, current);
 
       }
       else
       {
-        r1 =   x1[i] - 0.5*dr;
+        r1 = x1[i] - 0.5*dr;
         r2 = (r_i+0.5)*dr;
         r3 = x1[i]+0.5*dr;
         dz1 = (z_k+1)*dz-x3[i];
@@ -1161,12 +1254,12 @@ void Particles::azimuthal_j_weighting(Time* time1, current *this_j)
 }
 
 void Particles::strict_motion_weighting(Time *time1,
-                                         current *this_j,
-                                         double x1_new,
-                                         double x3_new,
-                                         double x1_old,
-                                         double x3_old,
-                                         int p_number)
+                                        current *this_j,
+                                        double x1_new,
+                                        double x3_new,
+                                        double x1_old,
+                                        double x3_old,
+                                        int p_number)
 {
   double dr = geom1->dr;
   double dz = geom1->dz;
@@ -1176,10 +1269,16 @@ void Particles::strict_motion_weighting(Time *time1,
   int k_n =(int)ceil((x3_new)/dz)-1;
   int i_o = (int)ceil((x1_old)/dr)-1;
   int k_o =(int)ceil((x3_old)/dz)-1;
+  // TODO: workaround: sometimes it gives -1.
+  // Just get 0 cell if it happence
+  if (i_n < 0) { i_n = 0; }
+  if (k_n < 0) { k_n = 0; }
+  if (i_o < 0) { i_o = 0; }
+  if (k_o < 0) { k_o = 0; }
 
   if ((abs(x1_new-x1_old)<1e-15)&&(abs(x3_new-x3_old)<1e-15))
   {
-    cout<<"WARNING! zero velocity!\n";
+    cerr<<"WARNING! zero velocity!" << endl;
     return;
   }
   // stirct axis motion
@@ -1323,7 +1422,6 @@ void Particles::strict_motion_weighting(Time *time1,
   }
 }
 
-
 bool continuity_equation(Time *input_time,
                          Geometry *input_geometry,
                          current *input_J,
@@ -1353,383 +1451,383 @@ bool continuity_equation(Time *input_time,
 }
 //int* Particles::get_cell_numbers_jr(double x1_new,double x3_new, double x1_old, double x3_old)
 /*
-int* Particles::get_cell_numbers_jr(double x1_new,double x3_new, double x1_old, double x3_old)
-{
+  int* Particles::get_cell_numbers_jr(double x1_new,double x3_new, double x1_old, double x3_old)
+  {
 
-        int i_new = (int)ceil((x1_new)/geom1->dr)-1;
-        int k_new =(int)ceil((x3_new)/geom1->dz)-1;
-        int i_old = (int)ceil((x1_old)/geom1->dr)-1;
-        int k_old =(int)ceil((x3_old)/geom1->dz)-1;
-        if (x1_old==(i_old+1)*geom1->dr)
-            i_old=i_new;
-        if(x3_old==(k_old+1)*geom1->dz)
-            k_old=k_new;
-        if (x1_new==(i_new+1)*geom1->dr)
-            i_new=i_old;
-        if(x3_new==(k_new+1)*geom1->dz)
-            k_new=k_old;
+  int i_new = (int)ceil((x1_new)/geom1->dr)-1;
+  int k_new =(int)ceil((x3_new)/geom1->dz)-1;
+  int i_old = (int)ceil((x1_old)/geom1->dr)-1;
+  int k_old =(int)ceil((x3_old)/geom1->dz)-1;
+  if (x1_old==(i_old+1)*geom1->dr)
+  i_old=i_new;
+  if(x3_old==(k_old+1)*geom1->dz)
+  k_old=k_new;
+  if (x1_new==(i_new+1)*geom1->dr)
+  i_new=i_old;
+  if(x3_new==(k_new+1)*geom1->dz)
+  k_new=k_old;
 
 
   /// 4 cells
 
-    if (i_new==i_old&&k_new==k_old)
-    {
-      int * res_cells = new int[4];
+  if (i_new==i_old&&k_new==k_old)
+  {
+  int * res_cells = new int[4];
 
-         res_cells[0]=i_new;
-        res_cells[1]=k_new;
-        res_cells[2]=i_new;
-        res_cells[3]=k_new+1;
+  res_cells[0]=i_new;
+  res_cells[1]=k_new;
+  res_cells[2]=i_new;
+  res_cells[3]=k_new+1;
 
-    }
-    /// 7 cells
-    if (i_new!=i_old||k_new!=k_old)
-    {
-        if(i_new!=i_old)
-        {
-       int i_new_max=0;
-        if (i_new<i_old)
-            int i_new_max=i_old;
-        else
-            i_new_max=i_new;
-        int * res_cells = new int[8];
-        res_cells[0]= i_new_max;
-        res_cells[1]= k_new;
-        res_cells[2]=i_new_max;
-        res_cells[3]=k_new+1;
-        res_cells[4]=i_new_max-1;
-        res_cells[5]=k_new;
-        res_cells[6]=i_new_max-1;
-        res_cells[7]=k_new+1;
+  }
+  /// 7 cells
+  if (i_new!=i_old||k_new!=k_old)
+  {
+  if(i_new!=i_old)
+  {
+  int i_new_max=0;
+  if (i_new<i_old)
+  int i_new_max=i_old;
+  else
+  i_new_max=i_new;
+  int * res_cells = new int[8];
+  res_cells[0]= i_new_max;
+  res_cells[1]= k_new;
+  res_cells[2]=i_new_max;
+  res_cells[3]=k_new+1;
+  res_cells[4]=i_new_max-1;
+  res_cells[5]=k_new;
+  res_cells[6]=i_new_max-1;
+  res_cells[7]=k_new+1;
 
-        }
+  }
 
-        if(k_new!=k_old)
-        {
-        int k_new_max=0;
-        if (k_new<k_old)
-            int k_new_max=k_old;
-        else
-            k_new_max=k_new;
+  if(k_new!=k_old)
+  {
+  int k_new_max=0;
+  if (k_new<k_old)
+  int k_new_max=k_old;
+  else
+  k_new_max=k_new;
 
-        int * res_cells = new int[6];
-        res_cells[0]=i_new;
-        res_cells[1]=k_new_max-1;
-        res_cells[2]=i_new;
-        res_cells[3]=k_new_max;
-        res_cells[4]=i_new;
-        res_cells[5]=k_new_max+1;
+  int * res_cells = new int[6];
+  res_cells[0]=i_new;
+  res_cells[1]=k_new_max-1;
+  res_cells[2]=i_new;
+  res_cells[3]=k_new_max;
+  res_cells[4]=i_new;
+  res_cells[5]=k_new_max+1;
 
-        }
+  }
 
-    }
-    // 10 cells
+  }
+  // 10 cells
 
-    {
-     if((i_new>i_old)&&(k_new>k_old)||(i_new<i_old)&&(k_new<k_old))
-     {
-        int ik_temp=0;
-        double x_temp= 0;
-        if (i_new<i_old)
-        {
-            x_temp=x1_new;
-             ik_temp=i_new;
-             i_new=i_old;
-             x1_new=x1_old;
-             i_old=ik_temp;
-             x1_old=x_temp;
+  {
+  if((i_new>i_old)&&(k_new>k_old)||(i_new<i_old)&&(k_new<k_old))
+  {
+  int ik_temp=0;
+  double x_temp= 0;
+  if (i_new<i_old)
+  {
+  x_temp=x1_new;
+  ik_temp=i_new;
+  i_new=i_old;
+  x1_new=x1_old;
+  i_old=ik_temp;
+  x1_old=x_temp;
 
-        }
-
-
-        if (k_new<k_old)
-        {
-              x_temp=x3_new;
-             ik_temp=k_new;
-             k_new=k_old;
-             x3_new=x3_old;
-             k_old=ik_temp;
-             x3_old=x_temp;
-        }
-        double a = (x1_new - x1_old)/(x3_new - x3_old);
-                        double r1 = i_new*geom1->dr;
-                    double delta_z1 = (r1 - x1_old)/a;
-                        double z1 = x3_old + delta_z1;
-                        double z2 = k_new*geom1->dz;
-                        double delta_r2 = (z2-x3_old)*a;
-                        double r2 = x1_old+ delta_r2;
-                        if (z1<k_new*geom1->dz)
-                        {
-                             int * res_cells = new int[10];
-                             res_cells[0]=i_new-1;
-                             res_cells[1]=k_new-1;
-                             res_cells[2]=i_new-1;
-                             res_cells[3]=k_new;
-
-                             res_cells[4]=i_new;
-                             res_cells[5]=k_new-1;
-                             res_cells[6]=i_new;
-                             res_cells[7]=k_new;
-
-                             res_cells[8]=i_new;
-                             res_cells[9]=k_new+1;
+  }
 
 
+  if (k_new<k_old)
+  {
+  x_temp=x3_new;
+  ik_temp=k_new;
+  k_new=k_old;
+  x3_new=x3_old;
+  k_old=ik_temp;
+  x3_old=x_temp;
+  }
+  double a = (x1_new - x1_old)/(x3_new - x3_old);
+  double r1 = i_new*geom1->dr;
+  double delta_z1 = (r1 - x1_old)/a;
+  double z1 = x3_old + delta_z1;
+  double z2 = k_new*geom1->dz;
+  double delta_r2 = (z2-x3_old)*a;
+  double r2 = x1_old+ delta_r2;
+  if (z1<k_new*geom1->dz)
+  {
+  int * res_cells = new int[10];
+  res_cells[0]=i_new-1;
+  res_cells[1]=k_new-1;
+  res_cells[2]=i_new-1;
+  res_cells[3]=k_new;
 
-                        }
-                        else if (z1>k_new*geom1->dz)
-                        {
-                             int * res_cells = new int[10];
-                             res_cells[0]=i_new-1;
-                             res_cells[1]=k_new-1;
+  res_cells[4]=i_new;
+  res_cells[5]=k_new-1;
+  res_cells[6]=i_new;
+  res_cells[7]=k_new;
 
-                             res_cells[2]=i_new-1;
-                             res_cells[3]=k_new;
-
-
-                             res_cells[6]=i_new-1;
-                             res_cells[7]=k_new+1;
-
-                             res_cells[8]=i_new;
-                             res_cells[9]=k_new+1;
-
-                        }
+  res_cells[8]=i_new;
+  res_cells[9]=k_new+1;
 
 
 
+  }
+  else if (z1>k_new*geom1->dz)
+  {
+  int * res_cells = new int[10];
+  res_cells[0]=i_new-1;
+  res_cells[1]=k_new-1;
 
-     }
-
-    }
-
-}
-void Particles::get_cell_numbers_jr_1(double x1_new,double x3_new, double x1_old, double x3_old,int *i_return, int* k_return,int* accur)
-{
-
-        int i_new = (int)ceil((x1_new)/geom1->dr)-1;
-        int k_new =(int)ceil((x3_new)/geom1->dz)-1;
-        int i_old = (int)ceil((x1_old)/geom1->dr)-1;
-        int k_old =(int)ceil((x3_old)/geom1->dz)-1;
-        if (x1_old==(i_old+1)*geom1->dr)
-            i_old=i_new;
-        if(x3_old==(k_old+1)*geom1->dz)
-            k_old=k_new;
-        if (x1_new==(i_new+1)*geom1->dr)
-            i_new=i_old;
-        if(x3_new==(k_new+1)*geom1->dz)
-            k_new=k_old;
-
-        int cell_value = abs(i_new-i_old)+abs(k_new-k_old);
-
-  /// 4 cells
-
-    if (cell_value==0)
-    {
-    *i_return=i_new;
-    *k_return=k_new;
-    *accur=1;
-    }
-    /// 7 cells
-    if (cell_value==1)
-    {
-    *i_return=i_new;
-    *k_return=k_new;
-    *accur=2;
-
-    }
-    // 10 cells
-
-    {
-
-     *i_return=i_new;
-    *k_return=k_new;
-    *accur=3;
+  res_cells[2]=i_new-1;
+  res_cells[3]=k_new;
 
 
-    }
+  res_cells[6]=i_new-1;
+  res_cells[7]=k_new+1;
 
-    }
+  res_cells[8]=i_new;
+  res_cells[9]=k_new+1;
 
-void Particles::get_cell_numbers_jr_2(double x1_new,double x3_new, double x1_old, double x3_old,int **cell_arr_jr, int **cell_arr_jz, int* number)
-{
+  }
 
-        int i_new = (int)ceil((x1_new)/geom1->dr)-1;
-        int k_new =(int)ceil((x3_new)/geom1->dz)-1;
-        int i_old = (int)ceil((x1_old)/geom1->dr)-1;
-        int k_old =(int)ceil((x3_old)/geom1->dz)-1;
-        if (x1_old==(i_old+1)*geom1->dr)
-            i_old=i_new;
-        if(x3_old==(k_old+1)*geom1->dz)
-            k_old=k_new;
-        if (x1_new==(i_new+1)*geom1->dr)
-            i_new=i_old;
-        if(x3_new==(k_new+1)*geom1->dz)
-            k_new=k_old;
 
-        int cell_value = abs(i_new-i_old)+abs(k_new-k_old);
+
+
+  }
+
+  }
+
+  }
+  void Particles::get_cell_numbers_jr_1(double x1_new,double x3_new, double x1_old, double x3_old,int *i_return, int* k_return,int* accur)
+  {
+
+  int i_new = (int)ceil((x1_new)/geom1->dr)-1;
+  int k_new =(int)ceil((x3_new)/geom1->dz)-1;
+  int i_old = (int)ceil((x1_old)/geom1->dr)-1;
+  int k_old =(int)ceil((x3_old)/geom1->dz)-1;
+  if (x1_old==(i_old+1)*geom1->dr)
+  i_old=i_new;
+  if(x3_old==(k_old+1)*geom1->dz)
+  k_old=k_new;
+  if (x1_new==(i_new+1)*geom1->dr)
+  i_new=i_old;
+  if(x3_new==(k_new+1)*geom1->dz)
+  k_new=k_old;
+
+  int cell_value = abs(i_new-i_old)+abs(k_new-k_old);
 
   /// 4 cells
 
-    if (cell_value==0)
-    {
+  if (cell_value==0)
+  {
+  *i_return=i_new;
+  *k_return=k_new;
+  *accur=1;
+  }
+  /// 7 cells
+  if (cell_value==1)
+  {
+  *i_return=i_new;
+  *k_return=k_new;
+  *accur=2;
 
-        cell_arr_jr[0][0]=i_new;
-        cell_arr_jr[0][1]=k_new;
-        cell_arr_jr[1][0]=i_new;
-        cell_arr_jr[1][1]=k_new+1;
+  }
+  // 10 cells
 
-        cell_arr_jz[0][0]=i_new;
-        cell_arr_jz[0][1]=k_new;
-        cell_arr_jz[1][0]=i_new+1;
-        cell_arr_jz[1][1]=k_new;
+  {
 
-
-
-    }
-    /// 7 cells
-    if (cell_value==1)
-    {
-    set_simple_cell(cell_arr_jr, cell_arr_jz, 0,i_old,k_old);
-    set_simple_cell(cell_arr_jr, cell_arr_jz, 2,i_new,k_new);
-
-    }
-    // 10 cells
-
-    {
-
-    if (((i_new-i_old)+(k_new-k_old))!=0)
-    {
-         set_simple_cell(cell_arr_jr, cell_arr_jz, 0,i_old,k_old);
-         set_simple_cell(cell_arr_jr, cell_arr_jz, 2,i_new,k_new);
-         int i_temp= i_new;
-         int k_temp = k_new;
-         if (i_new <i_old)
-             i_temp=i_old;
-          if (k_new <k_old)
-             k_temp=k_old;
-         set_simple_cell(cell_arr_jr, cell_arr_jz, 4,i_temp,k_temp-1);
-         set_simple_cell(cell_arr_jr, cell_arr_jz, 6,i_temp-1,k_temp);
-
-    }
-       else if (((i_new-i_old)+(k_new-k_old))==0)
-    {
-         set_simple_cell(cell_arr_jr, cell_arr_jz, 0,i_old,k_old);
-         set_simple_cell(cell_arr_jr, cell_arr_jz, 2,i_new,k_new);
-         int i_temp= i_new;
-         int k_temp = k_new;
-         if (i_new <i_old)
-             i_temp=i_old;
-          if (k_new >k_old)
-             k_temp=k_old;
-         set_simple_cell(cell_arr_jr, cell_arr_jz, 4,i_temp-1,k_temp);
-         set_simple_cell(cell_arr_jr, cell_arr_jz, 6,i_temp,k_temp+1);
-
-    }
+  *i_return=i_new;
+  *k_return=k_new;
+  *accur=3;
 
 
-    }
+  }
 
-    }
-void Particles:: set_simple_cell(int** cell_arr_jr, int** cell_arr_jz,int start_number, int i_new, int k_new)
-{
-        cell_arr_jr[0+start_number][0]=i_new;
-        cell_arr_jr[0+start_number][1]=k_new;
-        cell_arr_jr[1+start_number][0]=i_new;
-        cell_arr_jr[1+start_number][1]=k_new+1;
+  }
 
-        cell_arr_jz[0+start_number][0]=i_new;
-        cell_arr_jz[0+start_number][1]=k_new;
-        cell_arr_jz[1+start_number][0]=i_new+1;
-        cell_arr_jz[1+start_number][1]=k_new;
+  void Particles::get_cell_numbers_jr_2(double x1_new,double x3_new, double x1_old, double x3_old,int **cell_arr_jr, int **cell_arr_jz, int* number)
+  {
 
-}
+  int i_new = (int)ceil((x1_new)/geom1->dr)-1;
+  int k_new =(int)ceil((x3_new)/geom1->dz)-1;
+  int i_old = (int)ceil((x1_old)/geom1->dr)-1;
+  int k_old =(int)ceil((x3_old)/geom1->dz)-1;
+  if (x1_old==(i_old+1)*geom1->dr)
+  i_old=i_new;
+  if(x3_old==(k_old+1)*geom1->dz)
+  k_old=k_new;
+  if (x1_new==(i_new+1)*geom1->dr)
+  i_new=i_old;
+  if(x3_new==(k_new+1)*geom1->dz)
+  k_new=k_old;
 
-void Particles::get_cell_numbers_new(double x1_new,double x3_new, double x1_old, double x3_old, int*i_min, int* i_max,int* k_min, int* k_max)
-{
-
-        int i_new = (int)ceil((x1_new)/geom1->dr)-1;
-        int k_new =(int)ceil((x3_new)/geom1->dz)-1;
-        int i_old = (int)ceil((x1_old)/geom1->dr)-1;
-        int k_old =(int)ceil((x3_old)/geom1->dz)-1;
-        if (x1_old==(i_old+1)*geom1->dr)
-            i_old=i_new;
-        if(x3_old==(k_old+1)*geom1->dz)
-            k_old=k_new;
-        if (x1_new==(i_new+1)*geom1->dr)
-            i_new=i_old;
-        if(x3_new==(k_new+1)*geom1->dz)
-            k_new=k_old;
-
-        int cell_value = abs(i_new-i_old)+abs(k_new-k_old);
+  int cell_value = abs(i_new-i_old)+abs(k_new-k_old);
 
   /// 4 cells
 
-    if (cell_value==0)
-    {
-      *i_min = i_new;
-    *i_max  =i_new+1;
-    *k_min = k_new;
-    *k_min = k_new+1;
+  if (cell_value==0)
+  {
 
+  cell_arr_jr[0][0]=i_new;
+  cell_arr_jr[0][1]=k_new;
+  cell_arr_jr[1][0]=i_new;
+  cell_arr_jr[1][1]=k_new+1;
 
-    }
-    /// 7 cells
-    if (cell_value==1)
-    {
-    if (i_new!=i_old)
-    {
-      int i_m = i_new;
-      if (i_new<i_old)
-      {
-        i_m=i_old;
-      }
-    *i_min = i_m-1;
-    *i_max  =i_m+1;
-    *k_min = k_new;
-    *k_max = k_new+1;
-
-    }
-    else {
-
-      int k_m = k_new;
-      if (k_new<k_old)
-      {
-        k_m=k_old;
-      }
-    *i_min = i_new;
-    *i_max  =i_new+1;
-    *k_min = k_m-1;
-    *k_max = k_m+1;
+  cell_arr_jz[0][0]=i_new;
+  cell_arr_jz[0][1]=k_new;
+  cell_arr_jz[1][0]=i_new+1;
+  cell_arr_jz[1][1]=k_new;
 
 
 
-    }
+  }
+  /// 7 cells
+  if (cell_value==1)
+  {
+  set_simple_cell(cell_arr_jr, cell_arr_jz, 0,i_old,k_old);
+  set_simple_cell(cell_arr_jr, cell_arr_jz, 2,i_new,k_new);
+
+  }
+  // 10 cells
+
+  {
+
+  if (((i_new-i_old)+(k_new-k_old))!=0)
+  {
+  set_simple_cell(cell_arr_jr, cell_arr_jz, 0,i_old,k_old);
+  set_simple_cell(cell_arr_jr, cell_arr_jz, 2,i_new,k_new);
+  int i_temp= i_new;
+  int k_temp = k_new;
+  if (i_new <i_old)
+  i_temp=i_old;
+  if (k_new <k_old)
+  k_temp=k_old;
+  set_simple_cell(cell_arr_jr, cell_arr_jz, 4,i_temp,k_temp-1);
+  set_simple_cell(cell_arr_jr, cell_arr_jz, 6,i_temp-1,k_temp);
+
+  }
+  else if (((i_new-i_old)+(k_new-k_old))==0)
+  {
+  set_simple_cell(cell_arr_jr, cell_arr_jz, 0,i_old,k_old);
+  set_simple_cell(cell_arr_jr, cell_arr_jz, 2,i_new,k_new);
+  int i_temp= i_new;
+  int k_temp = k_new;
+  if (i_new <i_old)
+  i_temp=i_old;
+  if (k_new >k_old)
+  k_temp=k_old;
+  set_simple_cell(cell_arr_jr, cell_arr_jz, 4,i_temp-1,k_temp);
+  set_simple_cell(cell_arr_jr, cell_arr_jz, 6,i_temp,k_temp+1);
+
+  }
 
 
-    }
-    // 10 cells
+  }
 
-    {
+  }
+  void Particles:: set_simple_cell(int** cell_arr_jr, int** cell_arr_jz,int start_number, int i_new, int k_new)
+  {
+  cell_arr_jr[0+start_number][0]=i_new;
+  cell_arr_jr[0+start_number][1]=k_new;
+  cell_arr_jr[1+start_number][0]=i_new;
+  cell_arr_jr[1+start_number][1]=k_new+1;
 
-    if (((i_new-i_old)+(k_new-k_old))!=0)
-    {
-       *i_max=i_new+1;
-    *i_min = i_new-1;
-    if (i_new<i_old)
-    {
-       *i_max=i_old+1;
-      * i_min = i_old-1;
-    }
+  cell_arr_jz[0+start_number][0]=i_new;
+  cell_arr_jz[0+start_number][1]=k_new;
+  cell_arr_jz[1+start_number][0]=i_new+1;
+  cell_arr_jz[1+start_number][1]=k_new;
 
-    *k_max=k_new+1;
-    *k_min=k_new-1;
-    if (i_new<i_old)
-    {
-        *k_max=k_old+1;
-        *k_min = k_old-1;
-    }
+  }
 
-    }
+  void Particles::get_cell_numbers_new(double x1_new,double x3_new, double x1_old, double x3_old, int*i_min, int* i_max,int* k_min, int* k_max)
+  {
 
-    }
-  */
+  int i_new = (int)ceil((x1_new)/geom1->dr)-1;
+  int k_new =(int)ceil((x3_new)/geom1->dz)-1;
+  int i_old = (int)ceil((x1_old)/geom1->dr)-1;
+  int k_old =(int)ceil((x3_old)/geom1->dz)-1;
+  if (x1_old==(i_old+1)*geom1->dr)
+  i_old=i_new;
+  if(x3_old==(k_old+1)*geom1->dz)
+  k_old=k_new;
+  if (x1_new==(i_new+1)*geom1->dr)
+  i_new=i_old;
+  if(x3_new==(k_new+1)*geom1->dz)
+  k_new=k_old;
+
+  int cell_value = abs(i_new-i_old)+abs(k_new-k_old);
+
+  /// 4 cells
+
+  if (cell_value==0)
+  {
+  *i_min = i_new;
+  *i_max  =i_new+1;
+  *k_min = k_new;
+  *k_min = k_new+1;
+
+
+  }
+  /// 7 cells
+  if (cell_value==1)
+  {
+  if (i_new!=i_old)
+  {
+  int i_m = i_new;
+  if (i_new<i_old)
+  {
+  i_m=i_old;
+  }
+  *i_min = i_m-1;
+  *i_max  =i_m+1;
+  *k_min = k_new;
+  *k_max = k_new+1;
+
+  }
+  else {
+
+  int k_m = k_new;
+  if (k_new<k_old)
+  {
+  k_m=k_old;
+  }
+  *i_min = i_new;
+  *i_max  =i_new+1;
+  *k_min = k_m-1;
+  *k_max = k_m+1;
+
+
+
+  }
+
+
+  }
+  // 10 cells
+
+  {
+
+  if (((i_new-i_old)+(k_new-k_old))!=0)
+  {
+  *i_max=i_new+1;
+  *i_min = i_new-1;
+  if (i_new<i_old)
+  {
+  *i_max=i_old+1;
+  * i_min = i_old-1;
+  }
+
+  *k_max=k_new+1;
+  *k_min=k_new-1;
+  if (i_new<i_old)
+  {
+  *k_max=k_old+1;
+  *k_min = k_old-1;
+  }
+
+  }
+
+  }
+*/
