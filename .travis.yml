@@ -1,12 +1,12 @@
 language: cpp
-compiler: gcc
-sudo: false # required
+sudo: false
 
 matrix:
   include:
     ## GCC
     # works on Precise and Trusty
     - os: linux
+      compiler: gcc-4.9
       addons:
         apt:
           sources:
@@ -14,10 +14,13 @@ matrix:
           packages:
             - g++-4.9
       env:
-        - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9 && CFLAGS=-m64"
+        - REAL_CC=gcc-4.9
+        - REAL_CXX=g++-4.9
+        - CFLAGS=-m64
 
     # works on Precise and Trusty
     - os: linux
+      compiler: gcc-7
       addons:
         apt:
           sources:
@@ -25,11 +28,13 @@ matrix:
           packages:
             - g++-7
       env:
-        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
+        - REAL_CC=gcc-7
+        - REAL_CXX=g++-7
 
     ## CLANG
     # works on Trusty
     - os: linux
+      compiler: clang-3.9
       addons:
         apt:
           sources:
@@ -39,10 +44,14 @@ matrix:
             - libiomp5
             - libiomp-dev
       env:
-        - MATRIX_EVAL="CC=clang-3.9 && CXX=clang++-3.9 && CFLAGS_OPENMP=-fopenmp=libiomp5 && CFLAGS=-m64"
+        - REAL_CC=clang-3.9
+        - REAL_CXX=clang++-3.9
+        - CFLAGS_OPENMP=-fopenmp=libiomp5
+        - CFLAGS=-m64
 
     # works on Trusty
     - os: linux
+      compiler: clang-5.0
       addons:
         apt:
           sources:
@@ -52,21 +61,27 @@ matrix:
             - libiomp5
             - libiomp-dev
       env:
-        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0 && CFLAGS_OPENMP=-fopenmp=libiomp5 && CFLAGS=-m64"
+        - REAL_CC=clang-5.0
+        - REAL_CXX=clang++-5.0
+        - CFLAGS_OPENMP=-fopenmp=libiomp5
+        - CFLAGS=-m64
 
 install:
   - git submodule update --init
 
-before_script:
+before_install:
   - echo 'Europe/Kiev' | sudo tee /etc/timezone
-  - eval "${MATRIX_EVAL}"
+
+before_script:
+  - export CC=${REAL_CC}
+  - export CXX=${REAL_CXX}
 
 script:
   - |
     if [ $TRAVIS_BRANCH = 'master' ]; then
-    make test-ext CFLAGS_OPENMP=${CFLAGS_OPENMP} CFLAGS=${CFLAGS};
+      make test-ext CFLAGS_OPENMP=${CFLAGS_OPENMP} CFLAGS=${CFLAGS};
     else
-    make test CFLAGS_OPENMP=${CFLAGS_OPENMP} CFLAGS=${CFLAGS};
+      make test CFLAGS_OPENMP=${CFLAGS_OPENMP} CFLAGS=${CFLAGS};
     fi
 
 after_script:
