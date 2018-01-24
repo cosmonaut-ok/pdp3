@@ -8,6 +8,8 @@ sys.path.append(current_dir)
 
 from parameters import Parameters
 
+from pdp3_plot_builder import PDP3PlotBuilder
+
 import argparse
 
 from numpy import *
@@ -18,8 +20,8 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as ani
 
 class Pdp3Movie:
-    def __init__(self, xml_config_file, video_file=None, clim_e1=[0,1], clim_e3=[0,1]):
-        self.__cfg = Parameters(xml_config_file, clim_e1, clim_e3, video_file)
+    def __init__(self, cfg): # xml_config_file, video_file=None, clim_er=[0,1], clim_ez=[0,1]):
+        self.__cfg = cfg # Parameters(xml_config_file, clim_er, clim_ez, video_file)
 
         ## define data files
         self.__data_file_e1 = os.path.join(self.__cfg.data_path, 'e1')
@@ -27,62 +29,49 @@ class Pdp3Movie:
         self.__data_file_rho_beam = os.path.join(self.__cfg.data_path, 'rho_beam')
 
         # %% set number of marks with names in X and Y axes
-        x_ticks_number = 10;
-        y_ticks_number = 4;
+        # x_ticks_number = 10;
+        # y_ticks_number = 4;
         # %% Titles and Ticks
-        self.__x_axe_title = 'Z(m)';
-        self.__y_axe_title = 'R(m)';
-        self.__x_tick_range = linspace(0, self.__cfg.z_size, x_ticks_number) # we need 10 (or x_ticks_number) ticks
-        self.__x_tick_gird_size = linspace(0, self.__cfg.z_grid_count, x_ticks_number) # from 0 to x_tick_max. it's required
-        self.__y_tick_range = linspace(0, self.__cfg.r_size, y_ticks_number) # to convert gird to real size (meters)
-        self.__y_tick_gird_size = linspace(0, self.__cfg.r_grid_count, y_ticks_number) # Same for X and Y axes
+        # self.__x_axe_title = 'Z(m)';
+        # self.__y_axe_title = 'R(m)';
+        # self.__x_tick_range = linspace(0, self.__cfg.z_size, x_ticks_number) # we need 10 (or x_ticks_number) ticks
+        # self.__x_tick_gird_size = linspace(0, self.__cfg.z_grid_count, x_ticks_number) # from 0 to x_tick_max. it's required
+        # self.__y_tick_range = linspace(0, self.__cfg.r_size, y_ticks_number) # to convert gird to real size (meters)
+        # self.__y_tick_gird_size = linspace(0, self.__cfg.r_grid_count, y_ticks_number) # Same for X and Y axes
 
         self.cmap = 'gray'
         self.video_codec = 'mjpeg'
         self.video_fps = 30
-        self.video_dpi = 100
+        self.video_dpi = 600
 
-        self.__figure = plt.figure(figsize=(10.50, 7.00), dpi=self.video_dpi)
+        self.__plot_builder = PDP3PlotBuilder(self.__cfg)
+        self.__plot_builder.setup_figure()
 
+        self.E_r_plot_name = 'E_r'
+        self.E_z_plot_name = 'E_z'
+        self.E_rho_beam_plot_name = 'RHO_beam'
 
-    def __setup_subplot(self, subplot_number, clim, interpolation_type):
-        a1 = self.__figure.add_subplot(subplot_number)
-        a1.set_aspect('equal')
-        ax1 = a1.get_xaxis()
-        ay1 = a1.get_yaxis()
-        a1.invert_yaxis()
-        im1 = a1.imshow(rand(self.__cfg.r_grid_count,self.__cfg.z_grid_count),cmap=self.cmap,interpolation=interpolation_type)
-        im1.set_clim(clim)
-        return a1
-
-    def __setup_figure(self):
-
-        interpolation_type = 'nearest'
-
-        self.__figure.set_size_inches([10,5])
-
-        # tight_layout()
-
-        a1 = self.__setup_subplot(311, self.__cfg.clim_e_field_r, interpolation_type)
-        a2 = self.__setup_subplot(312, self.__cfg.clim_e_field_z, interpolation_type)
-        a3 = self.__setup_subplot(313, self.__cfg.clim_e_field_bunch, interpolation_type)
-        return a1, a2, a3
+        self.__plot_builder.add_subplot_with_image(self.E_r_plot_name, 311,
+                                                   cmap=self.cmap, clim=self.__cfg.clim_e_field_r)
+        self.__plot_builder.add_subplot_with_image(self.E_z_plot_name, 312,
+                                                   cmap=self.cmap, clim=self.__cfg.clim_e_field_z)
+        self.__plot_builder.add_subplot_with_image(self.E_rho_beam_plot_name, 313,
+                                                   cmap=self.cmap, clim=self.__cfg.clim_e_field_bunch)
 
     def create_movie_with_3_plots(self):
-        a1, a2, a3 = self.__setup_figure()
-        self.__figure.show()
+        # im1, im2, im3 = self.__setup_figure()
+        self.__plot_builder.figure.show()
         ###########
         fpf = self.__cfg.frames_per_file
         sr = self.__cfg.r_grid_count
         sz = self.__cfg.z_grid_count
 
-
         FFMpegWriter = ani.writers['ffmpeg']
         metadata = dict(title='Movie Test', artist='Matplotlib',
                         comment='Movie support!')
-        writer = FFMpegWriter(fps=self.video_fps, metadata=metadata, codec=self.video_codec)
+        writer = FFMpegWriter(fps=self.video_fps, metadata=metadata, codec=self.video_codec, bitrate=20000)
 
-        with writer.saving(self.__figure, self.__cfg.movie_file, self.video_dpi):
+        with writer.saving(self.__plot_builder.figure, self.__cfg.movie_file, self.video_dpi):
             for k in range(0, fpf):
                 tstart = k*fpf # k=2 -> 200
                 tend = ((k+1)*fpf-1)
@@ -115,26 +104,27 @@ class Pdp3Movie:
 
                     print("Processing frame %d" % (local_step))
 
+                    rstart = sr*sz*local_step+1
+                    rend = sr*sz*(local_step+1)+1
                     try:
-                        h_field_shot1 = h_field_e1[sr*sz*local_step+1:sr*sz*(local_step+1)+1]
-                        h_field_matrix1 = flipud(reshape(h_field_shot1, (sr, sz)))
+                        self.__plot_builder.fill_image_with_data(
+                            self.E_z_plot_name,
+                            h_field_e1[rstart:rend])
 
-                        h_field_shot2 = h_field_e3[sr*sz*local_step+1:sr*sz*(local_step+1)+1]
-                        h_field_matrix2 = flipud(reshape(h_field_shot2, (sr, sz)))
+                        self.__plot_builder.fill_image_with_data(
+                            self.E_r_plot_name,
+                            h_field_e3[rstart:rend])
 
-                        h_field_shot3 = h_field_rho_beam[sr*sz*local_step+1:sr*sz*(local_step+1)+1]
-                        h_field_matrix3 = flipud(reshape(h_field_shot3, (sr, sz)))
-                    except:
+                        self.__plot_builder.fill_image_with_data(
+                            self.E_rho_beam_plot_name,
+                            h_field_rho_beam[rstart:rend])
+
+                    except ValueError: ## skip frame, when data is inconsistent
                         break
 
-                    interpolation_type = 'nearest'
-                    a1.imshow(h_field_matrix1, cmap=self.cmap, interpolation=interpolation_type)
-                    a2.imshow(h_field_matrix2, cmap=self.cmap, interpolation=interpolation_type)
-                    a3.imshow(h_field_matrix3, cmap=self.cmap, interpolation=interpolation_type)
                     writer.grab_frame()
-                self.__figure.canvas.draw()
-                self.__figure.canvas.flush_events()
 
+                    # self.__plot_builder.redraw()
 
 def main():
     parser = argparse.ArgumentParser(description='Process some integers.')
@@ -158,14 +148,17 @@ def main():
                         help='Color limit range for rho_beam. Default: -1e-7:0. Not implemented')
 
     args = parser.parse_args()
-    print(args)
+    # print(args)
 
-    clim_e1 = list(map(int, args.clim_e1.split(':'))) if args.clim_e1 else [0,1]
-    clim_e3 = list(map(int, args.clim_e3.split(':'))) if args.clim_e3 else [0,1]
-    clim_rho_beam = list(map(int, args.clim_rho_beam.split(':'))) if args.clim_rho_beam else [-1e-7, 0]
+    clim_e1 = list(map(int, args.clim_e1.split(':'))) if args.clim_e1 else [-1e5, 1e5]
+    clim_e3 = list(map(int, args.clim_e3.split(':'))) if args.clim_e3 else [-1e5, 1e5]
+    # clim_rho_beam = list(map(int, args.clim_rho_beam.split(':'))) if args.clim_rho_beam else [-1e-7, 0]
     file_delta = 100
 
-    movie = Pdp3Movie(args.properties_path, video_file=args.video_file, clim_e1=clim_e1, clim_e3=clim_e3)
+    ## initialize config
+    config = Parameters(args.properties_path, args.video_file, clim_e1, clim_e3)
+
+    movie = Pdp3Movie(config)
     movie.create_movie_with_3_plots()
 
 

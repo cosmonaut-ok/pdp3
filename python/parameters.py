@@ -16,7 +16,7 @@ from xml.dom import minidom
 # import matplotlib.animation as ani
 
 class Parameters:
-    def __init__(self, parameters_file, clim_e_field_r=[0,1], clim_e_field_z=[0,1], movie_file=None):
+    def __init__(self, parameters_file, movie_file=None, clim_e_field_r=[0,1], clim_e_field_z=[0,1]):
         '''
         + r_size
         + z_size
