@@ -42,7 +42,8 @@ class Pdp3Movie:
         self.cmap = 'gray'
         self.video_codec = 'mjpeg'
         self.video_fps = 30
-        self.video_dpi = 600
+        self.video_dpi = 100
+        self.video_bitrate=32000
 
         self.__plot_builder = PDP3PlotBuilder(self.__cfg)
         self.__plot_builder.setup_figure()
@@ -69,11 +70,14 @@ class Pdp3Movie:
         FFMpegWriter = ani.writers['ffmpeg']
         metadata = dict(title='Movie Test', artist='Matplotlib',
                         comment='Movie support!')
-        writer = FFMpegWriter(fps=self.video_fps, metadata=metadata, codec=self.video_codec, bitrate=20000)
+        writer = FFMpegWriter(fps=self.video_fps,
+                              metadata=metadata,
+                              codec=self.video_codec,
+                              bitrate=self.video_bitrate)
 
         with writer.saving(self.__plot_builder.figure, self.__cfg.movie_file, self.video_dpi):
             for k in range(0, fpf):
-                tstart = k*fpf # k=2 -> 200
+                tstart = k*fpf
                 tend = ((k+1)*fpf-1)
                 i = 1;
 
