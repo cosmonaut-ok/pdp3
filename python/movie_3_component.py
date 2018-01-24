@@ -37,11 +37,13 @@ class Pdp3Movie:
         self.__y_tick_range = linspace(0, self.__cfg.r_size, y_ticks_number) # to convert gird to real size (meters)
         self.__y_tick_gird_size = linspace(0, self.__cfg.r_grid_count, y_ticks_number) # Same for X and Y axes
 
-        self.__figure = plt.figure()
-
         self.cmap = 'gray'
-        self.video_codec = 'rawvideo'
-        self.video_fps = 15
+        self.video_codec = 'mjpeg'
+        self.video_fps = 30
+        self.video_dpi = 100
+
+        self.__figure = plt.figure(figsize=(10.50, 7.00), dpi=self.video_dpi)
+
 
     def __setup_subplot(self, subplot_number, clim, interpolation_type):
         a1 = self.__figure.add_subplot(subplot_number)
@@ -80,7 +82,7 @@ class Pdp3Movie:
                         comment='Movie support!')
         writer = FFMpegWriter(fps=self.video_fps, metadata=metadata, codec=self.video_codec)
 
-        with writer.saving(self.__figure, self.__cfg.movie_file, 100):
+        with writer.saving(self.__figure, self.__cfg.movie_file, self.video_dpi):
             for k in range(0, fpf):
                 tstart = k*fpf # k=2 -> 200
                 tend = ((k+1)*fpf-1)
