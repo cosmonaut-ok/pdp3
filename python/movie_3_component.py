@@ -17,12 +17,6 @@ from pylab import *
 import matplotlib.pyplot as plt
 import matplotlib.animation as ani
 
-
-
-
-# import matplotlib.pyplot as pyplot
-# import matplotlib.animation as animation
-
 class Pdp3Movie:
     def __init__(self, xml_config_file, video_file=None, clim_e1=[0,1], clim_e3=[0,1]):
         self.__cfg = Parameters(xml_config_file, clim_e1, clim_e3, video_file)
@@ -46,6 +40,8 @@ class Pdp3Movie:
         self.__figure = plt.figure()
 
         self.cmap = 'gray'
+        self.video_codec = 'rawvideo'
+        self.video_fps = 15
 
     def __setup_subplot(self, subplot_number, clim, interpolation_type):
         a1 = self.__figure.add_subplot(subplot_number)
@@ -78,51 +74,62 @@ class Pdp3Movie:
         sr = self.__cfg.r_grid_count
         sz = self.__cfg.z_grid_count
 
-        for k in range(0, fpf):
-            tstart = k*fpf # k=2 -> 200
-            tend = ((k+1)*fpf-1)
-            i = 1;
 
-            if not os.path.isfile(self.__data_file_e1 + str(k)) \
-               or not os.path.isfile(self.__data_file_e3 + str(k)) \
-               or not os.path.isfile(self.__data_file_rho_beam + str(k)):
-                print('No more data files exists. Exiting')
-                return
+        FFMpegWriter = ani.writers['ffmpeg']
+        metadata = dict(title='Movie Test', artist='Matplotlib',
+                        comment='Movie support!')
+        writer = FFMpegWriter(fps=self.video_fps, metadata=metadata, codec=self.video_codec)
 
-            print("Loading files set", k)
-            ## Open data files
-            fidh_e1 = open(self.__data_file_e1 + str(k), 'r')
-            fidh_e3 = open(self.__data_file_e3 + str(k), 'r')
-            fidh_rho_beam = open(self.__data_file_rho_beam + str(k), 'r')
+        with writer.saving(self.__figure, self.__cfg.movie_file, 100):
+            for k in range(0, fpf):
+                tstart = k*fpf # k=2 -> 200
+                tend = ((k+1)*fpf-1)
+                i = 1;
 
-            print(sr*sz*fpf)
-            h_field_e1 = fromfile(fidh_e1, dtype=float, count=sr*sz*fpf, sep=' ')
-            h_field_e3 = fromfile(fidh_e3, dtype=float, count=sr*sz*fpf, sep=' ')
-            h_field_rho_beam = fromfile(fidh_rho_beam, dtype=float, count=sr*sz*fpf, sep=' ')
+                if not os.path.isfile(self.__data_file_e1 + str(k)) \
+                   or not os.path.isfile(self.__data_file_e3 + str(k)) \
+                   or not os.path.isfile(self.__data_file_rho_beam + str(k)):
+                    print('No more data files exists. Exiting')
+                    return
 
-            ## Close data files
-            fidh_e1.close()
-            fidh_e3.close()
-            fidh_rho_beam.close()
+                print("Loading files set", k)
+                ## Open data files
+                fidh_e1 = open(self.__data_file_e1 + str(k), 'r')
+                fidh_e3 = open(self.__data_file_e3 + str(k), 'r')
+                fidh_rho_beam = open(self.__data_file_rho_beam + str(k), 'r')
 
-            for t in range(tstart, tend):
-                local_step = t % fpf
+                print(sr*sz*fpf)
+                h_field_e1 = fromfile(fidh_e1, dtype=float, count=sr*sz*fpf, sep=' ')
+                h_field_e3 = fromfile(fidh_e3, dtype=float, count=sr*sz*fpf, sep=' ')
+                h_field_rho_beam = fromfile(fidh_rho_beam, dtype=float, count=sr*sz*fpf, sep=' ')
 
-                print("Processing frame %d" % (local_step))
+                ## Close data files
+                fidh_e1.close()
+                fidh_e3.close()
+                fidh_rho_beam.close()
 
-                h_field_shot1 = h_field_e1[sr*sz*local_step+1:sr*sz*(local_step+1)+1]
-                h_field_matrix1 = flipud(reshape(h_field_shot1, (sr, sz)))
+                for t in range(tstart, tend):
+                    local_step = t % fpf
 
-                h_field_shot2 = h_field_e3[sr*sz*local_step+1:sr*sz*(local_step+1)+1]
-                h_field_matrix2 = flipud(reshape(h_field_shot2, (sr, sz)))
+                    print("Processing frame %d" % (local_step))
 
-                h_field_shot3 = h_field_rho_beam[sr*sz*local_step+1:sr*sz*(local_step+1)+1]
-                h_field_matrix3 = flipud(reshape(h_field_shot3, (sr, sz)))
+                    try:
+                        h_field_shot1 = h_field_e1[sr*sz*local_step+1:sr*sz*(local_step+1)+1]
+                        h_field_matrix1 = flipud(reshape(h_field_shot1, (sr, sz)))
 
-                interpolation_type = 'nearest'
-                a1.imshow(h_field_matrix1, cmap=self.cmap, interpolation=interpolation_type)
-                a2.imshow(h_field_matrix2, cmap=self.cmap, interpolation=interpolation_type)
-                a3.imshow(h_field_matrix3, cmap=self.cmap, interpolation=interpolation_type)
+                        h_field_shot2 = h_field_e3[sr*sz*local_step+1:sr*sz*(local_step+1)+1]
+                        h_field_matrix2 = flipud(reshape(h_field_shot2, (sr, sz)))
+
+                        h_field_shot3 = h_field_rho_beam[sr*sz*local_step+1:sr*sz*(local_step+1)+1]
+                        h_field_matrix3 = flipud(reshape(h_field_shot3, (sr, sz)))
+                    except:
+                        break
+
+                    interpolation_type = 'nearest'
+                    a1.imshow(h_field_matrix1, cmap=self.cmap, interpolation=interpolation_type)
+                    a2.imshow(h_field_matrix2, cmap=self.cmap, interpolation=interpolation_type)
+                    a3.imshow(h_field_matrix3, cmap=self.cmap, interpolation=interpolation_type)
+                    writer.grab_frame()
                 self.__figure.canvas.draw()
                 self.__figure.canvas.flush_events()
 
