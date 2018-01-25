@@ -3,12 +3,8 @@
 import os
 # import argparse
 
-
-
-
-
 from xml.dom import minidom
-# from numpy import *
+from numpy import *
 # from pylab import *
 
 # from matplotlib import *
@@ -103,9 +99,7 @@ class Parameters:
         self.clim_e_field_z = clim_e_field_z # z-component of E field
         self.clim_e_field_bunch = [-(bunch_density*1.6e-19), 0] # E field of electron/ion bunch
 
-
         # clim_rho_beam = [-(bunch_density*1.6e-19) 0];
-
 
         # self.__data_file_e_field_r = os.path.join(self.__data_path, 'e_field_r')
         # self.__data_file_e_field_z = os.path.join(self.__data_path, 'e_field_z')

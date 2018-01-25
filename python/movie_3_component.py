@@ -48,16 +48,26 @@ class Pdp3Movie:
         self.__plot_builder = PDP3PlotBuilder(self.__cfg)
         self.__plot_builder.setup_figure()
 
-        self.E_r_plot_name = 'E_r'
-        self.E_z_plot_name = 'E_z'
-        self.E_rho_beam_plot_name = 'RHO_beam'
+        self.E_r_plot_name = r'$E_r$'
+        self.E_z_plot_name = r'$E_z$'
+        self.E_rho_beam_plot_name = r'$\rho_{beam}$'
 
+        ## setup plot properties
         self.__plot_builder.add_subplot_with_image(self.E_r_plot_name, 311,
                                                    cmap=self.cmap, clim=self.__cfg.clim_e_field_r)
+        self.__plot_builder.setup_subplot(self.E_r_plot_name, x_axe_label='Z (m)', y_axe_label='R (m)')
+        self.__plot_builder.add_colorbar(self.E_r_plot_name, ticks=self.__cfg.clim_e_field_r, title=r'$V/m$')
+
         self.__plot_builder.add_subplot_with_image(self.E_z_plot_name, 312,
                                                    cmap=self.cmap, clim=self.__cfg.clim_e_field_z)
+        self.__plot_builder.setup_subplot(self.E_z_plot_name, x_axe_label='Z (m)', y_axe_label='R (m)')
+        self.__plot_builder.add_colorbar(self.E_z_plot_name, ticks=self.__cfg.clim_e_field_z, title=r'$V/m$')
+
         self.__plot_builder.add_subplot_with_image(self.E_rho_beam_plot_name, 313,
                                                    cmap=self.cmap, clim=self.__cfg.clim_e_field_bunch)
+        self.__plot_builder.setup_subplot(self.E_rho_beam_plot_name, x_axe_label='Z (m)', y_axe_label='R (m)')
+        self.__plot_builder.add_colorbar(self.E_rho_beam_plot_name, ticks=self.__cfg.clim_e_field_bunch, title=r'$V/m$')
+
 
     def create_movie_with_3_plots(self):
         # im1, im2, im3 = self.__setup_figure()
@@ -93,7 +103,6 @@ class Pdp3Movie:
                 fidh_e3 = open(self.__data_file_e3 + str(k), 'r')
                 fidh_rho_beam = open(self.__data_file_rho_beam + str(k), 'r')
 
-                print(sr*sz*fpf)
                 h_field_e1 = fromfile(fidh_e1, dtype=float, count=sr*sz*fpf, sep=' ')
                 h_field_e3 = fromfile(fidh_e3, dtype=float, count=sr*sz*fpf, sep=' ')
                 h_field_rho_beam = fromfile(fidh_rho_beam, dtype=float, count=sr*sz*fpf, sep=' ')
@@ -128,7 +137,7 @@ class Pdp3Movie:
 
                     writer.grab_frame()
 
-                    # self.__plot_builder.redraw()
+                    self.__plot_builder.redraw()
 
 def main():
     parser = argparse.ArgumentParser(description='Process some integers.')
