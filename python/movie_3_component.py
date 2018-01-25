@@ -52,21 +52,28 @@ class Pdp3Movie:
         self.E_z_plot_name = r'$E_z$'
         self.E_rho_beam_plot_name = r'$\rho_{beam}$'
 
+        x_axis_label = r'$Z (m)$'
+        y_axis_label = r'$R (m)$'
+        cbar_axis_label = r'$\frac{V}{m}$'
+
         ## setup plot properties
         self.__plot_builder.add_subplot_with_image(self.E_r_plot_name, 311,
                                                    cmap=self.cmap, clim=self.__cfg.clim_e_field_r)
-        self.__plot_builder.setup_subplot(self.E_r_plot_name, x_axe_label='Z (m)', y_axe_label='R (m)')
-        self.__plot_builder.add_colorbar(self.E_r_plot_name, ticks=self.__cfg.clim_e_field_r, title=r'$V/m$')
+        self.__plot_builder.setup_subplot(self.E_r_plot_name, x_axe_label=x_axis_label, y_axe_label=y_axis_label)
+        self.__plot_builder.add_colorbar(self.E_r_plot_name, ticks=self.__cfg.clim_e_field_r, title=cbar_axis_label)
 
         self.__plot_builder.add_subplot_with_image(self.E_z_plot_name, 312,
                                                    cmap=self.cmap, clim=self.__cfg.clim_e_field_z)
-        self.__plot_builder.setup_subplot(self.E_z_plot_name, x_axe_label='Z (m)', y_axe_label='R (m)')
-        self.__plot_builder.add_colorbar(self.E_z_plot_name, ticks=self.__cfg.clim_e_field_z, title=r'$V/m$')
+        self.__plot_builder.setup_subplot(self.E_z_plot_name, x_axe_label=x_axis_label, y_axe_label=y_axis_label)
+        self.__plot_builder.add_colorbar(self.E_z_plot_name, ticks=self.__cfg.clim_e_field_z, title=cbar_axis_label)
 
         self.__plot_builder.add_subplot_with_image(self.E_rho_beam_plot_name, 313,
                                                    cmap=self.cmap, clim=self.__cfg.clim_e_field_bunch)
-        self.__plot_builder.setup_subplot(self.E_rho_beam_plot_name, x_axe_label='Z (m)', y_axe_label='R (m)')
-        self.__plot_builder.add_colorbar(self.E_rho_beam_plot_name, ticks=self.__cfg.clim_e_field_bunch, title=r'$V/m$')
+        self.__plot_builder.setup_subplot(self.E_rho_beam_plot_name, x_axe_label=x_axis_label, y_axe_label=y_axis_label)
+        self.__plot_builder.add_colorbar(self.E_rho_beam_plot_name,
+                                         ticks=self.__cfg.clim_e_field_bunch,
+                                         ticklabels=[self.__cfg.bunch_density, 0],
+                                         title=cbar_axis_label)
 
 
     def create_movie_with_3_plots(self):
@@ -84,7 +91,8 @@ class Pdp3Movie:
                               metadata=metadata,
                               codec=self.video_codec,
                               bitrate=self.video_bitrate)
-
+        input()
+        exit(0)
         with writer.saving(self.__plot_builder.figure, self.__cfg.movie_file, self.video_dpi):
             for k in range(0, fpf):
                 tstart = k*fpf
