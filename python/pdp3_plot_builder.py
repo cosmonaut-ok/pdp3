@@ -55,6 +55,8 @@ class PDP3PlotBuilder:
         subplot and image parameters configures, using 'parameters' module
         also, this function adds subplot and image objects to plot builder's dictionary
         for quick access
+
+        FYI: cmap reference: https://matplotlib.org/examples/color/colormaps_reference.html
         '''
 
         interpolation_type = 'nearest'
@@ -75,7 +77,7 @@ class PDP3PlotBuilder:
 
         return subplot, image
 
-    def setup_subplot(self, name, title=None, x_axe_label='X', y_axe_label='Y'):
+    def setup_subplot(self, name, title=None, x_axe_label='X', y_axe_label='Y', tickbox=False, grid=False, position=None):
         ''' wrapper for configuration subplot properties '''
         axes = self.get_subplot(name)
 
@@ -110,9 +112,14 @@ class PDP3PlotBuilder:
         axes.set_yticklabels(y_tick_range)
 
         # axes.xticks(rotation=90)
+        axes.spines['top'].set_visible(tickbox)
+        axes.spines['right'].set_visible(tickbox)
 
-        axes.spines['top'].set_visible(False)
-        axes.spines['right'].set_visible(False)
+        axes.grid(grid)
+
+        if position:
+            axes.set_position(position)
+
 
     def add_colorbar(self, name, title=None, ticks=[-1, 1], ticklabels=None):
         ''' add colorbar to selected image and set it's properties '''
@@ -135,9 +142,10 @@ class PDP3PlotBuilder:
 
         __ticklabels = list(map(format_s, _ticklabels))
 
-        cbar.set_label(__title, rotation=0)
+        cbar.set_label(__title, rotation=45)
         cbar.set_ticks(__ticks)
         cbar.set_ticklabels(__ticklabels)
+        cbar.ax.tick_params(labelsize=6)
 
 
 

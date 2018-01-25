@@ -19,6 +19,10 @@ from pylab import *
 import matplotlib.pyplot as plt
 import matplotlib.animation as ani
 
+## README:
+## color map reference: https://matplotlib.org/examples/color/colormaps_reference.html
+## mathtext reference:  https://matplotlib.org/users/mathtext.html
+
 class Pdp3Movie:
     def __init__(self, cfg): # xml_config_file, video_file=None, clim_er=[0,1], clim_ez=[0,1]):
         self.__cfg = cfg # Parameters(xml_config_file, clim_er, clim_ez, video_file)
@@ -48,37 +52,40 @@ class Pdp3Movie:
         self.__plot_builder = PDP3PlotBuilder(self.__cfg)
         self.__plot_builder.setup_figure()
 
-        self.E_r_plot_name = r'$E_r$'
-        self.E_z_plot_name = r'$E_z$'
-        self.E_rho_beam_plot_name = r'$\rho_{beam}$'
+        self.E_r_plot_name = r'$\mathbf{Electrical\enspace Field\enspace Radial\enspace Component}\enspace(E_r)$'
+        self.E_z_plot_name = r'$\mathbf{Electrical\enspace Field\enspace Longitudal\enspace Component}\enspace(E_z)$'
+        self.E_rho_beam_plot_name = r'$\mathbf{Electron\enspace Bunch\enspace Density}\enspace (\rho_{bunch})$'
 
-        x_axis_label = r'$Z (m)$'
-        y_axis_label = r'$R (m)$'
+        x_axis_label = r'$\mathit{Z (m)}$'
+        y_axis_label = r'$\mathit{R (m)}$'
         cbar_axis_label = r'$\frac{V}{m}$'
 
         ## setup plot properties
         self.__plot_builder.add_subplot_with_image(self.E_r_plot_name, 311,
                                                    cmap=self.cmap, clim=self.__cfg.clim_e_field_r)
-        self.__plot_builder.setup_subplot(self.E_r_plot_name, x_axe_label=x_axis_label, y_axe_label=y_axis_label)
+        self.__plot_builder.setup_subplot(self.E_r_plot_name, x_axe_label=x_axis_label,
+                                          y_axe_label=y_axis_label, position=[0.1, 0.70, 0.8, 0.3])
         self.__plot_builder.add_colorbar(self.E_r_plot_name, ticks=self.__cfg.clim_e_field_r, title=cbar_axis_label)
 
         self.__plot_builder.add_subplot_with_image(self.E_z_plot_name, 312,
                                                    cmap=self.cmap, clim=self.__cfg.clim_e_field_z)
-        self.__plot_builder.setup_subplot(self.E_z_plot_name, x_axe_label=x_axis_label, y_axe_label=y_axis_label)
+        self.__plot_builder.setup_subplot(self.E_z_plot_name, x_axe_label=x_axis_label,
+                                          y_axe_label=y_axis_label, position=[0.1, 0.35, 0.8, 0.3])
         self.__plot_builder.add_colorbar(self.E_z_plot_name, ticks=self.__cfg.clim_e_field_z, title=cbar_axis_label)
 
         self.__plot_builder.add_subplot_with_image(self.E_rho_beam_plot_name, 313,
                                                    cmap=self.cmap, clim=self.__cfg.clim_e_field_bunch)
-        self.__plot_builder.setup_subplot(self.E_rho_beam_plot_name, x_axe_label=x_axis_label, y_axe_label=y_axis_label)
+        self.__plot_builder.setup_subplot(self.E_rho_beam_plot_name, x_axe_label=x_axis_label,
+                                          y_axe_label=y_axis_label, position=[0.1, 0.01, 0.8, 0.3])
         self.__plot_builder.add_colorbar(self.E_rho_beam_plot_name,
                                          ticks=self.__cfg.clim_e_field_bunch,
                                          ticklabels=[self.__cfg.bunch_density, 0],
-                                         title=cbar_axis_label)
+                                         title=r'$m^-3$')
 
-
-    def create_movie_with_3_plots(self):
+    def create_movie_with_3_plots(self, view=False):
         # im1, im2, im3 = self.__setup_figure()
-        self.__plot_builder.figure.show()
+        if view:
+            self.__plot_builder.figure.show()
         ###########
         fpf = self.__cfg.frames_per_file
         sr = self.__cfg.r_grid_count
@@ -143,8 +150,8 @@ class Pdp3Movie:
                         break
 
                     writer.grab_frame()
-
-                    self.__plot_builder.redraw()
+                    if view:
+                        self.__plot_builder.redraw()
 
 def main():
     parser = argparse.ArgumentParser(description='Process some integers.')
@@ -158,6 +165,8 @@ def main():
     #                     help='Full path to properties.xml')
 
     ## video_file=None, file_delta=100, clim_e1=[0,1], clim_e3=[0,1], clim_rho_beam=[-1e-7, 0]):
+
+    parser.add_argument('--view', action='store_true')
 
 
     parser.add_argument('--clim_e1', type=str,
@@ -179,7 +188,7 @@ def main():
     config = Parameters(args.properties_path, args.video_file, clim_e1, clim_e3)
 
     movie = Pdp3Movie(config)
-    movie.create_movie_with_3_plots()
+    movie.create_movie_with_3_plots(args.view)
 
 
 
