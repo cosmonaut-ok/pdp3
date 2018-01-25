@@ -15,6 +15,8 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
 from matplotlib import rc
 
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+
 class PDP3PlotBuilder:
     def __init__(self, cfg):
         self.__cfg = cfg
@@ -116,8 +118,11 @@ class PDP3PlotBuilder:
         ''' add colorbar to selected image and set it's properties '''
 
         image = self.get_image(name)
-        # axes = self.get_subplot(name)
-        cbar = self.figure.colorbar(image) # , ax = axes)
+        ax = self.get_subplot(name)
+        divider = make_axes_locatable(ax)
+        cax = divider.append_axes("right", size="2%", pad=0.05)
+
+        cbar = self.figure.colorbar(image, cax=cax) # , ax = axes)
 
         label_count = 3
 
@@ -133,6 +138,9 @@ class PDP3PlotBuilder:
         cbar.set_label(__title, rotation=0)
         cbar.set_ticks(__ticks)
         cbar.set_ticklabels(__ticklabels)
+
+
+
         ## set sci limit to 100. More, than 1000 should be printed in format XeY
         # cbar.formatter.set_powerlimits([-0, 0])
 
