@@ -91,8 +91,7 @@ class Pdp3Movie:
                               metadata=metadata,
                               codec=self.video_codec,
                               bitrate=self.video_bitrate)
-        input()
-        exit(0)
+
         with writer.saving(self.__plot_builder.figure, self.__cfg.movie_file, self.video_dpi):
             for k in range(0, fpf):
                 tstart = k*fpf
@@ -105,7 +104,7 @@ class Pdp3Movie:
                     print('No more data files exists. Exiting')
                     return
 
-                print("Loading files set", k)
+                print("Loading files set %d" % (k))
                 ## Open data files
                 fidh_e1 = open(self.__data_file_e1 + str(k), 'r')
                 fidh_e3 = open(self.__data_file_e3 + str(k), 'r')
