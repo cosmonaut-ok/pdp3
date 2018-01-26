@@ -3,93 +3,108 @@
 import sys
 import os
 
-current_dir = os.path.dirname(os.path.abspath('__file__'))
-sys.path.append(current_dir)
-
-from parameters import Parameters
-
-from pdp3_plot_builder import PDP3PlotBuilder
-
 import argparse
 
 from numpy import *
 from pylab import *
 
-# from matplotlib import *
 import matplotlib.pyplot as plt
 import matplotlib.animation as ani
+
+from parameters import Parameters
+from pdp3_plot_builder import PDP3PlotBuilder
 
 ## README:
 ## color map reference: https://matplotlib.org/examples/color/colormaps_reference.html
 ## mathtext reference:  https://matplotlib.org/users/mathtext.html
 
 class Pdp3Movie:
-    def __init__(self, cfg): # xml_config_file, video_file=None, clim_er=[0,1], clim_ez=[0,1]):
-        self.__cfg = cfg # Parameters(xml_config_file, clim_er, clim_ez, video_file)
+    def __init__(self, cfg):
+        ## define private object fields
+        self.__cfg = cfg
+        self.__plot_builder = PDP3PlotBuilder(self.__cfg)
 
-        ## define data files
-        self.__data_file_e1 = os.path.join(self.__cfg.data_path, 'e1')
-        self.__data_file_e3 = os.path.join(self.__cfg.data_path, 'e3')
-        self.__data_file_rho_beam = os.path.join(self.__cfg.data_path, 'rho_beam')
+        ## define public object fields
+        self.data_file_e_r_pattern = 'e_r'
+        self.data_file_e_z_pattern = 'e_z'
+        self.data_file_e_bunch_density_pattern = 'bunch_density'
 
-        # %% set number of marks with names in X and Y axes
-        # x_ticks_number = 10;
-        # y_ticks_number = 4;
-        # %% Titles and Ticks
-        # self.__x_axe_title = 'Z(m)';
-        # self.__y_axe_title = 'R(m)';
-        # self.__x_tick_range = linspace(0, self.__cfg.z_size, x_ticks_number) # we need 10 (or x_ticks_number) ticks
-        # self.__x_tick_gird_size = linspace(0, self.__cfg.z_grid_count, x_ticks_number) # from 0 to x_tick_max. it's required
-        # self.__y_tick_range = linspace(0, self.__cfg.r_size, y_ticks_number) # to convert gird to real size (meters)
-        # self.__y_tick_gird_size = linspace(0, self.__cfg.r_grid_count, y_ticks_number) # Same for X and Y axes
+        self.x_axis_label = r'$Z (m)$'
+        self.y_axis_label = r'$R (m)$'
+        self.cbar_axis_label = r'$V/m$'
+        self.cbar_bunch_density_axis_label = r'm^{-3}$'
 
+        self.position_e_r = [0.1, 0.70, 0.8, 0.3]
+        self.position_e_z = [0.1, 0.35, 0.8, 0.3]
+        self.position_bunch_density = [0.1, 0.01, 0.8, 0.3]
+
+        ## define public object fields
         self.cmap = 'gray'
         self.video_codec = 'mjpeg'
         self.video_fps = 30
         self.video_dpi = 100
         self.video_bitrate=32000
 
-        self.__plot_builder = PDP3PlotBuilder(self.__cfg)
+        self.E_r_plot_name = r'$E_r$'
+        self.E_z_plot_name = r'$E_z$'
+        self.E_bunch_density_plot_name = r'$\rho_{bunch}$'
+
+    def setup_plot(self, view):
+        '''
+        initialize plot figure and subplots with preset object fields
+        '''
         self.__plot_builder.setup_figure()
+        ## setup E_r plot
+        self.__plot_builder.add_subplot_with_image(
+            self.E_r_plot_name, 311, cmap=self.cmap, clim=self.__cfg.clim_e_field_r
+        )
+        self.__plot_builder.setup_subplot(
+            self.E_r_plot_name, x_axe_label=self.x_axis_label,
+            y_axe_label=self.y_axis_label, position=self.position_e_r
+        )
+        self.__plot_builder.add_colorbar(
+            self.E_r_plot_name, ticks=self.__cfg.clim_e_field_r, title=self.cbar_axis_label
+        )
 
-        self.E_r_plot_name = r'$\mathbf{Electrical\enspace Field\enspace Radial\enspace Component}\enspace(E_r)$'
-        self.E_z_plot_name = r'$\mathbf{Electrical\enspace Field\enspace Longitudal\enspace Component}\enspace(E_z)$'
-        self.E_rho_beam_plot_name = r'$\mathbf{Electron\enspace Bunch\enspace Density}\enspace (\rho_{bunch})$'
+        ## setup E_z plot
+        self.__plot_builder.add_subplot_with_image(
+            self.E_z_plot_name, 312, cmap=self.cmap, clim=self.__cfg.clim_e_field_z
+        )
+        self.__plot_builder.setup_subplot(
+            self.E_z_plot_name, x_axe_label=self.x_axis_label,
+            y_axe_label=self.y_axis_label, position=self.position_e_z
+        )
+        self.__plot_builder.add_colorbar(
+            self.E_z_plot_name, ticks=self.__cfg.clim_e_field_z, title=self.cbar_axis_label
+        )
 
-        x_axis_label = r'$\mathit{Z (m)}$'
-        y_axis_label = r'$\mathit{R (m)}$'
-        cbar_axis_label = r'$\frac{V}{m}$'
+        ## setup bunch_density plot
+        self.__plot_builder.add_subplot_with_image(
+            self.E_bunch_density_plot_name, 313, cmap=self.cmap, clim=self.__cfg.clim_e_field_bunch
+        )
+        self.__plot_builder.setup_subplot(
+            self.E_bunch_density_plot_name, x_axe_label=self.x_axis_label,
+            y_axe_label=self.y_axis_label, position=self.position_bunch_density
+        )
+        self.__plot_builder.add_colorbar(
+            self.E_bunch_density_plot_name, ticks=self.__cfg.clim_e_field_bunch,
+            ticklabels=[self.__cfg.bunch_density, 0], title=self.cbar_bunch_density_axis_label
+        )
 
-        ## setup plot properties
-        self.__plot_builder.add_subplot_with_image(self.E_r_plot_name, 311,
-                                                   cmap=self.cmap, clim=self.__cfg.clim_e_field_r)
-        self.__plot_builder.setup_subplot(self.E_r_plot_name, x_axe_label=x_axis_label,
-                                          y_axe_label=y_axis_label, position=[0.1, 0.70, 0.8, 0.3])
-        self.__plot_builder.add_colorbar(self.E_r_plot_name, ticks=self.__cfg.clim_e_field_r, title=cbar_axis_label)
-
-        self.__plot_builder.add_subplot_with_image(self.E_z_plot_name, 312,
-                                                   cmap=self.cmap, clim=self.__cfg.clim_e_field_z)
-        self.__plot_builder.setup_subplot(self.E_z_plot_name, x_axe_label=x_axis_label,
-                                          y_axe_label=y_axis_label, position=[0.1, 0.35, 0.8, 0.3])
-        self.__plot_builder.add_colorbar(self.E_z_plot_name, ticks=self.__cfg.clim_e_field_z, title=cbar_axis_label)
-
-        self.__plot_builder.add_subplot_with_image(self.E_rho_beam_plot_name, 313,
-                                                   cmap=self.cmap, clim=self.__cfg.clim_e_field_bunch)
-        self.__plot_builder.setup_subplot(self.E_rho_beam_plot_name, x_axe_label=x_axis_label,
-                                          y_axe_label=y_axis_label, position=[0.1, 0.01, 0.8, 0.3])
-        self.__plot_builder.add_colorbar(self.E_rho_beam_plot_name,
-                                         ticks=self.__cfg.clim_e_field_bunch,
-                                         ticklabels=[self.__cfg.bunch_density, 0],
-                                         title=r'$m^{-3}$')
-
-    def create_movie_with_3_plots(self, view=False):
-        # im1, im2, im3 = self.__setup_figure()
         if view:
             self.__plot_builder.figure.show()
-        ###########
+
+    def create_movie_with_3_plots(self, view=False, write=True):
+        '''
+        create movie with preset subplots and data from data files
+        '''
         fpf = self.__cfg.frames_per_file
         sr = self.__cfg.r_grid_count
         sz = self.__cfg.z_grid_count
+
+        data_file_e_r = os.path.join(self.__cfg.data_path, self.data_file_e_r_pattern)
+        data_file_e_z = os.path.join(self.__cfg.data_path, self.data_file_e_z_pattern)
+        data_file_bunch_density = os.path.join(self.__cfg.data_path, self.data_file_e_bunch_density_pattern)
 
         FFMpegWriter = ani.writers['ffmpeg']
         metadata = dict(title='Movie Test', artist='Matplotlib',
@@ -99,32 +114,38 @@ class Pdp3Movie:
                               codec=self.video_codec,
                               bitrate=self.video_bitrate)
 
+        ## dirty hack to aviod real file writing
+        if write:
+            movie_file = self.__cfg.movie_file
+        else:
+            movie_file = '/dev/null'
+
         with writer.saving(self.__plot_builder.figure, self.__cfg.movie_file, self.video_dpi):
             for k in range(0, fpf):
                 tstart = k*fpf
                 tend = ((k+1)*fpf-1)
                 i = 1;
 
-                if not os.path.isfile(self.__data_file_e1 + str(k)) \
-                   or not os.path.isfile(self.__data_file_e3 + str(k)) \
-                   or not os.path.isfile(self.__data_file_rho_beam + str(k)):
+                if not os.path.isfile(data_file_e_r + str(k)) \
+                   or not os.path.isfile(data_file_e_z + str(k)) \
+                   or not os.path.isfile(data_file_bunch_density + str(k)):
                     print('No more data files exists. Exiting')
                     return
 
                 print("Loading files set %d" % (k))
                 ## Open data files
-                fidh_e1 = open(self.__data_file_e1 + str(k), 'r')
-                fidh_e3 = open(self.__data_file_e3 + str(k), 'r')
-                fidh_rho_beam = open(self.__data_file_rho_beam + str(k), 'r')
+                fidh_e_r = open(data_file_e_r + str(k), 'r')
+                fidh_e_z = open(data_file_e_z + str(k), 'r')
+                fidh_bunch_density = open(data_file_bunch_density + str(k), 'r')
 
-                h_field_e1 = fromfile(fidh_e1, dtype=float, count=sr*sz*fpf, sep=' ')
-                h_field_e3 = fromfile(fidh_e3, dtype=float, count=sr*sz*fpf, sep=' ')
-                h_field_rho_beam = fromfile(fidh_rho_beam, dtype=float, count=sr*sz*fpf, sep=' ')
+                h_field_e_r = fromfile(fidh_e_r, dtype=float, count=sr*sz*fpf, sep=' ')
+                h_field_e_z = fromfile(fidh_e_z, dtype=float, count=sr*sz*fpf, sep=' ')
+                h_field_bunch_density = fromfile(fidh_bunch_density, dtype=float, count=sr*sz*fpf, sep=' ')
 
                 ## Close data files
-                fidh_e1.close()
-                fidh_e3.close()
-                fidh_rho_beam.close()
+                fidh_e_r.close()
+                fidh_e_z.close()
+                fidh_bunch_density.close()
 
                 for t in range(tstart, tend):
                     local_step = t % fpf
@@ -136,24 +157,29 @@ class Pdp3Movie:
                     try:
                         self.__plot_builder.fill_image_with_data(
                             self.E_z_plot_name,
-                            h_field_e1[rstart:rend])
+                            h_field_e_r[rstart:rend])
 
                         self.__plot_builder.fill_image_with_data(
                             self.E_r_plot_name,
-                            h_field_e3[rstart:rend])
+                            h_field_e_z[rstart:rend])
 
                         self.__plot_builder.fill_image_with_data(
-                            self.E_rho_beam_plot_name,
-                            h_field_rho_beam[rstart:rend])
+                            self.E_bunch_density_plot_name,
+                            h_field_bunch_density[rstart:rend])
 
                     except ValueError: ## skip frame, when data is inconsistent
                         break
 
-                    writer.grab_frame()
+                    if write:
+                        writer.grab_frame()
                     if view:
                         self.__plot_builder.redraw()
 
 def main():
+    ## configure RC properties
+    plt.rcParams['animation.ffmpeg_path'] = '/usr/bin/ffmpeg'
+
+    ####
     parser = argparse.ArgumentParser(description='Process some integers.')
     parser.add_argument('properties_path', metavar='properties_path', type=str,
                         help='Full path to properties.xml')
@@ -161,36 +187,75 @@ def main():
     parser.add_argument('--video_file', type=str,
                         help='Full path to output video file')
 
-    # parser.add_argument('clim_e1', metavar='properties_path', type=str,
-    #                     help='Full path to properties.xml')
+    parser.add_argument('--view', action='store_true', help='View animation interactively')
 
-    ## video_file=None, file_delta=100, clim_e1=[0,1], clim_e3=[0,1], clim_rho_beam=[-1e-7, 0]):
+    parser.add_argument('--view-only', action='store_true', default=False,
+                        help='View animation interactively and do not write video to file')
 
-    parser.add_argument('--view', action='store_true')
+    default_clim = [-1e5, 1e5]
 
-
-    parser.add_argument('--clim_e1', type=str,
-                        help='Color limit range for e1. Default: 0:1. Not implemented')
-    parser.add_argument('--clim_e3', type=str,
-                        help='Color limit range for e3. Default: 0:1. Not implemented')
-    parser.add_argument('--clim_rho_beam', type=str,
-                        help='Color limit range for rho_beam. Default: -1e-7:0. Not implemented')
+    parser.add_argument('--clim_e_r', type=str,
+                        help='Color limit range for Electrical field longitual component. Default %s'
+                        % ':'.join(map(str, default_clim)))
+    parser.add_argument('--clim_e_z', type=str,
+                        help='Color limit range for Electrical field radial component. Default %s'
+                        % ':'.join(map(str, default_clim)))
 
     args = parser.parse_args()
-    # print(args)
 
-    clim_e1 = list(map(int, args.clim_e1.split(':'))) if args.clim_e1 else [-1e5, 1e5]
-    clim_e3 = list(map(int, args.clim_e3.split(':'))) if args.clim_e3 else [-1e5, 1e5]
-    # clim_rho_beam = list(map(int, args.clim_rho_beam.split(':'))) if args.clim_rho_beam else [-1e-7, 0]
+    view=False
+    write=True
+
+    if args.view or args.view_only:
+        view=True
+    if args.view_only:
+        write=False
+
+    clim_e_r = list(map(int, args.clim_e_r.split(':'))) if args.clim_e_r else default_clim
+    clim_e_z = list(map(int, args.clim_e_z.split(':'))) if args.clim_e_z else default_clim
     file_delta = 100
 
-    ## initialize config
-    config = Parameters(args.properties_path, args.video_file, clim_e1, clim_e3)
+    # check if config file exists
+    if os.path.isfile(args.properties_path):
+        ## initialize config
+        config = Parameters(args.properties_path, args.video_file, clim_e_r, clim_e_z)
 
-    movie = Pdp3Movie(config)
-    movie.create_movie_with_3_plots(args.view)
+        movie = Pdp3Movie(config)
+        ################################################################################################
+        #################### configure plot and movie parameters #######################################
+        ################################################################################################
+        movie.data_file_e_r_pattern = 'e1'
+        movie.data_file_e_z_pattern = 'e3'
+        movie.data_file_e_bunch_density_pattern = 'rho_beam'
 
+        movie.x_axis_label = r'$\mathit{Z (m)}$'
+        movie.y_axis_label = r'$\mathit{R (m)}$'
+        movie.cbar_axis_label = r'$\frac{V}{m}$'
+        movie.cbar_bunch_density_axis_label = r'$m^{-3}$'
 
+        movie.position_e_r = [0.1, 0.70, 0.8, 0.3]
+        movie.position_e_z = [0.1, 0.35, 0.8, 0.3]
+        movie.position_bunch_density = [0.1, 0.01, 0.8, 0.3]
 
+        movie.cmap = 'gray'
+        movie.video_codec = 'mjpeg'
+        movie.video_fps = 30
+        movie.video_dpi = 100
+        movie.video_bitrate=32000
+
+        movie.E_r_plot_name = r'$\mathbf{Electrical\enspace Field\enspace Radial\enspace Component}\enspace(E_r)$'
+        movie.E_z_plot_name = r'$\mathbf{Electrical\enspace Field\enspace Longitudal\enspace Component}\enspace(E_z)$'
+        movie.E_bunch_density_plot_name = r'$\mathbf{Electron\enspace Bunch\enspace Density}\enspace (\rho_{bunch})$'
+        ################################################################################################
+        ################################################################################################
+        ################################################################################################
+
+        movie.setup_plot(view)
+        movie.create_movie_with_3_plots(view, write)
+    else:
+        print("Configuration file `%s' does not exists. Exiting" % args.properties_path)
+        exit(1)
+
+## call main function
 if __name__ == "__main__":
     main()

@@ -1,48 +1,17 @@
 #!/usr/bin/env python
 
 import os
-# import argparse
-
 from xml.dom import minidom
 from numpy import *
-# from pylab import *
-
-# from matplotlib import *
-# import matplotlib.pyplot as plt
-# import matplotlib.animation as ani
 
 class Parameters:
     def __init__(self, parameters_file, movie_file=None, clim_e_field_r=[0,1], clim_e_field_z=[0,1]):
         '''
-        + r_size
-        + z_size
-        + r_grid_count
-        + z_grid_count
-        ===
-        start_time
-        end_time
-        step_time # delta_t
-        ===
-        + config_path
-        + data_path
-        + system_state_path
-        + movie_file
-        ===
-        + bunch_density
-        ===
-        + clim_e_field_r     # r-component of E field
-        + clim_e_field_z     # z-component of E field
-        + clim_e_field_bunch # E field of electron/ion bunch
-        ===
-        frames_per_file
+        read parameters from properties.xml, recalculate and set parameters as object fields
         '''
 
-        # self.clim_e_field_r = clim_e_field_r
-        # self.clim_e_field_z = clim_e_field_z
-        # self.clim_rho_beam = clim_rho_beam
-
         self.config_path = os.path.dirname(parameters_file)
-        self.movie_file = movie_file if movie_file else os.path.join(self.config_path, 'field_movie_python.avi')
+        self.movie_file = movie_file if movie_file else os.path.join(self.config_path, 'field_movie.avi')
 
         ## read parameters_file
         dom_root = minidom.parse(parameters_file)
@@ -51,19 +20,8 @@ class Parameters:
         geometry = dom_root.getElementsByTagName('geometry')[0]
         self.r_grid_count = int(geometry.getElementsByTagName('n_grid_r')[0].firstChild.data)-1
         self.z_grid_count = int(geometry.getElementsByTagName('n_grid_z')[0].firstChild.data)-1
-        self.r_size= float(geometry.getElementsByTagName('r_size')[0].firstChild.data)
+        self.r_size = float(geometry.getElementsByTagName('r_size')[0].firstChild.data)
         self.z_size = float(geometry.getElementsByTagName('z_size')[0].firstChild.data)
-
-        # set number of marks with names in X and Y axes
-        # x_ticks_number = 10;
-        # y_ticks_number = 4;
-        # %% Titles and Ticks
-        # self.__x_axe_title = 'Z(m)';
-        # self.__y_axe_title = 'R(m)';
-        # self.__x_tick_range = linspace(0, x_tick_max, x_ticks_number) # we need 10 (or x_ticks_number) ticks
-        # self.__x_tick_gird_size = linspace(0, self.__size_field_z, x_ticks_number) # from 0 to x_tick_max. it's required
-        # self.__y_tick_range = linspace(0, y_tick_max, y_ticks_number) # to convert gird to real size (meters)
-        # self.__y_tick_gird_size = linspace(0, self.__size_field_r, y_ticks_number) # Same for X and Y axes
 
         # get file to save parameters
         file_save_parameters = dom_root.getElementsByTagName('file_save_parameters')[0]
@@ -98,10 +56,3 @@ class Parameters:
         self.clim_e_field_r = clim_e_field_r # r-component of E field
         self.clim_e_field_z = clim_e_field_z # z-component of E field
         self.clim_e_field_bunch = [-(bunch_density*1.6e-19), 0] # E field of electron/ion bunch
-
-        # clim_rho_beam = [-(bunch_density*1.6e-19) 0];
-
-        # self.__data_file_e_field_r = os.path.join(self.__data_path, 'e_field_r')
-        # self.__data_file_e_field_z = os.path.join(self.__data_path, 'e_field_z')
-        # self.__data_file_rho_beam = os.path.join(self.__data_path, 'rho_beam')
-        # self.__figure = plt.figure()
