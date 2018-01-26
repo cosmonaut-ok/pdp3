@@ -80,7 +80,7 @@ class Pdp3Movie:
         self.__plot_builder.add_colorbar(self.E_rho_beam_plot_name,
                                          ticks=self.__cfg.clim_e_field_bunch,
                                          ticklabels=[self.__cfg.bunch_density, 0],
-                                         title=r'$m^-3$')
+                                         title=r'$m^{-3}$')
 
     def create_movie_with_3_plots(self, view=False):
         # im1, im2, im3 = self.__setup_figure()
