@@ -6,10 +6,6 @@
 using namespace std;
 using namespace constant;
 
-Fourier::Fourier(int t)
-{
-}
-
 Fourier::~Fourier(void)
 {
 }
@@ -22,8 +18,8 @@ void Fourier::fast_sine_transform(double** a, int lenght_n, int ir, bool inv)
 
 	for (int k=0; k<lenght_n; k++)
   {
-    a_sinc[0]=(0,0);
-    a_sinc[lenght_n]=(0,0);
+    a_sinc[0]=(0.0);
+    a_sinc[lenght_n]=(0.0);
     a_sinc[d_lenght-k+1].real(-a[ir][k]);
     a_sinc[d_lenght-k+1].imag(0);
     a_sinc[k+1].real(a[ir][k]);

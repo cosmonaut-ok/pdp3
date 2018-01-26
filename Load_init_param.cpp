@@ -211,7 +211,7 @@ void Load_init_param::init_boundary ()
   if (boundary_conditions == 0)
   {
     p_list->charge_weighting(c_rho_new);
-    Fourier four1(0);
+    Fourier four1();
     Poisson_dirichlet dirih(c_geom);
     dirih.poisson_solve(efield, c_rho_new);
   }
@@ -355,6 +355,8 @@ void Load_init_param::run(void)
   this->c_time->current_time = 0.0 ;
   p_list->charge_weighting(c_rho_new);
 
+	////// MARK fourier1->Fourier translations //////
+	// Seems: https://en.wikipedia.org/wiki/Dirichlet_distribution
   Poisson_dirichlet dirih(c_geom);
   dirih.poisson_solve(efield, c_rho_new);
 
