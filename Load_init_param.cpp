@@ -46,34 +46,44 @@ Load_init_param::Load_init_param(char* xml_file_name)
   read_xml (xml_file_name);
 
   // load PML parameters
+	cout << "Initialising PML Data\n";
   init_pml ();
 
   // load Geometry parameters
+	cout << "Initialising Geometry Parameters\n";
   init_geometry ();
 
   // creating field objects
+	cout << "Initialising E/M Fields Data\n";
   init_fields ();
 
   // load time parameters
+	cout << "Initialising Time Data\n";
   init_time ();
 
   // load particle parameters
+	cout << "Initialising Particles Data\n";
   p_list = new particles_list(0);
   init_particles();
 
   // load bunch
+	cout << "Initialising Particles Bunch Data\n";
   c_bunch = init_bunch();
 
-  //Maxwell initial conditions///
+	cout << "Initialising Bounrary Conditions Data\n";
+  // Maxwell initial conditions
+	cout << "...Initialising Bounrary Maxwell Conditions Data\n";
   init_boundary_maxwell();
 
   // creating rho and current arrays
+	cout << "...Doing Some Shit\n";
   c_rho_new = new charge_density(c_geom);
-  c_rho_old = new charge_density (c_geom);
-  c_rho_beam = new charge_density (c_geom);
+  c_rho_old = new charge_density(c_geom);
+  c_rho_beam = new charge_density(c_geom);
   c_current = new current(c_geom);
 
   // boundary conditions
+	cout << "...Initialising Bounrary Conditions Data\n";
   char* a = read_char((char*)"Boundary_conditions");
   if (atoi(a)==0)
   {
@@ -84,6 +94,7 @@ Load_init_param::Load_init_param(char* xml_file_name)
   }
 
   // load File Path
+	cout << "Initialising File System Paths\n";
   init_file_saving_parameters();
 
   cout << "Initialisation complete\n";
@@ -172,7 +183,7 @@ Bunch* Load_init_param::init_bunch()
   // initialise particles bunch data
   XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
   XMLElement* sub_root =root->FirstChildElement (BUNCH_PARAMS_NAME);
-  cout << "Initialising particle bunch data\n";
+
   Bunch* prtls = 0;
   char* p_name= new char [50];
   strcpy (p_name, sub_root->FirstChildElement("name")->GetText());
@@ -206,7 +217,6 @@ Bunch* Load_init_param::init_bunch()
 
 void Load_init_param::init_boundary_maxwell ()
 {
-  cout << "Initialising bounrary maxwell conditions data\n";
   XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
   XMLElement* sub_root =root->FirstChildElement (BOUNDARY_MAXWELL_PARAMS_NAME);
   //
@@ -226,7 +236,6 @@ void Load_init_param::init_boundary_maxwell ()
 
 void Load_init_param::init_pml ()
 {
-  cout << "Initialising PML data\n";
   XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
   XMLElement* sub_root =root->FirstChildElement (PML_PARAMS_NAME);
   //
@@ -284,7 +293,6 @@ void Load_init_param::init_fields ()
 
 void Load_init_param::init_time ()
 {
-  cout << "Initialising time data\n";
   XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
   XMLElement* sub_root =root->FirstChildElement (TIME_PARAMS_NAME);
   //
@@ -368,7 +376,7 @@ bool Load_init_param::save_system_state(double t)
 
 void Load_init_param::run(void)
 {
-  cout << "Launching simulation\n";
+  cout << "\nLaunch simulation\n\n";
 
   this->c_time->current_time = 0.0 ;
   p_list->charge_weighting(c_rho_new);
