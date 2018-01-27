@@ -55,7 +55,7 @@ pdp3_CXX_SRCS         = Boundary_Maxwell_conditions.cpp \
 			particles_struct.cpp
 pdp3_RC_SRCS          = pdp3.rc \
 			pdp31.rc
-pdp3_LDFLAGS          = -m64
+pdp3_LDFLAGS          =
 pdp3_ARFLAGS          =
 pdp3_DLL_PATH         =
 pdp3_DLLS             =
@@ -80,7 +80,7 @@ RC = wrc
 AR = ar
 
 CFLAGS ?= -m64 -mcmodel=medium
-CFLAGS_SPEEDUP = -funsafe-math-optimizations -ffast-math
+CFLAGS_SPEEDUP = -ffast-math
 CFLAGS_NO_OPENMP ?= -Wno-unknown-pragmas
 CFLAGS_OPENMP ?= -fopenmp
 CFLAGS_DEBUG ?= -O0 -Wall -g -ggdb -fvar-tracking -ggnu-pubnames -pedantic
