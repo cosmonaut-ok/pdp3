@@ -368,17 +368,16 @@ void Load_init_param::run(void)
   {
     c_bunch->bunch_inject(c_time);
 
-    //1. Calculate H field
+    // 1. Calculate H field
     hfield->calc_field(efield, c_time);
 
-    ////// MARK //////
-    //2. Calculate v
+    // 2. Calculate v
     c_current->reset_j();
     c_rho_old->reset_rho();
     c_rho_beam->reset_rho();
     p_list->step_v(efield, hfield, c_time);
 
-    //3. Calculate x, calculate J
+    // 3. Calculate x, calculate J
     p_list->copy_coords();
     p_list->charge_weighting(c_rho_old);  //continuity equation
     p_list->half_step_coord(c_time);
@@ -386,7 +385,8 @@ void Load_init_param::run(void)
     p_list->half_step_coord(c_time);
     p_list->j_weighting(c_time,c_current);
 
-    //4. Calculate E
+    ////// MARK //////
+    // 4. Calculate E
     // maxwell_rad.probe_mode_exitation(&geom1,&current1, 1,7e8, time1.current_time);
     efield->calc_field(hfield,c_time, c_current, c_pml);
 
