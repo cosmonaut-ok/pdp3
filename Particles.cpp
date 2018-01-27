@@ -33,7 +33,7 @@ Particles::Particles(char const *p_name,
   mass = (double)p_mass*(double)EL_MASS;
   number = p_number;
 
-  //allocate memory for coordinates and velocities of particles
+  // allocate memory for coordinates and velocities of particles
   mass_array = new double[number];
   charge_array = new double[number];
   x1 = new double[number];
@@ -67,6 +67,8 @@ Particles::Particles(Particles &cp_particles)
   v2 = new double[number];
   v3 = new double[number];
   is_alive = new int[number];
+
+#pragma omp parallel for
   for (int i=0; i<cp_particles.number; i++)
   {
     x1[i] = cp_particles.x1[i];
@@ -92,6 +94,7 @@ Particles::~Particles()
 
 void Particles::set_v_0()
 {
+#pragma omp parallel for
   for(int i=0; i<number; i++)
   {
     v1[i] = 0;
@@ -102,6 +105,7 @@ void Particles::set_v_0()
 
 void Particles::set_x_0()
 {
+#pragma omp parallel for
   for(int i=0; i<number; i++)
   {
     x1[i] = 0.5; // TODO: WHY?
@@ -212,7 +216,6 @@ void Particles::step_v(E_field *e_fld, H_field *h_fld, Time* t)
 
       // 2. Half acceleration in the electric field
       // u'(n) = u(n-1/2) + q*dt/2/m*E(n)
-
       v1[i] = v1[i] + e1;
       v2[i] = v2[i] + e2;
       v3[i] = v3[i] + e3;
@@ -248,20 +251,21 @@ void Particles::step_v(E_field *e_fld, H_field *h_fld, Time* t)
 
 void Particles::half_step_coord(Time* t)
 {
-  double dr = geom1->dr;
-  double dz = geom1->dz;
-  double x1_wall = geom1->first_size - dr/2.0;
-  double x3_wall = geom1->second_size - dz/2.0;
-  double half_dr = dr/2.0;
-  double half_dz = dz/2.0;
-  double x1_wallX2 = x1_wall*2.0;
-  double x3_wallX2 = x3_wall*2.0;
-  double half_dt = t->delta_t/2.0;
-
-#pragma omp parallel for shared(dr, dz, x1_wall, x3_wall, half_dr, half_dz, x1_wallX2, x3_wallX2, half_dt)
+// #pragma omp parallel for shared(dr, dz, x1_wall, x3_wall, half_dr, half_dz, x1_wallX2, x3_wallX2, half_dt)
+#pragma omp parallel for
   for(int i=0; i<number; i++)
     if (is_alive[i])
     {
+      double dr = geom1->dr;
+      double dz = geom1->dz;
+      double x1_wall = geom1->first_size - dr/2.0;
+      double x3_wall = geom1->second_size - dz/2.0;
+      double half_dr = dr/2.0;
+      double half_dz = dz/2.0;
+      double x1_wallX2 = x1_wall*2.0;
+      double x3_wallX2 = x3_wall*2.0;
+      double half_dt = t->delta_t/2.0;
+
       // check if x1 and x3 are correct
       if (isnan(x1[i]) || isinf(x1[i]) != 0 || isnan(x3[i]) || isinf(x3[i]) != 0)
       {
@@ -301,8 +305,8 @@ void Particles::half_step_coord(Time* t)
 // function for charge density weighting
 void Particles::charge_weighting(charge_density* ro1)
 {
-  int r_i=0;  // number of particle i cell
-  int z_k=0;  // number of particle k cell
+  int r_i = 0;  // number of particle i cell
+  int z_k = 0;  // number of particle k cell
 
   double dr = geom1->dr;
   double dz = geom1->dz;
@@ -314,7 +318,7 @@ void Particles::charge_weighting(charge_density* ro1)
   double v_2 = 0; // volume of [i+1][k] cell
   //double ro_v_2 = 0; // charge density in i+1 cell
 
-  double value =0;
+  double value = 0;
   // double **temp = ro1->get_ro();
 
   for(int i=0; i<number; i++)
@@ -442,9 +446,9 @@ void Particles::velocity_distribution(double therm_vel)
   double const1 = 2*therm_vel*therm_vel;
   double temp1;
 
+#pragma omp parallel for
   for(int i=0; i<number; i++)
   {
-
     R = (double)(i)/(double)number;
 
     // part of numerical integral calculation

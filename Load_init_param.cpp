@@ -123,7 +123,7 @@ void Load_init_param::init_particles()
   Particles* prtls = 0;
 
 	// initialize particles list
-	p_list = new particles_list(0);
+	p_list = new particles_list();
 
 	// creating rho and current arrays
 	// WARNING! should be called after geometry initialised
@@ -355,14 +355,14 @@ void Load_init_param::run(void)
   this->c_time->current_time = 0.0 ;
   p_list->charge_weighting(c_rho_new);
 
-	////// MARK fourier1->Fourier translations //////
 	// Seems: https://en.wikipedia.org/wiki/Dirichlet_distribution
   Poisson_dirichlet dirih(c_geom);
   dirih.poisson_solve(efield, c_rho_new);
 
+  ////// MARK //////
   //variable for out_class function
   p_list->create_coord_arrays();
-  int step_number= 0;
+  int step_number = 0;
   clock_t t1 = clock();
 
   while (c_time->current_time < c_time->end_time)
@@ -398,22 +398,22 @@ void Load_init_param::run(void)
 
     // print header on every 20 logging steps
     if  ((((int)(c_time->current_time/c_time->delta_t))%(data_dump_interval*20)==0))
-      {
-  cout << endl
-       << left << setw(8) << "Step"
-       << left << setw(13) << "Saved Frame"
-       << left << setw(20) << "Current Time (sec)"
-       << left << setw(32) << "Real Step Execution Time (sec)"
-       << endl;
-      }
+    {
+      cout << endl
+           << left << setw(8) << "Step"
+           << left << setw(13) << "Saved Frame"
+           << left << setw(20) << "Current Time (sec)"
+           << left << setw(32) << "Real Step Execution Time (sec)"
+           << endl;
+    }
 
     if  ((((int)(c_time->current_time/c_time->delta_t))%data_dump_interval==0))
     {
       cout << left << setw(8) << step_number * data_dump_interval
-     << left << setw(13) << step_number
-     << left << setw(20) << c_time->current_time
-     << left << setw(32) << (double)(clock() - t1) / CLOCKS_PER_SEC
-     << endl;
+           << left << setw(13) << step_number
+           << left << setw(20) << c_time->current_time
+           << left << setw(32) << (double)(clock() - t1) / CLOCKS_PER_SEC
+           << endl;
 
       c_bunch->charge_weighting(c_rho_beam);
       c_rho_old->reset_rho();
