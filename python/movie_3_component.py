@@ -120,7 +120,7 @@ class Pdp3Movie:
         else:
             movie_file = '/dev/null'
 
-        with writer.saving(self.__plot_builder.figure, self.__cfg.movie_file, self.video_dpi):
+        with writer.saving(self.__plot_builder.figure, movie_file, self.video_dpi):
             for k in range(0, fpf):
                 tstart = k*fpf
                 tend = ((k+1)*fpf-1)

@@ -83,13 +83,6 @@ class PDP3PlotBuilder:
 
         _title = title or name
 
-        # ## set sci limit to 100. More, than 1000 should be printed in format XeY
-        # xfmt = ScalarFormatter()
-        # xfmt.set_powerlimits((-3,3))  # Or whatever your limits are . . .
-        # # {{ Make your plot }}
-        # # gca().xaxis.set_major_formatter(xfmt)
-        # axes.xaxis.set_major_formatter(xfmt)
-
         # tick labels, that shows __real__ model space dimensions
         # translates from grid_size
         x_tick_range = around(linspace(0, self.__cfg.z_size, self.x_tick_count+1), 2)
