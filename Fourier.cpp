@@ -160,7 +160,7 @@ void Fourier::fast_fourier_transform(double**a,int lenght_n,int ir, bool inv)
 {
 	complex<double>* im_a = new complex<double> [lenght_n];
 
-#pragma om parallel for shared (im_a, ir)
+#pragma omp parallel for shared (im_a, ir)
   for(int k=0;k<lenght_n;k++)
   {
     im_a[k].real(a[ir][k]);
@@ -169,7 +169,7 @@ void Fourier::fast_fourier_transform(double**a,int lenght_n,int ir, bool inv)
 
   Fourier::fast_fourier_alg(im_a, lenght_n);
 
-#pragma om parallel for shared (im_a, ir)
+#pragma omp parallel for shared (im_a, ir)
   for(int k=0;k<lenght_n;k++)
   {
     a[ir][k]=real(im_a[k]);
@@ -177,7 +177,7 @@ void Fourier::fast_fourier_transform(double**a,int lenght_n,int ir, bool inv)
 
   if (inv == true)
   {
-#pragma om parallel for shared (ir, lenght_n)
+#pragma omp parallel for shared (ir, lenght_n)
     for(int k=0;k<lenght_n;k++)
       a[ir][k]=1.0/lenght_n*a[ir][k];
   }

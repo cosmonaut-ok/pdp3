@@ -147,7 +147,7 @@ void Load_init_param::init_particles()
 		// init and setup particles properties
     prtls = new Particles(strcpy(new char [50], p_name), charge, mass, number, c_geom, p_list);
     prtls->load_spatial_distribution_with_variable_mass(left_density,right_density,0,0);
-    prtls->velocity_distribution_v2(temperature);
+    prtls->velocity_distribution(temperature);
     particle_kind = particle_kind->NextSiblingElement(p_king_section_name);
   }
 }
