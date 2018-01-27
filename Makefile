@@ -104,7 +104,7 @@ else
 CFLAGS += $(CFLAGS_OPENMP)
 endif
 
-CXXFLAGS = ${CFLAGS}
+CXXFLAGS = ${CFLAGS} #  -fopenmp
 
 ### Generic targets
 all: $(SUBDIRS) $(DLLS:%=%.so) $(LIBS) $(EXES)
