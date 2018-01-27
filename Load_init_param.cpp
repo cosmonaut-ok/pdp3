@@ -359,7 +359,6 @@ void Load_init_param::run(void)
   Poisson_dirichlet dirih(c_geom);
   dirih.poisson_solve(efield, c_rho_new);
 
-  ////// MARK //////
   //variable for out_class function
   p_list->create_coord_arrays();
   int step_number = 0;
@@ -372,6 +371,7 @@ void Load_init_param::run(void)
     //1. Calculate H field
     hfield->calc_field(efield, c_time);
 
+    ////// MARK //////
     //2. Calculate v
     c_current->reset_j();
     c_rho_old->reset_rho();

@@ -19,7 +19,7 @@ public:
   ~Bunch(void);
 public:
   double duration; //bunch duration
-  double n_bunch;// bunch density;
+  double n_bunch; // bunch density;
   double vel_bunch; // bunch velocity
   double radius; // bunch radius
 public:
