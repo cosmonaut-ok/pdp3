@@ -10,9 +10,7 @@ char* getCmdOption(char ** begin, char ** end, const std::string & option)
 {
   char ** itr = std::find(begin, end, option);
   if (itr != end && ++itr != end)
-    {
-      return *itr;
-    }
+    return *itr;
   return 0;
 }
 
@@ -28,24 +26,24 @@ int main(int argc, char **argv)
   char * filename;
 
   if (cmdOptionExists(argv, argv+argc, "-h"))
+  {
+    cerr << "USAGE:\n  pdp3 [ -f configfile_path ]\n";
+    return 1;
+  }
+
+  if (cmdOptionExists(argv, argv+argc, "-f"))
+  {
+    filename = getCmdOption(argv, argv + argc, "-f");
+    if (filename == NULL)
     {
-      cerr << "USAGE:\n  pdp3 [ -f configfile_path ]\n";
+      cerr << "ERROR: configuration path is not specified" << endl;
       return 1;
     }
-  
-  if (cmdOptionExists(argv, argv+argc, "-f"))
-    {
-      filename = getCmdOption(argv, argv + argc, "-f");
-      if (filename == NULL)
-	{
-	  cerr << "ERROR: configuration path is not specified" << endl;
-	  return 1;
-	}
-    }
+  }
   else
-    {
-      filename = (char*)"parameters.xml";
-    }
+  {
+    filename = (char*)"parameters.xml";
+  }
 
   Load_init_param init_param(filename);
 
