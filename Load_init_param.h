@@ -33,7 +33,6 @@ public:
   ~Load_init_param(void);
 
 public:
-  char* read_char(char* p_name);
   double* read_double_params(const char* p_name);
   bool save_system_state(double t);
   void run(void);
@@ -58,13 +57,13 @@ public:
   int system_state_dump_interval;
   int frames_per_file;
   // dump data
-  bool dump_e1;
-  bool dump_e2;
-  bool dump_e3;
-  bool dump_h1;
-  bool dump_h2;
-  bool dump_h3;
-  bool dump_rho_beam;
+  bool is_dump_e1;
+  bool is_dump_e2;
+  bool is_dump_e3;
+  bool is_dump_h1;
+  bool is_dump_h2;
+  bool is_dump_h3;
+  bool is_dump_rho_beam;
 
 private:
   void read_xml(const char* xml_file_name);
@@ -73,8 +72,8 @@ private:
   void init_fields ();
   void init_time ();
   void init_particles ();
-  void init_boundary_maxwell ();
-  Bunch* init_bunch();
+  void init_boundary ();
+  void init_bunch();
   void init_file_saving_parameters ();
   bool to_bool (string str);
 };
