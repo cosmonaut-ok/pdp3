@@ -22,7 +22,7 @@ void Fourier::fast_sine_transform(double** a, int lenght_n, int ir, bool inv)
   a_sinc[lenght_n]=(0.0);
 
 #pragma omp parallel for shared (lenght_n, d_lenght, a_sinc)
-	for (int k=0; k<lenght_n; k++)
+  for (int k=0; k<lenght_n; k++)
   {
     a_sinc[d_lenght-k+1].real(-a[ir][k]);
     a_sinc[d_lenght-k+1].imag(0);
@@ -144,7 +144,7 @@ void Fourier::fast_fourier_alg(complex<double>* a, int lenght_n)
 // use fast_fourier_alg to real data
 void Fourier::fast_fourier_transform(double**a,int lenght_n,int ir, bool inv)
 {
-	complex<double>* im_a = new complex<double> [lenght_n];
+  complex<double>* im_a = new complex<double> [lenght_n];
 
 #pragma omp parallel for shared (im_a, ir)
   for(int k=0;k<lenght_n;k++)

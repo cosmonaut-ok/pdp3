@@ -121,14 +121,14 @@ double Particles::get_gamma(int i)
   beta = (pow(v1[i], 2) + pow(v2[i], 2) + pow(v3[i], 2)) / LIGHT_SPEED_POW_2;
 
   if (beta > 1) // it's VERY BAD! Beta should not be more, than 1
-	{
-		cerr << "CRITICAL!(get_gamma): Lorentz factor aka gamma is comples. Can not continue." << endl
-				 << "\tUsually it happens, when <Time> -> <delta_t> value is too big." << endl
-				 << "\tv1[" << i << "] = " << v1[i]
-				 << "\tv2[" << i << "] = " << v2[i]
-				 << "\tv3[" << i << "] = " << v3[i];
-		exit(1);
-	}
+  {
+    cerr << "CRITICAL!(get_gamma): Lorentz factor aka gamma is comples. Can not continue." << endl
+         << "\tUsually it happens, when <Time> -> <delta_t> value is too big." << endl
+         << "\tv1[" << i << "] = " << v1[i]
+         << "\tv2[" << i << "] = " << v2[i]
+         << "\tv3[" << i << "] = " << v3[i];
+    exit(1);
+  }
 
   gamma = pow(1.0 - beta, -0.5);
 
@@ -151,14 +151,14 @@ double Particles::get_gamma_inv(int i) // TODO: it is not alpha
   beta = (pow(v1[i], 2) + pow(v2[i], 2) + pow(v3[i], 2)) / LIGHT_SPEED_POW_2;
 
   if (beta > 1) // it's VERY BAD! Beta should not be more, than 1
-	{
-		cerr << "CRITICAL!(get_gamma_inv): Lorentz factor aka gamma is comples. Can not continue." << endl
-				 << "\tUsually it happens, when <Time> -> <delta_t> value is too big." << endl
-				 << "\tv1[" << i << "] = " << v1[i]
-				 << "\tv2[" << i << "] = " << v2[i]
-				 << "\tv3[" << i << "] = " << v3[i];
-		exit(1);
-	}
+  {
+    cerr << "CRITICAL!(get_gamma_inv): Lorentz factor aka gamma is comples. Can not continue." << endl
+         << "\tUsually it happens, when <Time> -> <delta_t> value is too big." << endl
+         << "\tv1[" << i << "] = " << v1[i]
+         << "\tv2[" << i << "] = " << v2[i]
+         << "\tv3[" << i << "] = " << v3[i];
+    exit(1);
+  }
 
   gamma = pow(1.0 + beta, 0.5);
 

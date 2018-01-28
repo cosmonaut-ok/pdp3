@@ -43,38 +43,38 @@ Load_init_param::Load_init_param(char* xml_file_name)
 #endif
 
   // read XML config file
-	cout << "Reading configuration file ``" << xml_file_name << "``\n";
+  cout << "Reading configuration file ``" << xml_file_name << "``\n";
   read_xml(xml_file_name);
 
   // load PML parameters
-	cout << "Initialising PML Data\n";
+  cout << "Initialising PML Data\n";
   init_pml();
 
   // load Geometry parameters
-	cout << "Initialising Geometry Parameters\n";
+  cout << "Initialising Geometry Parameters\n";
   init_geometry();
 
   // creating field objects
-	cout << "Initialising E/M Fields Data\n";
+  cout << "Initialising E/M Fields Data\n";
   init_fields ();
 
   // load time parameters
-	cout << "Initialising Time Data\n";
+  cout << "Initialising Time Data\n";
   init_time ();
 
   // load particle parameters
-	cout << "Initialising Particles Data\n";
+  cout << "Initialising Particles Data\n";
   init_particles();
 
   // load bunch
-	cout << "Initialising Particles Bunch Data\n";
+  cout << "Initialising Particles Bunch Data\n";
   init_bunch();
 
-	cout << "Initialising Bounrary Conditions Data\n";
+  cout << "Initialising Bounrary Conditions Data\n";
   init_boundary();
 
   // load File Path
-	cout << "Initialising File System Paths\n";
+  cout << "Initialising File System Paths\n";
   init_file_saving_parameters();
 
   cout << "Initialisation complete\n";
@@ -122,12 +122,12 @@ void Load_init_param::init_particles()
 
   Particles* prtls = 0;
 
-	// initialize particles list
-	p_list = new particles_list();
+  // initialize particles list
+  p_list = new particles_list();
 
-	// creating rho and current arrays
-	// WARNING! should be called after geometry initialised
-	c_rho_new = new charge_density(c_geom);
+  // creating rho and current arrays
+  // WARNING! should be called after geometry initialised
+  c_rho_new = new charge_density(c_geom);
   c_rho_old = new charge_density(c_geom);
   c_rho_beam = new charge_density(c_geom);
   c_current = new current(c_geom);
@@ -144,7 +144,7 @@ void Load_init_param::init_particles()
     right_density = atof(particle_kind->FirstChildElement("right_density")->GetText());
     temperature = atof(particle_kind->FirstChildElement("temperature")->GetText());
 
-		// init and setup particles properties
+    // init and setup particles properties
     prtls = new Particles(strcpy(new char [50], p_name), charge, mass, number, c_geom, p_list);
     prtls->load_spatial_distribution_with_variable_mass(left_density,right_density,0,0);
     prtls->velocity_distribution(temperature);
@@ -158,7 +158,7 @@ void Load_init_param::init_bunch()
   XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
   XMLElement* sub_root =root->FirstChildElement (BUNCH_PARAMS_NAME);
 
-	char* p_name = (char*)sub_root->FirstChildElement("name")->GetText();
+  char* p_name = (char*)sub_root->FirstChildElement("name")->GetText();
   double charge = atof(sub_root
                        ->FirstChildElement("charge")
                        ->GetText());
@@ -182,7 +182,7 @@ void Load_init_param::init_bunch()
                                  ->GetText());
 
   Bunch* prtls = new Bunch(p_name, charge, mass,number, c_geom, p_list,
-													 duration, radius, density, initial_velocity);
+                           duration, radius, density, initial_velocity);
 
   c_bunch = prtls;
 }
@@ -202,9 +202,9 @@ void Load_init_param::init_boundary ()
                            FirstChildElement("e_fi_right")->
                            GetText());
 
-	int boundary_conditions = atoi(root->FirstChildElement("Boundary_conditions")->GetText());
+  int boundary_conditions = atoi(root->FirstChildElement("Boundary_conditions")->GetText());
 
-	// Maxwell initial conditions
+  // Maxwell initial conditions
   Boundary_Maxwell_conditions maxwell_rad(efield); // TODO: WTF?
   maxwell_rad.specify_initial_field(c_geom, e_fi_upper, e_fi_left, e_fi_right);
 
@@ -237,7 +237,7 @@ void Load_init_param::init_pml ()
   double sigma_2_t = atof(sub_root->
                           FirstChildElement("sigma_2")->
                           GetText());
-	c_pml = new PML(comp_l_1, comp_l_2, comp_l_3, sigma_1_t, sigma_2_t);
+  c_pml = new PML(comp_l_1, comp_l_2, comp_l_3, sigma_1_t, sigma_2_t);
 }
 
 void Load_init_param::init_geometry ()
@@ -309,14 +309,14 @@ void Load_init_param::init_file_saving_parameters ()
   char* path_dump = (char*)sub_root->FirstChildElement("path_to_save_state")->GetText();
 
   data_dump_interval = atoi(sub_root
-														->FirstChildElement("data_dump_interval")
-														->GetText());
+                            ->FirstChildElement("data_dump_interval")
+                            ->GetText());
   system_state_dump_interval = atoi(sub_root
-																		->FirstChildElement("system_state_dump_interval")
-																		->GetText());
+                                    ->FirstChildElement("system_state_dump_interval")
+                                    ->GetText());
   frames_per_file = atoi(sub_root
-												 ->FirstChildElement("frames_per_file")
-												 ->GetText());
+                         ->FirstChildElement("frames_per_file")
+                         ->GetText());
 
   // dump data configuration
   is_dump_e1 = to_bool(dump_data_root->FirstChildElement("e1")->GetText());
@@ -355,7 +355,7 @@ void Load_init_param::run(void)
   this->c_time->current_time = 0.0 ;
   p_list->charge_weighting(c_rho_new);
 
-	// Seems: https://en.wikipedia.org/wiki/Dirichlet_distribution
+  // Seems: https://en.wikipedia.org/wiki/Dirichlet_distribution
   Poisson_dirichlet dirih(c_geom);
   dirih.poisson_solve(efield, c_rho_new);
 
