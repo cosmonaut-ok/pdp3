@@ -84,10 +84,5 @@ void Boundary_Maxwell_conditions::probe_mode_exitation(Geometry* cyl_geom,
     {
     k_max=3*10e8*time/dz;*/
   for (k=k_start;k<k_max;k++)
-  {
     j_p[0][k]=6e7*sin(2*PI*frequency*time)*sin(2.0*n*PI*dz*(k-k_start)/(probe_lenght));
-    //e_fld->e1[0][k]=1e3*sin(2*PI*frequency*time)*sin(PI*dz*k/(0.5*3e8/frequency));
-  }
-  /*}*/
-
 }

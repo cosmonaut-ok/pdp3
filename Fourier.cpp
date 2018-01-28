@@ -112,20 +112,6 @@ void Fourier::fast_fourier_alg(complex<double>* a, int lenght_n)
     }
 
   }
-//for(int k=0; k<lenght_n; k++)
-//printf("\n%d -> %d",k,a[k]);
-//////////////////////////////////////////////
-
-//fast fourier part//
-/////////////////////////////////////////////
-
-///////////////////////////////////////////
-
-  //fast algorithm//
-//////////////////////////////////////////
-
-  // double pi = 4.0*atan(1.0);
-
 
   complex<double> im_j (0,1);
 
