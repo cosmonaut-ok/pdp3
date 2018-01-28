@@ -488,6 +488,7 @@ Triple E_field::get_field(double x1, double x3)
 double* E_field::get_1d_e1()
 {
   // copy 2d field array into 1d array rowwise
+#pragma omp parallel for
   for (int i = 0; i < geom1->n_grid_1 - 1; i++)
     for (int k = 0; k < geom1->n_grid_2; k++)
       e1_1d[i * geom1->n_grid_2 + k] = e1[i][k];
@@ -497,6 +498,7 @@ double* E_field::get_1d_e1()
 double* E_field::get_1d_e2()
 {
   // copy 2d field array into 1d array rowwise
+#pragma omp parallel for
   for (int i = 0; i < geom1->n_grid_1; i++)
     for (int k = 0; k < geom1->n_grid_2; k++)
       e2_1d[i * geom1->n_grid_2 + k] = e2[i][k];
@@ -506,6 +508,7 @@ double* E_field::get_1d_e2()
 double* E_field::get_1d_e3()
 {
   // copy 2d field array into 1d array rowwise
+#pragma omp parallel for
   for (int i = 0; i < geom1->n_grid_1; i++)
     for (int k = 0; k < geom1->n_grid_2 - 1; k++)
       e3_1d[i * (geom1->n_grid_2 - 1) + k] = e3[i][k];

@@ -385,7 +385,6 @@ void Load_init_param::run(void)
     p_list->half_step_coord(c_time);
     p_list->j_weighting(c_time,c_current);
 
-    ////// MARK //////
     // 4. Calculate E
     // maxwell_rad.probe_mode_exitation(&geom1,&current1, 1,7e8, time1.current_time);
     efield->calc_field(hfield,c_time, c_current, c_pml);
@@ -429,7 +428,7 @@ void Load_init_param::run(void)
 
       if (is_dump_rho_beam) c_io_class->out_data("rho_beam", c_rho_beam->get_ro(),step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
 
-      step_number=step_number+1;
+      step_number += 1;
       t1 = clock();
       if  ((((int)(c_time->current_time/c_time->delta_t))%system_state_dump_interval==0)&&(step_number!=1))
         this->save_system_state(c_time->current_time);
