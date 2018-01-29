@@ -15,6 +15,9 @@
 #include "time.h"
 #include "tinyxml2.h"
 
+#include <sys/time.h>
+#include <ctime>
+
 using namespace std;
 using namespace tinyxml2;
 
@@ -135,7 +138,7 @@ void Load_init_param::init_particles()
   while(particle_kind)
   {
     strcpy (p_name, particle_kind->FirstChildElement("name")->GetText());
-    cout << "Initialising " << p_name << " data\n";
+    cout << "Initialising " << p_name << " Data\n";
 
     charge = atof(particle_kind->FirstChildElement("charge")->GetText());
     mass = atof(particle_kind->FirstChildElement("mass")->GetText());
@@ -362,8 +365,9 @@ void Load_init_param::run(void)
   //variable for out_class function
   p_list->create_coord_arrays();
   int step_number = 0;
-  clock_t t1 = clock();
+  time_t t1 = time(0);
 
+  
   while (c_time->current_time < c_time->end_time)
   {
     c_bunch->bunch_inject(c_time);
@@ -401,8 +405,8 @@ void Load_init_param::run(void)
       cout << endl
            << left << setw(8) << "Step"
            << left << setw(13) << "Saved Frame"
-           << left << setw(20) << "Current Time (sec)"
-           << left << setw(32) << "Real Step Execution Time (sec)"
+           << left << setw(18) << "Model Time (sec)"
+           << left << setw(32) << "Approx. Step Execution Time (sec)"
            << endl;
     }
 
@@ -410,8 +414,8 @@ void Load_init_param::run(void)
     {
       cout << left << setw(8) << step_number * data_dump_interval
            << left << setw(13) << step_number
-           << left << setw(20) << c_time->current_time
-           << left << setw(32) << (double)(clock() - t1) / CLOCKS_PER_SEC
+           << left << setw(18) << c_time->current_time
+           << left << setw(32) << (double)(time(0) - t1) / data_dump_interval
            << endl;
 
       c_bunch->charge_weighting(c_rho_beam);
@@ -429,7 +433,7 @@ void Load_init_param::run(void)
       if (is_dump_rho_beam) c_io_class->out_data("rho_beam", c_rho_beam->get_ro(),step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
 
       step_number += 1;
-      t1 = clock();
+      t1 = time(0);
       if  ((((int)(c_time->current_time/c_time->delta_t))%system_state_dump_interval==0)&&(step_number!=1))
         this->save_system_state(c_time->current_time);
     }

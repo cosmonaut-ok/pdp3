@@ -22,8 +22,10 @@ RoadMap:
 - Linux:
   - 'make' util
   - libgomp or libgomp (for clang or gcc)
+  - python+matplotlib+numpy (or anaconda - python scientific environment)
 - Windows:
-  - MS Visual Studio 2013 or Cygwin with 'make' util (for gcc/clang/icc)
+  - MS Visual Studio 2017 or Cygwin with 'make' util (for gcc/clang/icc)
+  - anaconda (python scientific environment)
 
 ## HOWTO
 
