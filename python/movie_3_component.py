@@ -187,7 +187,7 @@ def main():
     parser.add_argument('--video_file', type=str,
                         help='Full path to output video file')
 
-    parser.add_argument('--view', action='store_true', help='View animation interactively')
+    parser.add_argument('--no-view', action='store_true', help='View animation interactively')
 
     parser.add_argument('--view-only', action='store_true', default=False,
                         help='View animation interactively and do not write video to file')
@@ -203,13 +203,13 @@ def main():
 
     args = parser.parse_args()
 
-    view=False
+    view=True
     write=True
 
-    if args.view or args.view_only:
-        view=True
+    if args.no_view:
+        view = False
     if args.view_only:
-        write=False
+        write = False
 
     clim_e_r = list(map(int, args.clim_e_r.split(':'))) if args.clim_e_r else default_clim
     clim_e_z = list(map(int, args.clim_e_z.split(':'))) if args.clim_e_z else default_clim
@@ -252,6 +252,8 @@ def main():
 
         movie.setup_plot(view)
         movie.create_movie_with_3_plots(view, write)
+        if view:
+            input("Press 'Return' to exit ")
     else:
         print("Configuration file `%s' does not exists. Exiting" % args.properties_path)
         exit(1)
