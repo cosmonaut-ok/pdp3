@@ -1,5 +1,6 @@
 SRCDIR                = .
 SUBDIRS               =
+TESTSUBDIRS           = test/unit
 DLLS                  =
 LIBS                  =
 EXES                  = pdp3
@@ -18,13 +19,10 @@ LIBRARIES             =
 ### tinyxml2 sources and settings
 tinyxml2_SUBDIR := $(SRCDIR)/lib/tinyxml2/
 # LDFLAGS := -L$(tinyxml2_SUBDIR)
-INCLUDE_PATH := $(INCLUDE_PATH) -I$(tinyxml2_SUBDIR)
-SUBDIRS := $(SUBDIRS) $(tinyxml2_SUBDIR)
+INCLUDE_PATH += -I$(tinyxml2_SUBDIR)
+SUBDIRS += $(tinyxml2_SUBDIR)
 DLL_IMPORTS := tinyxml2
-LDFLAGS := $(LDFLAGS) -L$(tinyxml2_SUBDIR)
-
-# FOO_LIBSFILES := $(FOO_SUBDIR)/libfoo.a $(FOO_SUBDIR)/libgnufoo.a
-# FOO_LDLIBS := -lfoo -lgnufoo
+LDFLAGS += -L$(tinyxml2_SUBDIR)
 
 ### pdp3 sources and settings
 pdp3_MODULE           = pdp3
@@ -132,15 +130,20 @@ DEFINCL = $(INCLUDE_PATH) $(DEFINES) $(OPTIONS)
 CLEAN_FILES     = y.tab.c y.tab.h lex.yy.c core *.orig *.rej \
                   \\\#*\\\# *~ *% .\\\#*
 
-clean:: $(SUBDIRS:%=%/__clean__) $(EXTRASUBDIRS:%=%/__clean__)
+clean:: $(SUBDIRS:%=%/__clean__) $(EXTRASUBDIRS:%=%/__clean__) $(TESTSUBDIRS:%=%/__clean__)
 	$(RM) $(CLEAN_FILES) $(C_SRCS:.c=.o) $(CXX_SRCS:.cpp=.o)
 	$(RM) $(DLLS:%=%.so) $(LIBS) $(EXES) $(EXES:%=%.so)
 
 $(SUBDIRS:%=%/__clean__): dummy
 	cd `dirname $@` && $(MAKE) clean
 
+
 $(EXTRASUBDIRS:%=%/__clean__): dummy
 	-cd `dirname $@` && $(RM) $(CLEAN_FILES)
+
+
+$(TESTSUBDIRS:%=%/__clean__): dummy
+	cd `dirname $@` && $(MAKE) clean
 
 ### Target specific build rules
 DEFLIB = $(LIBRARY_PATH) $(LIBRARIES) $(DLL_PATH) $(DLL_IMPORTS:%=-l%)
@@ -157,7 +160,12 @@ mrproper: clean
 run: bootstrap
 	./pdp3
 
-test: mrproper all
+$(TESTSUBDIRS:%=%/__test__): dummy
+	cd `dirname $@` && $(MAKE) test
+
+unittest: $(TESTSUBDIRS:%=%/__test__)
+
+test: mrproper all unittest
 	TESTDIR=$(TESTDIR) /bin/bash ./test/test.sh
 
 test-ext: mrproper all

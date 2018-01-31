@@ -299,6 +299,8 @@ x64/
 *.exe
 *.res
 *.so
+*.h.gch
+*.a
 pdp3
 pdp3_result/
 testdir/
@@ -306,3 +308,4 @@ GPATH
 GRTAGS
 GTAGS
 temp/			
+test/unit/run
