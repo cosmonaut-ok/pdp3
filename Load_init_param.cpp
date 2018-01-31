@@ -440,6 +440,6 @@ void Load_init_param::run(void)
     c_time->current_time = c_time->current_time + c_time->delta_t;
     //if (!res)
     //  cout<<"Error:"<<c_time->current_time<<"! ";
-    cout << "\nSimulation Completed\n\n";    
   }
+  cout << "\nSimulation Completed\n\n";    
 }
