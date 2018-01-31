@@ -65,7 +65,6 @@ public:
   double get_gamma(int i);
   double get_gamma_inv(int i);
   void velocity_distribution(double therm_vel);
-  void velocity_distribution_v2 (double therm_vel);
   void load_spatial_distribution(double n1,
                                  double n2,
                                  double left_plasma_boundary,

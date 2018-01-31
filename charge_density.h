@@ -13,5 +13,5 @@ public:
 
   ~charge_density(void);
 protected:
-  double** ro;
+  double** rho;
 };

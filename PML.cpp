@@ -37,7 +37,8 @@ void PML::calc_sigma(Geometry* geom1)
     for(int i=0; i<geom1->n_grid_1; i++)
       for(int k=0; k<geom1->n_grid_2; k++)
         if ((geom1->first_size - geom1->dr*(i)) <= lenght_sigma_extern)
-          geom1->sigma[i][k] = sigma1 + (sigma2-sigma1)/(pow(lenght_sigma_extern,2))*pow((geom1->dr*(i+1)-geom1->first_size+lenght_sigma_extern),2);
+          geom1->sigma[i][k] = sigma1 + (sigma2-sigma1)/(pow(lenght_sigma_extern,2)) *
+            pow((geom1->dr*(i+1)-geom1->first_size+lenght_sigma_extern),2);
   }
   else
   {
@@ -47,32 +48,33 @@ void PML::calc_sigma(Geometry* geom1)
       {
         if (geom1->dz*k<lenght_sigma_left)
         {
-          geom1->sigma[i][k] = sigma1 + (sigma2-sigma1)/(pow(lenght_sigma_left,2))*pow((lenght_sigma_left-geom1->dz*k),2);
+          geom1->sigma[i][k] = sigma1 + (sigma2-sigma1)/(pow(lenght_sigma_left,2)) *
+            pow((lenght_sigma_left-geom1->dz*k),2);
         }
         if ((geom1->second_size - geom1->dz*(k))<lenght_sigma_right)
         {
-          geom1->sigma[i][k] = sigma1 + (sigma2-sigma1)/(pow(lenght_sigma_right,2))*pow((geom1->dz*(k+1)-geom1->second_size+lenght_sigma_right),2);
+          geom1->sigma[i][k] = sigma1 + (sigma2-sigma1)/(pow(lenght_sigma_right,2)) *
+            pow((geom1->dz*(k+1)-geom1->second_size+lenght_sigma_right),2);
         }
       }
   }
-/////////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////////
 
   if (comparative_l_3 == 0)
   {
   }
   else
   {
-    // sigma assigning//
-    //sigma on z=z wall//
-//////////////////////////////////////////////
+    // sigma assigning
+    // sigma on z=z wall
     for(int i=0;i<geom1->n_grid_1;i++)
       for(int k=0;k<geom1->n_grid_2;k++)
         if ((geom1->first_size - geom1->dr*(i)) <= lenght_sigma_extern)
-          if (((geom1->first_size - geom1->dr*(i+1)) < lenght_sigma_extern * geom1->dz * (k)/lenght_sigma_left) && ( (geom1->first_size - geom1->dr*(i)) <= (lenght_sigma_extern/lenght_sigma_right*(geom1->second_size - geom1->dz*(k)))))
-            geom1->sigma[i][k] = sigma1 + (sigma2-sigma1)/(pow(lenght_sigma_extern,2))*pow((geom1->dr*(i+1)-geom1->first_size+lenght_sigma_extern),2);
-/////////////////////////////////////////////
+          if (((geom1->first_size - geom1->dr*(i+1)) < lenght_sigma_extern * geom1->dz *
+               (k)/lenght_sigma_left) && ( (geom1->first_size - geom1->dr*(i)) <=
+                                           (lenght_sigma_extern/lenght_sigma_right *
+                                            (geom1->second_size - geom1->dz*(k)))))
+            geom1->sigma[i][k] = sigma1 + (sigma2-sigma1)/(pow(lenght_sigma_extern,2)) *
+              pow((geom1->dr*(i+1)-geom1->first_size+lenght_sigma_extern),2);
   }
   return;
 }

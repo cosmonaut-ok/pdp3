@@ -32,7 +32,6 @@ public:
   ~H_field(void);
   void calc_field(E_field* e_field1, Time* time1);
   void set_homogeneous_h(double H1, double H2, double H3);
-  void magnetostatic_equation(Geometry* geom1);
   Triple get_field(double x1, double x3);
   double* get_1d_h1();
   double* get_1d_h2();

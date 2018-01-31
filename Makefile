@@ -53,7 +53,7 @@ pdp3_CXX_SRCS         = Boundary_Maxwell_conditions.cpp \
 			particles_struct.cpp
 pdp3_RC_SRCS          = pdp3.rc \
 			pdp31.rc
-pdp3_LDFLAGS          = -m64
+pdp3_LDFLAGS          =
 pdp3_ARFLAGS          =
 pdp3_DLL_PATH         =
 pdp3_DLLS             =
@@ -78,7 +78,7 @@ RC = wrc
 AR = ar
 
 CFLAGS ?= -m64 -mcmodel=medium
-CFLAGS_SPEEDUP = -funsafe-math-optimizations -ffast-math
+CFLAGS_SPEEDUP = -ffast-math
 CFLAGS_NO_OPENMP ?= -Wno-unknown-pragmas
 CFLAGS_OPENMP ?= -fopenmp
 CFLAGS_DEBUG ?= -O0 -Wall -g -ggdb -fvar-tracking -ggnu-pubnames -pedantic
@@ -102,7 +102,7 @@ else
 CFLAGS += $(CFLAGS_OPENMP)
 endif
 
-CXXFLAGS = ${CFLAGS}
+CXXFLAGS = ${CFLAGS} #  -fopenmp
 
 ### Generic targets
 all: $(SUBDIRS) $(DLLS:%=%.so) $(LIBS) $(EXES)
@@ -166,10 +166,10 @@ $(TESTSUBDIRS:%=%/__test__): dummy
 unittest: $(TESTSUBDIRS:%=%/__test__)
 
 test: mrproper all
-	TESTDIR=$(TESTDIR) /bin/bash ./test/test.sh
+	TESTDIR=$(TESTDIR) /bin/bash ./test/functional/test.sh
 
 test-ext: mrproper all unittest
-	TESTDIR=$(TESTDIR) /bin/bash ./test/test.sh extended
+	TESTDIR=$(TESTDIR) /bin/bash ./test/functional/test.sh extended
 
 .PHONY: check-syntax
 

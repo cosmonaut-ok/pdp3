@@ -1,3 +1,0 @@
->> solinit = bvpinit(linspace(1e-10,2,2001),@mat4init);
->> sol = bvp4c(@mat4ode,@mat4bc,solinit); fi = deval(sol, xint);
->> hold on; plot(fi(1,2:end),'color','red')

@@ -15,6 +15,9 @@
 #include "time.h"
 #include "tinyxml2.h"
 
+#include <sys/time.h>
+#include <ctime>
+
 using namespace std;
 using namespace tinyxml2;
 
@@ -43,47 +46,38 @@ Load_init_param::Load_init_param(char* xml_file_name)
 #endif
 
   // read XML config file
-  read_xml (xml_file_name);
+  cout << "Reading configuration file ``" << xml_file_name << "``\n";
+  read_xml(xml_file_name);
 
   // load PML parameters
-  init_pml ();
+  cout << "Initialising PML Data\n";
+  init_pml();
 
   // load Geometry parameters
-  init_geometry ();
+  cout << "Initialising Geometry Parameters\n";
+  init_geometry();
 
   // creating field objects
+  cout << "Initialising E/M Fields Data\n";
   init_fields ();
 
   // load time parameters
+  cout << "Initialising Time Data\n";
   init_time ();
 
   // load particle parameters
-  p_list = new particles_list(0);
+  cout << "Initialising Particles Data\n";
   init_particles();
 
   // load bunch
-  c_bunch = init_bunch();
+  cout << "Initialising Particles Bunch Data\n";
+  init_bunch();
 
-  //Maxwell initial conditions///
-  init_boundary_maxwell();
-
-  // creating rho and current arrays
-  c_rho_new = new charge_density(c_geom);
-  c_rho_old = new charge_density (c_geom);
-  c_rho_beam = new charge_density (c_geom);
-  c_current = new current(c_geom);
-
-  // boundary conditions
-  char* a = read_char((char*)"Boundary_conditions");
-  if (atoi(a)==0)
-  {
-    p_list->charge_weighting(c_rho_new);
-    Fourier four1(0);
-    Poisson_dirichlet dirih(c_geom);
-    dirih.poisson_solve(efield, c_rho_new);
-  }
+  cout << "Initialising Bounrary Conditions Data\n";
+  init_boundary();
 
   // load File Path
+  cout << "Initialising File System Paths\n";
   init_file_saving_parameters();
 
   cout << "Initialisation complete\n";
@@ -95,8 +89,6 @@ Load_init_param::~Load_init_param(void)
 
 void Load_init_param::read_xml(const char* xml_file_name)
 {
-  cout << "Reading configuration file ``" << xml_file_name << "``\n";
-
   xml_data = new XMLDocument(true, COLLAPSE_WHITESPACE);
 
   XMLError e_result = xml_data->LoadFile(xml_file_name);
@@ -105,16 +97,6 @@ void Load_init_param::read_xml(const char* xml_file_name)
     cerr << "ERROR: Can not read configuration file ``" << xml_file_name << "``\n";
     exit (78);
   }
-}
-
-char* Load_init_param::read_char(char* p_name)
-{
-  XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
-  XMLElement* sub_root =root->FirstChildElement (p_name);
-  char* vul_arr = new char [50];
-  strcpy(vul_arr, sub_root->GetText());
-
-  return vul_arr;
 }
 
 bool Load_init_param::to_bool(string str) {
@@ -143,10 +125,20 @@ void Load_init_param::init_particles()
 
   Particles* prtls = 0;
 
+  // initialize particles list
+  p_list = new particles_list();
+
+  // creating rho and current arrays
+  // WARNING! should be called after geometry initialised
+  c_rho_new = new charge_density(c_geom);
+  c_rho_old = new charge_density(c_geom);
+  c_rho_beam = new charge_density(c_geom);
+  c_current = new current(c_geom);
+
   while(particle_kind)
   {
-    strcpy (p_name,particle_kind->FirstChildElement("name")->GetText());
-    cout << "Initialising " << p_name << " data\n";
+    strcpy (p_name, particle_kind->FirstChildElement("name")->GetText());
+    cout << "Initialising " << p_name << " Data\n";
 
     charge = atof(particle_kind->FirstChildElement("charge")->GetText());
     mass = atof(particle_kind->FirstChildElement("mass")->GetText());
@@ -155,27 +147,21 @@ void Load_init_param::init_particles()
     right_density = atof(particle_kind->FirstChildElement("right_density")->GetText());
     temperature = atof(particle_kind->FirstChildElement("temperature")->GetText());
 
-    prtls = new Particles(strcpy(new char [50],p_name), charge, mass, number,
-                          c_geom, p_list);
-    prtls->load_spatial_distribution_with_variable_mass(
-      left_density,right_density,0,0);
-    // prtls->load_spatial_distribution(params[3],params[4],0,0);
-    prtls->velocity_distribution_v2(temperature);
+    // init and setup particles properties
+    prtls = new Particles(strcpy(new char [50], p_name), charge, mass, number, c_geom, p_list);
+    prtls->load_spatial_distribution_with_variable_mass(left_density,right_density,0,0);
+    prtls->velocity_distribution(temperature);
     particle_kind = particle_kind->NextSiblingElement(p_king_section_name);
   }
-
-  return;
 }
 
-Bunch* Load_init_param::init_bunch()
+void Load_init_param::init_bunch()
 {
   // initialise particles bunch data
   XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
   XMLElement* sub_root =root->FirstChildElement (BUNCH_PARAMS_NAME);
-  cout << "Initialising particle bunch data\n";
-  Bunch* prtls = 0;
-  char* p_name= new char [50];
-  strcpy (p_name, sub_root->FirstChildElement("name")->GetText());
+
+  char* p_name = (char*)sub_root->FirstChildElement("name")->GetText();
   double charge = atof(sub_root
                        ->FirstChildElement("charge")
                        ->GetText());
@@ -198,15 +184,14 @@ Bunch* Load_init_param::init_bunch()
                                  ->FirstChildElement("initial_velocity")
                                  ->GetText());
 
-  prtls = new Bunch(p_name, charge, mass,number, c_geom, p_list,
-                    duration, radius, density, initial_velocity);
+  Bunch* prtls = new Bunch(p_name, charge, mass,number, c_geom, p_list,
+                           duration, radius, density, initial_velocity);
 
-  return prtls;
+  c_bunch = prtls;
 }
 
-void Load_init_param::init_boundary_maxwell ()
+void Load_init_param::init_boundary ()
 {
-  cout << "Initialising bounrary maxwell conditions data\n";
   XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
   XMLElement* sub_root =root->FirstChildElement (BOUNDARY_MAXWELL_PARAMS_NAME);
   //
@@ -220,13 +205,23 @@ void Load_init_param::init_boundary_maxwell ()
                            FirstChildElement("e_fi_right")->
                            GetText());
 
-  Boundary_Maxwell_conditions maxwell_rad(efield);
+  int boundary_conditions = atoi(root->FirstChildElement("Boundary_conditions")->GetText());
+
+  // Maxwell initial conditions
+  Boundary_Maxwell_conditions maxwell_rad(efield); // TODO: WTF?
   maxwell_rad.specify_initial_field(c_geom, e_fi_upper, e_fi_left, e_fi_right);
+
+  if (boundary_conditions == 0)
+  {
+    p_list->charge_weighting(c_rho_new);
+    Fourier four1();
+    Poisson_dirichlet dirih(c_geom);
+    dirih.poisson_solve(efield, c_rho_new);
+  }
 }
 
 void Load_init_param::init_pml ()
 {
-  cout << "Initialising PML data\n";
   XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
   XMLElement* sub_root =root->FirstChildElement (PML_PARAMS_NAME);
   //
@@ -245,7 +240,6 @@ void Load_init_param::init_pml ()
   double sigma_2_t = atof(sub_root->
                           FirstChildElement("sigma_2")->
                           GetText());
-
   c_pml = new PML(comp_l_1, comp_l_2, comp_l_3, sigma_1_t, sigma_2_t);
 }
 
@@ -267,7 +261,7 @@ void Load_init_param::init_geometry ()
                       FirstChildElement("n_grid_z")->
                       GetText());
 
-  // TODO: load_pml should be first. Avoid it
+  // WARNING! should be called after init_pml
   c_geom = new Geometry(r_size, z_size, n_grid_r, n_grid_z, c_pml);
   c_geom->set_epsilon();
 }
@@ -277,14 +271,13 @@ void Load_init_param::init_fields ()
   efield = new E_field(c_geom);
   hfield = new H_field(c_geom);
   efield->boundary_conditions();
-  efield->set_homogeneous_efield(0.0, 0.0, 0); // TODO: unhardcode
-  hfield->set_homogeneous_h(0.0, 0.0, 0.0); // TODO: unhardcode
+  efield->set_homogeneous_efield(0.0, 0.0, 0.0);
+  hfield->set_homogeneous_h(0.0, 0.0, 0.0);
   efield->set_fi_on_z();
 }
 
 void Load_init_param::init_time ()
 {
-  cout << "Initialising time data\n";
   XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
   XMLElement* sub_root =root->FirstChildElement (TIME_PARAMS_NAME);
   //
@@ -310,47 +303,39 @@ void Load_init_param::init_time ()
 
 void Load_init_param::init_file_saving_parameters ()
 {
-  cout << "Initialising file saving parameters\n";
-
   XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
   XMLElement* sub_root = root->FirstChildElement (FILE_SAVE_PARAMS_NAME);
   XMLElement* dump_data_root = sub_root->FirstChildElement ("dump_data");
 
-  char* path_res = new char[50];
-  strcpy(path_res, sub_root->FirstChildElement("path_to_result")->GetText());
 
-  char* path_dump = new char[50];
-  strcpy(path_dump, sub_root->FirstChildElement("path_to_save_state")->GetText());
+  char* path_res = (char*)sub_root->FirstChildElement("path_to_result")->GetText();
+  char* path_dump = (char*)sub_root->FirstChildElement("path_to_save_state")->GetText();
 
-  data_dump_interval = atoi(sub_root->
-          FirstChildElement("data_dump_interval")->
-          GetText());
-
-  system_state_dump_interval = atoi(sub_root->
-            FirstChildElement("system_state_dump_interval")->
-            GetText());
-
-  frames_per_file = atoi(sub_root->
-       FirstChildElement("frames_per_file")->
-       GetText());
+  data_dump_interval = atoi(sub_root
+                            ->FirstChildElement("data_dump_interval")
+                            ->GetText());
+  system_state_dump_interval = atoi(sub_root
+                                    ->FirstChildElement("system_state_dump_interval")
+                                    ->GetText());
+  frames_per_file = atoi(sub_root
+                         ->FirstChildElement("frames_per_file")
+                         ->GetText());
 
   // dump data configuration
-  dump_e1 = to_bool(dump_data_root->FirstChildElement("e1")->GetText());
-  dump_e2 = to_bool(dump_data_root->FirstChildElement("e2")->GetText());
-  dump_e3 = to_bool(dump_data_root->FirstChildElement("e3")->GetText());
-  dump_h1 = to_bool(dump_data_root->FirstChildElement("h1")->GetText());
-  dump_h2 = to_bool(dump_data_root->FirstChildElement("h2")->GetText());
-  dump_h3 = to_bool(dump_data_root->FirstChildElement("h3")->GetText());
-  dump_rho_beam = to_bool(dump_data_root->FirstChildElement("rho_beam")->GetText());
+  is_dump_e1 = to_bool(dump_data_root->FirstChildElement("e1")->GetText());
+  is_dump_e2 = to_bool(dump_data_root->FirstChildElement("e2")->GetText());
+  is_dump_e3 = to_bool(dump_data_root->FirstChildElement("e3")->GetText());
+  is_dump_h1 = to_bool(dump_data_root->FirstChildElement("h1")->GetText());
+  is_dump_h2 = to_bool(dump_data_root->FirstChildElement("h2")->GetText());
+  is_dump_h3 = to_bool(dump_data_root->FirstChildElement("h3")->GetText());
+  is_dump_rho_beam = to_bool(dump_data_root->FirstChildElement("rho_beam")->GetText());
 
   c_io_class = new input_output_class (path_res, path_dump);
 }
 
-
-
-bool Load_init_param::save_system_state(double t)
+bool Load_init_param::save_system_state(double timestamp)
 {
-  cout << "Saving system state at " << t << endl;
+  cout << "Saving system state at " << timestamp << endl;
   c_io_class->out_field_dump((char*)"e1",efield->e1,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
   c_io_class->out_field_dump((char*)"e2",efield->e2,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
   c_io_class->out_field_dump((char*)"e3",efield->e3,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
@@ -363,38 +348,40 @@ bool Load_init_param::save_system_state(double t)
     c_io_class->out_velocity_dump(p_list->part_list[i]->name,p_list->part_list[i]->v1, p_list->part_list[i]->v2,p_list->part_list[i]->v3, p_list->part_list[i]->number);
 
   }
-  return true;
+  return(true);
 }
 
 void Load_init_param::run(void)
 {
-  cout << "Launching simulation\n";
+  cout << "\nLaunch Simulation\n\n";
 
   this->c_time->current_time = 0.0 ;
   p_list->charge_weighting(c_rho_new);
 
+  // Seems: https://en.wikipedia.org/wiki/Dirichlet_distribution
   Poisson_dirichlet dirih(c_geom);
   dirih.poisson_solve(efield, c_rho_new);
 
   //variable for out_class function
   p_list->create_coord_arrays();
-  int step_number= 0;
-  clock_t t1 = clock();
+  int step_number = 0;
+  time_t t1 = time(0);
 
+  
   while (c_time->current_time < c_time->end_time)
   {
     c_bunch->bunch_inject(c_time);
 
-    //1. Calculate H field
+    // 1. Calculate H field
     hfield->calc_field(efield, c_time);
 
-    //2. Calculate v
+    // 2. Calculate v
     c_current->reset_j();
     c_rho_old->reset_rho();
     c_rho_beam->reset_rho();
     p_list->step_v(efield, hfield, c_time);
 
-    //3. Calculate x, calculate J
+    // 3. Calculate x, calculate J
     p_list->copy_coords();
     p_list->charge_weighting(c_rho_old);  //continuity equation
     p_list->half_step_coord(c_time);
@@ -402,7 +389,7 @@ void Load_init_param::run(void)
     p_list->half_step_coord(c_time);
     p_list->j_weighting(c_time,c_current);
 
-    //4. Calculate E
+    // 4. Calculate E
     // maxwell_rad.probe_mode_exitation(&geom1,&current1, 1,7e8, time1.current_time);
     efield->calc_field(hfield,c_time, c_current, c_pml);
 
@@ -414,45 +401,45 @@ void Load_init_param::run(void)
 
     // print header on every 20 logging steps
     if  ((((int)(c_time->current_time/c_time->delta_t))%(data_dump_interval*20)==0))
-      {
-  cout << endl
-       << left << setw(8) << "Step"
-       << left << setw(13) << "Saved Frame"
-       << left << setw(20) << "Current Time (sec)"
-       << left << setw(32) << "Real Step Execution Time (sec)"
-       << endl;
-      }
+    {
+      cout << endl
+           << left << setw(8) << "Step"
+           << left << setw(13) << "Saved Frame"
+           << left << setw(18) << "Model Time (sec)"
+           << left << setw(32) << "Approx. Step Execution Time (sec)"
+           << endl;
+    }
 
     if  ((((int)(c_time->current_time/c_time->delta_t))%data_dump_interval==0))
     {
       cout << left << setw(8) << step_number * data_dump_interval
-     << left << setw(13) << step_number
-     << left << setw(20) << c_time->current_time
-     << left << setw(32) << (double)(clock() - t1) / CLOCKS_PER_SEC
-     << endl;
+           << left << setw(13) << step_number
+           << left << setw(18) << c_time->current_time
+           << left << setw(32) << (double)(time(0) - t1) / data_dump_interval
+           << endl;
 
       c_bunch->charge_weighting(c_rho_beam);
       c_rho_old->reset_rho();
       p_list[0].charge_weighting(c_rho_old);
 
-      if (dump_e1) c_io_class->out_data("e1",efield->e1,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-      if (dump_e2) c_io_class->out_data("e2",efield->e2,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-      if (dump_e3) c_io_class->out_data("e3",efield->e3,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+      if (is_dump_e1) c_io_class->out_data("e1",efield->e1,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+      if (is_dump_e2) c_io_class->out_data("e2",efield->e2,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+      if (is_dump_e3) c_io_class->out_data("e3",efield->e3,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
 
-      if (dump_h1) c_io_class->out_data("h1",hfield->h1,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-      if (dump_h2) c_io_class->out_data("h2",hfield->h2,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-      if (dump_h3) c_io_class->out_data("h3",hfield->h3,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+      if (is_dump_h1) c_io_class->out_data("h1",hfield->h1,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+      if (is_dump_h2) c_io_class->out_data("h2",hfield->h2,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+      if (is_dump_h3) c_io_class->out_data("h3",hfield->h3,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
 
-      if (dump_rho_beam) c_io_class->out_data("rho_beam", c_rho_beam->get_ro(),step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+      if (is_dump_rho_beam) c_io_class->out_data("rho_beam", c_rho_beam->get_ro(),step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
 
-      step_number=step_number+1;
-      t1 = clock();
+      step_number += 1;
+      t1 = time(0);
       if  ((((int)(c_time->current_time/c_time->delta_t))%system_state_dump_interval==0)&&(step_number!=1))
         this->save_system_state(c_time->current_time);
     }
     c_time->current_time = c_time->current_time + c_time->delta_t;
     //if (!res)
     //  cout<<"Error:"<<c_time->current_time<<"! ";
-
   }
+  cout << "\nSimulation Completed\n\n";    
 }
