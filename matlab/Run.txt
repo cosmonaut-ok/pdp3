@@ -1,2 +1,0 @@
-rho_movie_create_light3('C:\WORK\PDP3\pdp3_result\e1','C:\WORK\PDP3\pdp3_result\e3','C:\WORK\PDP3\pdp3_result\rho_beam',100,254,2046,[0 1],[0 1],[-1e-7 0])
-
