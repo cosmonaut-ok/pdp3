@@ -22,14 +22,14 @@ USER_DIR = ../..
 # Flags passed to the preprocessor.
 # Set Google Test's header directory as a system directory, such that
 # the compiler doesn't generate warnings in Google Test headers.
-CPPFLAGS += -isystem $(GTEST_DIR)/include -I../../
+CPPFLAGS += -isystem $(GTEST_DIR)/include -I../../ -L../../
 
 # Flags passed to the C++ compiler.
 CXXFLAGS += -g -Wall -Wextra -pthread
 
 # All tests produced by this Makefile.  Remember to add new tests you
 # created to the list.
-TESTS = run/universe_isok
+TESTS = run/universe_isok run/pdptime_isok
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -76,6 +76,13 @@ Constant_test.o : Constant_test.cpp \
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c Constant_test.cpp
 
 run/universe_isok : Constant_test.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+PDPTime_test.o: Constant_test.cpp \
+                     $(USER_DIR)/Constant.h $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c Constant_test.cpp
+
+run/pdptime_isok : PDPTime_test.cpp gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
 test: all
