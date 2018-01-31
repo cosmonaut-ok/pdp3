@@ -3,9 +3,8 @@
 set -e
 
 test -z $TESTDIR && TESTDIR=testingdir
-test -z $TRUE_MD5 && TRUE_MD5=test/true_md5sums
-test -z $TRUE_EXT_MD5 && TRUE_EXT_MD5=test/true_ext_md5sums
-test -z $TESTING_DATA_ARCHIVE && TESTING_DATA_ARCHIVE=test/test_true_data.tar.gz
+test -z $TRUE_MD5 && TRUE_MD5=test/functional/true_md5sums
+test -z $TRUE_EXT_MD5 && TRUE_EXT_MD5=test/functional/true_ext_md5sums
 
 if [ -n "$1" ] && [ "$1" == "extended" ]; then
     END_TIME=1.05e-10
