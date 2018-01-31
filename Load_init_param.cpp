@@ -353,7 +353,7 @@ bool Load_init_param::save_system_state(double timestamp)
 
 void Load_init_param::run(void)
 {
-  cout << "\nLaunch simulation\n\n";
+  cout << "\nLaunch Simulation\n\n";
 
   this->c_time->current_time = 0.0 ;
   p_list->charge_weighting(c_rho_new);
@@ -440,6 +440,6 @@ void Load_init_param::run(void)
     c_time->current_time = c_time->current_time + c_time->delta_t;
     //if (!res)
     //  cout<<"Error:"<<c_time->current_time<<"! ";
-
+    cout << "\nSimulation Completed\n\n";    
   }
 }
