@@ -29,7 +29,7 @@ CXXFLAGS += -g -Wall -Wextra -pthread
 
 # All tests produced by this Makefile.  Remember to add new tests you
 # created to the list.
-TESTS = run/sample1_unittest
+TESTS = run/universe_isok
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -75,7 +75,7 @@ Constant_test.o : Constant_test.cpp \
                      $(USER_DIR)/Constant.h $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c Constant_test.cpp
 
-run/sample1_unittest : Constant_test.o gtest_main.a
+run/universe_isok : Constant_test.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
 test: all
