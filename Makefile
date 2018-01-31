@@ -165,10 +165,10 @@ $(TESTSUBDIRS:%=%/__test__): dummy
 
 unittest: $(TESTSUBDIRS:%=%/__test__)
 
-test: mrproper all unittest
+test: mrproper all
 	TESTDIR=$(TESTDIR) /bin/bash ./test/test.sh
 
-test-ext: mrproper all
+test-ext: mrproper all unittest
 	TESTDIR=$(TESTDIR) /bin/bash ./test/test.sh extended
 
 .PHONY: check-syntax
