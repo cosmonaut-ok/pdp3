@@ -368,7 +368,7 @@ void Load_init_param::run(void)
   time_t t1 = time(0);
 
   
-  while (c_time->current_time < c_time->end_time)
+  while (c_time->current_time <= c_time->end_time)
   {
     c_bunch->bunch_inject(c_time);
 
