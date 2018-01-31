@@ -158,10 +158,10 @@ run: bootstrap
 	./pdp3
 
 test: mrproper all
-	TESTDIR=$(TESTDIR) /bin/bash ./test/test.sh
+	TESTDIR=$(TESTDIR) /bin/bash ./test/functional/test.sh
 
 test-ext: mrproper all
-	TESTDIR=$(TESTDIR) /bin/bash ./test/test.sh extended
+	TESTDIR=$(TESTDIR) /bin/bash ./test/functional/test.sh extended
 
 .PHONY: check-syntax
 
