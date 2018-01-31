@@ -1,5 +1,0 @@
->> figure, plot(fi(2,2:end)./fi_calc(:,200)')
->> fid = fopen('e:/taras/pdp3/pdP3/test');
->> fi_calc = fscanf(fid,'%g', 2000*513);fi_calc = reshape(fi_calc, 513,2000);fi_calc = fi_calc';
->> hold on; plot(fi_calc(:,200),'color','blue')
->> figure, plot(fi(2,2:end)./fi_calc(:,200)')
