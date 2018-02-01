@@ -17,6 +17,7 @@
 
 #include <sys/time.h>
 #include <ctime>
+#include <math.h>
 
 using namespace std;
 using namespace tinyxml2;
@@ -366,7 +367,7 @@ void Load_init_param::run(void)
   p_list->create_coord_arrays();
   int step_number = 0;
   time_t t1 = time(0);
-
+  char avg_step_exec_time[24]; // rounded and formatted average step execution time
   
   while (c_time->current_time <= c_time->end_time)
   {
@@ -406,16 +407,18 @@ void Load_init_param::run(void)
            << left << setw(8) << "Step"
            << left << setw(13) << "Saved Frame"
            << left << setw(18) << "Model Time (sec)"
-           << left << setw(32) << "Approx. Step Execution Time (sec)"
+           << left << setw(32) << "Avg. Step Exec. Time (sec)"
            << endl;
     }
 
     if  ((((int)(c_time->current_time/c_time->delta_t))%data_dump_interval==0))
     {
+      sprintf(avg_step_exec_time, "%.2f", (double)(time(0) - t1) / data_dump_interval);
+      
       cout << left << setw(8) << step_number * data_dump_interval
            << left << setw(13) << step_number
            << left << setw(18) << c_time->current_time
-           << left << setw(32) << (double)(time(0) - t1) / data_dump_interval
+           << left << setw(32) << avg_step_exec_time 
            << endl;
 
       c_bunch->charge_weighting(c_rho_beam);
