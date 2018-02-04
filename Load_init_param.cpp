@@ -407,7 +407,7 @@ void Load_init_param::run(void)
            << left << setw(8) << "Step"
            << left << setw(13) << "Saved Frame"
            << left << setw(18) << "Model Time (sec)"
-           << left << setw(32) << "Avg. Step Exec. Time (sec)"
+           << left << setw(32) << "Avg. Step Calculation Time (sec)"
            << endl;
     }
 
