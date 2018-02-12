@@ -133,6 +133,7 @@ CLEAN_FILES     = y.tab.c y.tab.h lex.yy.c core *.orig *.rej \
 clean:: $(SUBDIRS:%=%/__clean__) $(EXTRASUBDIRS:%=%/__clean__) $(TESTSUBDIRS:%=%/__clean__)
 	$(RM) $(CLEAN_FILES) $(C_SRCS:.c=.o) $(CXX_SRCS:.cpp=.o)
 	$(RM) $(DLLS:%=%.so) $(LIBS) $(EXES) $(EXES:%=%.so)
+	$(RM) -r python/__pycache__/
 
 $(SUBDIRS:%=%/__clean__): dummy
 	cd `dirname $@` && $(MAKE) clean
@@ -155,7 +156,7 @@ bootstrap: all
 	mkdir -p pdp3_files pdp3_result/Dump
 
 mrproper: clean
-	$(RM) -r pdp3_files pdp3_result $(TESTDIR)
+	$(RM) -r pdp3_files pdp3_result $(TESTDIR) *.avi
 
 run: bootstrap
 	./pdp3

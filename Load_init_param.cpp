@@ -17,6 +17,7 @@
 
 #include <sys/time.h>
 #include <ctime>
+#include <math.h>
 
 using namespace std;
 using namespace tinyxml2;
@@ -38,7 +39,7 @@ Load_init_param::Load_init_param(char* xml_file_name)
 {
     // NOTE: all system init is too huge,
     // so we use several "subconstructors"
-    // to initialise different parts of system
+    // to initialize different parts of system
 
   // define openmp-related options when openmp enabled
 #ifdef _OPENMP
@@ -50,37 +51,37 @@ Load_init_param::Load_init_param(char* xml_file_name)
   read_xml(xml_file_name);
 
   // load PML parameters
-  cout << "Initialising PML Data\n";
+  cout << "Initializing PML Data\n";
   init_pml();
 
   // load Geometry parameters
-  cout << "Initialising Geometry Parameters\n";
+  cout << "Initializing Geometry Parameters\n";
   init_geometry();
 
   // creating field objects
-  cout << "Initialising E/M Fields Data\n";
+  cout << "Initializing E/M Fields Data\n";
   init_fields ();
 
   // load time parameters
-  cout << "Initialising Time Data\n";
+  cout << "Initializing Time Data\n";
   init_time ();
 
   // load particle parameters
-  cout << "Initialising Particles Data\n";
+  cout << "Initializing Particles Data\n";
   init_particles();
 
   // load bunch
-  cout << "Initialising Particles Bunch Data\n";
+  cout << "Initializing Particles Bunch Data\n";
   init_bunch();
 
-  cout << "Initialising Bounrary Conditions Data\n";
+  cout << "Initializing Bounrary Conditions Data\n";
   init_boundary();
 
   // load File Path
-  cout << "Initialising File System Paths\n";
+  cout << "Initializing File System Paths\n";
   init_file_saving_parameters();
 
-  cout << "Initialisation complete\n";
+  cout << "Initialization complete\n";
 }
 
 Load_init_param::~Load_init_param(void)
@@ -129,7 +130,7 @@ void Load_init_param::init_particles()
   p_list = new particles_list();
 
   // creating rho and current arrays
-  // WARNING! should be called after geometry initialised
+  // WARNING! should be called after geometry initialized
   c_rho_new = new charge_density(c_geom);
   c_rho_old = new charge_density(c_geom);
   c_rho_beam = new charge_density(c_geom);
@@ -138,7 +139,7 @@ void Load_init_param::init_particles()
   while(particle_kind)
   {
     strcpy (p_name, particle_kind->FirstChildElement("name")->GetText());
-    cout << "Initialising " << p_name << " Data\n";
+    cout << "  Initializing " << p_name << " Data\n";
 
     charge = atof(particle_kind->FirstChildElement("charge")->GetText());
     mass = atof(particle_kind->FirstChildElement("mass")->GetText());
@@ -157,7 +158,7 @@ void Load_init_param::init_particles()
 
 void Load_init_param::init_bunch()
 {
-  // initialise particles bunch data
+  // initialize particles bunch data
   XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
   XMLElement* sub_root =root->FirstChildElement (BUNCH_PARAMS_NAME);
 
@@ -366,9 +367,9 @@ void Load_init_param::run(void)
   p_list->create_coord_arrays();
   int step_number = 0;
   time_t t1 = time(0);
-
+  char avg_step_exec_time[24]; // rounded and formatted average step execution time
   
-  while (c_time->current_time < c_time->end_time)
+  while (c_time->current_time <= c_time->end_time)
   {
     c_bunch->bunch_inject(c_time);
 
@@ -406,16 +407,18 @@ void Load_init_param::run(void)
            << left << setw(8) << "Step"
            << left << setw(13) << "Saved Frame"
            << left << setw(18) << "Model Time (sec)"
-           << left << setw(32) << "Approx. Step Execution Time (sec)"
+           << left << setw(32) << "Avg. Step Calculation Time (sec)"
            << endl;
     }
 
     if  ((((int)(c_time->current_time/c_time->delta_t))%data_dump_interval==0))
     {
+      sprintf(avg_step_exec_time, "%.2f", (double)(time(0) - t1) / data_dump_interval);
+      
       cout << left << setw(8) << step_number * data_dump_interval
            << left << setw(13) << step_number
            << left << setw(18) << c_time->current_time
-           << left << setw(32) << (double)(time(0) - t1) / data_dump_interval
+           << left << setw(32) << avg_step_exec_time 
            << endl;
 
       c_bunch->charge_weighting(c_rho_beam);
