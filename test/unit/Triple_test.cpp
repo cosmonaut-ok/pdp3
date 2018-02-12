@@ -1,7 +1,16 @@
 #include <gtest/gtest.h>
 #include "Triple.h"
+#include "Triple.cpp"
 
-TEST(Triple, _dummy)
+double first_component = 0.1;
+double second_component = 1.1;
+double third_component = 1.0;
+
+Triple test_triple(first_component, second_component, third_component);
+
+TEST(Triple, init)
 {
-  EXPECT_TRUE(2 == 2);
+  EXPECT_TRUE(test_triple.first == first_component);
+  EXPECT_TRUE(test_triple.second == second_component);
+  EXPECT_TRUE(test_triple.third == third_component);
 }
