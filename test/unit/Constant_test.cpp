@@ -30,9 +30,3 @@ TEST(Universe, MAGN_CONST)
 {
   EXPECT_TRUE(constant::MAGN_CONST == 1.26E-6);
 }
-
-int main(int ac, char* av[])
-{
-  testing::InitGoogleTest(&ac, av);
-  return RUN_ALL_TESTS();
-}

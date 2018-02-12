@@ -20,9 +20,3 @@ TEST(Time, time_init)
   EXPECT_TRUE(end_time == pdp_time->end_time);
   EXPECT_TRUE(delta_t == pdp_time->delta_t);
 }
-
-int main(int ac, char* av[])
-{
-  testing::InitGoogleTest(&ac, av);
-  return RUN_ALL_TESTS();
-}
