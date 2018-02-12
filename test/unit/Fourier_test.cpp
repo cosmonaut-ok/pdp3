@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include "Constant.h"
+#include "Fourier.h"
 
-TEST(Fouries, _default)
+TEST(Fourier, _default)
 {
   EXPECT_TRUE(2 == 2);
 }

@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include "Constant.h"
+#include "H_field.h"
 
-TEST(H_Field, _default)
+TEST(H_field, _default)
 {
   EXPECT_TRUE(2 == 2);
 }

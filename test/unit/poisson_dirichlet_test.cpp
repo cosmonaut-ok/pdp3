@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "Constant.h"
+#include "poisson_dirichlet.h"
 
 TEST(poisson_dirichlet, _default)
 {

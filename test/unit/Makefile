@@ -22,10 +22,13 @@ USER_DIR = ../..
 # Flags passed to the preprocessor.
 # Set Google Test's header directory as a system directory, such that
 # the compiler doesn't generate warnings in Google Test headers.
-CPPFLAGS += -isystem $(GTEST_DIR)/include -I../../ -L../../
+CPPFLAGS += -isystem $(GTEST_DIR)/include -I$(USER_DIR) -I../../lib/tinyxml2
 
 # Flags passed to the C++ compiler.
 CXXFLAGS += -g -Wall -Wextra -pthread
+
+# Linker flags
+LDFLAGS += -L$(USER_DIR)
 
 # All tests produced by this Makefile.  Remember to add new tests you
 # created to the list.
@@ -65,11 +68,8 @@ gtest.a : gtest-all.o
 gtest_main.a : gtest-all.o gtest_main.o
 	$(AR) $(ARFLAGS) $@ $^
 
-# main.cpp: $(OBJ_FILES) gtest_main.a
-# 	g++ $(LDFLAGS) -o $@ $^
-
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
-	g++ $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
+$(OBJ_DIR)/%.o: $(SRC_FILES)/%.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
 
 main: $(OBJ_FILES) gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) -o $@ $^

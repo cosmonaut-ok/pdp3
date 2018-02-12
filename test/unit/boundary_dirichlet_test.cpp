@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "Constant.h"
+#include "boundary_dirichlet.h"
 
 TEST(boundary_dirichlet, _default)
 {

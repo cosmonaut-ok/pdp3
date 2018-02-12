@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "Constant.h"
+#include "boundary_neumann.h"
 
 TEST(boundary_neumann, _default)
 {

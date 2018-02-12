@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "Constant.h"
+#include "charge_density.h"
 
 TEST(charge_density, _default)
 {

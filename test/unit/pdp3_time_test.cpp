@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "Constant.h"
+#include "pdp3_time.h"
 
 TEST(pdp3_time, _default)
 {

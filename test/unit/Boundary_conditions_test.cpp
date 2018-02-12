@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "Constant.h"
+#include "Boundary_conditions.h"
 
 TEST(Boundary_conditions, _default)
 {

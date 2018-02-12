@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "Constant.h"
+#include "current.h"
 
 TEST(current, _default)
 {

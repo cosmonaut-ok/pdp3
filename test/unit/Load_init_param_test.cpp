@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "Constant.h"
+#include "Load_init_param.h"
 
 TEST(Load_init_param, _default)
 {

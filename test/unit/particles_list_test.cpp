@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include "Constant.h"
+#include "particles_list.h"
 
-TEST(pacticles_list, _default)
+TEST(particles_list, _default)
 {
   EXPECT_TRUE(2 == 2);
 }

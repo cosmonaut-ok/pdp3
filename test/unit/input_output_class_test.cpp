@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "Constant.h"
+#include "input_output_class.h"
 
 TEST(input_output, _default)
 {

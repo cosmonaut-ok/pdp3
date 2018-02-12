@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "Constant.h"
+#include "particles_struct.h"
 
 TEST(particles_struct, _default)
 {

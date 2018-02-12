@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "Constant.h"
+#include "Poisson.h"
 
 TEST(Poisson, _default)
 {

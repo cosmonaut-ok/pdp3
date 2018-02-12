@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include "Constant.h"
+#include "Triple.h"
 
-TEST(Triple, default_)
+TEST(Triple, _default)
 {
   EXPECT_TRUE(2 == 2);
 }

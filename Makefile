@@ -51,6 +51,7 @@ pdp3_CXX_SRCS         = Boundary_Maxwell_conditions.cpp \
 			input_output_class.cpp \
 			particles_list.cpp \
 			particles_struct.cpp
+
 pdp3_RC_SRCS          = pdp3.rc \
 			pdp31.rc
 pdp3_LDFLAGS          =
@@ -108,7 +109,7 @@ CXXFLAGS = ${CFLAGS} #  -fopenmp
 all: $(SUBDIRS) $(DLLS:%=%.so) $(LIBS) $(EXES)
 
 ### Build rules
-.PHONY: all clean dummy
+.PHONY: all clean dummy check-syntax
 
 $(SUBDIRS): dummy
 	@cd $@ && $(MAKE)
@@ -171,8 +172,6 @@ test: mrproper all
 
 test-ext: mrproper all unittest
 	TESTDIR=$(TESTDIR) /bin/bash ./test/functional/test.sh extended
-
-.PHONY: check-syntax
 
 check-syntax:
 	$(CXX) $(LIBRARY_PATH) $(INCLUDE_PATH) -Wall -Wextra -pedantic -fsyntax-only $(CHK_SOURCES)
