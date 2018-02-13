@@ -38,7 +38,10 @@ SRC_DIR := .
 OBJ_DIR := .
 
 SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)
+USER_SRC_FILES := $(wildcard $(USER_DIR)/*.cpp)
+
 OBJ_FILES := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC_FILES))
+USER_OBJ_FILES := $(patsubst $(USER_DIR)/%.cpp,$(USER_DIR)/%.o,$(USER_SRC_FILES))
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -71,7 +74,10 @@ gtest_main.a : gtest-all.o gtest_main.o
 $(OBJ_DIR)/%.o: $(SRC_FILES)/%.cpp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
 
-main: $(OBJ_FILES) gtest_main.a
+$(USER_OBJ_DIR)/%.o: $(USER_SRC_FILES)/%.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
+
+main: $(OBJ_FILES) $(USER_OBJ_FILES) gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) -o $@ $^
 
 test: all
