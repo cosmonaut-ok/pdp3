@@ -2,7 +2,6 @@
 #include "PML.h"
 #include "PML.cpp"
 #include "Geometry.h"
-#include "Geometry.cpp"
 
 // positive case
 double comp_l_1 = 0.0;

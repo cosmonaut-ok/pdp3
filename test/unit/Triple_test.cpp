@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include "Triple.h"
-// #include "Triple.cpp"
+#include "Triple.cpp"
 
 double first_component = 0.1;
 double second_component = 1.1;

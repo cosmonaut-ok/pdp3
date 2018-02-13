@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include "Geometry.h"
-// #include "Geometry.cpp"
+#include "Geometry.cpp"
 
 namespace geometry {
 	double comp_l_1 = 0.0;
