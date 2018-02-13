@@ -81,11 +81,10 @@ before_script:
 
 script:
   - |
-    make unittest
     if [ $TRAVIS_BRANCH = 'master' ]; then
-      make test-ext CFLAGS_OPENMP=${CFLAGS_OPENMP} DEBUG=yes;
+      make test-ext CFLAGS_OPENMP=${CFLAGS_OPENMP};
     else
-      make test CFLAGS_OPENMP=${CFLAGS_OPENMP} DEBUG=yes;
+      make test CFLAGS_OPENMP=${CFLAGS_OPENMP};
     fi
 
 after_script:
