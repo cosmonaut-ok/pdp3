@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include "Particles.h"
 
-TEST(Particles, _dummy)
+TEST(Particles, DUMMY)
 {
   EXPECT_TRUE(2 == 2);
 }

@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include "Bunch.h"
 
-TEST(Bunch, _dummy)
+TEST(Bunch, DUMMY)
 {
   EXPECT_TRUE(2 == 2);
 }

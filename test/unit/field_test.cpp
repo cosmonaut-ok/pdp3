@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include "field.h"
 
-TEST(field, _dummy)
+TEST(field, DUMMY)
 {
   EXPECT_TRUE(2 == 2);
 }
