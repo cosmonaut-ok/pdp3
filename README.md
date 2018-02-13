@@ -125,7 +125,7 @@ user@host$ git pull origin master ## get latest stable code
 
 ### Begining work
 
-NOTE: c++ style coding is BSD-style with spaces (not tabs) indentications, offset 2
+NOTE: Coding conventions follows google c++ coding style: https://google.github.io/styleguide/cppguide.html with exception as BSD-style indentications for cycles/conditions/functions. Also, please, use cpplint (placed as submodule) to check your style (lib/cpplint/cpplint.py)
 
 1. Checkout to new branch
 ```bash
