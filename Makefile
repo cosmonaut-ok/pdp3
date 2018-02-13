@@ -170,7 +170,7 @@ unittest: $(TESTSUBDIRS:%=%/__test__)
 test: mrproper all
 	TESTDIR=$(TESTDIR) /bin/bash ./test/functional/test.sh
 
-test-ext: mrproper all unittest
+test-ext: mrproper all
 	TESTDIR=$(TESTDIR) /bin/bash ./test/functional/test.sh extended
 
 check-syntax:
