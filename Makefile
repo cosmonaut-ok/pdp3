@@ -1,5 +1,6 @@
 SRCDIR                = .
 SUBDIRS               =
+TESTSUBDIRS           = test/unit
 DLLS                  =
 LIBS                  =
 EXES                  = pdp3
@@ -18,13 +19,10 @@ LIBRARIES             =
 ### tinyxml2 sources and settings
 tinyxml2_SUBDIR := $(SRCDIR)/lib/tinyxml2/
 # LDFLAGS := -L$(tinyxml2_SUBDIR)
-INCLUDE_PATH := $(INCLUDE_PATH) -I$(tinyxml2_SUBDIR)
-SUBDIRS := $(SUBDIRS) $(tinyxml2_SUBDIR)
+INCLUDE_PATH += -I$(tinyxml2_SUBDIR)
+SUBDIRS += $(tinyxml2_SUBDIR)
 DLL_IMPORTS := tinyxml2
-LDFLAGS := $(LDFLAGS) -L$(tinyxml2_SUBDIR)
-
-# FOO_LIBSFILES := $(FOO_SUBDIR)/libfoo.a $(FOO_SUBDIR)/libgnufoo.a
-# FOO_LDLIBS := -lfoo -lgnufoo
+LDFLAGS += -L$(tinyxml2_SUBDIR)
 
 ### pdp3 sources and settings
 pdp3_MODULE           = pdp3
@@ -53,6 +51,7 @@ pdp3_CXX_SRCS         = Boundary_Maxwell_conditions.cpp \
 			input_output_class.cpp \
 			particles_list.cpp \
 			particles_struct.cpp
+
 pdp3_RC_SRCS          = pdp3.rc \
 			pdp31.rc
 pdp3_LDFLAGS          =
@@ -110,7 +109,7 @@ CXXFLAGS = ${CFLAGS} #  -fopenmp
 all: $(SUBDIRS) $(DLLS:%=%.so) $(LIBS) $(EXES)
 
 ### Build rules
-.PHONY: all clean dummy
+.PHONY: all clean dummy check-syntax
 
 $(SUBDIRS): dummy
 	@cd $@ && $(MAKE)
@@ -132,7 +131,7 @@ DEFINCL = $(INCLUDE_PATH) $(DEFINES) $(OPTIONS)
 CLEAN_FILES     = y.tab.c y.tab.h lex.yy.c core *.orig *.rej \
                   \\\#*\\\# *~ *% .\\\#*
 
-clean:: $(SUBDIRS:%=%/__clean__) $(EXTRASUBDIRS:%=%/__clean__)
+clean:: $(SUBDIRS:%=%/__clean__) $(EXTRASUBDIRS:%=%/__clean__) $(TESTSUBDIRS:%=%/__clean__)
 	$(RM) $(CLEAN_FILES) $(C_SRCS:.c=.o) $(CXX_SRCS:.cpp=.o)
 	$(RM) $(DLLS:%=%.so) $(LIBS) $(EXES) $(EXES:%=%.so)
 	$(RM) -r python/__pycache__/
@@ -140,8 +139,13 @@ clean:: $(SUBDIRS:%=%/__clean__) $(EXTRASUBDIRS:%=%/__clean__)
 $(SUBDIRS:%=%/__clean__): dummy
 	cd `dirname $@` && $(MAKE) clean
 
+
 $(EXTRASUBDIRS:%=%/__clean__): dummy
 	-cd `dirname $@` && $(RM) $(CLEAN_FILES)
+
+
+$(TESTSUBDIRS:%=%/__clean__): dummy
+	cd `dirname $@` && $(MAKE) clean
 
 ### Target specific build rules
 DEFLIB = $(LIBRARY_PATH) $(LIBRARIES) $(DLL_PATH) $(DLL_IMPORTS:%=-l%)
@@ -158,13 +162,16 @@ mrproper: clean
 run: bootstrap
 	./pdp3
 
+$(TESTSUBDIRS:%=%/__test__): dummy
+	cd `dirname $@` && $(MAKE) test
+
+unittest: $(TESTSUBDIRS:%=%/__test__)
+
 test: mrproper all
 	TESTDIR=$(TESTDIR) /bin/bash ./test/functional/test.sh
 
 test-ext: mrproper all
 	TESTDIR=$(TESTDIR) /bin/bash ./test/functional/test.sh extended
-
-.PHONY: check-syntax
 
 check-syntax:
 	$(CXX) $(LIBRARY_PATH) $(INCLUDE_PATH) -Wall -Wextra -pedantic -fsyntax-only $(CHK_SOURCES)

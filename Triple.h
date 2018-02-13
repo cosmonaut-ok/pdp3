@@ -1,5 +1,4 @@
 #pragma once
-#include "particles_struct.h"
 
 class Triple
 {
