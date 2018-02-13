@@ -12,7 +12,6 @@ public:
 public:
   Time(void);
   Time(double ct, double st, double rt, double et, double dt);
-  Time(double* time_params);
 
   ~Time(void);
 };
