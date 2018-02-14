@@ -14,7 +14,7 @@ namespace geometry {
   double n_grid_r = 16;
   double n_grid_z = 64;
 
-  Geometry * geometry = new Geometry(r_size, z_size, n_grid_r, n_grid_z)
+  Geometry * geometry = new Geometry(r_size, z_size, n_grid_r, n_grid_z);
 
   TEST(Geometry, init)
   {
