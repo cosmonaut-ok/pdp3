@@ -4,7 +4,6 @@
 #include "pdp3_time.h"
 //#include "H_field.h"
 #include "Particles.h"
-#include"PML.h"
 #include"charge_density.h"
 #include"current.h"
 #include"Triple.h"
@@ -24,11 +23,11 @@ public:
   double** fi; //potential
   double** t_charge_density;
   const Geometry* geom1;
-  // const double epsilon0;
+
   E_field(Geometry* geom1_t);
   E_field();
   ~E_field(void);
-  // void calc_field(H_field* h_field1, Time* time1, current* current1, PML* pml1);
+
   void calc_field(H_field* h_field1, Time* time1, current* current1);
   void poisson_equation2(Geometry* geom1, charge_density* ro1);
   void cosine_ftansfrom(double** fi_ro, int lenght_n, int k);

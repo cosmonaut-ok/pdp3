@@ -38,7 +38,6 @@ public:
   void run(void);
 
 public:
-  PML * c_pml;
   Geometry * c_geom;
   Time * c_time;
   Particles* c_part;
@@ -67,7 +66,6 @@ public:
 
 private:
   void read_xml(const char* xml_file_name);
-  void init_pml ();
   void init_geometry ();
   void init_fields ();
   void init_time ();
