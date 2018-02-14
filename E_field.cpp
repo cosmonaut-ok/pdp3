@@ -8,12 +8,12 @@
 using namespace std;
 using namespace constant;
 
-E_field::E_field(): epsilon0(EPSILON0)
+E_field::E_field()
 {
 }
 
 //// constructor
-E_field::E_field(Geometry* geom1_t): geom1(geom1_t), epsilon0(EPSILON0)
+E_field::E_field(Geometry* geom1_t): geom1(geom1_t)
 {
   //// Er
   // n_grid - number of edges
@@ -148,11 +148,10 @@ void E_field::boundary_conditions()
   }
 }
 
-// Electric field calculation with absorbing fields on walls
+// Electric field calculation
 void E_field::calc_field(H_field* h_field1,
                          Time* time1,
-                         current* current1,
-                         PML* pml1)
+                         current* current1)
 {
   double** j1 = current1->get_j1();
   double** j2 = current1->get_j2();
@@ -204,48 +203,6 @@ void E_field::calc_field(H_field* h_field1,
       (2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
     koef_h =  2*time1->delta_t/(2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
     e3[i][k]=e3[i][k]*koef_e - (j3[i][k] - (h2[i][k]-h2[i-1][k])/dr - (h2[i][k]+h2[i-1][k])/(2.0*dr*i))*koef_h;
-  }
-}
-
-// Electric field calculation sigma=0
-void E_field::calc_field(H_field* h_field1, Time* time1, current* current1)
-{
-  double** j1= current1->get_j1();
-  double** j2= current1->get_j2();
-  double** j3= current1->get_j3();
-  double** h1 = h_field1->h1;
-  double** h2 = h_field1->h2;
-  double** h3 = h_field1->h3;
-  double dr = geom1->dr;
-  double dz = geom1->dz;
-
-  //// Er first[i] value
-#pragma omp parallel shared (time1, h2, j1, j3)
-  {
-#pragma omp for
-    for(int k=1; k<(geom1->n_grid_2-1); k++)
-      e1[0][k]=e1[0][k]-(j1[0][k])*time1->delta_t/EPSILON0;
-
-    //Ez on axis//
-#pragma omp for
-    for(int k=0; k<(geom1->n_grid_2-1); k++)
-      e3[0][k]=e3[0][k]-(j3[0][k]-2.0/dr*h2[0][k])*time1->delta_t/EPSILON0;
-  }
-
-  for(int i=1; i<(geom1->n_grid_1-1); i++)
-    for(int k=1; k<(geom1->n_grid_2-1); k++)
-    {
-      e1[i][k]=e1[i][k] - (j1[i][k]+(h2[i][k]-h2[i][k-1])/dz) * time1->delta_t/EPSILON0;
-      e2[i][k]=e2[i][k] - (j2[i][k]-(h1[i][k]-h1[i][k-1])/dz +
-                           (h3[i][k]-h3[i-1][k])/dr)*time1->delta_t/EPSILON0;;
-      e3[i][k]=e3[i][k] - (j3[i][k]-(h2[i][k]-h2[i-1][k])/dr -
-                           (h2[i][k]+h2[i-1][k])/(2.0*dr*i))*time1->delta_t/EPSILON0;
-    }
-
-  for(int i=1; i<(geom1->n_grid_1-1); i++)
-  {
-    int k=0;
-    e3[i][k]=e3[i][k] -(j3[i][k]-(h2[i][k]-h2[i-1][k])/dr - (h2[i][k]+h2[i-1][k])/(2.0*dr*i))*time1->delta_t/EPSILON0;
   }
 }
 
