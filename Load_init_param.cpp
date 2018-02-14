@@ -368,7 +368,7 @@ void Load_init_param::run(void)
   int step_number = 0;
   time_t t1 = time(0);
   char avg_step_exec_time[24]; // rounded and formatted average step execution time
-  
+
   while (c_time->current_time <= c_time->end_time)
   {
     c_bunch->bunch_inject(c_time);
@@ -392,7 +392,7 @@ void Load_init_param::run(void)
 
     // 4. Calculate E
     // maxwell_rad.probe_mode_exitation(&geom1,&current1, 1,7e8, time1.current_time);
-    efield->calc_field(hfield,c_time, c_current, c_pml);
+    efield->calc_field(hfield,c_time, c_current); // , c_pml);
 
     //continuity equation
     c_rho_new->reset_rho();
@@ -414,11 +414,11 @@ void Load_init_param::run(void)
     if  ((((int)(c_time->current_time/c_time->delta_t))%data_dump_interval==0))
     {
       sprintf(avg_step_exec_time, "%.2f", (double)(time(0) - t1) / data_dump_interval);
-      
+
       cout << left << setw(8) << step_number * data_dump_interval
            << left << setw(13) << step_number
            << left << setw(18) << c_time->current_time
-           << left << setw(32) << avg_step_exec_time 
+           << left << setw(32) << avg_step_exec_time
            << endl;
 
       c_bunch->charge_weighting(c_rho_beam);
@@ -444,5 +444,5 @@ void Load_init_param::run(void)
     //if (!res)
     //  cout<<"Error:"<<c_time->current_time<<"! ";
   }
-  cout << "\nSimulation Completed\n\n";    
+  cout << "\nSimulation Completed\n\n";
 }
