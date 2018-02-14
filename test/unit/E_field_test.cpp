@@ -14,8 +14,8 @@ namespace e_field {
 
   E_field * efield = new E_field(geometry);
 
-  TEST(E_field, DUMMY)
+  TEST(E_field, object_created)
   {
-    EXPECT_TRUE(2 == 2);
+    EXPECT_TRUE(efield);
   }
 }
