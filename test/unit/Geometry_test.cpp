@@ -14,10 +14,8 @@ namespace geometry {
   double n_grid_r = 16;
   double n_grid_z = 64;
 
-  PML * pml_default = new PML(0.0, 0.0, 1.1, 1e-5, 7e-2);
-
-  Geometry * geometry = new Geometry(r_size, z_size, n_grid_r, n_grid_z, pml_default);
-  // Geometry * geometry_zero = new Geometry(r_size, z_size, n_grid_r, n_grid_z);
+  Geometry * geometry = new Geometry(r_size, z_size, n_grid_r, n_grid_z);
+  Geometry * geometry_default = new Geometry(r_size, z_size, n_grid_r, n_grid_z);
 
   TEST(Geometry, init)
   {
@@ -25,5 +23,25 @@ namespace geometry {
     ASSERT_EQ (geometry->second_size, z_size);
     ASSERT_EQ (geometry->n_grid_1, n_grid_r);
     ASSERT_EQ (geometry->n_grid_2, n_grid_z);
+  }
+
+  TEST(Geometry, set_epsilon)
+  {
+    geometry->set_epsilon();
+    for(int i=0;i<(n_grid_r);i++)
+      for(int k=0;k<(n_grid_z);k++)
+      {
+        ASSERT_EQ (geometry->epsilon[i][k], 1);
+        ASSERT_NE (geometry_default->epsilon[i][k], 1);
+      }
+  }
+
+  TEST(Geometry, setPML)
+  {
+    geometry->setPML(comp_l_1, comp_l_2, comp_l_3, sigma_1_t, sigma_2_t);
+
+     for(int i=0;i < n_grid_r; i++)
+      for(int k=0;k < n_grid_z; k++)
+        ASSERT_NE (geometry->sigma[i][k], geometry_default->sigma[i][k]);
   }
 }
