@@ -263,10 +263,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\PML.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\Poisson.cpp"
 				>
 			</File>
@@ -354,10 +350,6 @@
 			</File>
 			<File
 				RelativePath=".\particles_list.h"
-				>
-			</File>
-			<File
-				RelativePath=".\PML.h"
 				>
 			</File>
 			<File
