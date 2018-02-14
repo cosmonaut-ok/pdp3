@@ -50,10 +50,6 @@ Load_init_param::Load_init_param(char* xml_file_name)
   cout << "Reading configuration file ``" << xml_file_name << "``\n";
   read_xml(xml_file_name);
 
-  // load PML parameters
-  cout << "Initializing PML Data\n";
-  init_pml();
-
   // load Geometry parameters
   cout << "Initializing Geometry Parameters\n";
   init_geometry();
@@ -221,33 +217,12 @@ void Load_init_param::init_boundary ()
   }
 }
 
-void Load_init_param::init_pml ()
-{
-  XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
-  XMLElement* sub_root =root->FirstChildElement (PML_PARAMS_NAME);
-  //
-  double comp_l_1 = atof(sub_root->
-                         FirstChildElement("comparative_l_1")->
-                         GetText());
-  double comp_l_2 = atof(sub_root->
-                         FirstChildElement("comparative_l_2")->
-                         GetText());
-  double comp_l_3 = atof(sub_root->
-                         FirstChildElement("comparative_l_3")->
-                         GetText());
-  double sigma_1_t = atof(sub_root->
-                          FirstChildElement("sigma_1")->
-                          GetText());
-  double sigma_2_t = atof(sub_root->
-                          FirstChildElement("sigma_2")->
-                          GetText());
-  c_pml = new PML(comp_l_1, comp_l_2, comp_l_3, sigma_1_t, sigma_2_t);
-}
-
 void Load_init_param::init_geometry ()
 {
   XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
   XMLElement* sub_root =root->FirstChildElement (GEOMETRY_PARAMS_NAME);
+  XMLElement* pml_sub_root =root->FirstChildElement (PML_PARAMS_NAME);
+
   //
   double r_size = atof(sub_root->
                        FirstChildElement("r_size")->
@@ -261,9 +236,29 @@ void Load_init_param::init_geometry ()
   int n_grid_z = atoi(sub_root->
                       FirstChildElement("n_grid_z")->
                       GetText());
+  // PML
+  double comp_l_1 = atof(pml_sub_root->
+                         FirstChildElement("comparative_l_1")->
+                         GetText());
+  double comp_l_2 = atof(pml_sub_root->
+                         FirstChildElement("comparative_l_2")->
+                         GetText());
+  double comp_l_3 = atof(pml_sub_root->
+                         FirstChildElement("comparative_l_3")->
+                         GetText());
+  double sigma_1_t = atof(pml_sub_root->
+                          FirstChildElement("sigma_1")->
+                          GetText());
+  double sigma_2_t = atof(pml_sub_root->
+                          FirstChildElement("sigma_2")->
+                          GetText());
 
-  // WARNING! should be called after init_pml
-  c_geom = new Geometry(r_size, z_size, n_grid_r, n_grid_z, c_pml);
+  c_geom = new Geometry(r_size, z_size, n_grid_r, n_grid_z);
+
+  // add PML to geometry
+  if (comp_l_1 != 0 or comp_l_2 != 0 or comp_l_3 != 0)
+    c_geom->setPML(comp_l_1, comp_l_2, comp_l_3, sigma_1_t, sigma_2_t);
+
   c_geom->set_epsilon();
 }
 
@@ -392,7 +387,7 @@ void Load_init_param::run(void)
 
     // 4. Calculate E
     // maxwell_rad.probe_mode_exitation(&geom1,&current1, 1,7e8, time1.current_time);
-    efield->calc_field(hfield,c_time, c_current); // , c_pml);
+    efield->calc_field(hfield,c_time, c_current);
 
     //continuity equation
     c_rho_new->reset_rho();

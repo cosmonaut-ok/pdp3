@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -220,7 +220,6 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Particles.cpp" />
     <ClCompile Include="particles_list.cpp" />
-    <ClCompile Include="PML.cpp" />
     <ClCompile Include="Poisson.cpp" />
     <ClCompile Include="Poisson_dirichlet.cpp" />
     <ClCompile Include="Poisson_neumann.cpp" />
@@ -248,7 +247,6 @@
     <ClInclude Include="particles_list.h" />
     <ClInclude Include="particles_struct.h" />
     <ClInclude Include="pdp3_time.h" />
-    <ClInclude Include="PML.h" />
     <ClInclude Include="Poisson.h" />
     <ClInclude Include="poisson_dirichlet.h" />
     <ClInclude Include="Poisson_neumann.h" />
