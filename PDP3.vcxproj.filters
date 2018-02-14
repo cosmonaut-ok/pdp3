@@ -59,9 +59,6 @@
     <ClCompile Include="particles_list.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PML.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Poisson.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -131,9 +128,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="particles_list.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PML.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Poisson.h">
