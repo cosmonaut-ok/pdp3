@@ -15,97 +15,84 @@ E_field::E_field()
 //// constructor
 E_field::E_field(Geometry* geom1_t): geom1(geom1_t)
 {
-  //// Er
   // n_grid - number of edges
-  e1 = new double*[geom1->n_grid_1-1];
-#pragma omp parallel for shared (e1)
-  for (int i=0; i<(geom1->n_grid_1-1);i++)
-    e1[i]= new double[geom1->n_grid_2];
-  e1_1d = new double[(geom1->n_grid_1-1)*geom1->n_grid_2];
-
+  //// Er
+  e1 = new double*[geom1->n_grid_1];
+  e1_1d = new double[(geom1->n_grid_1)*geom1->n_grid_2];
   //// Ef
   e2 = new double*[geom1->n_grid_1];
-#pragma omp parallel for shared (e2)
-  for (int i=0; i<(geom1->n_grid_1);i++)
-    e2[i]= new double[geom1->n_grid_2];
   e2_1d = new double[geom1->n_grid_1*geom1->n_grid_2];
-
   //// Ez
   e3 = new double*[geom1->n_grid_1];
-#pragma omp parallel for shared (e3)
-  for (int i=0; i<(geom1->n_grid_1);i++)
-    e3[i]= new double[geom1->n_grid_2-1];
-  e3_1d = new double[geom1->n_grid_1*(geom1->n_grid_2-1)];
+  e3_1d = new double[geom1->n_grid_1*(geom1->n_grid_2)];
+
+
+#pragma omp parallel for shared (e1, e2, e3)
+  // filling second demension
+  for (int i=0; i<(geom1->n_grid_1); i++)
+  {
+    e1[i]= new double[geom1->n_grid_2];
+    e2[i]= new double[geom1->n_grid_2];
+    e3[i]= new double[geom1->n_grid_2];
+  }
 
   //// fi
   fi = new double*[geom1->n_grid_1];
-#pragma omp parallel for shared (fi)
-  for (int i=0; i<(geom1->n_grid_1);i++)
-    fi[i]= new double[geom1->n_grid_2];
-
   //// charge_density
   t_charge_density = new double*[geom1->n_grid_1];
-#pragma omp parallel shared (t_charge_density)
-  {
-#pragma omp for
-    for (int i=0; i<(geom1->n_grid_1);i++)
-      t_charge_density[i] = new double[geom1->n_grid_2];
 
-    // set zero initial temp ro
-#pragma omp for
-    for (int i=0; i<(geom1->n_grid_1);i++)
-      for (int k=0; k<(geom1->n_grid_2);k++)
-        t_charge_density[i][k]=0;
+#pragma omp parallel for
+  // filling second demension
+  // for potential and charge density
+  for (int i=0; i<(geom1->n_grid_1); i++)
+  {
+    fi[i]= new double[geom1->n_grid_2];
+    t_charge_density[i] = new double[geom1->n_grid_2];
   }
+
+  // set zero initial temp ro
+#pragma omp for
+  for (int i=0; i<(geom1->n_grid_1); i++)
+    for (int k=0; k<(geom1->n_grid_2); k++)
+      t_charge_density[i][k] = 0;
 }
 
 // destructor
 E_field::~E_field()
 {
   for (int i=0; i<(geom1->n_grid_1-1);i++)
+  {
     delete[]e1[i];
-  delete[]e1;
-
-  for (int i=0; i<(geom1->n_grid_1);i++)
     delete[]e2[i];
-  delete[]e2;
-
-  for (int i=0; i<(geom1->n_grid_1);i++)
     delete[]e3[i];
+  }
+  delete[]e1;
+  delete[]e2;
   delete[]e3;
 
   for (int i=0; i<(geom1->n_grid_1);i++)
+  {
     delete[]fi[i];
-  delete[]fi;
-
-  for (int i=0; i<(geom1->n_grid_1);i++)
     delete[]t_charge_density[i];
+  }
+  delete[]fi;
   delete[]t_charge_density;
 }
 
 // initial E distribution
 void E_field::set_homogeneous_efield(double E1, double E2, double E3)
 {
-  //// Er
-#pragma omp parallel shared (E1, E2, E3)
-  {
-#pragma omp for
-    for(int i=0;i<(geom1->n_grid_1-1);i++)
-      for(int k=0;k<(geom1->n_grid_2-1);k++)
-        e1[i][k]= E1;
-
-    //// Ef
-#pragma omp for
-    for(int i=0;i<(geom1->n_grid_1-1);i++)
-      for(int k=0;k<(geom1->n_grid_2-1);k++)
-        e2[i][k]=E2;
-
-    //// Ez
-#pragma omp for
-    for(int i=0;i<(geom1->n_grid_1-1);i++)
-      for(int k=0;k<(geom1->n_grid_2-1);k++)
-        e3[i][k]=E3;
-  }
+#pragma omp parallel for shared (E1, E2, E3)
+  for(int i=0; i<(geom1->n_grid_1-1); i++)
+    for(int k=0; k<(geom1->n_grid_2-1); k++)
+    {
+      // Er
+      e1[i][k] = E1;
+      // Ef
+      e2[i][k] = E2;
+      // Ez
+      e3[i][k] = E3;
+    }
 }
 
 void E_field::boundary_conditions()
@@ -115,7 +102,7 @@ void E_field::boundary_conditions()
 #pragma omp parallel
   {
 #pragma omp for
-    for(int i=0;i<(geom1->n_grid_1-1);i++)
+    for(int i=0; i<(geom1->n_grid_1-1); i++)
     {
       e1[i][0]=0;
       e1[i][geom1->n_grid_2-1]=0;
@@ -124,14 +111,14 @@ void E_field::boundary_conditions()
 
     //// Border Ef conditions
 #pragma omp for
-    for(int k=0;k<(geom1->n_grid_2);k++)
+    for(int k=0; k<(geom1->n_grid_2); k++)
     {
       e2[0][k]=0;
       e2[geom1->n_grid_1-1][k]=0;
     }
 
 #pragma omp for
-    for(int i=0;i<(geom1->n_grid_1);i++)
+    for(int i=0; i<(geom1->n_grid_1); i++)
     {
       e2[i][0]=0;
       e2[i][geom1->n_grid_2-1]=0;
@@ -139,7 +126,7 @@ void E_field::boundary_conditions()
 
     //// Border Ez conditions
 #pragma omp for
-    for(int k=0;k<(geom1->n_grid_2-1);k++)
+    for(int k=0; k<(geom1->n_grid_2-1); k++)
     {
       e3[0][k]=0;
       e3[geom1->n_grid_1-1][k]=0;
@@ -170,7 +157,9 @@ void E_field::calc_field(H_field* h_field1,
     int i=0;
     koef_e = (2.0*geom1->epsilon[i][k]*EPSILON0 - geom1->sigma[i][k]*time1->delta_t) /
       (2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
+
     koef_h =  2*time1->delta_t/(2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
+
     e1[i][k]=e1[i][k] * koef_e  - (j1[i][k]+(h2[i][k] - h2[i][k-1])/dz)*koef_h;
   }
 
