@@ -1,11 +1,11 @@
-#include "charge_density.h"
+#include "chargeDensity.h"
 
-charge_density::charge_density(void)
+ChargeDensity::ChargeDensity(void)
 {
 }
 
 // constructor
-charge_density::charge_density(Geometry* geom1_t): geom1(geom1_t)
+ChargeDensity::ChargeDensity(Geometry* geom1_t): geom1(geom1_t)
 {
   rho = new double*[geom1->n_grid_1];
 #pragma omp parallel
@@ -21,24 +21,24 @@ charge_density::charge_density(Geometry* geom1_t): geom1(geom1_t)
         rho[i][k]=0;
   }
 }
-charge_density::~charge_density(void)
+ChargeDensity::~ChargeDensity(void)
 {
   for (int i=0; i<(geom1->n_grid_1);i++)
     delete[]rho[i];
   delete[]rho;
 }
 
-double** charge_density::get_ro() const
+double** ChargeDensity::get_ro() const
 {
   return rho;
 }
 
-void charge_density::set_ro_weighting(int i, int k, double value)
+void ChargeDensity::set_ro_weighting(int i, int k, double value)
 {
   rho[i][k]=rho[i][k]+value;
 }
 
-void charge_density::reset_rho()
+void ChargeDensity::reset_rho()
 {
 #pragma omp parallel for
   for (int i=0;i<geom1->n_grid_1;i++)

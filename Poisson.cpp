@@ -1,5 +1,5 @@
 #include "Poisson.h"
-#include "Constant.h"
+#include "constant.h"
 
 using namespace constant;
 
@@ -11,7 +11,7 @@ Poisson::~Poisson(void)
 {
 }
 
-bool Poisson::test_poisson_equation(E_field* input_e ,charge_density *rho)
+bool Poisson::test_poisson_equation(EField* input_e, ChargeDensity *rho)
 {
   double dr = cyl_geom->dr;
   double dz = cyl_geom->dz;
