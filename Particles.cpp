@@ -43,9 +43,7 @@ Particles::Particles(char const *p_name,
 
 #pragma omp parallel for
   for (int i = 0; i < number; i++)
-  {
     is_alive[i] = 1;
-  }
 }
 
 // copy constructor
@@ -430,24 +428,27 @@ void Particles::velocity_distribution(double tempr_ev)
   double therm_vel = sqrt(tempr_ev*2.0*EL_CHARGE/
                           (this->init_const_mass*EL_MASS));
   // double R =0; // number from [0;1]
+	// TODO: why 5e6?
   double dv = therm_vel/0.5e7; // velocity step in calculation integral
-  double cutoff_vel = 9.0*therm_vel; //cutoff velocity
+	// TODO: why 9.0?
+  double cutoff_vel = 9.0*therm_vel; // cutoff velocity
   int lenght_arr = (int)cutoff_vel/dv;
   double s = 0;
-  double ds = 0;
+
   double* integ_array = new double [lenght_arr];
 
   double const1 = 2*therm_vel*therm_vel;
   // part of numerical integral calculation
   for (int i=0; i<lenght_arr; i++)
   {
+		double ds = 0;
     ds = exp(-dv*i*dv*i/const1)*dv;
-    s=s+ds;
+    s = s+ds;
     integ_array[i] = s;
   }
 
 #pragma omp parallel for shared(integ_array, lenght_arr, const1, dv)
-  for(int i_n=0;i_n<number;i_n++)
+  for(int i_n=0; i_n<number; i_n++)
   {
     double Rr = random_reverse(i_n,3);
     double Rfi = random_reverse(i_n,5);
@@ -457,15 +458,15 @@ void Particles::velocity_distribution(double tempr_ev)
     double f_vr = Rr*t_z;
     double f_vfi = Rfi*t_z;
     double f_vz = Rz*t_z;
-    int sign =1;
-    if (i_n%2==1)
+    int sign = 1;
+    if (i_n%2 == 1)
       sign =-1;
 
     // binary search
-    int i=0;
-    int j=lenght_arr;
-    int k=0;
-    while(i<=j)
+    int i = 0;
+    int j = lenght_arr;
+    int k = 0;
+    while(i <= j)
     {
       k = i + (j-i)/2;
       if(f_vr>integ_array[k])
@@ -477,10 +478,10 @@ void Particles::velocity_distribution(double tempr_ev)
     }
     v1[i_n]=dv*k*sign;
 
-    i=0;
-    j=lenght_arr;
-    k=0;
-    while(i<=j)
+    i = 0;
+    j = lenght_arr;
+    k = 0;
+    while(i <= j)
     {
       k = i + (j-i)/2;
       if(f_vfi>integ_array[k])
@@ -513,10 +514,10 @@ void Particles::velocity_distribution(double tempr_ev)
 double Particles::random_reverse(double vel, int power)
 {
   int int_vel =(int) floor(vel);
-  double ost =0;
-  double r =0;
-  int order =1;
-  while(int_vel>=1)
+  double ost = 0;
+  double r = 0;
+  int order = 1;
+  while(int_vel >= 1)
   {
     ost = int_vel % power;
 
