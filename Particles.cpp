@@ -157,7 +157,7 @@ double Particles::get_gamma_inv(int i) // TODO: it is not alpha
 
   if (isinf(gamma) == 1) { // avoid infinity values
     cerr << "WARNING(get_gamma_inv): reciprocal gamma (Lorenz factor) directs to infinity for [v1, v2, v3, i]: ["
-         << v1[i] << ", " << v2[i] << ", " << v3[i] << ", " << i << "]\n";
+         << v1[i] << ", " << v2[i] << ", " << v3[i] << ", " << i << "]" << endl;
     return 1e100; // just return some very big value
   }
   else
