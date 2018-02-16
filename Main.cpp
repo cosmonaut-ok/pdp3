@@ -27,7 +27,7 @@ int main(int argc, char **argv)
 
   if (cmdOptionExists(argv, argv+argc, "-h"))
   {
-    cerr << "USAGE:\n  pdp3 [ -f configfile_path ]\n";
+    cerr << "USAGE:" << endl << "  pdp3 [ -f configfile_path ]" << endl;
     return 1;
   }
 
