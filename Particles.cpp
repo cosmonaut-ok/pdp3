@@ -23,9 +23,7 @@ Particles::Particles(char const *p_name,
                      double p_charge,
                      double p_mass,
                      int p_number,
-                     Geometry* geom,
-                     particles_list* t_p_list):geom1(geom),
-                                               p_list(t_p_list)
+                     Geometry* geom):geom1(geom)
 {
   name = (char *) p_name;
   charge = (double)p_charge*(double)EL_CHARGE;
@@ -48,9 +46,6 @@ Particles::Particles(char const *p_name,
   {
     is_alive[i] = 1;
   }
-
-  // insert to particles_lists
-  p_list->part_list.push_back(this);
 }
 
 // copy constructor
