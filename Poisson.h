@@ -1,7 +1,7 @@
 #pragma once
-#include "H_field.h"
-#include "E_field.h"
-#include "charge_density.h"
+#include "hField.h"
+#include "eField.h"
+#include "chargeDensity.h"
 
 class Poisson
 {
@@ -11,6 +11,6 @@ public:
 public:
   Geometry* cyl_geom;
 public:
-  virtual void poisson_solve(E_field* input_e, charge_density* ro1)=0;
-  bool test_poisson_equation(E_field* input_e, charge_density* input_rho);
+  virtual void poisson_solve(EField* input_e, ChargeDensity* ro1) = 0;
+  bool test_poisson_equation(EField* input_e, ChargeDensity* input_rho);
 };

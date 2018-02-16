@@ -1,12 +1,12 @@
 #include "Particles.h"
-#include "E_field.h"
-#include "H_field.h"
+#include "eField.h"
+#include "hField.h"
 #include "pdp3_time.h"
 #include "Triple.h"
 #include <math.h>
 #include <string.h>
 #include <cstdlib>
-#include "Constant.h"
+#include "constant.h"
 
 using namespace std;
 using namespace constant;
@@ -166,7 +166,7 @@ double Particles::get_gamma_inv(int i) // TODO: it is not alpha
   }
 }
 
-void Particles::step_v(E_field *e_fld, H_field *h_fld, Time* t)
+void Particles::step_v(EField *e_fld, HField *h_fld, Time* t)
 {
 
 #pragma omp parallel for shared(e_fld, h_fld, t)
@@ -296,7 +296,7 @@ void Particles::half_step_coord(Time* t)
 }
 
 // function for charge density weighting
-void Particles::charge_weighting(charge_density* ro1)
+void Particles::charge_weighting(ChargeDensity* ro1)
 {
   int r_i = 0;  // number of particle i cell
   int z_k = 0;  // number of particle k cell
