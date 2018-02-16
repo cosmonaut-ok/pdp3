@@ -78,7 +78,7 @@ CFLAGS ?= -m64 -mcmodel=medium
 CFLAGS_SPEEDUP = -ffast-math
 CFLAGS_NO_OPENMP ?= -Wno-unknown-pragmas
 CFLAGS_OPENMP ?= -fopenmp
-CFLAGS_DEBUG ?= -O0 -Wall -g -ggdb -fvar-tracking -ggnu-pubnames -pedantic
+CFLAGS_DEBUG ?= -O0 -Wall -Wextra -g -ggdb -fvar-tracking -ggnu-pubnames -pedantic
 
 ## set debug options
 ifeq ($(DEBUG), yes)
