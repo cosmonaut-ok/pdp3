@@ -10,7 +10,7 @@ public:
         double p_mass,
         int p_number,
         Geometry* geom,
-        particles_list* p_list,
+        // particles_list* p_list,
         double b_duration,
         double b_radius,
         double b_density,
