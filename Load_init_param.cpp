@@ -1,9 +1,8 @@
-// #include <sstream>
-// #include <string>
-// #include <iomanip>
 #include <algorithm>
 #include <iomanip>
-// #include <cctype>
+#include <ctime>
+#include <math.h>
+
 // enable openmp optional
 #ifdef _OPENMP
 #include <omp.h>
@@ -14,10 +13,6 @@
 #include "Load_init_param.h"
 #include "time.h"
 #include "tinyxml2.h"
-
-// #include <sys/time.h>
-#include <ctime>
-#include <math.h>
 
 using namespace std;
 using namespace tinyxml2;
@@ -37,9 +32,9 @@ Load_init_param::Load_init_param(void)
 
 Load_init_param::Load_init_param(char* xml_file_name)
 {
-    // NOTE: all system init is too huge,
-    // so we use several "subconstructors"
-    // to initialize different parts of system
+  // NOTE: all system init is too huge,
+  // so we use several "subconstructors"
+  // to initialize different parts of system
 
   // define openmp-related options when openmp enabled
 #ifdef _OPENMP
@@ -47,37 +42,37 @@ Load_init_param::Load_init_param(char* xml_file_name)
 #endif
 
   // read XML config file
-  cout << "Reading configuration file ``" << xml_file_name << "``\n";
+  cout << "Reading configuration file ``" << xml_file_name << "``" << endl;
   read_xml(xml_file_name);
 
   // load Geometry parameters
-  cout << "Initializing Geometry Parameters\n";
+  cout << "Initializing Geometry Parameters" << endl;
   init_geometry();
 
   // creating field objects
-  cout << "Initializing E/M Fields Data\n";
+  cout << "Initializing E/M Fields Data" << endl;
   init_fields ();
 
   // load time parameters
-  cout << "Initializing Time Data\n";
+  cout << "Initializing Time Data" << endl;
   init_time ();
 
   // load particle parameters
-  cout << "Initializing Particles Data\n";
+  cout << "Initializing Particles Data" << endl;
   init_particles();
 
   // load bunch
-  cout << "Initializing Particles Bunch Data\n";
+  cout << "Initializing Particles Bunch Data" << endl;
   init_bunch();
 
-  cout << "Initializing Bounrary Conditions Data\n";
+  cout << "Initializing Bounrary Conditions Data" << endl;
   init_boundary();
 
   // load File Path
-  cout << "Initializing File System Paths\n";
+  cout << "Initializing File System Paths" << endl;
   init_file_saving_parameters();
 
-  cout << "Initialization complete\n";
+  cout << "Initialization complete" << endl;
 }
 
 Load_init_param::~Load_init_param(void)
@@ -91,7 +86,7 @@ void Load_init_param::read_xml(const char* xml_file_name)
   XMLError e_result = xml_data->LoadFile(xml_file_name);
   if (e_result != XML_SUCCESS)
   {
-    cerr << "ERROR: Can not read configuration file ``" << xml_file_name << "``\n";
+    cerr << "ERROR: Can not read configuration file ``" << xml_file_name << "``" << endl;
     exit (78);
   }
 }
@@ -135,7 +130,7 @@ void Load_init_param::init_particles()
   while(particle_kind)
   {
     strcpy (p_name, particle_kind->FirstChildElement("name")->GetText());
-    cout << "  Initializing " << p_name << " Data\n";
+    cout << "  Initializing " << p_name << " Data" << endl;
 
     charge = atof(particle_kind->FirstChildElement("charge")->GetText());
     mass = atof(particle_kind->FirstChildElement("mass")->GetText());
@@ -353,7 +348,7 @@ bool Load_init_param::save_system_state(double timestamp)
 
 void Load_init_param::run(void)
 {
-  cout << "\nLaunch Simulation\n\n";
+  cout << endl << "Launch Simulation" << endl << endl;
 
   this->c_time->current_time = 0.0 ;
   p_list->charge_weighting(c_rho_new);
@@ -443,5 +438,5 @@ void Load_init_param::run(void)
     //if (!res)
     //  cout<<"Error:"<<c_time->current_time<<"! ";
   }
-  cout << "\nSimulation Completed\n\n";
+  cout << endl << "Simulation Completed" << endl << endl;
 }
