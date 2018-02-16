@@ -20,11 +20,10 @@ class Particles
 {
 public:
   Particles(void);
-  Particles(Particles& cp_particles);
+
   Particles(char const *p_name, double p_charge, double p_mass, int p_number,
-            Geometry* geom, particles_list* p_list);
-  Particles(char* p_name, double* params,
-            Geometry* geom, particles_list* p_list);
+            Geometry* geom);
+	Particles(Particles& cp_particles);
   ~Particles();
 public:
   // The specie name
