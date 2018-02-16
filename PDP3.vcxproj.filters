@@ -11,16 +11,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Boundary_conditions.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="boundary_dirichlet.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Boundary_Maxwell_conditions.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="boundary_neumann.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Bunch.cpp">
@@ -82,16 +73,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Boundary_conditions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="boundary_dirichlet.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Boundary_Maxwell_conditions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="boundary_neumann.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Bunch.h">

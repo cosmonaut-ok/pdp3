@@ -202,10 +202,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Boundary_conditions.cpp" />
-    <ClCompile Include="boundary_dirichlet.cpp" />
     <ClCompile Include="Boundary_Maxwell_conditions.cpp" />
-    <ClCompile Include="boundary_neumann.cpp" />
     <ClCompile Include="Bunch.cpp" />
     <ClCompile Include="charge_density.cpp" />
     <ClCompile Include="current.cpp" />
@@ -227,10 +224,7 @@
     <ClCompile Include="Triple.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Boundary_conditions.h" />
-    <ClInclude Include="boundary_dirichlet.h" />
     <ClInclude Include="Boundary_Maxwell_conditions.h" />
-    <ClInclude Include="boundary_neumann.h" />
     <ClInclude Include="Bunch.h" />
     <ClInclude Include="charge_density.h" />
     <ClInclude Include="Constant.h" />

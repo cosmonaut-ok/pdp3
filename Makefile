@@ -28,7 +28,6 @@ LDFLAGS += -L$(tinyxml2_SUBDIR)
 pdp3_MODULE           = pdp3
 pdp3_C_SRCS           =
 pdp3_CXX_SRCS         = Boundary_Maxwell_conditions.cpp \
-			Boundary_conditions.cpp \
 			Bunch.cpp \
 			E_field.cpp \
 			Fourier.cpp \
@@ -42,8 +41,6 @@ pdp3_CXX_SRCS         = Boundary_Maxwell_conditions.cpp \
 			Poisson_neumann.cpp \
 			pdp3_time.cpp \
 			Triple.cpp \
-			boundary_dirichlet.cpp \
-			boundary_neumann.cpp \
 			charge_density.cpp \
 			current.cpp \
 			field.cpp \
