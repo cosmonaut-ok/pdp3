@@ -1,5 +1,5 @@
 #include "poisson_neumann.h"
-#include "Constant.h"
+#include "constant.h"
 
 using namespace constant;
 
@@ -17,7 +17,7 @@ Poisson_neumann::~Poisson_neumann(void)
     delete[]t_charge_density[i];
   delete[]t_charge_density;
 }
-void Poisson_neumann::poisson_solve(E_field* input_e, charge_density* ro1)
+void Poisson_neumann::poisson_solve(EField* input_e, ChargeDensity* ro1)
 {
   double a = 0;
   double c = 0;

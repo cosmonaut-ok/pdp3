@@ -13,11 +13,11 @@ public:
   double** epsilon;
   double** sigma;
 
-  double set_dr();
-  double set_dz();
+  double get_dr();
+  double get_dz();
 
   void set_epsilon();
-  void setPML(double comparative_l_1, double comparative_l_2, double comparative_l_3,
+  void set_pml(double comparative_l_1, double comparative_l_2, double comparative_l_3,
               double sigma1, double sigma2);
 
 	Geometry(double fs, double ss, int ng1, int ng2);

@@ -1,7 +1,7 @@
 #include "Fourier.h"
 #include <complex>
 #include "stdio.h"
-#include "Constant.h"
+#include "constant.h"
 
 using namespace std;
 using namespace constant;

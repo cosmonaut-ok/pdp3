@@ -1,5 +1,5 @@
 #pragma once
-#include "Geometry.h"
+#include "geometry.h"
 #include <complex>
 
 using namespace std;

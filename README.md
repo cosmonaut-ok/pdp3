@@ -104,6 +104,23 @@ After visualization finished, please, look into directory with `parameters.xml` 
 
 ## Hacking
 
+### Coding Style
+
+- Indentication: 2 spaces
+- Braces: BSD style
+- Naming:
+  - classes - CamelCase
+  - files - camelCase, same as class name, begining from lower case
+  - functions - snake_case, lower case
+- Spacing:
+  - after/around operators
+  - no space after unary operators
+  - no space before the postfix increment & decrement unary operators
+  - no space around the . and -> structure member operators
+- Declaring pointer data or a function that returns a pointer type: preferred to use of * is adjacent to the data name or function name and not adjacent to the type name
+- Comments: '//' at line begining
+- File naming: lowercase
+
 ### Working with GIT
 
 ### Before work
@@ -124,8 +141,6 @@ user@host$ git pull origin master ## get latest stable code
 ```
 
 ### Begining work
-
-NOTE: Coding conventions follows google c++ coding style: https://google.github.io/styleguide/cppguide.html with exception as BSD-style indentications for cycles/conditions/functions. Also, please, use cpplint (placed as submodule) to check your style (lib/cpplint/cpplint.py)
 
 1. Checkout to new branch
 ```bash

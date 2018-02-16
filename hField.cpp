@@ -1,13 +1,13 @@
-#include "H_field.h"
-#include "E_field.h"
+#include "hField.h"
+#include "eField.h"
 #include <cstdlib>
 #include <math.h>
-#include "Constant.h"
+#include "constant.h"
 
 using namespace constant;
 
 // Constructor
-H_field::H_field(Geometry* geom1_l):geom1(geom1_l)
+HField::HField(Geometry* geom1_l):geom1(geom1_l)
 {
   // Hr
   h1 = new double* [geom1->n_grid_1];
@@ -91,7 +91,7 @@ H_field::H_field(Geometry* geom1_l):geom1(geom1_l)
   }
 }
 // Destructor
-H_field::~H_field(void)
+HField::~HField(void)
 {
   for (int i=0; i<(geom1->n_grid_1);i++)
   {
@@ -131,7 +131,7 @@ H_field::~H_field(void)
 
 }
 
-void H_field::set_homogeneous_h(double H1, double H2, double H3)
+void HField::set_homogeneous_h(double H1, double H2, double H3)
 {
 #pragma omp parallel shared (H1, H2, H3)
   {
@@ -163,7 +163,7 @@ void H_field::set_homogeneous_h(double H1, double H2, double H3)
 }
 
 // Field calculation
-void H_field::calc_field(E_field* e_field1, Time* time1)
+void HField::calc_field(EField* e_field1, Time* time1)
 {
   double alpha;
 
@@ -199,7 +199,7 @@ void H_field::calc_field(E_field* e_field1, Time* time1)
 }
 
 // function for magnetic field weighting//
-Triple H_field::get_field(double x1, double x3)
+Triple HField::get_field(double x1, double x3)
 {
   int i_r=0; // number of particle i cell
   int k_z=0; // number of particle k cell
@@ -307,7 +307,7 @@ Triple H_field::get_field(double x1, double x3)
 }
 
 //// /Return one dimensional field components
-double* H_field::get_1d_h1()
+double* HField::get_1d_h1()
 {
   // copy 2d field array into 1d array rowwise
 #pragma omp parallel for
@@ -317,7 +317,7 @@ double* H_field::get_1d_h1()
   return h1_1d;
 }
 
-double* H_field::get_1d_h2()
+double* HField::get_1d_h2()
 {
   // copy 2d field array into 1d array rowwise
 #pragma omp parallel for
@@ -327,7 +327,7 @@ double* H_field::get_1d_h2()
   return h2_1d;
 }
 
-double* H_field::get_1d_h3()
+double* HField::get_1d_h3()
 {
   // copy 2d field array into 1d array rowwise
 #pragma omp parallel for
