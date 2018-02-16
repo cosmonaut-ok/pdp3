@@ -1,5 +1,5 @@
 #include <math.h>
-#include "Geometry.h"
+#include "geometry.h"
 
 Geometry::Geometry()
   {
@@ -12,8 +12,8 @@ Geometry::Geometry (double fs, double ss, int ng1, int ng2)
   second_size = ss;
   n_grid_1 = ng1;
   n_grid_2 = ng2;
-  dr = set_dr();
-  dz = set_dz();
+  dr = get_dr();
+  dz = get_dz();
 
   epsilon = new double*[n_grid_1];
 #pragma omp parallel for
@@ -43,18 +43,18 @@ Geometry::~Geometry(void)
 {
 }
 
-double Geometry::set_dr()
+double Geometry::get_dr()
 {
   return first_size/(n_grid_1-1);
 }
 
-double Geometry::set_dz()
+double Geometry::get_dz()
 {
   return second_size/(n_grid_2-1);
 }
 
 // PML
-void Geometry::setPML(double comparative_l_1, double comparative_l_2, double comparative_l_3,
+void Geometry::set_pml(double comparative_l_1, double comparative_l_2, double comparative_l_3,
                       double sigma1, double sigma2)
 {
   // defining lenght of sigma calculation ion left wall
@@ -78,7 +78,7 @@ void Geometry::setPML(double comparative_l_1, double comparative_l_2, double com
   else
   {
     // sigma on r=0 and r=r walls
-    for(int k=0;k<n_grid_2;k++)
+    for(int k=0; k<n_grid_2; k++)
       for(int i=0;i<n_grid_1;i++)
       {
         if (dz*k<lenght_sigma_left)

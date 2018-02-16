@@ -1,7 +1,7 @@
 #pragma once
-#include "Geometry.h"
+#include "geometry.h"
 #include "pdp3_time.h"
-#include "charge_density.h"
+#include "chargeDensity.h"
 #include "current.h"
 #include "Triple.h"
 #include "particles_list.h"
@@ -12,9 +12,9 @@ using namespace std;
 
 class particles_list;
 
-class E_field;
+class EField;
 
-class H_field;
+class HField;
 
 class Particles
 {
@@ -55,8 +55,8 @@ public:
   Geometry* geom1;
   particles_list* p_list;
 public:
-  void charge_weighting(charge_density* ro1);
-  void step_v(E_field *e_fld, H_field *h_fld, Time* t);
+  void charge_weighting(ChargeDensity* ro1);
+  void step_v(EField *e_fld, HField *h_fld, Time* t);
   virtual void half_step_coord(Time* t);
   void set_j_0();
   void set_v_0();

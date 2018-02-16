@@ -25,8 +25,8 @@ public:
 public:
   void bunch_inject(Time* time);
   void bunch_inject_calc_E(Geometry* geom,
-                           E_field * E_beam,
-                           E_field* E,
+                           EField * E_beam,
+                           EField* E,
                            Time* time);
   virtual void half_step_coord(Time* t);
 };

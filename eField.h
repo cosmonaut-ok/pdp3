@@ -1,16 +1,15 @@
 #pragma once
 #include "field.h"
-#include "Geometry.h"
+#include "geometry.h"
 #include "pdp3_time.h"
-//#include "H_field.h"
 #include "Particles.h"
-#include"charge_density.h"
+#include"chargeDensity.h"
 #include"current.h"
 #include"Triple.h"
 #include "particles_struct.h"
 
-class H_field;
-class E_field
+class HField;
+class EField
 {
 
 public:
@@ -24,18 +23,18 @@ public:
   double** t_charge_density;
   const Geometry* geom1;
 
-  E_field(Geometry* geom1_t);
-  E_field();
-  ~E_field(void);
+  EField(Geometry* geom1_t);
+  EField();
+  ~EField(void);
 
-  void calc_field(H_field* h_field1, Time* time1, current* current1);
-  void poisson_equation2(Geometry* geom1, charge_density* ro1);
+  void calc_field(HField* h_field1, Time* time1, current* current1);
+  void poisson_equation2(Geometry* geom1, ChargeDensity* ro1);
   void cosine_ftansfrom(double** fi_ro, int lenght_n, int k);
   void set_homogeneous_efield(double E1, double E2, double E3);
   void set_fi_on_z();
   void boundary_conditions();
   Triple get_field(double x1, double x3);
-  bool test_poisson_equation(charge_density* rho);
+  bool test_poisson_equation(ChargeDensity* rho);
   void TridiagonalSolve(const double *a,
                         const double *b,
                         double *c,

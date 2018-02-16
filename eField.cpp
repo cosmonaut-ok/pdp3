@@ -1,19 +1,19 @@
-#include "E_field.h"
-#include "H_field.h"
+#include "eField.h"
+#include "hField.h"
 #include "math.h"
 #include "Fourier.h"
 #include <fstream>
-#include "Constant.h"
+#include "constant.h"
 
 using namespace std;
 using namespace constant;
 
-E_field::E_field()
+EField::EField()
 {
 }
 
 //// constructor
-E_field::E_field(Geometry* geom1_t): geom1(geom1_t)
+EField::EField(Geometry* geom1_t): geom1(geom1_t)
 {
   // n_grid - number of edges
   //// Er
@@ -58,7 +58,7 @@ E_field::E_field(Geometry* geom1_t): geom1(geom1_t)
 }
 
 // destructor
-E_field::~E_field()
+EField::~EField()
 {
   for (int i=0; i<(geom1->n_grid_1-1);i++)
   {
@@ -80,7 +80,7 @@ E_field::~E_field()
 }
 
 // initial E distribution
-void E_field::set_homogeneous_efield(double E1, double E2, double E3)
+void EField::set_homogeneous_efield(double E1, double E2, double E3)
 {
 #pragma omp parallel for shared (E1, E2, E3)
   for(int i=0; i<(geom1->n_grid_1-1); i++)
@@ -95,7 +95,7 @@ void E_field::set_homogeneous_efield(double E1, double E2, double E3)
     }
 }
 
-void E_field::boundary_conditions()
+void EField::boundary_conditions()
 {
   //// Border Er conditions
   // last elements of array [ngrid-1]!!!
@@ -136,7 +136,7 @@ void E_field::boundary_conditions()
 }
 
 // Electric field calculation
-void E_field::calc_field(H_field* h_field1,
+void EField::calc_field(HField* h_field1,
                          Time* time1,
                          current* current1)
 {
@@ -196,7 +196,7 @@ void E_field::calc_field(H_field* h_field1,
 }
 
 // set fi on r=z boundary
-void E_field::set_fi_on_z()
+void EField::set_fi_on_z()
 {
 #pragma omp parallel for
   for (int k=0; k<(geom1->n_grid_2);k++)
@@ -204,7 +204,7 @@ void E_field::set_fi_on_z()
 }
 
 // poisson equation solving 2
-void E_field::poisson_equation2(Geometry* geom1, charge_density* ro1)
+void EField::poisson_equation2(Geometry* geom1, ChargeDensity* ro1)
 {
   // const double epsilon0 = EPSILON0;
   double phi0(0.0);
@@ -293,7 +293,7 @@ void E_field::poisson_equation2(Geometry* geom1, charge_density* ro1)
 
 }
 
-void E_field::TridiagonalSolve(const double *a,
+void EField::TridiagonalSolve(const double *a,
                                const double *b,
                                double *c,
                                double *d, double *x,
@@ -317,7 +317,7 @@ void E_field::TridiagonalSolve(const double *a,
 }
 
 // function for electric field weighting
-Triple E_field::get_field(double x1, double x3)
+Triple EField::get_field(double x1, double x3)
 {
   int i_r = 0; // number of particle i cell
   int k_z = 0; // number of particle k cell
@@ -431,7 +431,7 @@ Triple E_field::get_field(double x1, double x3)
 
 //// Return one dimensional field components
 
-double* E_field::get_1d_e1()
+double* EField::get_1d_e1()
 {
   // copy 2d field array into 1d array rowwise
 #pragma omp parallel for
@@ -441,7 +441,7 @@ double* E_field::get_1d_e1()
   return e1_1d;
 }
 
-double* E_field::get_1d_e2()
+double* EField::get_1d_e2()
 {
   // copy 2d field array into 1d array rowwise
 #pragma omp parallel for
@@ -451,7 +451,7 @@ double* E_field::get_1d_e2()
   return e2_1d;
 }
 
-double* E_field::get_1d_e3()
+double* EField::get_1d_e3()
 {
   // copy 2d field array into 1d array rowwise
 #pragma omp parallel for

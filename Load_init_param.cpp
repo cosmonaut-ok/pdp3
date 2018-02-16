@@ -23,7 +23,7 @@ using namespace tinyxml2;
 #define TIME_PARAMS_NAME "Time"
 #define PARTICLES_PARAMS_NAME "Particles"
 #define BUNCH_PARAMS_NAME "Particles_bunch"
-#define BOUNDARY_MAXWELL_PARAMS_NAME "Boundary_Maxwell_conditions"
+#define BOUNDARY_MAXWELL_PARAMS_NAME "boundary_maxwell_conditions"
 #define FILE_SAVE_PARAMS_NAME "file_save_parameters"
 
 Load_init_param::Load_init_param(void)
@@ -122,9 +122,9 @@ void Load_init_param::init_particles()
 
   // creating rho and current arrays
   // WARNING! should be called after geometry initialized
-  c_rho_new = new charge_density(c_geom);
-  c_rho_old = new charge_density(c_geom);
-  c_rho_beam = new charge_density(c_geom);
+  c_rho_new = new ChargeDensity(c_geom);
+  c_rho_old = new ChargeDensity(c_geom);
+  c_rho_beam = new ChargeDensity(c_geom);
   c_current = new current(c_geom);
 
   while(particle_kind)
@@ -204,7 +204,7 @@ void Load_init_param::init_boundary ()
   int boundary_conditions = atoi(root->FirstChildElement("Boundary_conditions")->GetText());
 
   // Maxwell initial conditions
-  Boundary_Maxwell_conditions maxwell_rad(efield); // TODO: WTF?
+  BoundaryMaxwellConditions maxwell_rad(efield); // TODO: WTF?
   maxwell_rad.specify_initial_field(c_geom, e_fi_upper, e_fi_left, e_fi_right);
 
   if (boundary_conditions == 0)
@@ -255,16 +255,16 @@ void Load_init_param::init_geometry ()
   c_geom = new Geometry(r_size, z_size, n_grid_r, n_grid_z);
 
   // add PML to geometry
-  if (comp_l_1 != 0 || comp_l_2 != 0 || comp_l_3 != 0)
-    c_geom->setPML(comp_l_1, comp_l_2, comp_l_3, sigma_1_t, sigma_2_t);
+  if ((comp_l_1 != 0) || (comp_l_2 != 0) || (comp_l_3 != 0))
+    c_geom->set_pml(comp_l_1, comp_l_2, comp_l_3, sigma_1_t, sigma_2_t);
 
   c_geom->set_epsilon();
 }
 
 void Load_init_param::init_fields ()
 {
-  efield = new E_field(c_geom);
-  hfield = new H_field(c_geom);
+  efield = new EField(c_geom);
+  hfield = new HField(c_geom);
   efield->boundary_conditions();
   efield->set_homogeneous_efield(0.0, 0.0, 0.0);
   hfield->set_homogeneous_h(0.0, 0.0, 0.0);

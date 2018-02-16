@@ -9,5 +9,5 @@ public:
   ~Poisson_neumann(void);
 public:
   double** t_charge_density;
-  void poisson_solve(E_field* input_e, charge_density* input_rho);
+  void poisson_solve(EField* input_e, ChargeDensity* input_rho);
 };

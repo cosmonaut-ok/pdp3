@@ -1,21 +1,21 @@
-#include "Boundary_Maxwell_conditions.h"
-#include "Constant.h"
+#include "boundaryMaxwellConditions.h"
+#include "constant.h"
 
 using namespace constant;
 
-Boundary_Maxwell_conditions::Boundary_Maxwell_conditions(E_field* e_fld_t):e_fld(e_fld_t)
+BoundaryMaxwellConditions::BoundaryMaxwellConditions(EField* e_fld_t):e_fld(e_fld_t)
 {
 }
 
-Boundary_Maxwell_conditions::Boundary_Maxwell_conditions(void)
+BoundaryMaxwellConditions::BoundaryMaxwellConditions(void)
 {
 }
 
-Boundary_Maxwell_conditions::~Boundary_Maxwell_conditions(void)
+BoundaryMaxwellConditions::~BoundaryMaxwellConditions(void)
 {
 }
 
-void Boundary_Maxwell_conditions::specify_initial_field(Geometry* cyl_geom,
+void BoundaryMaxwellConditions::specify_initial_field(Geometry* cyl_geom,
                                                         double E_fi_upper,
                                                         double E_fi_left,
                                                         double E_fi_right)

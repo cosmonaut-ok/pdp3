@@ -82,11 +82,11 @@ cat<<EOF>${TESTDIR}/parameters.xml
   </Particles_bunch>
 
 
-  <Boundary_Maxwell_conditions>
+  <boundary_maxwell_conditions>
     <e_fi_upper> 0  </e_fi_upper>
     <e_fi_left> 0 </e_fi_left>
     <e_fi_right> 0 </e_fi_right>
-  </Boundary_Maxwell_conditions>
+  </boundary_maxwell_conditions>
 
   <Boundary_conditions type = "dirichlet">0</Boundary_conditions>
 
