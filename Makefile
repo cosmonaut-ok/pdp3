@@ -27,12 +27,12 @@ LDFLAGS += -L$(tinyxml2_SUBDIR)
 ### pdp3 sources and settings
 pdp3_MODULE           = pdp3
 pdp3_C_SRCS           =
-pdp3_CXX_SRCS         = Boundary_Maxwell_conditions.cpp \
-			Bunch.cpp \
-			E_field.cpp \
+pdp3_CXX_SRCS         = boundaryMaxwellConditions.cpp \
+			bunch.cpp \
+			eField.cpp \
 			Fourier.cpp \
-			Geometry.cpp \
-			H_field.cpp \
+			geometry.cpp \
+			hField.cpp \
 			Load_init_param.cpp \
 			Main.cpp \
 			Particles.cpp \
@@ -41,7 +41,7 @@ pdp3_CXX_SRCS         = Boundary_Maxwell_conditions.cpp \
 			Poisson_neumann.cpp \
 			pdp3_time.cpp \
 			Triple.cpp \
-			charge_density.cpp \
+			chargeDensity.cpp \
 			current.cpp \
 			field.cpp \
 			input_output_class.cpp \

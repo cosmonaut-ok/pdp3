@@ -21,13 +21,13 @@ particles_list::~particles_list(void)
 }
 
 // sicle for all particles kinds in system
-void particles_list::charge_weighting(charge_density* rho)
+void particles_list::charge_weighting(ChargeDensity* rho)
 {
   for(size_t i = 0; i < part_list.size(); i++)
     part_list[i]->charge_weighting(rho);
 }
 
-void particles_list::step_v(E_field *e_fld, H_field *h_fld, Time* t)
+void particles_list::step_v(EField *e_fld, HField *h_fld, Time* t)
 {
   for(std::size_t i = 0; i < part_list.size(); i++)
     part_list[i]->step_v(e_fld, h_fld, t);

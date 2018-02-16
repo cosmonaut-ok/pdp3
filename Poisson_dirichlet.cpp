@@ -1,5 +1,5 @@
 #include "poisson_dirichlet.h"
-#include "Constant.h"
+#include "constant.h"
 
 using namespace constant;
 
@@ -23,7 +23,7 @@ Poisson_dirichlet::~Poisson_dirichlet(void)
   delete[]t_charge_density;
 }
 
-void Poisson_dirichlet::poisson_solve(E_field* input_e, charge_density* ro1)
+void Poisson_dirichlet::poisson_solve(EField* input_e, ChargeDensity* ro1)
 {
 	double a=0;
 	double c=0;

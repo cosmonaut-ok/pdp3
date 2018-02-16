@@ -5,8 +5,8 @@
 #include <math.h>
 
 #include "field.h"
-#include "E_field.h"
-#include "H_field.h"
+#include "eField.h"
+#include "hField.h"
 #include "pdp3_time.h"
 #include "Particles.h"
 #include "Fourier.h"
@@ -14,9 +14,9 @@
 #include "poisson_neumann.h"
 #include "poisson_dirichlet.h"
 #include "particles_list.h"
-#include "Boundary_Maxwell_conditions.h"
+#include "boundaryMaxwellConditions.h"
 #include "input_output_class.h"
-#include "Bunch.h"
+#include "bunch.h"
 #include "time.h"
 #include "particles_struct.h"
 
@@ -43,12 +43,12 @@ public:
   Particles* c_part;
   Bunch * c_bunch;
   particles_list* p_list;
-  E_field* efield;
-  H_field* hfield;
+  EField* efield;
+  HField* hfield;
   input_output_class * c_io_class;
-  charge_density * c_rho_new;
-  charge_density * c_rho_old;
-  charge_density * c_rho_beam;
+  ChargeDensity * c_rho_new;
+  ChargeDensity * c_rho_old;
+  ChargeDensity * c_rho_beam;
   current * c_current;
   XMLDocument* xml_data;
   int testnumber;

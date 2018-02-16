@@ -36,12 +36,24 @@ namespace geometry {
       }
   }
 
-  TEST(Geometry, setPML)
+  TEST(Geometry, set_pml)
   {
-    geometry->setPML(comp_l_1, comp_l_2, comp_l_3, sigma_1_t, sigma_2_t);
+    geometry->set_pml(comp_l_1, comp_l_2, comp_l_3, sigma_1_t, sigma_2_t);
 
-     for(int i=0;i < n_grid_r; i++)
-      for(int k=0;k < n_grid_z; k++)
+     for(int i=0; i < n_grid_r; i++)
+      for(int k=0; k < n_grid_z; k++)
         ASSERT_NE (geometry->sigma[i][k], geometry_default->sigma[i][k]);
+  }
+
+  TEST(Geometry, get_dr)
+  {
+    double r_ratio = r_size/(n_grid_r-1);
+    ASSERT_EQ (geometry->get_dr(), r_ratio);
+  }
+
+  TEST(Geometry, get_dz)
+  {
+    double z_ratio = z_size/(n_grid_z-1);
+    ASSERT_EQ (geometry->get_dz(), z_ratio);
   }
 }

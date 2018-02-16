@@ -1,5 +1,5 @@
-#include "E_field.h"
-#include "H_field.h"
+#include "eField.h"
+#include "hField.h"
 #include "pdp3_time.h"
 
 Time::Time(void)

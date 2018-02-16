@@ -1,7 +1,7 @@
 #pragma once
 #include "field.h"
-#include "Geometry.h"
-//#include "E_field.h"
+#include "geometry.h"
+//#include "eField.h"
 #include "pdp3_time.h"
 #include "Particles.h"
 #include "Fourier.h"
@@ -9,9 +9,9 @@
 #include "Triple.h"
 #include "particles_struct.h"
 
-class E_field;
+class EField;
 
-class H_field
+class HField
 {
 public:
   double** h1;
@@ -27,10 +27,10 @@ public:
   double** Afi;
   double** Az;
   const Geometry* geom1;
-  H_field(Geometry* geom1);
-  H_field(void);
-  ~H_field(void);
-  void calc_field(E_field* e_field1, Time* time1);
+  HField(Geometry* geom1);
+  HField(void);
+  ~HField(void);
+  void calc_field(EField* e_field1, Time* time1);
   void set_homogeneous_h(double H1, double H2, double H3);
   Triple get_field(double x1, double x3);
   double* get_1d_h1();
