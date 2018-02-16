@@ -15,7 +15,7 @@
 #include "time.h"
 #include "tinyxml2.h"
 
-#include <sys/time.h>
+// #include <sys/time.h>
 #include <ctime>
 #include <math.h>
 
@@ -260,7 +260,7 @@ void Load_init_param::init_geometry ()
   c_geom = new Geometry(r_size, z_size, n_grid_r, n_grid_z);
 
   // add PML to geometry
-  if (comp_l_1 != 0 or comp_l_2 != 0 or comp_l_3 != 0)
+  if (comp_l_1 != 0 || comp_l_2 != 0 || comp_l_3 != 0)
     c_geom->setPML(comp_l_1, comp_l_2, comp_l_3, sigma_1_t, sigma_2_t);
 
   c_geom->set_epsilon();
