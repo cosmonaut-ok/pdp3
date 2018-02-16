@@ -1302,31 +1302,3 @@ void Particles::strict_motion_weighting(Time *time1,
     }
   }
 }
-
-bool continuity_equation(Time *input_time,
-                         Geometry *input_geometry,
-                         current *input_J,
-                         charge_density *rho_old,
-                         charge_density *rho_new)
-{
-  double **rho_old_array = rho_old->get_ro() ;
-  double **rho_new_array = rho_new->get_ro() ;
-  double **J1 = input_J->get_j1() ;
-  double **J3 = input_J->get_j3() ;
-  // double delta_rho = 1.0/(input_geometry->dz*4.0*PI*input_geometry->dr*input_geometry->dr) ;
-  bool ok = true;
-  double res, tolerance = 1e-3 ;
-  for (int i=1;i<input_geometry->n_grid_1-1;i++)
-
-    for (int k=1;k<input_geometry->n_grid_2-1;k++)
-    {
-      res = (rho_new_array[i][k] - rho_old_array[i][k])/input_time->delta_t +
-        (J3[i][k] - J3[i][k-1])/input_geometry->dz +(J1[i][k] - J1[i-1][k])/input_geometry->dr +
-        (J1[i][k] + J1[i-1][k])/(2.0*i*input_geometry->dr);
-      if (res > tolerance)
-      {
-        ok = false;
-      }
-    }
-  return ok;
-}
