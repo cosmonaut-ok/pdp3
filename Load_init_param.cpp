@@ -112,15 +112,15 @@ void Load_init_param::init_particles()
     ->FirstChildElement (PARTICLES_PARAMS_NAME)
     ->FirstChildElement (p_king_section_name);
 
-  char* p_name= new char [50];
-  double charge = 0;
-  double mass = 0; // TODO: should it be double?
-  double number = 0;
-  double left_density = 0;
-  double right_density = 0;
-  double temperature = 0;
+  char* p_name = new char [50];
+  double charge;
+  double mass; // TODO: should it be double?
+  double number;
+  double left_density;
+  double right_density;
+  double temperature;
 
-  Particles* prtls = 0;
+  Particles* prtls;
 
   // initialize particles list
   p_list = new particles_list();
@@ -145,7 +145,9 @@ void Load_init_param::init_particles()
     temperature = atof(particle_kind->FirstChildElement("temperature")->GetText());
 
     // init and setup particles properties
-    prtls = new Particles(strcpy(new char [50], p_name), charge, mass, number, c_geom, p_list);
+    prtls = new Particles(strcpy(new char [50], p_name), charge, mass, number, c_geom);
+		p_list->part_list.push_back(prtls); // push particles to particles list vector
+
     prtls->load_spatial_distribution_with_variable_mass(left_density,right_density,0,0);
     prtls->velocity_distribution(temperature);
     particle_kind = particle_kind->NextSiblingElement(p_king_section_name);
@@ -159,6 +161,7 @@ void Load_init_param::init_bunch()
   XMLElement* sub_root =root->FirstChildElement (BUNCH_PARAMS_NAME);
 
   char* p_name = (char*)sub_root->FirstChildElement("name")->GetText();
+	Bunch* prtls;
   double charge = atof(sub_root
                        ->FirstChildElement("charge")
                        ->GetText());
@@ -181,8 +184,9 @@ void Load_init_param::init_bunch()
                                  ->FirstChildElement("initial_velocity")
                                  ->GetText());
 
-  Bunch* prtls = new Bunch(p_name, charge, mass,number, c_geom, p_list,
-                           duration, radius, density, initial_velocity);
+  prtls = new Bunch(p_name, charge, mass,number, c_geom, // p_list,
+										duration, radius, density, initial_velocity);
+	p_list->part_list.push_back(prtls); // push bunch to particles list vector
 
   c_bunch = prtls;
 }

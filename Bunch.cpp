@@ -10,12 +10,12 @@ Bunch::Bunch(char* p_name,
              double p_mass,
              int p_number,
              Geometry* geom,
-             particles_list* p_list,
+             // particles_list* p_list,
              double b_duration,
              double b_radius,
              double b_density,
              double b_init_velocity):Particles(p_name, p_charge, p_mass,
-                                               p_number, geom, p_list)
+                                               p_number, geom)
 {
   // fill object fields
   duration = b_duration;
