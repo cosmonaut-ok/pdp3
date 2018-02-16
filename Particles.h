@@ -125,9 +125,3 @@ public:
                              int* accur);
 
 };
-
-bool continuity_equation(Time *input_time,
-                         Geometry *input_geometry,
-                         current *input_J,
-                         charge_density *rho_start,
-                         charge_density *rho_end);
