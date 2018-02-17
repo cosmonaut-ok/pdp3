@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include "Geometry.h"
-#include "Particles.h"
-#include "Particles.cpp"
+#include "geometry.h"
+#include "particles.h"
+#include "particles.cpp"
 
 namespace particles {
   double comp_l_1 = 0.0;

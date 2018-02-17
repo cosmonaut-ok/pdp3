@@ -1,6 +1,6 @@
 #pragma once
-#include "Particles.h"
-#include "pdp3_time.h"
+#include "particles.h"
+#include "pdp3Time.h"
 
 class Bunch : public Particles
 {
