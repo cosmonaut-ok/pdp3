@@ -1,6 +1,8 @@
-SRCDIR                = .
-OBJDIR                = .
-INCLUDEDIR            = $(SRCDIR)
+MKDIR                 = mkdir
+ROOTDIR               = .
+SRCDIR                = $(ROOTDIR)/src
+OBJDIR                = $(ROOTDIR)/obj
+INCLUDEDIR            = $(ROOTDIR)/include
 SUBDIRS               =
 TESTSUBDIRS           = test/unit
 EXES                  = pdp3
@@ -25,7 +27,7 @@ pdp3_LIBRARY_PATH     =
 pdp3_LIBRARIES        =
 
 ### tinyxml2 sources and settings
-tinyxml2_SUBDIR := $(SRCDIR)/lib/tinyxml2/
+tinyxml2_SUBDIR := $(ROOTDIR)/lib/tinyxml2
 INCLUDE_PATH += -I$(tinyxml2_SUBDIR)
 SUBDIRS += $(tinyxml2_SUBDIR)
 pdp3_LIBRARIES += tinyxml2
@@ -75,10 +77,10 @@ endif
 CXXFLAGS = ${CFLAGS} #  -fopenmp
 
 ### Generic targets
-all: $(SUBDIRS) $(LIBS) $(EXES)
+all: prepare $(SUBDIRS) $(LIBS) $(EXES)
 
 ### Build rules
-.PHONY: all clean dummy check-syntax
+.PHONY: all clean dummy check-syntax prepare
 
 $(SUBDIRS): dummy
 	@cd $@ && $(MAKE)
@@ -87,23 +89,28 @@ $(SUBDIRS): dummy
 .SUFFIXES: .cpp .cxx
 DEFINCL = $(INCLUDE_PATH) $(DEFINES) $(OPTIONS)
 
-.c.o:
-	$(CC) -c $(CFLAGS) $(CEXTRA) $(DEFINCL) -o $@ $<
+# obj/%.c.o:
+# 	$(CC) -c $(CFLAGS) $(CEXTRA) $(DEFINCL) -o $@ $<
 
-.cpp.o:
-	$(CXX) -c $(CXXFLAGS) $(CXXEXTRA) $(DEFINCL) -o $@ $<
+# obj/%.cpp.o:
+# 	$(CXX) -c $(CXXFLAGS) $(CXXEXTRA) $(DEFINCL) -o $@ $<
 
-.cxx.o:
+# obj/%.cxx.o:
+# 	$(CXX) -c $(CXXFLAGS) $(CXXEXTRA) $(DEFINCL) -o $@ $<
+
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	$(CXX) -c $(CXXFLAGS) $(CXXEXTRA) $(DEFINCL) -o $@ $<
 
 # Rules for cleaning
 CLEAN_FILES  = y.tab.c y.tab.h lex.yy.c core *.orig *.rej \
                \\\#*\\\# *~ *% .\\\#*
 
-clean:: $(SUBDIRS:%=%/__clean__) $(EXTRASUBDIRS:%=%/__clean__) $(TESTSUBDIRS:%=%/__clean__)
-	$(RM) $(CLEAN_FILES) $(C_SRCS:.c=.o) $(CXX_SRCS:.cpp=.o)
+BUILD_DIRS = pdp3_files pdp3_result/Dump $(OBJDIR) pdp3_result
+
+clean: $(SUBDIRS:%=%/__clean__) $(EXTRASUBDIRS:%=%/__clean__) $(TESTSUBDIRS:%=%/__clean__)
+	$(RM) $(pdp3_OBJS) $(CLEAN_FILES)
 	$(RM) $(LIBS) $(EXES) $(EXES:%=%.so)
-	$(RM) -r python/__pycache__/
+	$(RM) -r $(BUILD_DIRS) $(ROOTDIR)/python/__pycache__/
 
 $(SUBDIRS:%=%/__clean__): dummy
 	cd `dirname $@` && $(MAKE) clean
@@ -119,11 +126,8 @@ $(TESTSUBDIRS:%=%/__clean__): dummy
 $(pdp3_MODULE): $(pdp3_OBJS)
 	$(CXX) $(CXXFLAGS) $(CXXEXTRA) $(DEFINCL) $(LDFLAGS) -o $@ $(pdp3_OBJS) $(pdp3_LIBRARY_PATH) $(pdp3_LIBRARIES:%=-l%)
 
-bootstrap: all
-	mkdir -p pdp3_files pdp3_result/Dump
-
 mrproper: clean
-	$(RM) -r pdp3_files pdp3_result $(TESTDIR) *.avi
+	$(RM) -r $(TESTDIR) *.avi
 
 run: bootstrap
 	./pdp3
@@ -141,3 +145,6 @@ test-ext: mrproper all
 
 check-syntax:
 	$(CXX) $(LIBRARY_PATH) $(INCLUDE_PATH) -Wall -Wextra -pedantic -fsyntax-only $(CHK_SOURCES)
+
+prepare:
+	$(MKDIR) -p $(BUILD_DIRS)
