@@ -1,7 +1,7 @@
 #include "eField.h"
 #include "hField.h"
 #include "math.h"
-#include "Fourier.h"
+#include "fourier.h"
 #include <fstream>
 #include "constant.h"
 
@@ -138,7 +138,7 @@ void EField::boundary_conditions()
 // Electric field calculation
 void EField::calc_field(HField* h_field1,
                          Time* time1,
-                         current* current1)
+                         Current* current1)
 {
   double** j1 = current1->get_j1();
   double** j2 = current1->get_j2();
@@ -261,7 +261,7 @@ void EField::poisson_equation2(Geometry* geom1, ChargeDensity* ro1)
     d[geom1->n_grid_1-2] -= phi0;
     c1[geom1->n_grid_1-2] = 0.0;
     d1[geom1->n_grid_1-2] -= phi0;
-    TridiagonalSolve(a, b, c, d, phi, geom1->n_grid_1-1);
+    tridiagonal_solve(a, b, c, d, phi, geom1->n_grid_1-1);
     for (int i = 0; i < geom1->n_grid_1 -1; i++)
       fi[i][k] = phi[i];
   }
@@ -293,7 +293,7 @@ void EField::poisson_equation2(Geometry* geom1, ChargeDensity* ro1)
 
 }
 
-void EField::TridiagonalSolve(const double *a,
+void EField::tridiagonal_solve(const double *a,
                                const double *b,
                                double *c,
                                double *d, double *x,

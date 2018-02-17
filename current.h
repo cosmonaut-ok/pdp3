@@ -1,13 +1,13 @@
 #pragma once
 #include "geometry.h"
 
-class current
+class Current
 {
 public:
   Geometry* geom1;
-  current(void);
-  current(Geometry* geom1);
-  ~current(void);
+  Current(void);
+  Current(Geometry* geom1);
+  ~Current(void);
   double** get_j1() const;
   double** get_j2() const;
   double** get_j3() const;

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -202,50 +202,49 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Boundary_Maxwell_conditions.cpp" />
-    <ClCompile Include="Bunch.cpp" />
-    <ClCompile Include="charge_density.cpp" />
+    <ClCompile Include="boundaryMaxwellConditions.cpp" />
+    <ClCompile Include="bunch.cpp" />
+    <ClCompile Include="chargeDensity.cpp" />
     <ClCompile Include="current.cpp" />
-    <ClCompile Include="E_field.cpp" />
+    <ClCompile Include="eField.cpp" />
     <ClCompile Include="field.cpp" />
-    <ClCompile Include="Fourier.cpp" />
-    <ClCompile Include="Geometry.cpp" />
-    <ClCompile Include="H_field.cpp" />
-    <ClCompile Include="input_output_class.cpp" />
+    <ClCompile Include="fourier.cpp" />
+    <ClCompile Include="geometry.cpp" />
+    <ClCompile Include="hField.cpp" />
+    <ClCompile Include="inputOutputClass.cpp" />
     <ClCompile Include="lib\tinyxml2\tinyxml2.cpp" />
-    <ClCompile Include="Load_init_param.cpp" />
-    <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Particles.cpp" />
-    <ClCompile Include="particles_list.cpp" />
-    <ClCompile Include="Poisson.cpp" />
-    <ClCompile Include="Poisson_dirichlet.cpp" />
-    <ClCompile Include="Poisson_neumann.cpp" />
-    <ClCompile Include="pdp3_time.cpp" />
-    <ClCompile Include="Triple.cpp" />
+    <ClCompile Include="loadInitParam.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="particles.cpp" />
+    <ClCompile Include="particlesList.cpp" />
+    <ClCompile Include="poisson.cpp" />
+    <ClCompile Include="poissonDirichlet.cpp" />
+    <ClCompile Include="poissonNeumann.cpp" />
+    <ClCompile Include="pdp3Time.cpp" />
+    <ClCompile Include="triple.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Boundary_Maxwell_conditions.h" />
-    <ClInclude Include="Bunch.h" />
-    <ClInclude Include="charge_density.h" />
-    <ClInclude Include="Constant.h" />
+    <ClInclude Include="boundaryMaxwellConditions.h" />
+    <ClInclude Include="bunch.h" />
+    <ClInclude Include="chargeDensity.h" />
+    <ClInclude Include="constant.h" />
     <ClInclude Include="current.h" />
-    <ClInclude Include="E_field.h" />
+    <ClInclude Include="eField.h" />
     <ClInclude Include="field.h" />
-    <ClInclude Include="Fourier.h" />
-    <ClInclude Include="Geometry.h" />
-    <ClInclude Include="H_field.h" />
-    <ClInclude Include="input_output_class.h" />
+    <ClInclude Include="fourier.h" />
+    <ClInclude Include="geometry.h" />
+    <ClInclude Include="hField.h" />
+    <ClInclude Include="inputOutputClass.h" />
     <ClInclude Include="lib\tinyxml2\tinyxml2.h" />
-    <ClInclude Include="Load_init_param.h" />
-    <ClInclude Include="Particles.h" />
-    <ClInclude Include="particles_list.h" />
-    <ClInclude Include="particles_struct.h" />
-    <ClInclude Include="pdp3_time.h" />
-    <ClInclude Include="Poisson.h" />
-    <ClInclude Include="poisson_dirichlet.h" />
-    <ClInclude Include="Poisson_neumann.h" />
-    <ClInclude Include="resource1.h" />
-    <ClInclude Include="Triple.h" />
+    <ClInclude Include="loadInitParam.h" />
+    <ClInclude Include="particles.h" />
+    <ClInclude Include="particlesList.h" />
+    <ClInclude Include="particlesStruct.h" />
+    <ClInclude Include="pdp3Time.h" />
+    <ClInclude Include="poisson.h" />
+    <ClInclude Include="poissonDirichlet.h" />
+    <ClInclude Include="poissonNeumann.h" />
+    <ClInclude Include="triple.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="parameters.xml">
