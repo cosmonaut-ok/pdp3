@@ -309,3 +309,4 @@ GRTAGS
 GTAGS
 temp/
 test/unit/main
+obj/
