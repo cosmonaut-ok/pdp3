@@ -43,7 +43,6 @@ pdp3_CXX_SRCS         = boundaryMaxwellConditions.cpp \
 			Triple.cpp \
 			chargeDensity.cpp \
 			current.cpp \
-			field.cpp \
 			input_output_class.cpp \
 			particles_list.cpp \
 			particles_struct.cpp

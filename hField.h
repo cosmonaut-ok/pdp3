@@ -1,5 +1,4 @@
 #pragma once
-#include "field.h"
 #include "geometry.h"
 //#include "eField.h"
 #include "pdp3_time.h"
