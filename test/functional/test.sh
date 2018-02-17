@@ -19,7 +19,7 @@ cp pdp3 ${TESTDIR}
 cat<<EOF>${TESTDIR}/parameters.xml
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- edited with XMLSpy v2011 rel. 2 -->
-<Initial_parameters>
+<initial_parameters>
 
   <geometry>
     <r_size>   0.25  </r_size>
@@ -28,26 +28,26 @@ cat<<EOF>${TESTDIR}/parameters.xml
     <n_grid_z> 2047</n_grid_z>
   </geometry>
 
-  <PML>
+  <pml>
     <comparative_l_1>0</comparative_l_1>
     <comparative_l_2> 0 </comparative_l_2>
     <comparative_l_3> 0 </comparative_l_3>
     <sigma_1> 0.00001 </sigma_1>
     <sigma_2> 0.07 </sigma_2>
-  </PML>
+  </pml>
 
-  <Time>
+  <time>
     <start_time> 0 </start_time>
     <relaxation_time> 0 </relaxation_time>
     <current_time> 0 </current_time>
     <end_time>${END_TIME}</end_time>
     <delta_t>1e-12</delta_t>
-  </Time>
+  </time>
 
-  <Number_of_part_kinds>  2 </Number_of_part_kinds>
+  <number_of_part_kinds>  2 </number_of_part_kinds>
 
 
-    <Particles>
+    <particles>
     <particle_kind>
       <name>Electrons</name>
       <charge> -1 </charge>
@@ -67,10 +67,10 @@ cat<<EOF>${TESTDIR}/parameters.xml
       <right_density> 2.05e14 </right_density>
       <temperature> 0.1 </temperature>
     </particle_kind>
-  </Particles>
+  </particles>
 
 
-  <Particles_bunch>
+  <particles_bunch>
     <name> Electrons </name>
     <charge> -1 </charge>
     <mass> 1 </mass>
@@ -79,7 +79,7 @@ cat<<EOF>${TESTDIR}/parameters.xml
     <radius>0.02</radius>
     <density> 1e13 </density>
     <initial_velocity> 3e7 </initial_velocity>
-  </Particles_bunch>
+  </particles_bunch>
 
 
   <boundary_maxwell_conditions>
@@ -88,11 +88,11 @@ cat<<EOF>${TESTDIR}/parameters.xml
     <e_fi_right> 0 </e_fi_right>
   </boundary_maxwell_conditions>
 
-  <Boundary_conditions type = "dirichlet">0</Boundary_conditions>
+  <boundary_conditions type = "dirichlet">0</boundary_conditions>
 
   <file_save_parameters>
     <path_to_result>pdp3_result/</path_to_result>
-    <path_to_save_state>pdp3_result/Dump/</path_to_save_state>
+    <path_to_save_state>pdp3_result/dump/</path_to_save_state>
     <data_dump_interval>5</data_dump_interval>
     <frames_per_file>100</frames_per_file>
     <system_state_dump_interval>1000</system_state_dump_interval>
@@ -107,7 +107,7 @@ cat<<EOF>${TESTDIR}/parameters.xml
     </dump_data>
   </file_save_parameters>
 
-</Initial_parameters>
+</initial_parameters>
 
 EOF
 
