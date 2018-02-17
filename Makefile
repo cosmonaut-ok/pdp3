@@ -1,70 +1,44 @@
 SRCDIR                = .
+OBJDIR                = .
+INCLUDEDIR            = $(SRCDIR)
 SUBDIRS               =
 TESTSUBDIRS           = test/unit
-DLLS                  =
-LIBS                  =
 EXES                  = pdp3
 TESTDIR               = testdir
 ### Common settings
 CEXTRA                =
 CXXEXTRA              =
-RCEXTRA               =
 DEFINES               =
-INCLUDE_PATH          = -I$(SRCDIR)
-DLL_PATH              =
-DLL_IMPORTS           =
+INCLUDE_PATH          = -I$(INCLUDEDIR)
 LIBRARY_PATH          =
 LIBRARIES             =
-
-### tinyxml2 sources and settings
-tinyxml2_SUBDIR := $(SRCDIR)/lib/tinyxml2/
-# LDFLAGS := -L$(tinyxml2_SUBDIR)
-INCLUDE_PATH += -I$(tinyxml2_SUBDIR)
-SUBDIRS += $(tinyxml2_SUBDIR)
-DLL_IMPORTS := tinyxml2
-LDFLAGS += -L$(tinyxml2_SUBDIR)
 
 ### pdp3 sources and settings
 pdp3_MODULE           = pdp3
 pdp3_C_SRCS           =
-pdp3_CXX_SRCS         = boundaryMaxwellConditions.cpp \
-			bunch.cpp \
-			eField.cpp \
-			Fourier.cpp \
-			geometry.cpp \
-			hField.cpp \
-			Load_init_param.cpp \
-			Main.cpp \
-			Particles.cpp \
-			Poisson.cpp \
-			Poisson_dirichlet.cpp \
-			Poisson_neumann.cpp \
-			pdp3_time.cpp \
-			Triple.cpp \
-			chargeDensity.cpp \
-			current.cpp \
-			input_output_class.cpp \
-			particles_list.cpp \
-			particles_struct.cpp
 
-pdp3_RC_SRCS          = pdp3.rc \
-			pdp31.rc
+pdp3_CXX_SRCS := $(wildcard $(SRCDIR)/*.cpp)
+
 pdp3_LDFLAGS          =
 pdp3_ARFLAGS          =
-pdp3_DLL_PATH         =
-pdp3_DLLS             =
 pdp3_LIBRARY_PATH     =
 pdp3_LIBRARIES        =
 
-pdp3_OBJS             = $(pdp3_C_SRCS:.c=.o) \
-			$(pdp3_CXX_SRCS:.cpp=.o)
+### tinyxml2 sources and settings
+tinyxml2_SUBDIR := $(SRCDIR)/lib/tinyxml2/
+INCLUDE_PATH += -I$(tinyxml2_SUBDIR)
+SUBDIRS += $(tinyxml2_SUBDIR)
+pdp3_LIBRARIES += tinyxml2
+
+LDFLAGS += -L$(tinyxml2_SUBDIR)
+
+pdp3_OBJS := $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(pdp3_CXX_SRCS))
 
 LDFLAGS := $(LDFLAGS) $(pdp3_LDFLAGS)
 
 ### Global source lists
 C_SRCS                = $(pdp3_C_SRCS)
 CXX_SRCS              = $(pdp3_CXX_SRCS)
-RC_SRCS               = $(pdp3_RC_SRCS)
 
 ### Tools
 CC ?= gcc
@@ -101,7 +75,7 @@ endif
 CXXFLAGS = ${CFLAGS} #  -fopenmp
 
 ### Generic targets
-all: $(SUBDIRS) $(DLLS:%=%.so) $(LIBS) $(EXES)
+all: $(SUBDIRS) $(LIBS) $(EXES)
 
 ### Build rules
 .PHONY: all clean dummy check-syntax
@@ -110,7 +84,7 @@ $(SUBDIRS): dummy
 	@cd $@ && $(MAKE)
 
 # Implicit rules
-.SUFFIXES: .cpp .cxx .rc .res
+.SUFFIXES: .cpp .cxx
 DEFINCL = $(INCLUDE_PATH) $(DEFINES) $(OPTIONS)
 
 .c.o:
@@ -123,12 +97,12 @@ DEFINCL = $(INCLUDE_PATH) $(DEFINES) $(OPTIONS)
 	$(CXX) -c $(CXXFLAGS) $(CXXEXTRA) $(DEFINCL) -o $@ $<
 
 # Rules for cleaning
-CLEAN_FILES     = y.tab.c y.tab.h lex.yy.c core *.orig *.rej \
-                  \\\#*\\\# *~ *% .\\\#*
+CLEAN_FILES  = y.tab.c y.tab.h lex.yy.c core *.orig *.rej \
+               \\\#*\\\# *~ *% .\\\#*
 
 clean:: $(SUBDIRS:%=%/__clean__) $(EXTRASUBDIRS:%=%/__clean__) $(TESTSUBDIRS:%=%/__clean__)
 	$(RM) $(CLEAN_FILES) $(C_SRCS:.c=.o) $(CXX_SRCS:.cpp=.o)
-	$(RM) $(DLLS:%=%.so) $(LIBS) $(EXES) $(EXES:%=%.so)
+	$(RM) $(LIBS) $(EXES) $(EXES:%=%.so)
 	$(RM) -r python/__pycache__/
 
 $(SUBDIRS:%=%/__clean__): dummy
@@ -142,11 +116,8 @@ $(EXTRASUBDIRS:%=%/__clean__): dummy
 $(TESTSUBDIRS:%=%/__clean__): dummy
 	cd `dirname $@` && $(MAKE) clean
 
-### Target specific build rules
-DEFLIB = $(LIBRARY_PATH) $(LIBRARIES) $(DLL_PATH) $(DLL_IMPORTS:%=-l%)
-
 $(pdp3_MODULE): $(pdp3_OBJS)
-	$(CXX) $(CXXFLAGS) $(CXXEXTRA) $(DEFINCL) $(LDFLAGS) -o $@ $(pdp3_OBJS) $(pdp3_LIBRARY_PATH) $(pdp3_DLL_PATH) $(DEFLIB) $(pdp3_DLLS:%=-l%) $(pdp3_LIBRARIES:%=-l%)
+	$(CXX) $(CXXFLAGS) $(CXXEXTRA) $(DEFINCL) $(LDFLAGS) -o $@ $(pdp3_OBJS) $(pdp3_LIBRARY_PATH) $(pdp3_LIBRARIES:%=-l%)
 
 bootstrap: all
 	mkdir -p pdp3_files pdp3_result/Dump
@@ -160,7 +131,7 @@ run: bootstrap
 $(TESTSUBDIRS:%=%/__test__): dummy
 	cd `dirname $@` && $(MAKE) test
 
-unittest: $(TESTSUBDIRS:%=%/__test__)
+test-unit: $(TESTSUBDIRS:%=%/__test__)
 
 test: mrproper all
 	TESTDIR=$(TESTDIR) /bin/bash ./test/functional/test.sh

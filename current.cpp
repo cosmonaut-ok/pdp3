@@ -1,10 +1,10 @@
 #include "current.h"
 
-current::current(void)
+Current::Current(void)
 {
 }
 
-current::current(Geometry* geom1_t): geom1(geom1_t)
+Current::Current(Geometry* geom1_t): geom1(geom1_t)
 {
   //// jr
   // n_grid - number of edges
@@ -58,7 +58,7 @@ current::current(Geometry* geom1_t): geom1(geom1_t)
 }
 
 // Destructor
-current::~current(void)
+Current::~Current(void)
 {
   for (int i=0; i<(geom1->n_grid_1-1);i++)
     delete[]j1[i];
@@ -81,23 +81,23 @@ current::~current(void)
 // functions for getting access to j arrays
 //
 
-double** current::get_j1() const
+double** Current::get_j1() const
 {
   return this->j1;
 }
 
-double** current::get_j2() const
+double** Current::get_j2() const
 {
   return this->j2;
 }
 
-double** current::get_j3() const
+double** Current::get_j3() const
 {
   return this->j3;
 }
 
 // Return one dimensional field components
-double* current::get_j1_1d() const
+double* Current::get_j1_1d() const
 {
   // copy 2d field array into 1d array rowwise
 #pragma omp parallel for
@@ -107,7 +107,7 @@ double* current::get_j1_1d() const
   return j1_1d;
 }
 
-double* current::get_j2_1d() const
+double* Current::get_j2_1d() const
 {
   // copy 2d field array into 1d array rowwise
 #pragma omp parallel for
@@ -117,7 +117,7 @@ double* current::get_j2_1d() const
   return j2_1d;
 }
 
-double* current::get_j3_1d() const
+double* Current::get_j3_1d() const
 {
   // copy 2d field array into 1d array rowwise
 #pragma omp parallel for
@@ -127,7 +127,7 @@ double* current::get_j3_1d() const
   return j3_1d;
 }
 
-void current::j1_add_1d(double *j1_1d)
+void Current::j1_add_1d(double *j1_1d)
 {
   // copy 2d field array into 1d array rowwise
 #pragma omp parallel for
@@ -136,7 +136,7 @@ void current::j1_add_1d(double *j1_1d)
       j1[i][k] += j1_1d[i * geom1->n_grid_2 + k];
 }
 
-void current::j2_add_1d(double *j2_1d)
+void Current::j2_add_1d(double *j2_1d)
 {
   // copy 2d field array into 1d array rowwise
 #pragma omp parallel for
@@ -145,7 +145,7 @@ void current::j2_add_1d(double *j2_1d)
       j2[i][k] += j2_1d[i * geom1->n_grid_2 + k];
 }
 
-void current::j3_add_1d(double *j3_1d)
+void Current::j3_add_1d(double *j3_1d)
 {
   // copy 2d field array into 1d array rowwise
 #pragma omp parallel for
@@ -157,22 +157,22 @@ void current::j3_add_1d(double *j3_1d)
 //
 // functions for changing values of j
 //
-void current::set_j1(int i, int k, double value)
+void Current::set_j1(int i, int k, double value)
 {
   j1[i][k] = j1[i][k] + value;
 }
 
-void current::set_j2(int i, int k, double value)
+void Current::set_j2(int i, int k, double value)
 {
   j2[i][k] = j2[i][k] + value;
 }
 
-void current::set_j3(int i, int k, double value)
+void Current::set_j3(int i, int k, double value)
 {
   j3[i][k]=j3[i][k] + value;
 }
 
-void current::reset_j()
+void Current::reset_j()
 {
 #pragma omp parallel
   {

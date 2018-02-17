@@ -1,6 +1,6 @@
 #include "bunch.h"
-#include "pdp3_time.h"
-#include "poisson_dirichlet.h"
+#include "pdp3Time.h"
+#include "poissonDirichlet.h"
 #include "constant.h"
 
 using namespace constant;
