@@ -1,11 +1,11 @@
 #pragma once
 #include "geometry.h"
-#include "pdp3_time.h"
-#include "Particles.h"
+#include "pdp3Time.h"
+#include "particles.h"
 #include"chargeDensity.h"
 #include"current.h"
-#include"Triple.h"
-#include "particles_struct.h"
+#include"triple.h"
+#include "particlesStruct.h"
 
 class HField;
 class EField
@@ -26,7 +26,7 @@ public:
   EField();
   ~EField(void);
 
-  void calc_field(HField* h_field1, Time* time1, current* current1);
+  void calc_field(HField* h_field1, Time* time1, Current* current1);
   void poisson_equation2(Geometry* geom1, ChargeDensity* ro1);
   void cosine_ftansfrom(double** fi_ro, int lenght_n, int k);
   void set_homogeneous_efield(double E1, double E2, double E3);
@@ -34,12 +34,12 @@ public:
   void boundary_conditions();
   Triple get_field(double x1, double x3);
   bool test_poisson_equation(ChargeDensity* rho);
-  void TridiagonalSolve(const double *a,
-                        const double *b,
-                        double *c,
-                        double *d,
-                        double *x,
-                        int n);
+  void tridiagonal_solve(const double *a,
+                         const double *b,
+                         double *c,
+                         double *d,
+                         double *x,
+                         int n);
   double* get_1d_e1();
   double* get_1d_e2();
   double* get_1d_e3();
