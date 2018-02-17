@@ -17,18 +17,19 @@
 GTEST_DIR = ../../lib/googletest/googletest
 
 # Where to find user code.
-USER_DIR = ../..
+USER_SRC_DIR = ../../src
+USER_INC_DIR = ../../include
 
 # Flags passed to the preprocessor.
 # Set Google Test's header directory as a system directory, such that
 # the compiler doesn't generate warnings in Google Test headers.
-CPPFLAGS += -isystem $(GTEST_DIR)/include -I$(USER_DIR) -I../../lib/tinyxml2 -fopenmp
+CPPFLAGS += -isystem $(GTEST_DIR)/include -I$(USER_INC_DIR) -I$(USER_SRC_DIR) -I../../lib/tinyxml2 -fopenmp
 
 # Flags passed to the C++ compiler.
 CXXFLAGS += -g -Wall -Wextra -pthread
 
 # Linker flags
-LDFLAGS += -L$(USER_DIR)
+LDFLAGS += -L$(USER_SRC_DIR)
 
 # All tests produced by this Makefile.  Remember to add new tests you
 # created to the list.
@@ -38,10 +39,10 @@ SRC_DIR := .
 OBJ_DIR := .
 
 SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)
-# USER_SRC_FILES := $(wildcard $(USER_DIR)/*.cpp)
+# USER_SRC_FILES := $(wildcard $(USER_SRC_DIR)/*.cpp)
 
 OBJ_FILES := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC_FILES))
-# USER_OBJ_FILES := $(patsubst $(USER_DIR)/%.cpp,$(USER_DIR)/%.o,$(USER_SRC_FILES))
+# USER_OBJ_FILES := $(patsubst $(USER_SRC_DIR)/%.cpp,$(USER_SRC_DIR)/%.o,$(USER_SRC_FILES))
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
