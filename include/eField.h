@@ -5,7 +5,6 @@
 #include"chargeDensity.h"
 #include"current.h"
 #include"triple.h"
-#include "particlesStruct.h"
 
 class HField;
 class EField

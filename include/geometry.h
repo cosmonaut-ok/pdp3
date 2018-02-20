@@ -1,5 +1,4 @@
 #pragma once
-#include "particlesStruct.h"
 
 class Geometry
 {

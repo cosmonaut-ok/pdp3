@@ -1,7 +1,6 @@
 #pragma once
 #include <fstream>
 #include <iostream>
-#include "particlesStruct.h"
 
 using namespace std;
 class InputOutputClass
