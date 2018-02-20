@@ -239,7 +239,6 @@
     <ClInclude Include="include/loadInitParam.h" />
     <ClInclude Include="include/particles.h" />
     <ClInclude Include="include/particlesList.h" />
-    <ClInclude Include="include/particlesStruct.h" />
     <ClInclude Include="include/pdp3Time.h" />
     <ClInclude Include="include/poisson.h" />
     <ClInclude Include="include/poissonDirichlet.h" />
