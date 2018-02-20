@@ -17,7 +17,6 @@
 #include "inputOutputClass.h"
 #include "bunch.h"
 #include "time.h"
-#include "particlesStruct.h"
 
 #include "tinyxml2.h"
 

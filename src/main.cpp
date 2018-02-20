@@ -3,9 +3,6 @@
 
 using namespace std;
 
-ParticlesStruct specie;
-// #define BUILD_OPENCL
-
 char* get_cmd_option(char ** begin, char ** end, const std::string & option)
 {
   char ** itr = std::find(begin, end, option);
