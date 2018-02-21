@@ -1,7 +1,5 @@
 #pragma once
-#include "geometry.h"
 #include "pdp3Time.h"
-#include "particles.h"
 #include "chargeDensity.h"
 #include "current.h"
 #include "triple.h"
@@ -14,8 +12,6 @@ class EField : public Field
 public:
   double** fi; //potential
   double** t_charge_density;
-
-  // const Geometry* geom1;
 
   EField(Geometry* geom1_t);
   EField();
@@ -35,7 +31,4 @@ public:
                          double *d,
                          double *x,
                          int n);
-  double* get_1d_field_r();
-  double* get_1d_field_phi();
-  double* get_1d_field_z();
 };

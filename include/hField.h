@@ -1,6 +1,4 @@
 #pragma once
-// #include "geometry.h"
-// #include "eField.h"
 #include "pdp3Time.h"
 #include "particles.h"
 #include "fourier.h"
@@ -20,15 +18,10 @@ public:
   double** Afi;
   double** Az;
 
-  // const Geometry* geom1;
-
   HField(Geometry* geom1);
   HField(void);
   ~HField(void);
   void calc_field(EField* e_field1, Time* time1);
   void set_homogeneous_h(double FIELD_R, double FIELD_PHI, double FIELD_Z);
   Triple get_field(double x1, double x3);
-  double* get_1d_field_r();
-  double* get_1d_field_phi();
-  double* get_1d_field_z();
 };
