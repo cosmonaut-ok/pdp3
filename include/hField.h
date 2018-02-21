@@ -19,7 +19,9 @@ public:
   double** Ar;
   double** Afi;
   double** Az;
-  const Geometry* geom1;
+
+  // const Geometry* geom1;
+
   HField(Geometry* geom1);
   HField(void);
   ~HField(void);

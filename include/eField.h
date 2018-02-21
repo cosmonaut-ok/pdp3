@@ -14,7 +14,8 @@ class EField : public Field
 public:
   double** fi; //potential
   double** t_charge_density;
-  const Geometry* geom1;
+
+  // const Geometry* geom1;
 
   EField(Geometry* geom1_t);
   EField();

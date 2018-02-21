@@ -7,28 +7,9 @@
 using namespace constant;
 
 // Constructor
-HField::HField(Geometry* geom1_l):geom1(geom1_l)
+HField::HField(Geometry* geom1_l) : Field(geom1_l)
 {
-  // Hr
-  field_r = new double* [geom1->n_grid_1];
-#pragma omp parallel for shared (field_r)
-  for (int i=0;i<(geom1->n_grid_1);i++)
-    field_r[i] = new double[geom1->n_grid_2-1];
-  field_r_1d = new double[geom1->n_grid_1 * (geom1->n_grid_2 - 1)];
-
-  // Hf
-  field_phi = new double* [geom1->n_grid_1-1];
-#pragma omp parallel for shared (field_phi)
-  for (int i=0;i<(geom1->n_grid_1-1);i++)
-    field_phi[i] = new double[geom1->n_grid_2-1];
-  field_phi_1d = new double[(geom1->n_grid_1 - 1) * (geom1->n_grid_2 - 1)];
-
-  // Hz
-  field_z = new double* [geom1->n_grid_1-1];
-#pragma omp parallel for shared (field_z)
-  for (int i=0;i<(geom1->n_grid_1-1);i++)
-    field_z[i] = new double[geom1->n_grid_2];
-  field_z_1d = new double[(geom1->n_grid_1 - 1) * geom1->n_grid_2];
+	// Calling parent constructor
 
   // Hr_half_time
   field_r_half_time = new double* [geom1->n_grid_1];
@@ -93,30 +74,6 @@ HField::HField(Geometry* geom1_l):geom1(geom1_l)
 // Destructor
 HField::~HField(void)
 {
-  for (int i=0; i<(geom1->n_grid_1);i++)
-  {
-    delete[]field_r[i];
-    delete[]field_r_half_time[i];
-  }
-  delete[]field_r;
-  delete[]field_r_half_time;
-
-  for (int i=0; i<(geom1->n_grid_1-1);i++)
-  {
-    delete[]field_phi[i];
-    delete[]field_phi_half_time[i];
-  }
-  delete[]field_phi;
-  delete[]field_phi_half_time;
-
-  for (int i=0; i<(geom1->n_grid_1-1);i++)
-  {
-    delete[]field_z[i];
-    delete[]field_z_half_time[i];
-  }
-  delete[]field_z;
-  delete[]field_z_half_time;
-
   for (int i=0; i<(geom1->n_grid_1-1);i++)
     delete[]Ar[i];
   delete[]Ar;
@@ -173,8 +130,8 @@ void HField::calc_field(EField* e_field1, Time* time1)
     int i=geom1->n_grid_1-1;
     alpha=((e_field1->field_phi[i][k+1]-e_field1->field_phi[i][k])/geom1->dz)/MAGN_CONST;
 
-    this->field_r_half_time[i][k]=this->field_r[i][k]+alpha*time1->delta_t/2;
-    this->field_r[i][k] = this->field_r[i][k]+alpha*time1->delta_t;
+    field_r_half_time[i][k]=field_r[i][k]+alpha*time1->delta_t/2;
+    field_r[i][k] = field_r[i][k]+alpha*time1->delta_t;
   }
 
   for(int i=0;i<(geom1->n_grid_1-1);i++)
@@ -182,18 +139,18 @@ void HField::calc_field(EField* e_field1, Time* time1)
     {
       alpha=((e_field1->field_phi[i][k+1]-e_field1->field_phi[i][k])/geom1->dz)/MAGN_CONST;
 
-      this->field_r_half_time[i][k]=this->field_r[i][k]+alpha*time1->delta_t/2;
-      this->field_r[i][k] = this->field_r[i][k]+alpha*time1->delta_t;
+      field_r_half_time[i][k]=field_r[i][k]+alpha*time1->delta_t/2;
+      field_r[i][k] = field_r[i][k]+alpha*time1->delta_t;
 
       alpha=((e_field1->field_z[i+1][k]-e_field1->field_z[i][k])/geom1->dr -
              (e_field1->field_r[i][k+1]-e_field1->field_r[i][k])/geom1->dz)/MAGN_CONST;
-      this->field_phi_half_time[i][k] = this->field_phi[i][k]+alpha*time1->delta_t/2;
-      this->field_phi[i][k] = this->field_phi[i][k]+alpha*time1->delta_t;
+      field_phi_half_time[i][k] = field_phi[i][k]+alpha*time1->delta_t/2;
+      field_phi[i][k] = field_phi[i][k]+alpha*time1->delta_t;
 
       alpha= ((e_field1->field_phi[i+1][k]+e_field1->field_phi[i][k])/(2.0*geom1->dr*(i+0.5)) +
               (e_field1->field_phi[i+1][k]-e_field1->field_phi[i][k])/geom1->dr)/MAGN_CONST;
-      this->field_z_half_time[i][k] = this->field_z[i][k]-alpha*time1->delta_t/2;
-      this->field_z[i][k] = this->field_z[i][k]-alpha*time1->delta_t;
+      field_z_half_time[i][k] = field_z[i][k]-alpha*time1->delta_t/2;
+      field_z[i][k] = field_z[i][k]-alpha*time1->delta_t;
 
     }
 }
@@ -304,35 +261,4 @@ Triple HField::get_field(double x1, double x3)
   Triple components(hr, hfi, hz);
 
   return components;
-}
-
-//// /Return one dimensional field components
-double* HField::get_1d_field_r()
-{
-  // copy 2d field array into 1d array rowwise
-#pragma omp parallel for
-  for (int i = 0; i < geom1->n_grid_1; i++)
-    for (int k = 0; k < geom1->n_grid_2 - 1; k++)
-      field_r_1d[i * (geom1->n_grid_2 - 1) + k] = field_r_half_time[i][k];
-  return field_r_1d;
-}
-
-double* HField::get_1d_field_phi()
-{
-  // copy 2d field array into 1d array rowwise
-#pragma omp parallel for
-  for (int i = 0; i < geom1->n_grid_1 - 1; i++)
-    for (int k = 0; k < geom1->n_grid_2 - 1; k++)
-      field_phi_1d[i * (geom1->n_grid_2 - 1) + k] = field_phi_half_time[i][k];
-  return field_phi_1d;
-}
-
-double* HField::get_1d_field_z()
-{
-  // copy 2d field array into 1d array rowwise
-#pragma omp parallel for
-  for (int i = 0; i < geom1->n_grid_1 - 1; i++)
-    for (int k = 0; k < geom1->n_grid_2; k++)
-      field_z_1d[i * geom1->n_grid_2 + k] = field_z_half_time[i][k];
-  return field_z_1d;
 }
