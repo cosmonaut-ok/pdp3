@@ -19,8 +19,8 @@ bool Poisson::test_poisson_equation(EField* input_e, ChargeDensity *rho)
   double a=0;
   bool res =true;
   double **rho1 = rho->get_ro();
-  double** e1 =input_e->e1;
-  double** e3 = input_e->e3;
+  double** e1 =input_e->field_r;
+  double** e3 = input_e->field_z;
   ofstream delta("delta");
   for (int i=1;i<cyl_geom->n_grid_1-1;i++)
     for (int k=1;k<cyl_geom->n_grid_2-1;k++)
