@@ -51,18 +51,18 @@ EField::~EField()
 }
 
 // initial E distribution
-void EField::set_homogeneous_efield(double E1, double E2, double E3)
+void EField::set_homogeneous_efield(double E_r, double E_phi, double E_z)
 {
-#pragma omp parallel for shared (E1, E2, E3)
+#pragma omp parallel for shared (E_r, E_phi, E_z)
   for(int i=0; i<(geom1->n_grid_1-1); i++)
     for(int k=0; k<(geom1->n_grid_2-1); k++)
     {
       // Er
-      field_r[i][k] = E1;
+      field_r[i][k] = E_r;
       // Ef
-      field_phi[i][k] = E2;
+      field_phi[i][k] = E_phi;
       // Ez
-      field_z[i][k] = E3;
+      field_z[i][k] = E_z;
     }
 }
 
