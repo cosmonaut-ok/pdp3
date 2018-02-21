@@ -9,7 +9,7 @@ using namespace constant;
 // Constructor
 HField::HField(Geometry* geom1_l) : Field(geom1_l)
 {
-	// Calling parent constructor
+  // Calling parent constructor
 
   // Hr_half_time
   field_r_half_time = new double* [geom1->n_grid_1];

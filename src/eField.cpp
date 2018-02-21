@@ -13,9 +13,9 @@ EField::EField()
 }
 
 //// constructor
-EField::EField(Geometry* geom1_t) : Field (geom1_t) // : geom1(geom1_t)
+EField::EField(Geometry* geom1_t) : Field (geom1_t)
 {
-	// Calling parent constructor
+  // Calling parent constructor
 
   //// fi
   fi = new double*[geom1->n_grid_1];

@@ -17,7 +17,7 @@ public:
   EField();
   ~EField(void);
 
-  void calc_field(HField* h_field1, Time* timfield_r, Current* current1);
+  void calc_field(HField* h_field1, Time* time1, Current* current1);
   void poisson_equation2(Geometry* geom1, ChargeDensity* ro1);
   void cosine_ftansfrom(double** fi_ro, int lenght_n, int k);
   void set_homogeneous_efield(double E_r, double E_phi, double E_z);

@@ -12,7 +12,7 @@ public:
   double *field_phi_1d;
   double *field_z_1d;
 
-	const Geometry *geom1;
+  const Geometry *geom1;
 
   Field(Geometry* geom1);
   Field(void);
