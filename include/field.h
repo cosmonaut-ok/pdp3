@@ -1,11 +1,13 @@
 #pragma once
-#include "geometry.h"
+/* #include "geometry.h" */
+/* // #include "eField.h" */
+/* #include "pdp3Time.h" */
+/* #include "particles.h" */
+/* #include "fourier.h" */
+/* #include "current.h" */
+/* #include "triple.h" */
 // #include "eField.h"
-#include "pdp3Time.h"
-#include "particles.h"
-#include "fourier.h"
-#include "current.h"
-#include "triple.h"
+// #include "hField.h"
 
 class Field
 {

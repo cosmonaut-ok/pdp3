@@ -1,16 +1,17 @@
 #pragma once
-#include "geometry.h"
+// #include "geometry.h"
 // #include "eField.h"
 #include "pdp3Time.h"
 #include "particles.h"
 #include "fourier.h"
 #include "current.h"
 #include "triple.h"
-// #include "field.h"
+#include "field.h"
 
 class EField;
+// class Field;
 
-class HField // : public Field
+class HField : public Field
 {
 public:
   double** field_r;

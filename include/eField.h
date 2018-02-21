@@ -5,13 +5,14 @@
 #include "chargeDensity.h"
 #include "current.h"
 #include "triple.h"
-// #include "field.h"
+
+#include "field.h"
 
 class HField;
+// class Field;
 
-class EField // : public Field
+class EField : public Field
 {
-
 public:
   double** field_r; //Er
   double** field_phi; //Ef
