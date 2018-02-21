@@ -117,9 +117,9 @@ double Particles::get_gamma(int i)
   {
     cerr << "CRITICAL!(get_gamma): Lorentz factor aka gamma is comples. Can not continue." << endl
          << "\tUsually it happens, when <Time> -> <delta_t> value is too big." << endl
-         << "\tv1[" << i << "] = " << v1[i]
-         << "\tv2[" << i << "] = " << v2[i]
-         << "\tv3[" << i << "] = " << v3[i];
+         << "\tv1[" << i << "] = " << v1[i] << endl
+         << "\tv2[" << i << "] = " << v2[i] << endl
+         << "\tv3[" << i << "] = " << v3[i] << endl;
     exit(1);
   }
 
@@ -147,9 +147,9 @@ double Particles::get_gamma_inv(int i) // TODO: it is not alpha
   {
     cerr << "CRITICAL!(get_gamma_inv): Lorentz factor aka gamma is comples. Can not continue." << endl
          << "\tUsually it happens, when <Time> -> <delta_t> value is too big." << endl
-         << "\tv1[" << i << "] = " << v1[i]
-         << "\tv2[" << i << "] = " << v2[i]
-         << "\tv3[" << i << "] = " << v3[i];
+         << "\tv1[" << i << "] = " << v1[i] << endl
+         << "\tv2[" << i << "] = " << v2[i] << endl
+         << "\tv3[" << i << "] = " << v3[i] << endl;
     exit(1);
   }
 
