@@ -4,6 +4,7 @@
 #include <iostream>
 #include <math.h>
 
+#include "field.h"
 #include "eField.h"
 #include "hField.h"
 #include "pdp3Time.h"
