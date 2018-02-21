@@ -5,12 +5,12 @@
 class Bunch : public Particles
 {
 public:
-  Bunch(char* p_name,
+  Bunch(char *p_name,
         double p_charge,
         double p_mass,
         int p_number,
-        Geometry* geom,
-        // particles_list* p_list,
+        Geometry *geom,
+        // particles_list *p_list,
         double b_duration,
         double b_radius,
         double b_density,
@@ -23,10 +23,10 @@ public:
   double vel_bunch; // bunch velocity
   double radius; // bunch radius
 public:
-  void bunch_inject(Time* time);
-  void bunch_inject_calc_E(Geometry* geom,
-                           EField * E_beam,
-                           EField* E,
-                           Time* time);
-  virtual void half_step_coord(Time* t);
+  void bunch_inject(Time *time);
+  void bunch_inject_calc_E(Geometry *geom,
+                           EField  *E_beam,
+                           EField *E,
+                           Time *time);
+  virtual void half_step_coord(Time *t);
 };

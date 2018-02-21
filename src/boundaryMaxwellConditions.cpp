@@ -3,7 +3,7 @@
 
 using namespace constant;
 
-BoundaryMaxwellConditions::BoundaryMaxwellConditions(EField* e_fld_t):e_fld(e_fld_t)
+BoundaryMaxwellConditions::BoundaryMaxwellConditions(EField *e_fld_t):e_fld(e_fld_t)
 {
 }
 
@@ -15,7 +15,7 @@ BoundaryMaxwellConditions::~BoundaryMaxwellConditions(void)
 {
 }
 
-void BoundaryMaxwellConditions::specify_initial_field(Geometry* cyl_geom,
+void BoundaryMaxwellConditions::specify_initial_field(Geometry *cyl_geom,
                                                         double E_fi_upper,
                                                         double E_fi_left,
                                                         double E_fi_right)

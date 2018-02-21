@@ -3,7 +3,7 @@
 
 using namespace constant;
 
-PoissonNeumann::PoissonNeumann(Geometry* cyl_geom):Poisson(cyl_geom)
+PoissonNeumann::PoissonNeumann(Geometry *cyl_geom):Poisson(cyl_geom)
 {
   // charge_density
   t_charge_density = new double*[cyl_geom->n_grid_1];
@@ -17,19 +17,19 @@ PoissonNeumann::~PoissonNeumann(void)
     delete[]t_charge_density[i];
   delete[]t_charge_density;
 }
-void PoissonNeumann::poisson_solve(EField* input_e, ChargeDensity* ro1)
+void PoissonNeumann::poisson_solve(EField *input_e, ChargeDensity *ro1)
 {
   double a = 0;
   double c = 0;
   double b = 0;
   double d = 0;
-  double* alpha = new double [cyl_geom->n_grid_1];
-  double* beta = new double [cyl_geom->n_grid_1];
-  Fourier* four1 = 0;
-  double** ro = ro1->get_ro();
-  double** e1 = input_e->field_r;
-  double** e3 = input_e->field_z;
-  double** fi = input_e->fi;
+  double *alpha = new double [cyl_geom->n_grid_1];
+  double *beta = new double [cyl_geom->n_grid_1];
+  Fourier *four1 = 0;
+  double **ro = ro1->get_ro();
+  double **e1 = input_e->field_r;
+  double **e3 = input_e->field_z;
+  double **fi = input_e->fi;
   double dr = cyl_geom->dr;
   double dz = cyl_geom->dz;
 

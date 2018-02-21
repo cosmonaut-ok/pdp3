@@ -8,7 +8,7 @@ InputOutputClass::InputOutputClass(void)
 {
 }
 
-InputOutputClass::InputOutputClass(char* c_pathres,char* c_pathdump)
+InputOutputClass::InputOutputClass(char *c_pathres,char *c_pathdump)
 {
   strcpy(path_result, c_pathres);
   strcpy(path_dump, c_pathdump);
@@ -20,7 +20,7 @@ InputOutputClass::~InputOutputClass(void)
 }
 
 void InputOutputClass::out_data(char const *comp_name,
-                                  double** out_value,
+                                  double **out_value,
                                   int step_number,
                                   int number,
                                   int r_step,
@@ -45,8 +45,8 @@ void InputOutputClass::out_data(char const *comp_name,
   out_val.close();
 }
 
-void InputOutputClass::out_field_dump(char* comp_name,
-                                        double** out_value,
+void InputOutputClass::out_field_dump(char *comp_name,
+                                        double **out_value,
                                         int r_step,
                                         int z_step)
 {
@@ -65,9 +65,9 @@ void InputOutputClass::out_field_dump(char* comp_name,
 }
 
 /////
-void InputOutputClass::out_coord(char* comp_name,
-                                   double* coord_r,
-                                   double* coord_z,
+void InputOutputClass::out_coord(char *comp_name,
+                                   double *coord_r,
+                                   double *coord_z,
                                    int step_number,
                                    int number,
                                    int particles_number)
@@ -97,9 +97,9 @@ void InputOutputClass::out_coord(char* comp_name,
   out_val.close();
 }
 
-void InputOutputClass::out_coord_dump(char* comp_name ,
-                                        double* coord_r,
-                                        double* coord_z,
+void InputOutputClass::out_coord_dump(char *comp_name ,
+                                        double *coord_r,
+                                        double *coord_z,
                                         int particles_number)
 {
   char st_name[100] ;
@@ -119,10 +119,10 @@ void InputOutputClass::out_coord_dump(char* comp_name ,
   out_val.close();
 }
 
-void InputOutputClass::out_velocity_dump(char* comp_name,
-                                            double* v1,
-                                            double* v2,
-                                            double* v3,
+void InputOutputClass::out_velocity_dump(char *comp_name,
+                                            double *v1,
+                                            double *v2,
+                                            double *v3,
                                             int particles_number)
 {
   char st_name[100] ;

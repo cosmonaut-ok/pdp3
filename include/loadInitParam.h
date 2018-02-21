@@ -28,28 +28,28 @@ class LoadInitParam
 {
 public:
   LoadInitParam(void);
-  LoadInitParam(char* xml_file_name);
+  LoadInitParam(char *xml_file_name);
   ~LoadInitParam(void);
 
 public:
-  double* read_double_params(const char* p_name);
+  double *read_double_params(const char *p_name);
   bool save_system_state(double t);
   void run(void);
 
 public:
-  Geometry * c_geom;
-  Time * c_time;
-  Particles* c_part;
-  Bunch * c_bunch;
-  ParticlesList* p_list;
-  EField* efield;
-  HField* hfield;
-  InputOutputClass * c_io_class;
-  ChargeDensity * c_rho_new;
-  ChargeDensity * c_rho_old;
-  ChargeDensity * c_rho_beam;
-  Current * c_current;
-  XMLDocument* xml_data;
+  Geometry  *c_geom;
+  Time  *c_time;
+  Particles *c_part;
+  Bunch  *c_bunch;
+  ParticlesList *p_list;
+  EField *efield;
+  HField *hfield;
+  InputOutputClass  *c_io_class;
+  ChargeDensity  *c_rho_new;
+  ChargeDensity  *c_rho_old;
+  ChargeDensity  *c_rho_beam;
+  Current  *c_current;
+  XMLDocument *xml_data;
   int testnumber;
   int data_dump_interval;
   int system_state_dump_interval;
@@ -64,7 +64,7 @@ public:
   bool is_dump_rho_beam;
 
 private:
-  void read_xml(const char* xml_file_name);
+  void read_xml(const char *xml_file_name);
   void init_geometry ();
   void init_fields ();
   void init_time ();

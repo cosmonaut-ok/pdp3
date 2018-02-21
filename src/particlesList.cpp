@@ -21,31 +21,31 @@ ParticlesList::~ParticlesList(void)
 }
 
 // sicle for all particles kinds in system
-void ParticlesList::charge_weighting(ChargeDensity* rho)
+void ParticlesList::charge_weighting(ChargeDensity *rho)
 {
   for(size_t i = 0; i < part_list.size(); i++)
     part_list[i]->charge_weighting(rho);
 }
 
-void ParticlesList::step_v(EField *e_fld, HField *h_fld, Time* t)
+void ParticlesList::step_v(EField *e_fld, HField *h_fld, Time *t)
 {
   for(std::size_t i = 0; i < part_list.size(); i++)
     part_list[i]->step_v(e_fld, h_fld, t);
 }
 
-void ParticlesList::half_step_coord(Time* t)
+void ParticlesList::half_step_coord(Time *t)
 {
   for(size_t i = 0; i < part_list.size(); i++)
     part_list[i]->half_step_coord(t);
 }
 
-void ParticlesList::j_weighting(Time* time1, Current *j1)
+void ParticlesList::j_weighting(Time *time1, Current *j1)
 {
   for(std::size_t i = 0; i < part_list.size(); i++)
     part_list[i]->j_weighting(time1,j1,x1_old[i],x3_old[i]);
 }
 
-void ParticlesList::azimuthal_j_weighting(Time* time1, Current *j1)
+void ParticlesList::azimuthal_j_weighting(Time *time1, Current *j1)
 {
   for(std::size_t i=0; i<part_list.size(); i++)
     part_list[i]->azimuthal_j_weighting(time1,j1);
@@ -55,13 +55,13 @@ void ParticlesList::create_coord_arrays(void)
 {
   //creates arrays for storing old particles coordinates
   int kinds_number = part_list.size();
-  x1_old = new double* [kinds_number];
+  x1_old = new double *[kinds_number];
   for(int k=0; k<kinds_number; k++)
   {
     x1_old[k]= new double[part_list[k]->number];
   }
 
-  x3_old = new double* [kinds_number];
+  x3_old = new double *[kinds_number];
   for(int k=0; k<kinds_number; k++)
   {
     x3_old[k]= new double[part_list[k]->number];
