@@ -3,15 +3,15 @@
 
 using namespace std;
 
-char* get_cmd_option(char ** begin, char ** end, const std::string & option)
+char *get_cmd_option(char  **begin, char  **end, const std::string & option)
 {
-  char ** itr = std::find(begin, end, option);
+  char  **itr = std::find(begin, end, option);
   if (itr != end && ++itr != end)
     return *itr;
   return 0;
 }
 
-bool cmd_option_exists(char** begin, char** end, const std::string& option)
+bool cmd_option_exists(char **begin, char **end, const std::string& option)
 {
   return std::find(begin, end, option) != end;
 }
@@ -20,7 +20,7 @@ bool cmd_option_exists(char** begin, char** end, const std::string& option)
 
 int main(int argc, char **argv)
 {
-  char * filename;
+  char  *filename;
 
   if (cmd_option_exists(argv, argv+argc, "-h"))
   {

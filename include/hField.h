@@ -18,10 +18,10 @@ public:
   double **Afi;
   double **Az;
 
-  HField(Geometry* geom1);
+  HField(Geometry *geom1);
   HField(void);
   ~HField(void);
-  void calc_field(EField* e_field1, Time* time1);
+  void calc_field(EField *e_field1, Time *time1);
   void set_homogeneous_h(double E_r, double E_phi, double E_z);
   Triple get_field(double x1, double x3);
 
