@@ -30,7 +30,7 @@ LoadInitParam::LoadInitParam(void)
 {
 }
 
-LoadInitParam::LoadInitParam(char* xml_file_name)
+LoadInitParam::LoadInitParam(char *xml_file_name)
 {
   // NOTE: all system init is too huge,
   // so we use several "subconstructors"
@@ -79,7 +79,7 @@ LoadInitParam::~LoadInitParam(void)
 {
 }
 
-void LoadInitParam::read_xml(const char* xml_file_name)
+void LoadInitParam::read_xml(const char *xml_file_name)
 {
   xml_data = new XMLDocument(true, COLLAPSE_WHITESPACE);
 
@@ -101,13 +101,13 @@ bool LoadInitParam::to_bool(string str) {
 
 void LoadInitParam::init_particles()
 {
-  const char* p_king_section_name = "particle_kind";
-  XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
-  XMLElement* particle_kind = root
+  const char *p_king_section_name = "particle_kind";
+  XMLElement *root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
+  XMLElement *particle_kind = root
     ->FirstChildElement (PARTICLES_PARAMS_NAME)
     ->FirstChildElement (p_king_section_name);
 
-  char* p_name = new char [50];
+  char *p_name = new char [50];
   double charge;
   double mass; // TODO: should it be double?
   double number;
@@ -115,7 +115,7 @@ void LoadInitParam::init_particles()
   double right_density;
   double temperature;
 
-  Particles* prtls;
+  Particles *prtls;
 
   // initialize particles list
   p_list = new ParticlesList();
@@ -152,11 +152,11 @@ void LoadInitParam::init_particles()
 void LoadInitParam::init_bunch()
 {
   // initialize particles bunch data
-  XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
-  XMLElement* sub_root =root->FirstChildElement (BUNCH_PARAMS_NAME);
+  XMLElement *root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
+  XMLElement *sub_root =root->FirstChildElement (BUNCH_PARAMS_NAME);
 
-  char* p_name = (char*)sub_root->FirstChildElement("name")->GetText();
-	Bunch* prtls;
+  char *p_name = (char*)sub_root->FirstChildElement("name")->GetText();
+	Bunch *prtls;
   double charge = atof(sub_root
                        ->FirstChildElement("charge")
                        ->GetText());
@@ -188,8 +188,8 @@ void LoadInitParam::init_bunch()
 
 void LoadInitParam::init_boundary ()
 {
-  XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
-  XMLElement* sub_root =root->FirstChildElement (BOUNDARY_MAXWELL_PARAMS_NAME);
+  XMLElement *root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
+  XMLElement *sub_root =root->FirstChildElement (BOUNDARY_MAXWELL_PARAMS_NAME);
   //
   double e_fi_upper = atof(sub_root->
                            FirstChildElement("e_fi_upper")->
@@ -218,9 +218,9 @@ void LoadInitParam::init_boundary ()
 
 void LoadInitParam::init_geometry ()
 {
-  XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
-  XMLElement* sub_root =root->FirstChildElement (GEOMETRY_PARAMS_NAME);
-  XMLElement* pml_sub_root =root->FirstChildElement (PML_PARAMS_NAME);
+  XMLElement *root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
+  XMLElement *sub_root =root->FirstChildElement (GEOMETRY_PARAMS_NAME);
+  XMLElement *pml_sub_root =root->FirstChildElement (PML_PARAMS_NAME);
 
   //
   double r_size = atof(sub_root->
@@ -273,8 +273,8 @@ void LoadInitParam::init_fields ()
 
 void LoadInitParam::init_time ()
 {
-  XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
-  XMLElement* sub_root =root->FirstChildElement (TIME_PARAMS_NAME);
+  XMLElement *root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
+  XMLElement *sub_root =root->FirstChildElement (TIME_PARAMS_NAME);
   //
   double start_time = atof(sub_root->
                            FirstChildElement("start_time")->
@@ -298,13 +298,13 @@ void LoadInitParam::init_time ()
 
 void LoadInitParam::init_file_saving_parameters ()
 {
-  XMLElement* root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
-  XMLElement* sub_root = root->FirstChildElement (FILE_SAVE_PARAMS_NAME);
-  XMLElement* dump_data_root = sub_root->FirstChildElement ("dump_data");
+  XMLElement *root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
+  XMLElement *sub_root = root->FirstChildElement (FILE_SAVE_PARAMS_NAME);
+  XMLElement *dump_data_root = sub_root->FirstChildElement ("dump_data");
 
 
-  char* path_res = (char*)sub_root->FirstChildElement("path_to_result")->GetText();
-  char* path_dump = (char*)sub_root->FirstChildElement("path_to_save_state")->GetText();
+  char *path_res = (char*)sub_root->FirstChildElement("path_to_result")->GetText();
+  char *path_dump = (char*)sub_root->FirstChildElement("path_to_save_state")->GetText();
 
   data_dump_interval = atoi(sub_root
                             ->FirstChildElement("data_dump_interval")
@@ -409,7 +409,7 @@ void LoadInitParam::run(void)
     {
       sprintf(avg_step_exec_time, "%.2f", (double)(time(0) - t1) / data_dump_interval);
 
-      cout << left << setw(8) << step_number * data_dump_interval
+      cout << left << setw(8) << step_number  *data_dump_interval
            << left << setw(13) << step_number
            << left << setw(18) << c_time->current_time
            << left << setw(32) << avg_step_exec_time

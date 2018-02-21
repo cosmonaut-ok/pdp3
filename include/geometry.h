@@ -9,8 +9,8 @@ public:
   int n_grid_2;
   double dr;
   double dz;
-  double** epsilon;
-  double** sigma;
+  double **epsilon;
+  double **sigma;
 
   double get_dr();
   double get_dz();
