@@ -4,7 +4,7 @@ Current::Current(void)
 {
 }
 
-Current::Current(Geometry* geom1_t): geom1(geom1_t)
+Current::Current(Geometry *geom1_t): geom1(geom1_t)
 {
   //// jr
   // n_grid - number of edges
@@ -81,49 +81,49 @@ Current::~Current(void)
 // functions for getting access to j arrays
 //
 
-double** Current::get_j1() const
+double **Current::get_j1() const
 {
   return this->j1;
 }
 
-double** Current::get_j2() const
+double **Current::get_j2() const
 {
   return this->j2;
 }
 
-double** Current::get_j3() const
+double **Current::get_j3() const
 {
   return this->j3;
 }
 
 // Return one dimensional field components
-double* Current::get_j1_1d() const
+double *Current::get_j1_1d() const
 {
   // copy 2d field array into 1d array rowwise
 #pragma omp parallel for
   for (int i = 0; i < geom1->n_grid_1 - 1; i++)
     for (int k = 0; k < geom1->n_grid_2; k++)
-      j1_1d[i * geom1->n_grid_2 + k] = j1[i][k];
+      j1_1d[i  *geom1->n_grid_2 + k] = j1[i][k];
   return j1_1d;
 }
 
-double* Current::get_j2_1d() const
+double *Current::get_j2_1d() const
 {
   // copy 2d field array into 1d array rowwise
 #pragma omp parallel for
   for (int i = 0; i < geom1->n_grid_1; i++)
     for (int k = 0; k < geom1->n_grid_2; k++)
-      j2_1d[i * geom1->n_grid_2 + k] = j2[i][k];
+      j2_1d[i  *geom1->n_grid_2 + k] = j2[i][k];
   return j2_1d;
 }
 
-double* Current::get_j3_1d() const
+double *Current::get_j3_1d() const
 {
   // copy 2d field array into 1d array rowwise
 #pragma omp parallel for
   for (int i = 0; i < geom1->n_grid_1; i++)
     for (int k = 0; k < geom1->n_grid_2 - 1; k++)
-      j3_1d[i * (geom1->n_grid_2 - 1) + k] = j3[i][k];
+      j3_1d[i  *(geom1->n_grid_2 - 1) + k] = j3[i][k];
   return j3_1d;
 }
 
@@ -133,7 +133,7 @@ void Current::j1_add_1d(double *j1_1d)
 #pragma omp parallel for
   for (int i = 0; i < geom1->n_grid_1 - 1; i++)
     for (int k = 0; k < geom1->n_grid_2; k++)
-      j1[i][k] += j1_1d[i * geom1->n_grid_2 + k];
+      j1[i][k] += j1_1d[i  *geom1->n_grid_2 + k];
 }
 
 void Current::j2_add_1d(double *j2_1d)
@@ -142,7 +142,7 @@ void Current::j2_add_1d(double *j2_1d)
 #pragma omp parallel for
   for (int i = 0; i < geom1->n_grid_1; i++)
     for (int k = 0; k < geom1->n_grid_2; k++)
-      j2[i][k] += j2_1d[i * geom1->n_grid_2 + k];
+      j2[i][k] += j2_1d[i  *geom1->n_grid_2 + k];
 }
 
 void Current::j3_add_1d(double *j3_1d)
@@ -151,7 +151,7 @@ void Current::j3_add_1d(double *j3_1d)
 #pragma omp parallel for
   for (int i = 0; i < geom1->n_grid_1; i++)
     for (int k = 0; k < geom1->n_grid_2 - 1; k++)
-      j3[i][k] += j3_1d[i * (geom1->n_grid_2 - 1) + k];
+      j3[i][k] += j3_1d[i  *(geom1->n_grid_2 - 1) + k];
 }
 
 //

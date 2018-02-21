@@ -23,7 +23,7 @@ Particles::Particles(char const *p_name,
                      double p_charge,
                      double p_mass,
                      int p_number,
-                     Geometry* geom):geom1(geom)
+                     Geometry *geom):geom1(geom)
 {
   name = (char *) p_name;
   charge = (double)p_charge*(double)EL_CHARGE;
@@ -166,7 +166,7 @@ double Particles::get_gamma_inv(int i) // TODO: it is not alpha
   }
 }
 
-void Particles::step_v(EField *e_fld, HField *h_fld, Time* t)
+void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
 {
 
 #pragma omp parallel for shared(e_fld, h_fld, t)
@@ -242,7 +242,7 @@ void Particles::step_v(EField *e_fld, HField *h_fld, Time* t)
     }
 }
 
-void Particles::half_step_coord(Time* t)
+void Particles::half_step_coord(Time *t)
 {
 // #pragma omp parallel for shared(dr, dz, x1_wall, x3_wall, half_dr, half_dz, x1_wallX2, x3_wallX2, half_dt)
 #pragma omp parallel for
@@ -266,8 +266,8 @@ void Particles::half_step_coord(Time* t)
         exit(1);
       }
       //
-      x1[i] = x1[i] + v1[i] * half_dt;
-      x3[i] = x3[i] + v3[i] * half_dt;
+      x1[i] = x1[i] + v1[i]  *half_dt;
+      x3[i] = x3[i] + v3[i]  *half_dt;
 
       if (x1[i] > x1_wall)
       {
@@ -296,7 +296,7 @@ void Particles::half_step_coord(Time* t)
 }
 
 // function for charge density weighting
-void Particles::charge_weighting(ChargeDensity* ro1)
+void Particles::charge_weighting(ChargeDensity *ro1)
 {
   int r_i = 0;  // number of particle i cell
   int z_k = 0;  // number of particle k cell
@@ -435,7 +435,7 @@ void Particles::velocity_distribution(double tempr_ev)
   int lenght_arr = (int)cutoff_vel/dv;
   double s = 0;
 
-  double* integ_array = new double [lenght_arr];
+  double *integ_array = new double [lenght_arr];
 
   double const1 = 2*therm_vel*therm_vel;
   // part of numerical integral calculation
@@ -618,7 +618,7 @@ void Particles::load_spatial_distribution_with_variable_mass(double n1,
       rand_z = random_reverse(number - 1 - n,11);
       x1[n] = (geom1->first_size - dr)*(rand_r) + dr/2.0;
       n_in_big =N_real_i*x1[n]/N_big_for_cell;
-      charge_array[n]=charge* n_in_big;
+      charge_array[n]=charge *n_in_big;
       mass_array[n]= mass*n_in_big;
       //x3[n] = (geom1->second_size - dz)*(rand_z) + dz/2;
       //x3[n] = (geom1->second_size - dz)*sqrt(rand_z) + dz/2.0;
@@ -631,7 +631,7 @@ void Particles::load_spatial_distribution_with_variable_mass(double n1,
   }
 }
 
-void Particles::simple_j_weighting(Time* time1,
+void Particles::simple_j_weighting(Time *time1,
                                    Current *j1,
                                    double x1_new,
                                    double x3_new,
@@ -669,7 +669,7 @@ void Particles::simple_j_weighting(Time* time1,
     //calculate current in [i+1,k] cell//
     wj = charge_array[p_number]/(2*dr*dz*delta_t*2*PI*(i_n+1)*dr*dr) *
       (k*delta_z*delta_z/2.0+delta_z*b + delta_z*dr + dr*dr/k *
-       (0.25-(i_n+0.5)*(i_n+0.5)) * log((k*delta_z+b)/b));
+       (0.25-(i_n+0.5)*(i_n+0.5))  *log((k*delta_z+b)/b));
     // set new weighting current value
     j1->set_j3(i_n+1,k_n, wj);
 
@@ -684,7 +684,7 @@ void Particles::simple_j_weighting(Time* time1,
 
     //weighting jr in [i][k] cell
     wj = charge_array[p_number]/(2*PI*r0*dz*dz*dr*delta_t) *
-      (r0*k*delta_r+k/2.0 * delta_r*(x1_old+delta_r/2.0)+0.5*delta_r*
+      (r0*k*delta_r+k/2.0  *delta_r*(x1_old+delta_r/2.0)+0.5*delta_r*
        (b-k*(2*r0+r1))+ delta_r*(b-k*r1)*(4*r0*r0-dr*dr)/(8*x1_old*(x1_old+delta_r)) +
        (k*(r0*r0/2.0-dr*dr/8.0))*log((x1_old+delta_r)/x1_old));
     j1->set_j1(i_n,k_n, wj);
@@ -727,7 +727,7 @@ void Particles::simple_j_weighting(Time* time1,
 
     //weighting jr in [i][k] cell
     wj = charge_array[p_number]/(2*PI*r0*dz*dz*dr*delta_t) *
-      (r0*k*delta_r+k/2.0 * delta_r*(x1_old+delta_r/2.0)+0.5*delta_r*(b-k*(2*r0+r1))+
+      (r0*k*delta_r+k/2.0  *delta_r*(x1_old+delta_r/2.0)+0.5*delta_r*(b-k*(2*r0+r1))+
        delta_r*(b-k*r1)*(4*r0*r0-dr*dr)/(8*x1_old*(x1_old+delta_r)) +
        (k*(r0*r0/2.0-dr*dr/8.0))*log((x1_old+delta_r)/x1_old));
     j1->set_j1(i_n,k_n, wj);
@@ -743,7 +743,7 @@ void Particles::simple_j_weighting(Time* time1,
 
   //}
 }
-void Particles::simple_constrho_j_weighting(Time* time1,
+void Particles::simple_constrho_j_weighting(Time *time1,
                                             Current *j1,
                                             double x1_new,
                                             double x3_new,
@@ -776,7 +776,7 @@ void Particles::simple_constrho_j_weighting(Time* time1,
 
     // double b = x3_old- k_n*dz;;
     //weighting jr in [i][k+1] cell
-    //   wj = charge/(2*PI*r0*dz*dz*dr*delta_t) * ();
+    //   wj = charge/(2*PI*r0*dz*dz*dr*delta_t)  *();
     j1->set_j1(i_n, k_n+1, wj);
   }
   // if i cell is equal 0
@@ -787,12 +787,12 @@ void Particles::simple_constrho_j_weighting(Time* time1,
     double k = delta_r/delta_z;
     double b = x1_old;
     // calculate current jz in [i,k] cell
-    // wj = charge/(2.0*dr*dz*delta_t*PI*dr*dr/4.0) * (dr*delta_z - k*delta_z*delta_z/2.0 - delta_z*b );
+    // wj = charge/(2.0*dr*dz*delta_t*PI*dr*dr/4.0)  *(dr*delta_z - k*delta_z*delta_z/2.0 - delta_z*b );
     // set new weighting current value
     j1->set_j3(i_n,k_n, wj);
 
     // calculate current in [i+1,k] cell
-    // wj = charge/(2.0*dr*dz*delta_t*2.0*PI*dr*dr) * (k*delta_z*delta_z/2.0 + delta_z*dr +delta_z*b);
+    // wj = charge/(2.0*dr*dz*delta_t*2.0*PI*dr*dr)  *(k*delta_z*delta_z/2.0 + delta_z*dr +delta_z*b);
     // set new weighting current value
     j1->set_j3(i_n+1,k_n, wj);
 
@@ -807,7 +807,7 @@ void Particles::simple_constrho_j_weighting(Time* time1,
 
     //weighting jr in [i][k] cell
     wj = charge_array[p_number]/(2*PI*r0*dz*dz*dr*delta_t) *
-      (r0*k*delta_r+k/2.0 * delta_r*(x1_old+delta_r/2.0)+0.5*delta_r*(b-k*(2*r0+r1))+
+      (r0*k*delta_r+k/2.0  *delta_r*(x1_old+delta_r/2.0)+0.5*delta_r*(b-k*(2*r0+r1))+
        delta_r*(b-k*r1)*(4*r0*r0-dr*dr)/(8*x1_old*(x1_old+delta_r)) +
        (k*(r0*r0/2.0-dr*dr/8.0))*log((x1_old+delta_r)/x1_old));
     j1->set_j1(i_n,k_n, wj);
@@ -822,7 +822,7 @@ void Particles::simple_constrho_j_weighting(Time* time1,
   }
 }
 
-void Particles::j_weighting(Time* time1, Current *j1, double* x1_o,double* x3_o)
+void Particles::j_weighting(Time *time1, Current *j1, double *x1_o,double *x3_o)
 {
   double dr = geom1->dr;
   double dz = geom1->dz;
@@ -1034,7 +1034,7 @@ void Particles::j_weighting(Time* time1, Current *j1, double* x1_o,double* x3_o)
     }
 
 }
-void Particles::azimuthal_j_weighting(Time* time1, Current *this_j)
+void Particles::azimuthal_j_weighting(Time *time1, Current *this_j)
 {
 
   int r_i=0;  // number of particle i cell
@@ -1171,10 +1171,10 @@ void Particles::strict_motion_weighting(Time *time1,
     r2 = (i_n+0.5)*dr;
     r3 = x1_new+0.5*dr;
     if (i_n==0)
-      wj_lower = charge_array[p_number]/(time1->delta_t*PI*dr*dr/4.0) * PI*(r2*r2-r1*r1)/value_part;
+      wj_lower = charge_array[p_number]/(time1->delta_t*PI*dr*dr/4.0)  *PI*(r2*r2-r1*r1)/value_part;
     else
-      wj_lower = charge_array[p_number]/(time1->delta_t*2.0*PI*i_n*dr*dr) * PI*(r2*r2-r1*r1)/value_part;
-    double wj_upper = charge_array[p_number]/(time1->delta_t*2*PI*(i_n+1)*dr*dr) * PI*(r3*r3-r2*r2)/value_part;
+      wj_lower = charge_array[p_number]/(time1->delta_t*2.0*PI*i_n*dr*dr)  *PI*(r2*r2-r1*r1)/value_part;
+    double wj_upper = charge_array[p_number]/(time1->delta_t*2*PI*(i_n+1)*dr*dr)  *PI*(r3*r3-r2*r2)/value_part;
     double wj=0;
     this_j->set_j1(i_n,k_n,0.0);
     this_j->set_j1(i_n,k_n+1,0.0);
