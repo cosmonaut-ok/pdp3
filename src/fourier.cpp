@@ -12,11 +12,11 @@ Fourier::~Fourier(void)
 {
 }
 
-void Fourier::fast_sine_transform(double** a, int lenght_n, int ir, bool inv)
+void Fourier::fast_sine_transform(double **a, int lenght_n, int ir, bool inv)
 {
   int d_lenght=2*lenght_n;
   complex<double> im_i (0,1);
-  complex<double>* a_sinc = new complex<double> [d_lenght+2];
+  complex<double> *a_sinc = new complex<double> [d_lenght+2];
 
   a_sinc[0]=(0.0);
   a_sinc[lenght_n]=(0.0);
@@ -49,12 +49,12 @@ void Fourier::fast_sine_transform(double** a, int lenght_n, int ir, bool inv)
   }
 }
 
-void Fourier::fast_cosine_transform(double** a, int lenght_n, int ir, bool inv)
+void Fourier::fast_cosine_transform(double **a, int lenght_n, int ir, bool inv)
 {
-//  void fast_fourier_alg(complex<double>* a, int lenght_n);
+//  void fast_fourier_alg(complex<double> *a, int lenght_n);
   int d_lenght=2*lenght_n;
   complex<double> im_i (0,1);
-  complex<double>* a_sinc = new complex<double> [d_lenght-2];
+  complex<double> *a_sinc = new complex<double> [d_lenght-2];
 
 #pragma omp parallel for shared(lenght_n, d_lenght)
   for (int k=0;k<(lenght_n-2);k++)
@@ -88,7 +88,7 @@ void Fourier::fast_cosine_transform(double** a, int lenght_n, int ir, bool inv)
   }
 }
 
-void Fourier::fast_fourier_alg(complex<double>* a, int lenght_n)
+void Fourier::fast_fourier_alg(complex<double> *a, int lenght_n)
 {
 #pragma omp parallel for shared (lenght_n)
   for (int k=0; k<lenght_n; k++)
@@ -142,9 +142,9 @@ void Fourier::fast_fourier_alg(complex<double>* a, int lenght_n)
 }
 
 // use fast_fourier_alg to real data
-void Fourier::fast_fourier_transform(double**a,int lenght_n,int ir, bool inv)
+void Fourier::fast_fourier_transform(double **a, int lenght_n, int ir, bool inv)
 {
-  complex<double>* im_a = new complex<double> [lenght_n];
+  complex<double> *im_a = new complex<double> [lenght_n];
 
 #pragma omp parallel for shared (im_a, ir)
   for(int k=0;k<lenght_n;k++)

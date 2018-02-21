@@ -5,7 +5,7 @@ ChargeDensity::ChargeDensity(void)
 }
 
 // constructor
-ChargeDensity::ChargeDensity(Geometry* geom1_t): geom1(geom1_t)
+ChargeDensity::ChargeDensity(Geometry *geom1_t): geom1(geom1_t)
 {
   rho = new double*[geom1->n_grid_1];
 #pragma omp parallel
@@ -28,7 +28,7 @@ ChargeDensity::~ChargeDensity(void)
   delete[]rho;
 }
 
-double** ChargeDensity::get_ro() const
+double **ChargeDensity::get_ro() const
 {
   return rho;
 }

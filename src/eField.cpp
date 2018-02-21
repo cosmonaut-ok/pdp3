@@ -13,7 +13,7 @@ EField::EField()
 }
 
 //// constructor
-EField::EField(Geometry* geom1_t) : Field (geom1_t)
+EField::EField(Geometry *geom1_t) : Field (geom1_t)
 {
   // Calling parent constructor
 
@@ -107,18 +107,18 @@ void EField::boundary_conditions()
 }
 
 // Electric field calculation
-void EField::calc_field(HField* h_field1,
-                         Time* time1,
-                         Current* current1)
+void EField::calc_field(HField *h_field1,
+                         Time *time1,
+                         Current *current1)
 {
-  double** j1 = current1->get_j1();
-  double** j2 = current1->get_j2();
-  double** j3 = current1->get_j3();
+  double **j1 = current1->get_j1();
+  double **j2 = current1->get_j2();
+  double **j3 = current1->get_j3();
   double koef_e = 0;
   double koef_h = 0;
-  double** h1 = h_field1->field_r;
-  double** h2 = h_field1->field_phi;
-  double** h3 = h_field1->field_z;
+  double **h1 = h_field1->field_r;
+  double **h2 = h_field1->field_phi;
+  double **h3 = h_field1->field_z;
   double dr = geom1->dr;
   double dz = geom1->dz;
 
@@ -131,7 +131,7 @@ void EField::calc_field(HField* h_field1,
 
     koef_h =  2*time1->delta_t/(2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
 
-    field_r[i][k]=field_r[i][k] * koef_e  - (j1[i][k]+(h2[i][k] - h2[i][k-1])/dz)*koef_h;
+    field_r[i][k]=field_r[i][k]  *koef_e  - (j1[i][k]+(h2[i][k] - h2[i][k-1])/dz)*koef_h;
   }
 
   //// Ez=on axis// // ???????????
@@ -175,7 +175,7 @@ void EField::set_fi_on_z()
 }
 
 // poisson equation solving 2
-void EField::poisson_equation2(Geometry* geom1, ChargeDensity* ro1)
+void EField::poisson_equation2(Geometry *geom1, ChargeDensity *ro1)
 {
   // const double epsilon0 = EPSILON0;
   double phi0(0.0);
@@ -186,12 +186,12 @@ void EField::poisson_equation2(Geometry* geom1, ChargeDensity* ro1)
   double *c1 = new double [geom1->n_grid_1];
   double *d1 = new double [geom1->n_grid_1];
   double *phi = new double [geom1->n_grid_1];
-  Fourier* four1=0;
+  Fourier *four1=0;
 
   // double dr = geom1->dr;
   double dr2 = geom1->dr*geom1->dr;
 
-  double** ro = ro1->get_ro();
+  double **ro = ro1->get_ro();
 
   // copy charge_density array in to temp array
 #pragma omp parallel for shared (ro)
@@ -275,16 +275,16 @@ void EField::tridiagonal_solve(const double *a,
   d[0] /= b[0]; // Division by zero would imply a singular matrix
 
   for(int i = 1; i < n; i++){
-    double id = (b[i] - c[i-1] * a[i]); // Division by zero risk
+    double id = (b[i] - c[i-1]  *a[i]); // Division by zero risk
     c[i] /= id; // Last value calculated is redundant
-    d[i] = (d[i] - d[i-1] * a[i])/id;
+    d[i] = (d[i] - d[i-1]  *a[i])/id;
   }
 
   // Now, back substitute
   x[n - 1] = d[n - 1];
 
   for(int i = n - 2; i >= 0; i--)
-    x[i] = d[i] - c[i] * x[i + 1];
+    x[i] = d[i] - c[i]  *x[i + 1];
 }
 
 // function for electric field weighting

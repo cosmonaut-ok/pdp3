@@ -5,12 +5,12 @@
 
 using namespace constant;
 
-Bunch::Bunch(char* p_name,
+Bunch::Bunch(char *p_name,
              double p_charge,
              double p_mass,
              int p_number,
-             Geometry* geom,
-             // particles_list* p_list,
+             Geometry *geom,
+             // particles_list *p_list,
              double b_duration,
              double b_radius,
              double b_density,
@@ -24,7 +24,7 @@ Bunch::Bunch(char* p_name,
   vel_bunch = b_init_velocity;
   //
   double b_lenght = duration*vel_bunch;
-  double n_in_big = PI * pow(radius, 2) * b_lenght * n_bunch / number;
+  double n_in_big = PI  *pow(radius, 2)  *b_lenght  *n_bunch / number;
   charge *= n_in_big;
   mass *= n_in_big;
 
@@ -44,7 +44,7 @@ Bunch::~Bunch(void)
 {
 }
 
-void Bunch::bunch_inject(Time* time)
+void Bunch::bunch_inject(Time *time)
 {
   double dl = vel_bunch*time->delta_t;
   int step_num = duration/time->delta_t;
@@ -65,7 +65,7 @@ void Bunch::bunch_inject(Time* time)
       rand_i = random_reverse(start_number + i, 9);
       rand_z = random_reverse(start_number + i, 11);
 
-      x1[i+start_number] = sqrt(dr * dr / 4.0 + radius * (radius - dr) * rand_i);
+      x1[i+start_number] = sqrt(dr  *dr / 4.0 + radius  *(radius - dr)  *rand_i);
 
       x3[i+start_number] = dl*(rand_z)+dz/2.0;
       v3[i+start_number] = vel_bunch;
@@ -83,7 +83,7 @@ void Bunch::bunch_inject(Time* time)
   }
 }
 
-void Bunch::half_step_coord(Time* t)
+void Bunch::half_step_coord(Time *t)
 {
   double dr = geom1->dr;
   double dz = geom1->dz;
