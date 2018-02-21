@@ -28,14 +28,14 @@ void BoundaryMaxwellConditions::specify_initial_field(Geometry* cyl_geom,
 #pragma omp for
     for (int i=0;i<(n_grid1);i++)
     {
-      e_fld->e2[i][0]=E_fi_left;
-      e_fld->e2[i][n_grid2-1]=E_fi_right;
+      e_fld->field_phi[i][0]=E_fi_left;
+      e_fld->field_phi[i][n_grid2-1]=E_fi_right;
     }
 
 #pragma omp for
     for(int k=0;k<n_grid2;k++)
     {
-      e_fld->e2[n_grid1-1][k]=E_fi_upper;
+      e_fld->field_phi[n_grid1-1][k]=E_fi_upper;
     }
   }
 }
