@@ -6,21 +6,22 @@
 #include "fourier.h"
 #include "current.h"
 #include "triple.h"
+// #include "field.h"
 
 class EField;
 
-class HField
+class HField // : public Field
 {
 public:
-  double** h1;
-  double** h2;
-  double** h3;
-  double* h1_1d;
-  double* h2_1d;
-  double* h3_1d;
-  double** h1_half_time;
-  double** h2_half_time;
-  double** h3_half_time;
+  double** field_r;
+  double** field_phi;
+  double** field_z;
+  double* field_r_1d;
+  double* field_phi_1d;
+  double* field_z_1d;
+  double** field_r_half_time;
+  double** field_phi_half_time;
+  double** field_z_half_time;
   double** Ar;
   double** Afi;
   double** Az;
@@ -29,9 +30,9 @@ public:
   HField(void);
   ~HField(void);
   void calc_field(EField* e_field1, Time* time1);
-  void set_homogeneous_h(double H1, double H2, double H3);
+  void set_homogeneous_h(double FIELD_R, double FIELD_PHI, double FIELD_Z);
   Triple get_field(double x1, double x3);
-  double* get_1d_h1();
-  double* get_1d_h2();
-  double* get_1d_h3();
+  double* get_1d_field_r();
+  double* get_1d_field_phi();
+  double* get_1d_field_z();
 };

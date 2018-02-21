@@ -17,23 +17,23 @@ EField::EField(Geometry* geom1_t): geom1(geom1_t)
 {
   // n_grid - number of edges
   //// Er
-  e1 = new double*[geom1->n_grid_1];
-  e1_1d = new double[(geom1->n_grid_1)*geom1->n_grid_2];
+  field_r = new double*[geom1->n_grid_1];
+  field_r_1d = new double[(geom1->n_grid_1)*geom1->n_grid_2];
   //// Ef
-  e2 = new double*[geom1->n_grid_1];
-  e2_1d = new double[geom1->n_grid_1*geom1->n_grid_2];
+  field_phi = new double*[geom1->n_grid_1];
+  field_phi_1d = new double[geom1->n_grid_1*geom1->n_grid_2];
   //// Ez
-  e3 = new double*[geom1->n_grid_1];
-  e3_1d = new double[geom1->n_grid_1*(geom1->n_grid_2)];
+  field_z = new double*[geom1->n_grid_1];
+  field_z_1d = new double[geom1->n_grid_1*(geom1->n_grid_2)];
 
 
-#pragma omp parallel for shared (e1, e2, e3)
+#pragma omp parallel for shared (field_r, field_phi, field_z)
   // filling second demension
   for (int i=0; i<(geom1->n_grid_1); i++)
   {
-    e1[i]= new double[geom1->n_grid_2];
-    e2[i]= new double[geom1->n_grid_2];
-    e3[i]= new double[geom1->n_grid_2];
+    field_r[i]= new double[geom1->n_grid_2];
+    field_phi[i]= new double[geom1->n_grid_2];
+    field_z[i]= new double[geom1->n_grid_2];
   }
 
   //// fi
@@ -62,13 +62,13 @@ EField::~EField()
 {
   for (int i=0; i<(geom1->n_grid_1-1);i++)
   {
-    delete[]e1[i];
-    delete[]e2[i];
-    delete[]e3[i];
+    delete[]field_r[i];
+    delete[]field_phi[i];
+    delete[]field_z[i];
   }
-  delete[]e1;
-  delete[]e2;
-  delete[]e3;
+  delete[]field_r;
+  delete[]field_phi;
+  delete[]field_z;
 
   for (int i=0; i<(geom1->n_grid_1);i++)
   {
@@ -80,18 +80,18 @@ EField::~EField()
 }
 
 // initial E distribution
-void EField::set_homogeneous_efield(double E1, double E2, double E3)
+void EField::set_homogeneous_efield(double FIELD_R, double FIELD_PHI, double FIELD_Z)
 {
-#pragma omp parallel for shared (E1, E2, E3)
+#pragma omp parallel for shared (FIELD_R, FIELD_PHI, FIELD_Z)
   for(int i=0; i<(geom1->n_grid_1-1); i++)
     for(int k=0; k<(geom1->n_grid_2-1); k++)
     {
       // Er
-      e1[i][k] = E1;
+      field_r[i][k] = FIELD_R;
       // Ef
-      e2[i][k] = E2;
+      field_phi[i][k] = FIELD_PHI;
       // Ez
-      e3[i][k] = E3;
+      field_z[i][k] = FIELD_Z;
     }
 }
 
@@ -104,40 +104,40 @@ void EField::boundary_conditions()
 #pragma omp for
     for(int i=0; i<(geom1->n_grid_1-1); i++)
     {
-      e1[i][0]=0;
-      e1[i][geom1->n_grid_2-1]=0;
-      //e1[i][0]=limit_conditions();
+      field_r[i][0]=0;
+      field_r[i][geom1->n_grid_2-1]=0;
+      //field_r[i][0]=limit_conditions();
     }
 
     //// Border Ef conditions
 #pragma omp for
     for(int k=0; k<(geom1->n_grid_2); k++)
     {
-      e2[0][k]=0;
-      e2[geom1->n_grid_1-1][k]=0;
+      field_phi[0][k]=0;
+      field_phi[geom1->n_grid_1-1][k]=0;
     }
 
 #pragma omp for
     for(int i=0; i<(geom1->n_grid_1); i++)
     {
-      e2[i][0]=0;
-      e2[i][geom1->n_grid_2-1]=0;
+      field_phi[i][0]=0;
+      field_phi[i][geom1->n_grid_2-1]=0;
     }
 
     //// Border Ez conditions
 #pragma omp for
     for(int k=0; k<(geom1->n_grid_2-1); k++)
     {
-      e3[0][k]=0;
-      e3[geom1->n_grid_1-1][k]=0;
-      // e1[0][k]=limit_conditions();
+      field_z[0][k]=0;
+      field_z[geom1->n_grid_1-1][k]=0;
+      // field_r[0][k]=limit_conditions();
     }
   }
 }
 
 // Electric field calculation
 void EField::calc_field(HField* h_field1,
-                         Time* time1,
+                         Time* timfield_r,
                          Current* current1)
 {
   double** j1 = current1->get_j1();
@@ -145,9 +145,9 @@ void EField::calc_field(HField* h_field1,
   double** j3 = current1->get_j3();
   double koef_e = 0;
   double koef_h = 0;
-  double** h1 = h_field1->h1;
-  double** h2 = h_field1->h2;
-  double** h3 = h_field1->h3;
+  double** h1 = h_field1->field_r;
+  double** h2 = h_field1->field_phi;
+  double** h3 = h_field1->field_z;
   double dr = geom1->dr;
   double dz = geom1->dz;
 
@@ -155,43 +155,43 @@ void EField::calc_field(HField* h_field1,
   for(int k=1; k<(geom1->n_grid_2-1); k++)
   {
     int i=0;
-    koef_e = (2.0*geom1->epsilon[i][k]*EPSILON0 - geom1->sigma[i][k]*time1->delta_t) /
-      (2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
+    koef_e = (2.0*geom1->epsilon[i][k]*EPSILON0 - geom1->sigma[i][k]*timfield_r->delta_t) /
+      (2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*timfield_r->delta_t);
 
-    koef_h =  2*time1->delta_t/(2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
+    koef_h =  2*timfield_r->delta_t/(2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*timfield_r->delta_t);
 
-    e1[i][k]=e1[i][k] * koef_e  - (j1[i][k]+(h2[i][k] - h2[i][k-1])/dz)*koef_h;
+    field_r[i][k]=field_r[i][k] * koef_e  - (j1[i][k]+(h2[i][k] - h2[i][k-1])/dz)*koef_h;
   }
 
   //// Ez=on axis// // ???????????
   for(int k=0; k<(geom1->n_grid_2-1); k++)
   {
     int i=0;
-    koef_e = (2.0*geom1->epsilon[i][k]*EPSILON0 - geom1->sigma[i][k]*time1->delta_t) /
-      (2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
-    koef_h =  2*time1->delta_t/(2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
+    koef_e = (2.0*geom1->epsilon[i][k]*EPSILON0 - geom1->sigma[i][k]*timfield_r->delta_t) /
+      (2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*timfield_r->delta_t);
+    koef_h =  2*timfield_r->delta_t/(2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*timfield_r->delta_t);
 
-    e3[i][k]=e3[i][k]*koef_e - (j3[i][k]-4.0/dr*h2[i][k])*koef_h;
+    field_z[i][k]=field_z[i][k]*koef_e - (j3[i][k]-4.0/dr*h2[i][k])*koef_h;
   }
 
   for(int i=1; i<(geom1->n_grid_1-1); i++)
     for(int k=1; k<(geom1->n_grid_2-1); k++)
     {
-      koef_e = (2.0*geom1->epsilon[i][k]*EPSILON0 - geom1->sigma[i][k]*time1->delta_t) /
-        (2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
-      koef_h =  2*time1->delta_t/(2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
-      e1[i][k]=e1[i][k]*koef_e - (j1[i][k]+(h2[i][k]-h2[i][k-1])/dz)*koef_h;
-      e2[i][k]=e2[i][k]*koef_e - (j2[i][k]-(h1[i][k]-h1[i][k-1])/dz + (h3[i][k]-h3[i-1][k])/dr)*koef_h;
-      e3[i][k]=e3[i][k]*koef_e -(j3[i][k]-(h2[i][k]-h2[i-1][k])/dr - (h2[i][k]+h2[i-1][k])/(2.0*dr*i))*koef_h;
+      koef_e = (2.0*geom1->epsilon[i][k]*EPSILON0 - geom1->sigma[i][k]*timfield_r->delta_t) /
+        (2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*timfield_r->delta_t);
+      koef_h =  2*timfield_r->delta_t/(2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*timfield_r->delta_t);
+      field_r[i][k]=field_r[i][k]*koef_e - (j1[i][k]+(h2[i][k]-h2[i][k-1])/dz)*koef_h;
+      field_phi[i][k]=field_phi[i][k]*koef_e - (j2[i][k]-(h1[i][k]-h1[i][k-1])/dz + (h3[i][k]-h3[i-1][k])/dr)*koef_h;
+      field_z[i][k]=field_z[i][k]*koef_e -(j3[i][k]-(h2[i][k]-h2[i-1][k])/dr - (h2[i][k]+h2[i-1][k])/(2.0*dr*i))*koef_h;
     }
 
   for(int i=1; i<(geom1->n_grid_1-1); i++)
   {
     int k=0;
-    koef_e = (2.0*geom1->epsilon[i][k]*EPSILON0 - geom1->sigma[i][k]*time1->delta_t) /
-      (2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
-    koef_h =  2*time1->delta_t/(2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
-    e3[i][k]=e3[i][k]*koef_e - (j3[i][k] - (h2[i][k]-h2[i-1][k])/dr - (h2[i][k]+h2[i-1][k])/(2.0*dr*i))*koef_h;
+    koef_e = (2.0*geom1->epsilon[i][k]*EPSILON0 - geom1->sigma[i][k]*timfield_r->delta_t) /
+      (2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*timfield_r->delta_t);
+    koef_h =  2*timfield_r->delta_t/(2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*timfield_r->delta_t);
+    field_z[i][k]=field_z[i][k]*koef_e - (j3[i][k] - (h2[i][k]-h2[i-1][k])/dr - (h2[i][k]+h2[i-1][k])/(2.0*dr*i))*koef_h;
   }
 }
 
@@ -274,19 +274,19 @@ void EField::poisson_equation2(Geometry* geom1, ChargeDensity* ro1)
   // calculate electric field
   for (int i=0; i<(geom1->n_grid_1-1); i++)
     for (int k=1; k<(geom1->n_grid_2); k++)
-      e1[i][k]=(fi[i][k]-fi[i+1][k])/geom1->dr;
+      field_r[i][k]=(fi[i][k]-fi[i+1][k])/geom1->dr;
 
   for (int i=0; i<(geom1->n_grid_1); i++)
     for (int k=1; k<(geom1->n_grid_2-1); k++)
-      e3[i][k]=(fi[i][k]-fi[i][k+1])/geom1->dz;
+      field_z[i][k]=(fi[i][k]-fi[i][k+1])/geom1->dz;
 
   ofstream er("er"), ez("ez"); // TODO: WTF?
 #pragma omp parallel for
   for (int i=1; i<geom1->n_grid_1-1; i++)
     for (int k=1; k<geom1->n_grid_2-1; k++)
     {
-      er<<e1[i][k]<<" ";
-      ez<<e3[i][k]<<" ";
+      er<<field_r[i][k]<<" ";
+      ez<<field_z[i][k]<<" ";
     }
   er.close();
   ez.close();
@@ -351,16 +351,16 @@ Triple EField::get_field(double x1, double x3)
   r2 = (i_r+1)*dr;
 
   //weighting Er[i][k]//
-  er = er + e1[i_r][k_z]*(PI*dz1*(r2*r2-r1*r1))/vol_1;
+  er = er + field_r[i_r][k_z]*(PI*dz1*(r2*r2-r1*r1))/vol_1;
 
   //weighting Er[i+1][k]//
-  er = er + e1[i_r+1][k_z]*(PI*dz1*(r3*r3-r2*r2))/vol_2;
+  er = er + field_r[i_r+1][k_z]*(PI*dz1*(r3*r3-r2*r2))/vol_2;
 
   //weighting Er[i][k+1]//
-  er= er + e1[i_r][k_z+1]*(PI*dz2*(r2*r2-r1*r1))/vol_1;
+  er= er + field_r[i_r][k_z+1]*(PI*dz2*(r2*r2-r1*r1))/vol_1;
 
   //weighting Er[i+1][k+1]//
-  er = er + e1[i_r+1][k_z+1]*(PI*dz2*(r3*r3-r2*r2))/vol_2;
+  er = er + field_r[i_r+1][k_z+1]*(PI*dz2*(r3*r3-r2*r2))/vol_2;
 
   // weighting of E_z//
   // finding number of cell. example dz=0.5, x3 = 0.7, z_k =0;!!
@@ -382,16 +382,16 @@ Triple EField::get_field(double x1, double x3)
   dz2 = x3 - (k_z+0.5)*dz;
 
   // weighting Ez[i][k]
-  ez = ez + e3[i_r][k_z]*(PI*dz1*(r2*r2-r1*r1))/vol_1;
+  ez = ez + field_z[i_r][k_z]*(PI*dz1*(r2*r2-r1*r1))/vol_1;
 
   // weighting Ez[i+1][k]
-  ez = ez + e3[i_r+1][k_z]*PI*dz1*(r3*r3-r2*r2)/vol_2;
+  ez = ez + field_z[i_r+1][k_z]*PI*dz1*(r3*r3-r2*r2)/vol_2;
 
   // weighting Ez[i][k+1]
-  ez = ez + e3[i_r][k_z+1]*PI*dz2*(r2*r2-r1*r1)/vol_1;
+  ez = ez + field_z[i_r][k_z+1]*PI*dz2*(r2*r2-r1*r1)/vol_1;
 
   //weighting Ez[i+1][k+1]//
-  ez = ez + e3[i_r+1][k_z+1]*PI*dz2*(r3*r3-r2*r2)/vol_2;
+  ez = ez + field_z[i_r+1][k_z+1]*PI*dz2*(r3*r3-r2*r2)/vol_2;
 
   // weighting of E_fi
   // finding number of cell. example dz=0.5, x3 = 0.7, z_k =1;
@@ -413,16 +413,16 @@ Triple EField::get_field(double x1, double x3)
   dz2 = x3-k_z*dz;
 
   // weighting Efi[i][k]
-  efi += e2[i_r][k_z]*PI*dz1*(r2*r2 - r1*r1)/vol_1;
+  efi += field_phi[i_r][k_z]*PI*dz1*(r2*r2 - r1*r1)/vol_1;
 
   // weighting Efi[i+1][k]
-  efi += e2[i_r+1][k_z]*PI*dz1*(r3*r3-r2*r2)/vol_2;
+  efi += field_phi[i_r+1][k_z]*PI*dz1*(r3*r3-r2*r2)/vol_2;
 
   // weighting Efi[i][k+1]
-  efi += e2[i_r][k_z+1]*PI*dz2*(r2*r2-r1*r1)/vol_1;
+  efi += field_phi[i_r][k_z+1]*PI*dz2*(r2*r2-r1*r1)/vol_1;
 
   // weighting Efi[i+1][k+1]
-  efi += e2[i_r+1][k_z+1]*PI*dz2*(r3*r3-r2*r2)/vol_2;
+  efi += field_phi[i_r+1][k_z+1]*PI*dz2*(r3*r3-r2*r2)/vol_2;
 
   Triple components(er, efi, ez);
 
@@ -431,32 +431,32 @@ Triple EField::get_field(double x1, double x3)
 
 //// Return one dimensional field components
 
-double* EField::get_1d_e1()
+double* EField::get_1d_field_r()
 {
   // copy 2d field array into 1d array rowwise
 #pragma omp parallel for
   for (int i = 0; i < geom1->n_grid_1 - 1; i++)
     for (int k = 0; k < geom1->n_grid_2; k++)
-      e1_1d[i * geom1->n_grid_2 + k] = e1[i][k];
-  return e1_1d;
+      field_r_1d[i * geom1->n_grid_2 + k] = field_r[i][k];
+  return field_r_1d;
 }
 
-double* EField::get_1d_e2()
+double* EField::get_1d_field_phi()
 {
   // copy 2d field array into 1d array rowwise
 #pragma omp parallel for
   for (int i = 0; i < geom1->n_grid_1; i++)
     for (int k = 0; k < geom1->n_grid_2; k++)
-      e2_1d[i * geom1->n_grid_2 + k] = e2[i][k];
-  return e2_1d;
+      field_phi_1d[i * geom1->n_grid_2 + k] = field_phi[i][k];
+  return field_phi_1d;
 }
 
-double* EField::get_1d_e3()
+double* EField::get_1d_field_z()
 {
   // copy 2d field array into 1d array rowwise
 #pragma omp parallel for
   for (int i = 0; i < geom1->n_grid_1; i++)
     for (int k = 0; k < geom1->n_grid_2 - 1; k++)
-      e3_1d[i * (geom1->n_grid_2 - 1) + k] = e3[i][k];
-  return e3_1d;
+      field_z_1d[i * (geom1->n_grid_2 - 1) + k] = field_z[i][k];
+  return field_z_1d;
 }

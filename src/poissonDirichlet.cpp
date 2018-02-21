@@ -33,8 +33,8 @@ void PoissonDirichlet::poisson_solve(EField* input_e, ChargeDensity* ro1)
   double* beta = new double [cyl_geom->n_grid_1];
 	Fourier* four1=0;
   double** ro=ro1->get_ro();
-  double** e1 = input_e->e1;
-  double** e3 = input_e->e3;
+  double** e1 = input_e->field_r;
+  double** e3 = input_e->field_z;
   double** fi = input_e->fi;
   double dr = cyl_geom->dr;
   double dz = cyl_geom->dz;
