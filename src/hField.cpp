@@ -88,33 +88,33 @@ HField::~HField(void)
 
 }
 
-void HField::set_homogeneous_h(double E1, double E2, double E3)
+void HField::set_homogeneous_h(double E_r, double E_phi, double E_z)
 {
-#pragma omp parallel shared (E1, E2, E3)
+#pragma omp parallel shared (E_r, E_phi, E_z)
   {
 #pragma omp for
     for (int i=0;i<geom1->n_grid_1;i++)
       for (int k=0;(k<geom1->n_grid_2-1);k++)
       {
         //if (field_r[i][k]!= NULL)
-        field_r[i][k]=E1;
-        field_r_half_time[i][k]=E1;
+        field_r[i][k]=E_r;
+        field_r_half_time[i][k]=E_r;
       }
 #pragma omp for
     for (int i=0;i<(geom1->n_grid_1-1);i++)
       for (int k=0;(k<geom1->n_grid_2-1);k++)
       {
         //if (field_r[i][k]!= NULL)
-        field_phi[i][k]=E2;
-        field_phi_half_time[i][k]=E2;
+        field_phi[i][k]=E_phi;
+        field_phi_half_time[i][k]=E_phi;
       }
 #pragma omp for
     for (int i=0;i<(geom1->n_grid_1-1);i++)
       for (int k=0;(k<geom1->n_grid_2);k++)
       {
         //if (field_r[i][k]!= NULL)
-        field_z[i][k]=E3;
-        field_z_half_time[i][k]=E3;
+        field_z[i][k]=E_z;
+        field_z_half_time[i][k]=E_z;
       }
   }
 }
