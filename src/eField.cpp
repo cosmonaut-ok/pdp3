@@ -51,18 +51,18 @@ EField::~EField()
 }
 
 // initial E distribution
-void EField::set_homogeneous_efield(double FIELD_R, double FIELD_PHI, double FIELD_Z)
+void EField::set_homogeneous_efield(double E1, double E2, double E3)
 {
-#pragma omp parallel for shared (FIELD_R, FIELD_PHI, FIELD_Z)
+#pragma omp parallel for shared (E1, E2, E3)
   for(int i=0; i<(geom1->n_grid_1-1); i++)
     for(int k=0; k<(geom1->n_grid_2-1); k++)
     {
       // Er
-      field_r[i][k] = FIELD_R;
+      field_r[i][k] = E1;
       // Ef
-      field_phi[i][k] = FIELD_PHI;
+      field_phi[i][k] = E2;
       // Ez
-      field_z[i][k] = FIELD_Z;
+      field_z[i][k] = E3;
     }
 }
 
@@ -108,7 +108,7 @@ void EField::boundary_conditions()
 
 // Electric field calculation
 void EField::calc_field(HField* h_field1,
-                         Time* timfield_r,
+                         Time* time1,
                          Current* current1)
 {
   double** j1 = current1->get_j1();
@@ -126,10 +126,10 @@ void EField::calc_field(HField* h_field1,
   for(int k=1; k<(geom1->n_grid_2-1); k++)
   {
     int i=0;
-    koef_e = (2.0*geom1->epsilon[i][k]*EPSILON0 - geom1->sigma[i][k]*timfield_r->delta_t) /
-      (2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*timfield_r->delta_t);
+    koef_e = (2.0*geom1->epsilon[i][k]*EPSILON0 - geom1->sigma[i][k]*time1->delta_t) /
+      (2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
 
-    koef_h =  2*timfield_r->delta_t/(2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*timfield_r->delta_t);
+    koef_h =  2*time1->delta_t/(2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
 
     field_r[i][k]=field_r[i][k] * koef_e  - (j1[i][k]+(h2[i][k] - h2[i][k-1])/dz)*koef_h;
   }
@@ -138,9 +138,9 @@ void EField::calc_field(HField* h_field1,
   for(int k=0; k<(geom1->n_grid_2-1); k++)
   {
     int i=0;
-    koef_e = (2.0*geom1->epsilon[i][k]*EPSILON0 - geom1->sigma[i][k]*timfield_r->delta_t) /
-      (2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*timfield_r->delta_t);
-    koef_h =  2*timfield_r->delta_t/(2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*timfield_r->delta_t);
+    koef_e = (2.0*geom1->epsilon[i][k]*EPSILON0 - geom1->sigma[i][k]*time1->delta_t) /
+      (2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
+    koef_h =  2*time1->delta_t/(2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
 
     field_z[i][k]=field_z[i][k]*koef_e - (j3[i][k]-4.0/dr*h2[i][k])*koef_h;
   }
@@ -148,9 +148,9 @@ void EField::calc_field(HField* h_field1,
   for(int i=1; i<(geom1->n_grid_1-1); i++)
     for(int k=1; k<(geom1->n_grid_2-1); k++)
     {
-      koef_e = (2.0*geom1->epsilon[i][k]*EPSILON0 - geom1->sigma[i][k]*timfield_r->delta_t) /
-        (2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*timfield_r->delta_t);
-      koef_h =  2*timfield_r->delta_t/(2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*timfield_r->delta_t);
+      koef_e = (2.0*geom1->epsilon[i][k]*EPSILON0 - geom1->sigma[i][k]*time1->delta_t) /
+        (2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
+      koef_h =  2*time1->delta_t/(2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
       field_r[i][k]=field_r[i][k]*koef_e - (j1[i][k]+(h2[i][k]-h2[i][k-1])/dz)*koef_h;
       field_phi[i][k]=field_phi[i][k]*koef_e - (j2[i][k]-(h1[i][k]-h1[i][k-1])/dz + (h3[i][k]-h3[i-1][k])/dr)*koef_h;
       field_z[i][k]=field_z[i][k]*koef_e -(j3[i][k]-(h2[i][k]-h2[i-1][k])/dr - (h2[i][k]+h2[i-1][k])/(2.0*dr*i))*koef_h;
@@ -159,9 +159,9 @@ void EField::calc_field(HField* h_field1,
   for(int i=1; i<(geom1->n_grid_1-1); i++)
   {
     int k=0;
-    koef_e = (2.0*geom1->epsilon[i][k]*EPSILON0 - geom1->sigma[i][k]*timfield_r->delta_t) /
-      (2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*timfield_r->delta_t);
-    koef_h =  2*timfield_r->delta_t/(2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*timfield_r->delta_t);
+    koef_e = (2.0*geom1->epsilon[i][k]*EPSILON0 - geom1->sigma[i][k]*time1->delta_t) /
+      (2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
+    koef_h =  2*time1->delta_t/(2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
     field_z[i][k]=field_z[i][k]*koef_e - (j3[i][k] - (h2[i][k]-h2[i-1][k])/dr - (h2[i][k]+h2[i-1][k])/(2.0*dr*i))*koef_h;
   }
 }

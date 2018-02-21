@@ -22,6 +22,6 @@ public:
   HField(void);
   ~HField(void);
   void calc_field(EField* e_field1, Time* time1);
-  void set_homogeneous_h(double FIELD_R, double FIELD_PHI, double FIELD_Z);
+  void set_homogeneous_h(double E1, double E2, double E3);
   Triple get_field(double x1, double x3);
 };
