@@ -8,26 +8,26 @@ Field::Field()
 }
 
 //// constructor
-Field::Field(Geometry* geom1_t): geom1(geom1_t)
+Field::Field(Geometry *geom1_t): geom1(geom1_t)
 {
   // n_grid - number of edges
   //// Field_r
-  field_r = new double*[geom1->n_grid_1];
-  field_r_1d = new double[(geom1->n_grid_1)*geom1->n_grid_2];
+  field_r = new double *[geom1->n_grid_1];
+  field_r_1d = new double [(geom1->n_grid_1)*geom1->n_grid_2];
   //// Field_phi
-  field_phi = new double*[geom1->n_grid_1];
-  field_phi_1d = new double[geom1->n_grid_1*geom1->n_grid_2];
+  field_phi = new double *[geom1->n_grid_1];
+  field_phi_1d = new double [geom1->n_grid_1*geom1->n_grid_2];
   //// Field_z
-  field_z = new double*[geom1->n_grid_1];
-  field_z_1d = new double[geom1->n_grid_1*(geom1->n_grid_2)];
+  field_z = new double *[geom1->n_grid_1];
+  field_z_1d = new double [geom1->n_grid_1*(geom1->n_grid_2)];
 
 #pragma omp parallel for shared (field_r, field_phi, field_z)
   // filling second demension
   for (int i=0; i<(geom1->n_grid_1); i++)
   {
-    field_r[i]= new double[geom1->n_grid_2];
-    field_phi[i]= new double[geom1->n_grid_2];
-    field_z[i]= new double[geom1->n_grid_2];
+    field_r[i]= new double [geom1->n_grid_2];
+    field_phi[i]= new double [geom1->n_grid_2];
+    field_z[i]= new double [geom1->n_grid_2];
   }
 }
 
@@ -46,7 +46,7 @@ Field::~Field()
 }
 
 //// Return one dimensional field components
-double* Field::get_1d_field_r()
+double *Field::get_1d_field_r()
 {
   // copy 2d field array into 1d array rowwise
 #pragma omp parallel for
@@ -56,7 +56,7 @@ double* Field::get_1d_field_r()
   return field_r_1d;
 }
 
-double* Field::get_1d_field_phi()
+double *Field::get_1d_field_phi()
 {
   // copy 2d field array into 1d array rowwise
 #pragma omp parallel for
@@ -66,7 +66,7 @@ double* Field::get_1d_field_phi()
   return field_phi_1d;
 }
 
-double* Field::get_1d_field_z()
+double *Field::get_1d_field_z()
 {
   // copy 2d field array into 1d array rowwise
 #pragma omp parallel for

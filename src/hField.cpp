@@ -7,42 +7,42 @@
 using namespace constant;
 
 // Constructor
-HField::HField(Geometry* geom1_l) : Field(geom1_l)
+HField::HField(Geometry *geom1_l) : Field(geom1_l)
 {
   // Calling parent constructor
 
   // Hr_half_time
-  field_r_half_time = new double* [geom1->n_grid_1];
+  field_r_half_time = new double *[geom1->n_grid_1];
 #pragma omp parallel for shared (field_r_half_time)
   for (int i=0;i<(geom1->n_grid_1);i++)
     field_r_half_time[i] = new double[geom1->n_grid_2-1];
 
   // Hf half time
-  field_phi_half_time = new double* [geom1->n_grid_1-1];
+  field_phi_half_time = new double *[geom1->n_grid_1-1];
 #pragma omp parallel for shared (field_phi_half_time)
   for (int i=0;i<(geom1->n_grid_1-1);i++)
     field_phi_half_time[i] = new double[geom1->n_grid_2-1];
 
   // Hz half time
-  field_z_half_time = new double* [geom1->n_grid_1-1];
+  field_z_half_time = new double *[geom1->n_grid_1-1];
 #pragma omp parallel for shared (field_z_half_time)
   for (int i=0;i<(geom1->n_grid_1-1);i++)
     field_z_half_time[i] = new double[geom1->n_grid_2];
 
   // Ar
-  Ar = new double* [geom1->n_grid_1];
+  Ar = new double *[geom1->n_grid_1];
 #pragma omp parallel for shared (Ar)
   for (int i=0;i<(geom1->n_grid_1);i++)
     Ar[i] = new double[geom1->n_grid_2];
 
   // Afi
-  Afi = new double* [geom1->n_grid_1];
+  Afi = new double *[geom1->n_grid_1];
 #pragma omp parallel for shared (Afi)
   for (int i=0;i<(geom1->n_grid_1);i++)
     Afi[i] = new double[geom1->n_grid_2];
 
   // Az
-  Az = new double* [geom1->n_grid_1];
+  Az = new double *[geom1->n_grid_1];
 #pragma omp parallel for shared (Az)
   for (int i=0;i<(geom1->n_grid_1);i++)
   {
@@ -120,7 +120,7 @@ void HField::set_homogeneous_h(double E_r, double E_phi, double E_z)
 }
 
 // Field calculation
-void HField::calc_field(EField* e_field1, Time* time1)
+void HField::calc_field(EField *e_field1, Time *time1)
 {
   double alpha;
 
@@ -264,7 +264,7 @@ Triple HField::get_field(double x1, double x3)
 }
 
 //// /Return one dimensional field components
-double* HField::get_1d_field_r()
+double *HField::get_1d_field_r()
 {
   // copy 2d field array into 1d array rowwise
 #pragma omp parallel for
@@ -274,7 +274,7 @@ double* HField::get_1d_field_r()
   return field_r_1d;
 }
 
-double* HField::get_1d_field_phi()
+double *HField::get_1d_field_phi()
 {
   // copy 2d field array into 1d array rowwise
 #pragma omp parallel for
@@ -284,7 +284,7 @@ double* HField::get_1d_field_phi()
   return field_phi_1d;
 }
 
-double* HField::get_1d_field_z()
+double *HField::get_1d_field_z()
 {
   // copy 2d field array into 1d array rowwise
 #pragma omp parallel for

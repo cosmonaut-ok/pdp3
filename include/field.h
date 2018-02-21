@@ -14,12 +14,12 @@ public:
 
   const Geometry *geom1;
 
-  Field(Geometry* geom1);
+  Field(Geometry *geom1);
   Field(void);
 
   ~Field(void);
 
-  double* get_1d_field_r();
-  double* get_1d_field_phi();
-  double* get_1d_field_z();
+  double *get_1d_field_r();
+  double *get_1d_field_phi();
+  double *get_1d_field_z();
 };
