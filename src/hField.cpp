@@ -262,3 +262,34 @@ Triple HField::get_field(double x1, double x3)
 
   return components;
 }
+
+//// /Return one dimensional field components
+double* HField::get_1d_field_r()
+{
+  // copy 2d field array into 1d array rowwise
+#pragma omp parallel for
+  for (int i = 0; i < geom1->n_grid_1; i++)
+    for (int k = 0; k < geom1->n_grid_2 - 1; k++)
+      field_r_1d[i * (geom1->n_grid_2 - 1) + k] = field_r_half_time[i][k];
+  return field_r_1d;
+}
+
+double* HField::get_1d_field_phi()
+{
+  // copy 2d field array into 1d array rowwise
+#pragma omp parallel for
+  for (int i = 0; i < geom1->n_grid_1 - 1; i++)
+    for (int k = 0; k < geom1->n_grid_2 - 1; k++)
+      field_phi_1d[i * (geom1->n_grid_2 - 1) + k] = field_phi_half_time[i][k];
+  return field_phi_1d;
+}
+
+double* HField::get_1d_field_z()
+{
+  // copy 2d field array into 1d array rowwise
+#pragma omp parallel for
+  for (int i = 0; i < geom1->n_grid_1 - 1; i++)
+    for (int k = 0; k < geom1->n_grid_2; k++)
+      field_z_1d[i * geom1->n_grid_2 + k] = field_z_half_time[i][k];
+  return field_z_1d;
+}

@@ -1,9 +1,4 @@
-// #include "eField.h"
 #include "field.h"
-// #include "math.h"
-// #include "fourier.h"
-// #include <fstream>
-// #include "constant.h"
 
 using namespace std;
 // using namespace constant;

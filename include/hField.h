@@ -24,4 +24,8 @@ public:
   void calc_field(EField* e_field1, Time* time1);
   void set_homogeneous_h(double E1, double E2, double E3);
   Triple get_field(double x1, double x3);
+
+  double* get_1d_field_r();
+  double* get_1d_field_phi();
+  double* get_1d_field_z();
 };
