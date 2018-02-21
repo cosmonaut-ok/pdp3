@@ -5,21 +5,13 @@
 #include "chargeDensity.h"
 #include "current.h"
 #include "triple.h"
-
 #include "field.h"
 
 class HField;
-// class Field;
 
 class EField : public Field
 {
 public:
-  double** field_r; //Er
-  double** field_phi; //Ef
-  double** field_z; //Ez
-  double* field_r_1d; //Er
-  double* field_phi_1d; //Ef
-  double* field_z_1d; //Ez
   double** fi; //potential
   double** t_charge_density;
   const Geometry* geom1;

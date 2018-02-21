@@ -9,17 +9,10 @@
 #include "field.h"
 
 class EField;
-// class Field;
 
 class HField : public Field
 {
 public:
-  double** field_r;
-  double** field_phi;
-  double** field_z;
-  double* field_r_1d;
-  double* field_phi_1d;
-  double* field_z_1d;
   double** field_r_half_time;
   double** field_phi_half_time;
   double** field_z_half_time;
