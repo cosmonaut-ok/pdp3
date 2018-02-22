@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include "field.h"
 #include "eField.h"
 #include "eField.cpp"
 #include "geometry.h"

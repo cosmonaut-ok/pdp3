@@ -317,12 +317,12 @@ void LoadInitParam::init_file_saving_parameters ()
                          ->GetText());
 
   // dump data configuration
-  is_dump_e1 = to_bool(dump_data_root->FirstChildElement("e1")->GetText());
-  is_dump_e2 = to_bool(dump_data_root->FirstChildElement("e2")->GetText());
-  is_dump_e3 = to_bool(dump_data_root->FirstChildElement("e3")->GetText());
-  is_dump_h1 = to_bool(dump_data_root->FirstChildElement("h1")->GetText());
-  is_dump_h2 = to_bool(dump_data_root->FirstChildElement("h2")->GetText());
-  is_dump_h3 = to_bool(dump_data_root->FirstChildElement("h3")->GetText());
+  is_dump_e_r = to_bool(dump_data_root->FirstChildElement("E_r")->GetText());
+  is_dump_e_phi = to_bool(dump_data_root->FirstChildElement("E_phi")->GetText());
+  is_dump_e_z = to_bool(dump_data_root->FirstChildElement("E_z")->GetText());
+  is_dump_h_r = to_bool(dump_data_root->FirstChildElement("H_r")->GetText());
+  is_dump_h_phi = to_bool(dump_data_root->FirstChildElement("H_phi")->GetText());
+  is_dump_h_z = to_bool(dump_data_root->FirstChildElement("H_z")->GetText());
   is_dump_rho_beam = to_bool(dump_data_root->FirstChildElement("rho_beam")->GetText());
 
   c_io_class = new InputOutputClass (path_res, path_dump);
@@ -331,12 +331,12 @@ void LoadInitParam::init_file_saving_parameters ()
 bool LoadInitParam::save_system_state(double timestamp)
 {
   cout << "Saving system state at " << timestamp << endl;
-  c_io_class->out_field_dump((char*)"e1",efield->field_r,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-  c_io_class->out_field_dump((char*)"e2",efield->field_phi,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-  c_io_class->out_field_dump((char*)"e3",efield->field_z,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-  c_io_class->out_field_dump((char*)"h1",hfield->field_r,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-  c_io_class->out_field_dump((char*)"h2",hfield->field_phi,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-  c_io_class->out_field_dump((char*)"h3",hfield->field_z,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+  c_io_class->out_field_dump((char*)"E_r",efield->field_r,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+  c_io_class->out_field_dump((char*)"E_phi",efield->field_phi,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+  c_io_class->out_field_dump((char*)"E_z",efield->field_z,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+  c_io_class->out_field_dump((char*)"H_r",hfield->field_r,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+  c_io_class->out_field_dump((char*)"H_phi",hfield->field_phi,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+  c_io_class->out_field_dump((char*)"H_z",hfield->field_z,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
   for(unsigned int i=0;i<p_list->part_list.size();i++)
   {
     c_io_class->out_coord_dump(p_list->part_list[i]->name,p_list->part_list[i]->x1, p_list->part_list[i]->x3, p_list->part_list[i]->number);
@@ -419,13 +419,13 @@ void LoadInitParam::run(void)
       c_rho_old->reset_rho();
       p_list[0].charge_weighting(c_rho_old);
 
-      if (is_dump_e1) c_io_class->out_data("e1",efield->field_r,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-      if (is_dump_e2) c_io_class->out_data("e2",efield->field_phi,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-      if (is_dump_e3) c_io_class->out_data("e3",efield->field_z,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+      if (is_dump_e_r) c_io_class->out_data("E_r",efield->field_r,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+      if (is_dump_e_phi) c_io_class->out_data("E_phi",efield->field_phi,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+      if (is_dump_e_z) c_io_class->out_data("E_z",efield->field_z,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
 
-      if (is_dump_h1) c_io_class->out_data("h1",hfield->field_r,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-      if (is_dump_h2) c_io_class->out_data("h2",hfield->field_phi,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-      if (is_dump_h3) c_io_class->out_data("h3",hfield->field_z,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+      if (is_dump_h_r) c_io_class->out_data("H_e",hfield->field_r,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+      if (is_dump_h_phi) c_io_class->out_data("H_phi",hfield->field_phi,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+      if (is_dump_h_z) c_io_class->out_data("H_z",hfield->field_z,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
 
       if (is_dump_rho_beam) c_io_class->out_data("rho_beam", c_rho_beam->get_ro(),step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
 
