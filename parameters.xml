@@ -79,12 +79,12 @@
     <!-- <time_step>100</time_step>-->
     <!-- <number>100</number>-->
     <dump_data>
-      <e1>true</e1>
-      <e2>false</e2>
-      <e3>true</e3>
-      <h1>false</h1>
-      <h2>false</h2>
-      <h3>false</h3>
+      <E_r>true</E_r>
+      <E_phi>false</E_phi>
+      <E_z>true</E_z>
+      <H_r>false</H_r>
+      <H_phi>false</H_phi>
+      <H_z>false</H_z>
       <rho_beam>true</rho_beam>
     </dump_data>
   </file_save_parameters>

@@ -97,12 +97,12 @@ cat<<EOF>${TESTDIR}/parameters.xml
     <frames_per_file>100</frames_per_file>
     <system_state_dump_interval>1000</system_state_dump_interval>
     <dump_data>
-      <e1>true</e1>
-      <e2>false</e2>
-      <e3>true</e3>
-      <h1>false</h1>
-      <h2>false</h2>
-      <h3>false</h3>
+      <E_r>true</E_r>
+      <E_phi>false</E_phi>
+      <E_z>true</E_z>
+      <H_r>false</H_r>
+      <H_phi>false</H_phi>
+      <H_z>false</H_z>
       <rho_beam>true</rho_beam>
     </dump_data>
   </file_save_parameters>

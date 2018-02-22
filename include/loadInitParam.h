@@ -55,12 +55,12 @@ public:
   int system_state_dump_interval;
   int frames_per_file;
   // dump data
-  bool is_dump_e1;
-  bool is_dump_e2;
-  bool is_dump_e3;
-  bool is_dump_h1;
-  bool is_dump_h2;
-  bool is_dump_h3;
+  bool is_dump_e_r;
+  bool is_dump_e_phi;
+  bool is_dump_e_z;
+  bool is_dump_h_r;
+  bool is_dump_h_phi;
+  bool is_dump_h_z;
   bool is_dump_rho_beam;
 
 private:
