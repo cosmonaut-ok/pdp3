@@ -48,7 +48,7 @@ class Parameters:
             self.system_state_path = os.path.join(self.config_path, local_system_state_path)
 
         ## get normalization parameters
-        bunch = dom_root.getElementsByTagName('Particles_bunch');
+        bunch = dom_root.getElementsByTagName('particles_bunch');
         bunch_density = float(bunch.item(0).getElementsByTagName('density')[0].firstChild.data);
 
         self.bunch_density = bunch_density # particles density of electron/ion bunch
