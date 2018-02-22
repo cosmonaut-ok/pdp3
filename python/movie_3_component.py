@@ -224,8 +224,8 @@ def main():
         ################################################################################################
         #################### configure plot and movie parameters #######################################
         ################################################################################################
-        movie.data_file_e_r_pattern = 'e1'
-        movie.data_file_e_z_pattern = 'e3'
+        movie.data_file_e_r_pattern = 'E_r'
+        movie.data_file_e_z_pattern = 'E_z'
         movie.data_file_e_bunch_density_pattern = 'rho_beam'
 
         movie.x_axis_label = r'$\mathit{Z (m)}$'
