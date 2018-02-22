@@ -116,9 +116,9 @@ void EField::calc_field(HField *h_field1,
   double **j3 = current1->get_j3();
   double koef_e = 0;
   double koef_h = 0;
-  double **h1 = h_field1->field_r;
-  double **h2 = h_field1->field_phi;
-  double **h3 = h_field1->field_z;
+  double **h_r = h_field1->field_r;
+  double **h_phi = h_field1->field_phi;
+  double **h_z = h_field1->field_z;
   double dr = geom1->dr;
   double dz = geom1->dz;
 
@@ -131,7 +131,7 @@ void EField::calc_field(HField *h_field1,
 
     koef_h =  2*time1->delta_t/(2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
 
-    field_r[i][k]=field_r[i][k]  *koef_e  - (j1[i][k]+(h2[i][k] - h2[i][k-1])/dz)*koef_h;
+    field_r[i][k]=field_r[i][k]  *koef_e  - (j1[i][k]+(h_phi[i][k] - h_phi[i][k-1])/dz)*koef_h;
   }
 
   //// Ez=on axis// // ???????????
@@ -142,7 +142,7 @@ void EField::calc_field(HField *h_field1,
       (2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
     koef_h =  2*time1->delta_t/(2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
 
-    field_z[i][k]=field_z[i][k]*koef_e - (j3[i][k]-4.0/dr*h2[i][k])*koef_h;
+    field_z[i][k]=field_z[i][k]*koef_e - (j3[i][k]-4.0/dr*h_phi[i][k])*koef_h;
   }
 
   for(int i=1; i<(geom1->n_grid_1-1); i++)
@@ -151,9 +151,9 @@ void EField::calc_field(HField *h_field1,
       koef_e = (2.0*geom1->epsilon[i][k]*EPSILON0 - geom1->sigma[i][k]*time1->delta_t) /
         (2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
       koef_h =  2*time1->delta_t/(2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
-      field_r[i][k]=field_r[i][k]*koef_e - (j1[i][k]+(h2[i][k]-h2[i][k-1])/dz)*koef_h;
-      field_phi[i][k]=field_phi[i][k]*koef_e - (j2[i][k]-(h1[i][k]-h1[i][k-1])/dz + (h3[i][k]-h3[i-1][k])/dr)*koef_h;
-      field_z[i][k]=field_z[i][k]*koef_e -(j3[i][k]-(h2[i][k]-h2[i-1][k])/dr - (h2[i][k]+h2[i-1][k])/(2.0*dr*i))*koef_h;
+      field_r[i][k]=field_r[i][k]*koef_e - (j1[i][k]+(h_phi[i][k]-h_phi[i][k-1])/dz)*koef_h;
+      field_phi[i][k]=field_phi[i][k]*koef_e - (j2[i][k]-(h_r[i][k]-h_r[i][k-1])/dz + (h_z[i][k]-h_z[i-1][k])/dr)*koef_h;
+      field_z[i][k]=field_z[i][k]*koef_e -(j3[i][k]-(h_phi[i][k]-h_phi[i-1][k])/dr - (h_phi[i][k]+h_phi[i-1][k])/(2.0*dr*i))*koef_h;
     }
 
   for(int i=1; i<(geom1->n_grid_1-1); i++)
@@ -162,7 +162,7 @@ void EField::calc_field(HField *h_field1,
     koef_e = (2.0*geom1->epsilon[i][k]*EPSILON0 - geom1->sigma[i][k]*time1->delta_t) /
       (2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
     koef_h =  2*time1->delta_t/(2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
-    field_z[i][k]=field_z[i][k]*koef_e - (j3[i][k] - (h2[i][k]-h2[i-1][k])/dr - (h2[i][k]+h2[i-1][k])/(2.0*dr*i))*koef_h;
+    field_z[i][k]=field_z[i][k]*koef_e - (j3[i][k] - (h_phi[i][k]-h_phi[i-1][k])/dr - (h_phi[i][k]+h_phi[i-1][k])/(2.0*dr*i))*koef_h;
   }
 }
 
