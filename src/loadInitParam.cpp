@@ -378,7 +378,7 @@ void LoadInitParam::run(void)
 
     // 3. Calculate x, calculate J
     p_list->copy_coords();
-    p_list->charge_weighting(c_rho_old);  //continuity equation
+    // p_list->charge_weighting(c_rho_old);  //continuity equation
     p_list->half_step_coord(c_time);
     p_list->azimuthal_j_weighting(c_time, c_current);
     p_list->half_step_coord(c_time);
