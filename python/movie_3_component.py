@@ -226,7 +226,7 @@ def main():
         ################################################################################################
         movie.data_file_e_r_pattern = 'E_r'
         movie.data_file_e_z_pattern = 'E_z'
-        movie.data_file_e_bunch_density_pattern = 'rho_beam'
+        movie.data_file_e_bunch_density_pattern = 'rho_bunch'
 
         movie.x_axis_label = r'$\mathit{Z (m)}$'
         movie.y_axis_label = r'$\mathit{R (m)}$'
