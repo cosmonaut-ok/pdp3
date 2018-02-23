@@ -147,6 +147,9 @@ void LoadInitParam::init_particles()
     prtls->velocity_distribution(temperature);
     particle_kind = particle_kind->NextSiblingElement(p_king_section_name);
   }
+
+  p_list->charge_weighting(c_rho_new);
+  // p_list->create_coord_arrays();
 }
 
 void LoadInitParam::init_bunch()
@@ -211,6 +214,7 @@ void LoadInitParam::init_boundary ()
   {
     p_list->charge_weighting(c_rho_new);
     Fourier four1();
+    // Seems: https://en.wikipedia.org/wiki/Dirichlet_distribution
     PoissonDirichlet dirih(c_geom);
     dirih.poisson_solve(efield, c_rho_new);
   }
@@ -328,43 +332,72 @@ void LoadInitParam::init_file_saving_parameters ()
   c_io_class = new InputOutputClass (path_res, path_dump);
 }
 
-bool LoadInitParam::save_system_state(double timestamp)
+void LoadInitParam::dump_system_state()
 {
-  cout << "Saving system state at " << timestamp << endl;
-  c_io_class->out_field_dump((char*)"E_r",efield->field_r,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-  c_io_class->out_field_dump((char*)"E_phi",efield->field_phi,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-  c_io_class->out_field_dump((char*)"E_z",efield->field_z,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-  c_io_class->out_field_dump((char*)"H_r",hfield->field_r,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-  c_io_class->out_field_dump((char*)"H_phi",hfield->field_phi,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-  c_io_class->out_field_dump((char*)"H_z",hfield->field_z,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-  for(unsigned int i=0;i<p_list->part_list.size();i++)
+  c_io_class->out_field_dump((char*)"E_r", efield->field_r, c_geom->n_grid_1 - 1, c_geom->n_grid_2 - 1);
+  c_io_class->out_field_dump((char*)"E_phi", efield->field_phi, c_geom->n_grid_1 - 1, c_geom->n_grid_2 - 1);
+  c_io_class->out_field_dump((char*)"E_z", efield->field_z, c_geom->n_grid_1 - 1, c_geom->n_grid_2 - 1);
+  c_io_class->out_field_dump((char*)"H_r", hfield->field_r, c_geom->n_grid_1 - 1, c_geom->n_grid_2 - 1);
+  c_io_class->out_field_dump((char*)"H_phi", hfield->field_phi, c_geom->n_grid_1 - 1, c_geom->n_grid_2 - 1);
+  c_io_class->out_field_dump((char*)"H_z", hfield->field_z, c_geom->n_grid_1 - 1, c_geom->n_grid_2 - 1);
+  for(unsigned int i=0; i<p_list->part_list.size(); i++)
   {
-    c_io_class->out_coord_dump(p_list->part_list[i]->name,p_list->part_list[i]->x1, p_list->part_list[i]->x3, p_list->part_list[i]->number);
-    c_io_class->out_velocity_dump(p_list->part_list[i]->name,p_list->part_list[i]->v1, p_list->part_list[i]->v2,p_list->part_list[i]->v3, p_list->part_list[i]->number);
+    c_io_class->out_coord_dump(p_list->part_list[i]->name,
+                               p_list->part_list[i]->x1, p_list->part_list[i]->x3,
+                               p_list->part_list[i]->number);
+
+    c_io_class->out_velocity_dump(p_list->part_list[i]->name,
+                                  p_list->part_list[i]->v1, p_list->part_list[i]->v2, p_list->part_list[i]->v3,
+                                  p_list->part_list[i]->number);
 
   }
-  return(true);
+}
+
+void LoadInitParam::dump_data(int step_number)
+{
+
+  if (is_dump_e_r)
+    c_io_class->out_data("E_r", efield->field_r, step_number,
+                         frames_per_file, c_geom->n_grid_1 - 1, c_geom->n_grid_2 - 1);
+
+  if (is_dump_e_phi)
+    c_io_class->out_data("E_phi", efield->field_phi, step_number,
+                         frames_per_file, c_geom->n_grid_1 - 1, c_geom->n_grid_2 - 1);
+
+  if (is_dump_e_z)
+    c_io_class->out_data("E_z", efield->field_z, step_number,
+                         frames_per_file, c_geom->n_grid_1 - 1, c_geom->n_grid_2 - 1);
+
+  if (is_dump_h_r)
+    c_io_class->out_data("H_e", hfield->field_r, step_number,
+                         frames_per_file, c_geom->n_grid_1 - 1, c_geom->n_grid_2 - 1);
+
+  if (is_dump_h_phi)
+    c_io_class->out_data("H_phi", hfield->field_phi, step_number,
+                         frames_per_file, c_geom->n_grid_1 - 1, c_geom->n_grid_2 - 1);
+
+  if (is_dump_h_z)
+    c_io_class->out_data("H_z", hfield->field_z, step_number,
+                         frames_per_file, c_geom->n_grid_1 - 1, c_geom->n_grid_2 - 1);
+
+  if (is_dump_rho_bunch)
+    c_io_class->out_data("rho_bunch",  c_rho_bunch->get_rho(), step_number,
+                         frames_per_file, c_geom->n_grid_1 - 1, c_geom->n_grid_2 - 1);
 }
 
 void LoadInitParam::run(void)
 {
   cout << endl << "Launch Simulation" << endl << endl;
 
-  this->c_time->current_time = 0.0 ;
-  p_list->charge_weighting(c_rho_new);
-
-  // Seems: https://en.wikipedia.org/wiki/Dirichlet_distribution
-  PoissonDirichlet dirih(c_geom);
-  dirih.poisson_solve(efield, c_rho_new);
-
-  //variable for out_class function
-  p_list->create_coord_arrays();
   int step_number = 0;
   time_t t1 = time(0);
   char avg_step_exec_time[24]; // rounded and formatted average step execution time
 
+  p_list->create_coord_arrays();
+
   while (c_time->current_time <= c_time->end_time)
   {
+    // 0. inject bunch
     c_bunch->bunch_inject(c_time);
 
     // 1. Calculate H field
@@ -378,7 +411,7 @@ void LoadInitParam::run(void)
 
     // 3. Calculate x, calculate J
     p_list->copy_coords();
-    // p_list->charge_weighting(c_rho_old);  //continuity equation
+    // p_list->charge_weighting(c_rho_old); //continuity equation
     p_list->half_step_coord(c_time);
     p_list->azimuthal_j_weighting(c_time, c_current);
     p_list->half_step_coord(c_time);
@@ -405,7 +438,8 @@ void LoadInitParam::run(void)
            << endl;
     }
 
-    if  ((((int)(c_time->current_time/c_time->delta_t))%data_dump_interval==0))
+    // dump data to corresponding files
+    if  ((int)(c_time->current_time / c_time->delta_t) % data_dump_interval == 0)
     {
       sprintf(avg_step_exec_time, "%.2f", (double)(time(0) - t1) / data_dump_interval);
 
@@ -419,24 +453,17 @@ void LoadInitParam::run(void)
       // c_rho_old->reset_rho();
       // p_list[0].charge_weighting(c_rho_old);
 
-      if (is_dump_e_r) c_io_class->out_data("E_r",efield->field_r,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-      if (is_dump_e_phi) c_io_class->out_data("E_phi",efield->field_phi,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-      if (is_dump_e_z) c_io_class->out_data("E_z",efield->field_z,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-
-      if (is_dump_h_r) c_io_class->out_data("H_e",hfield->field_r,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-      if (is_dump_h_phi) c_io_class->out_data("H_phi",hfield->field_phi,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-      if (is_dump_h_z) c_io_class->out_data("H_z",hfield->field_z,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-
-      if (is_dump_rho_bunch) c_io_class->out_data("rho_bunch", c_rho_bunch->get_rho(),step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+      dump_data(step_number);
 
       step_number += 1;
       t1 = time(0);
       if  ((((int)(c_time->current_time/c_time->delta_t))%system_state_dump_interval==0)&&(step_number!=1))
-        this->save_system_state(c_time->current_time);
+      {
+        cout << "Saving system state at " << c_time->current_time << endl;
+        dump_system_state();
+      }
     }
     c_time->current_time = c_time->current_time + c_time->delta_t;
-    //if (!res)
-    //  cout<<"Error:"<<c_time->current_time<<"! ";
   }
   cout << endl << "Simulation Completed" << endl << endl;
 }
