@@ -124,7 +124,7 @@ void LoadInitParam::init_particles()
   // WARNING! should be called after geometry initialized
   c_rho_new = new ChargeDensity(c_geom);
   c_rho_old = new ChargeDensity(c_geom);
-  c_rho_beam = new ChargeDensity(c_geom);
+  c_rho_bunch = new ChargeDensity(c_geom);
   c_current = new Current(c_geom);
 
   while(particle_kind)
@@ -323,7 +323,7 @@ void LoadInitParam::init_file_saving_parameters ()
   is_dump_h_r = to_bool(dump_data_root->FirstChildElement("H_r")->GetText());
   is_dump_h_phi = to_bool(dump_data_root->FirstChildElement("H_phi")->GetText());
   is_dump_h_z = to_bool(dump_data_root->FirstChildElement("H_z")->GetText());
-  is_dump_rho_beam = to_bool(dump_data_root->FirstChildElement("rho_beam")->GetText());
+  is_dump_rho_bunch = to_bool(dump_data_root->FirstChildElement("rho_bunch")->GetText());
 
   c_io_class = new InputOutputClass (path_res, path_dump);
 }
@@ -373,7 +373,7 @@ void LoadInitParam::run(void)
     // 2. Calculate v
     c_current->reset_j();
     c_rho_old->reset_rho();
-    c_rho_beam->reset_rho();
+    c_rho_bunch->reset_rho();
     p_list->step_v(efield, hfield, c_time);
 
     // 3. Calculate x, calculate J
@@ -415,7 +415,7 @@ void LoadInitParam::run(void)
            << left << setw(32) << avg_step_exec_time
            << endl;
 
-      c_bunch->charge_weighting(c_rho_beam);
+      c_bunch->charge_weighting(c_rho_bunch);
       // c_rho_old->reset_rho();
       // p_list[0].charge_weighting(c_rho_old);
 
@@ -427,7 +427,7 @@ void LoadInitParam::run(void)
       if (is_dump_h_phi) c_io_class->out_data("H_phi",hfield->field_phi,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
       if (is_dump_h_z) c_io_class->out_data("H_z",hfield->field_z,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
 
-      if (is_dump_rho_beam) c_io_class->out_data("rho_beam", c_rho_beam->get_rho(),step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+      if (is_dump_rho_bunch) c_io_class->out_data("rho_bunch", c_rho_bunch->get_rho(),step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
 
       step_number += 1;
       t1 = time(0);

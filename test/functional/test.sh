@@ -103,7 +103,7 @@ cat<<EOF>${TESTDIR}/parameters.xml
       <H_r>false</H_r>
       <H_phi>false</H_phi>
       <H_z>false</H_z>
-      <rho_beam>true</rho_beam>
+      <rho_bunch>true</rho_bunch>
     </dump_data>
   </file_save_parameters>
 

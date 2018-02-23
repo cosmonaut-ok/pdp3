@@ -47,7 +47,7 @@ public:
   InputOutputClass  *c_io_class;
   ChargeDensity  *c_rho_new;
   ChargeDensity  *c_rho_old;
-  ChargeDensity  *c_rho_beam;
+  ChargeDensity  *c_rho_bunch;
   Current  *c_current;
   XMLDocument *xml_data;
   int testnumber;
@@ -61,7 +61,7 @@ public:
   bool is_dump_h_r;
   bool is_dump_h_phi;
   bool is_dump_h_z;
-  bool is_dump_rho_beam;
+  bool is_dump_rho_bunch;
 
 private:
   void read_xml(const char *xml_file_name);
