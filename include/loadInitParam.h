@@ -33,7 +33,8 @@ public:
 
 public:
   double *read_double_params(const char *p_name);
-  bool save_system_state(double t);
+  void dump_system_state();
+  void dump_data(int step_number);
   void run(void);
 
 public:
