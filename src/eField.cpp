@@ -191,7 +191,7 @@ void EField::poisson_equation2(Geometry *geom1, ChargeDensity *ro1)
   // double dr = geom1->dr;
   double dr2 = geom1->dr*geom1->dr;
 
-  double **ro = ro1->get_ro();
+  double **ro = ro1->get_rho();
 
   // copy charge_density array in to temp array
 #pragma omp parallel for shared (ro)

@@ -18,7 +18,7 @@ bool Poisson::test_poisson_equation(EField *input_e, ChargeDensity *rho)
   double accur =1e-3;
   double a=0;
   bool res =true;
-  double **rho1 = rho->get_ro();
+  double **rho1 = rho->get_rho();
   double **e1 =input_e->field_r;
   double **e3 = input_e->field_z;
   ofstream delta("delta");

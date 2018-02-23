@@ -312,7 +312,7 @@ void Particles::charge_weighting(ChargeDensity *ro1)
   //double ro_v_2 = 0; // charge density in i+1 cell
 
   double value = 0;
-  // double **temp = ro1->get_ro();
+  // double **temp = ro1->get_rho();
 
   for(int i=0; i<number; i++)
     if (is_alive[i])
