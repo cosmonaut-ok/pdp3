@@ -416,8 +416,8 @@ void LoadInitParam::run(void)
            << endl;
 
       c_bunch->charge_weighting(c_rho_beam);
-      c_rho_old->reset_rho();
-      p_list[0].charge_weighting(c_rho_old);
+      // c_rho_old->reset_rho();
+      // p_list[0].charge_weighting(c_rho_old);
 
       if (is_dump_e_r) c_io_class->out_data("E_r",efield->field_r,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
       if (is_dump_e_phi) c_io_class->out_data("E_phi",efield->field_phi,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
@@ -427,7 +427,7 @@ void LoadInitParam::run(void)
       if (is_dump_h_phi) c_io_class->out_data("H_phi",hfield->field_phi,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
       if (is_dump_h_z) c_io_class->out_data("H_z",hfield->field_z,step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
 
-      if (is_dump_rho_beam) c_io_class->out_data("rho_beam", c_rho_beam->get_ro(),step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+      if (is_dump_rho_beam) c_io_class->out_data("rho_beam", c_rho_beam->get_rho(),step_number,frames_per_file,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
 
       step_number += 1;
       t1 = time(0);
