@@ -105,7 +105,7 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 CLEAN_FILES  = y.tab.c y.tab.h lex.yy.c core *.orig *.rej \
                \\\#*\\\# *~ *% .\\\#*
 
-BUILD_DIRS = pdp3_files pdp3_result/Dump $(OBJDIR) pdp3_result
+BUILD_DIRS = pdp3_result pdp3_result/Dump $(OBJDIR)
 
 clean: $(SUBDIRS:%=%/__clean__) $(EXTRASUBDIRS:%=%/__clean__) $(TESTSUBDIRS:%=%/__clean__)
 	$(RM) $(pdp3_OBJS) $(CLEAN_FILES)
