@@ -28,7 +28,7 @@ ChargeDensity::~ChargeDensity(void)
   delete[]rho;
 }
 
-double **ChargeDensity::get_ro() const
+double **ChargeDensity::get_rho() const
 {
   return rho;
 }
