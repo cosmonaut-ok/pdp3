@@ -20,11 +20,11 @@ Bunch::Bunch(char *p_name,
   // fill object fields
   duration = b_duration;
   radius = b_radius;
-  n_bunch = b_density;
-  vel_bunch = b_init_velocity;
+  density = b_density;
+  velosity = b_init_velocity;
   //
-  double b_lenght = duration*vel_bunch;
-  double n_in_big = PI * pow(radius, 2) * b_lenght * n_bunch / number;
+  double b_lenght = duration*velosity;
+  double n_in_big = PI * pow(radius, 2) * b_lenght * density / number;
   charge *= n_in_big;
   mass *= n_in_big;
 
@@ -46,7 +46,7 @@ Bunch::~Bunch(void)
 
 void Bunch::bunch_inject(Time *time)
 {
-  double dl = vel_bunch * time->delta_t;
+  double dl = velosity * time->delta_t;
   int step_num = duration / time->delta_t;
   int particles_in_step = number / step_num;
   int start_number = time->current_time / time->delta_t * particles_in_step;
@@ -62,12 +62,12 @@ void Bunch::bunch_inject(Time *time)
 #pragma omp for
     for(int i = 0; i < particles_in_step; i++)
     {
-      double rand_i = random_reverse(start_number + i, 9);
+      double rand_i = random_reverse(start_number + i, 9); // TODO: why 9 and 11?
       double rand_z = random_reverse(start_number + i, 11);
 
       x1[i+start_number] = sqrt(half_r_cell_size_pow_2 + const1 * rand_i);
-      x3[i+start_number] = dl*(rand_z)+half_z_cell_size;
-      v3[i+start_number] = vel_bunch;
+      x3[i+start_number] = dl * rand_z + half_z_cell_size;
+      v3[i+start_number] = velosity;
       v1[i+start_number] = 0;
       v2[i+start_number] = 0; // fi velocity;
       is_alive[i+start_number] = true;

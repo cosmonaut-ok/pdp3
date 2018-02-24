@@ -428,7 +428,7 @@ void LoadInitParam::run(void)
     //bool res = continuity_equation(c_time, c_geom, c_current, c_rho_old, c_rho_new);
 
     // print header on every 20 logging steps
-    if  ((((int)(c_time->current_time/c_time->delta_t))%(data_dump_interval*20)==0))
+    if  ((int)(c_time->current_time / c_time->delta_t) % (data_dump_interval*20) == 0)
     {
       cout << endl
            << left << setw(8) << "Step"
