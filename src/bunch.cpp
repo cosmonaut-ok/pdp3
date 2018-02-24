@@ -46,28 +46,27 @@ Bunch::~Bunch(void)
 
 void Bunch::bunch_inject(Time *time)
 {
-  double dl = vel_bunch*time->delta_t;
-  int step_num = duration/time->delta_t;
-  int particles_in_step = number/step_num;
-  int start_number = time->current_time/time->delta_t*particles_in_step;
-  // exit (1);
-  double dr = geom1->dr;
-  double dz = geom1->dz;
-  double rand_i;
-  double rand_z;
+  double dl = vel_bunch * time->delta_t;
+  int step_num = duration / time->delta_t;
+  int particles_in_step = number / step_num;
+  int start_number = time->current_time / time->delta_t * particles_in_step;
+
+  // very local constants
+  double half_r_cell_size_pow_2 = pow(geom1->dr, 2) / 4.0;
+  double half_z_cell_size = geom1->dz / 2.0;
+  double const1 = radius * (radius - geom1->dr); // TODO: what is it? and why?
 
   if (time->current_time<duration)
-#pragma omp parallel shared(start_number, dr, dz, dl, time) private(rand_i, rand_z)
+#pragma omp parallel shared(start_number, dl, half_r_cell_size_pow_2, half_z_cell_size, const1)
   {
 #pragma omp for
     for(int i = 0; i < particles_in_step; i++)
     {
-      rand_i = random_reverse(start_number + i, 9);
-      rand_z = random_reverse(start_number + i, 11);
+      double rand_i = random_reverse(start_number + i, 9);
+      double rand_z = random_reverse(start_number + i, 11);
 
-      x1[i+start_number] = sqrt(dr * dr / 4.0 + radius * (radius - dr) * rand_i);
-
-      x3[i+start_number] = dl*(rand_z)+dz/2.0;
+      x1[i+start_number] = sqrt(half_r_cell_size_pow_2 + const1 * rand_i);
+      x3[i+start_number] = dl*(rand_z)+half_z_cell_size;
       v3[i+start_number] = vel_bunch;
       v1[i+start_number] = 0;
       v2[i+start_number] = 0; // fi velocity;
@@ -76,7 +75,7 @@ void Bunch::bunch_inject(Time *time)
 
 #pragma omp for
     for(int i = 0; i < number; i++)
-      if(x3[i]>(geom1->second_size - dz/2.0))
+      if(x3[i]>(geom1->second_size - half_z_cell_size))
       {
         is_alive[i]=false;
       }
