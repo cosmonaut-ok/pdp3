@@ -24,7 +24,7 @@ Bunch::Bunch(char *p_name,
   vel_bunch = b_init_velocity;
   //
   double b_lenght = duration*vel_bunch;
-  double n_in_big = PI  *pow(radius, 2)  *b_lenght  *n_bunch / number;
+  double n_in_big = PI * pow(radius, 2) * b_lenght * n_bunch / number;
   charge *= n_in_big;
   mass *= n_in_big;
 
@@ -51,8 +51,8 @@ void Bunch::bunch_inject(Time *time)
   int particles_in_step = number/step_num;
   int start_number = time->current_time/time->delta_t*particles_in_step;
   // exit (1);
-  double dr = geom1->dr*1.00000001; // TODO: WTF?
-  double dz = geom1->dz*1.00000001;
+  double dr = geom1->dr;
+  double dz = geom1->dz;
   double rand_i;
   double rand_z;
 
@@ -60,12 +60,12 @@ void Bunch::bunch_inject(Time *time)
 #pragma omp parallel shared(start_number, dr, dz, dl, time) private(rand_i, rand_z)
   {
 #pragma omp for
-    for(int i = 0; i <  particles_in_step; i++)
+    for(int i = 0; i < particles_in_step; i++)
     {
       rand_i = random_reverse(start_number + i, 9);
       rand_z = random_reverse(start_number + i, 11);
 
-      x1[i+start_number] = sqrt(dr  *dr / 4.0 + radius  *(radius - dr)  *rand_i);
+      x1[i+start_number] = sqrt(dr * dr / 4.0 + radius * (radius - dr) * rand_i);
 
       x3[i+start_number] = dl*(rand_z)+dz/2.0;
       v3[i+start_number] = vel_bunch;
@@ -75,7 +75,7 @@ void Bunch::bunch_inject(Time *time)
     }
 
 #pragma omp for
-    for(int i = 0; i <  number; i++)
+    for(int i = 0; i < number; i++)
       if(x3[i]>(geom1->second_size - dz/2.0))
       {
         is_alive[i]=false;

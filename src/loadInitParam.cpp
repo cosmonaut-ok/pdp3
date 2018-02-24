@@ -424,7 +424,7 @@ void LoadInitParam::run(void)
     //continuity equation
     c_rho_new->reset_rho();
 
-    p_list->charge_weighting(c_rho_new);  //continuity equation
+    p_list->charge_weighting(c_rho_new); //continuity equation
     //bool res = continuity_equation(c_time, c_geom, c_current, c_rho_old, c_rho_new);
 
     // print header on every 20 logging steps
@@ -443,7 +443,7 @@ void LoadInitParam::run(void)
     {
       sprintf(avg_step_exec_time, "%.2f", (double)(time(0) - t1) / data_dump_interval);
 
-      cout << left << setw(8) << step_number  *data_dump_interval
+      cout << left << setw(8) << step_number * data_dump_interval
            << left << setw(13) << step_number
            << left << setw(18) << c_time->current_time
            << left << setw(32) << avg_step_exec_time
