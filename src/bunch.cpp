@@ -52,7 +52,7 @@ void Bunch::bunch_inject(Time *time)
   int start_number = time->current_time / time->delta_t * particles_in_step;
 
   // very local constants
-  double half_r_cell_size_pow_2 = pow(geom1->dr, 2) / 4.0;
+  double half_r_cell_size_pow_2 = pow((geom1->dr / 2), 2);
   double half_z_cell_size = geom1->dz / 2.0;
   double const1 = radius * (radius - geom1->dr); // TODO: what is it? and why?
 
