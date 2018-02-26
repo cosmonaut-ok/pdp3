@@ -7,12 +7,10 @@
 #include <string.h>
 #include <cstdlib>
 #include "constant.h"
+#include "lib.h"
 
 using namespace std;
 using namespace constant;
-
-// C^2 define c^2 to decrease number of operations
-const double LIGHT_SPEED_POW_2 = pow (LIGHT_SPEED, 2);
 
 Particles::Particles(void)
 {
@@ -109,61 +107,15 @@ void Particles::set_x_0()
 // calculate Lorentz factor
 double Particles::get_gamma(int i)
 {
-  double gamma, beta;
-
-  beta = (pow(v1[i], 2) + pow(v2[i], 2) + pow(v3[i], 2)) / LIGHT_SPEED_POW_2;
-
-  if (beta > 1) // it's VERY BAD! Beta should not be more, than 1
-  {
-    cerr << "CRITICAL!(get_gamma): Lorentz factor aka gamma is comples. Can not continue." << endl
-         << "\tUsually it happens, when <Time> -> <delta_t> value is too big." << endl
-         << "\tv1[" << i << "] = " << v1[i] << endl
-         << "\tv2[" << i << "] = " << v2[i] << endl
-         << "\tv3[" << i << "] = " << v3[i] << endl;
-    exit(1);
-  }
-
-  gamma = pow(1.0 - beta, -0.5);
-
-  if (isinf(gamma) == 1) { // avoid infinity values
-    cerr << "WARNING(get_gamma): gamma (Lorenz factor) girects to infinity for [v1, v2, v3, i]: ["
-         << v1[i] << ", " << v2[i] << ", " << v3[i] << ", " << i << "]" << endl;
-    return 1e100; // just return some very big value
-  }
-  else
-  {
-    return gamma;
-  }
+	double velocity = sqrt(pow(v1[i], 2) + pow(v2[i], 2) + pow(v3[i], 2));
+	return lib::get_gamma (velocity);
 }
 
 // clculate reciprocal Lorentz factor (1/gamma), aka ``alpha''
 double Particles::get_gamma_inv(int i) // TODO: it is not alpha
 {
-  double gamma, beta;
-
-  beta = (pow(v1[i], 2) + pow(v2[i], 2) + pow(v3[i], 2)) / LIGHT_SPEED_POW_2;
-
-  if (beta > 1) // it's VERY BAD! Beta should not be more, than 1
-  {
-    cerr << "CRITICAL!(get_gamma_inv): Lorentz factor aka gamma is comples. Can not continue." << endl
-         << "\tUsually it happens, when <Time> -> <delta_t> value is too big." << endl
-         << "\tv1[" << i << "] = " << v1[i] << endl
-         << "\tv2[" << i << "] = " << v2[i] << endl
-         << "\tv3[" << i << "] = " << v3[i] << endl;
-    exit(1);
-  }
-
-  gamma = pow(1.0 + beta, 0.5);
-
-  if (isinf(gamma) == 1) { // avoid infinity values
-    cerr << "WARNING(get_gamma_inv): reciprocal gamma (Lorenz factor) directs to infinity for [v1, v2, v3, i]: ["
-         << v1[i] << ", " << v2[i] << ", " << v3[i] << ", " << i << "]" << endl;
-    return 1e100; // just return some very big value
-  }
-  else
-  {
-    return gamma;
-  }
+	double velocity = sqrt(pow(v1[i], 2) + pow(v2[i], 2) + pow(v3[i], 2));
+	return lib::get_gamma_inv(velocity);
 }
 
 void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
@@ -175,6 +127,10 @@ void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
     {
       // define vars directly in cycle, because of multithreading
       double gamma, b1, b2, b3, e1, e2, e3, vv1, vv2, vv3, const1, const2;
+			// use classical calculations, if velocity lower, than minimal
+			double min_relativistic_velocity = 1e8;
+			bool use_rel; // use relativistic calculations
+
       Triple E_compon(0.0, 0.0, 0.0), B_compon(0.0, 0.0, 0.0);
 
       // check if x1 and x3 are correct
@@ -199,9 +155,13 @@ void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
       vv2 = (abs(v2[i]) < 1e-15) ? 0 : v2[i];
       vv3 = (abs(v3[i]) < 1e-15) ? 0 : v3[i];
 
+			// 0. calculate, if we should use classical calculations
+			if (v1[i] > min_relativistic_velocity || v2[i] > min_relativistic_velocity || v3[i] > min_relativistic_velocity)
+				use_rel = true;
+
       // 1. Multiplication by relativistic factor
       // u(n-1/2) = gamma(n-1/2)*v(n-1/2)
-      gamma = get_gamma(i);
+      gamma = use_rel ? get_gamma(i) : 1;
       //
       v1[i] = gamma*vv1;
       v2[i] = gamma*vv2;
@@ -216,7 +176,7 @@ void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
       // 3. Rotation in the magnetic field
       // u" = u' + 2/(1+B'^2)[(u' + [u'xB'(n)])xB'(n)]
       // B'(n) = B(n)*q*dt/2/mass/gamma(n)
-      gamma = get_gamma_inv(i);
+      gamma = use_rel ? get_gamma_inv(i) : 1;
       b1 = b1/gamma;
       b2 = b2/gamma;
       b3 = b3/gamma;
