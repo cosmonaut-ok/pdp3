@@ -131,7 +131,7 @@ void EField::calc_field(HField *h_field1,
 
     koef_h =  2*time1->delta_t/(2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
 
-    field_r[i][k]=field_r[i][k]  *koef_e  - (j1[i][k]+(h_phi[i][k] - h_phi[i][k-1])/dz)*koef_h;
+    field_r[i][k]=field_r[i][k] * koef_e  - (j1[i][k]+(h_phi[i][k] - h_phi[i][k-1])/dz)*koef_h;
   }
 
   //// Ez=on axis// // ???????????
@@ -275,16 +275,16 @@ void EField::tridiagonal_solve(const double *a,
   d[0] /= b[0]; // Division by zero would imply a singular matrix
 
   for(int i = 1; i < n; i++){
-    double id = (b[i] - c[i-1]  *a[i]); // Division by zero risk
+    double id = (b[i] - c[i-1] * a[i]); // Division by zero risk
     c[i] /= id; // Last value calculated is redundant
-    d[i] = (d[i] - d[i-1]  *a[i])/id;
+    d[i] = (d[i] - d[i-1] * a[i])/id;
   }
 
   // Now, back substitute
   x[n - 1] = d[n - 1];
 
   for(int i = n - 2; i >= 0; i--)
-    x[i] = d[i] - c[i]  *x[i + 1];
+    x[i] = d[i] - c[i] * x[i + 1];
 }
 
 // function for electric field weighting

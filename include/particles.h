@@ -32,8 +32,8 @@ public:
   double charge;
   // The specie  *mass
   double mass; // in electron in electron masses
-  double  *mass_array;
-  double  *charge_array;
+  double *mass_array;
+  double *charge_array;
   double init_const_mass;
   // Number of particles
   int number;

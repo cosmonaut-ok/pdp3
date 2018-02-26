@@ -52,7 +52,7 @@ double *Field::get_1d_field_r()
 #pragma omp parallel for
   for (int i = 0; i < geom1->n_grid_1 - 1; i++)
     for (int k = 0; k < geom1->n_grid_2; k++)
-      field_r_1d[i  *geom1->n_grid_2 + k] = field_r[i][k];
+      field_r_1d[i * geom1->n_grid_2 + k] = field_r[i][k];
   return field_r_1d;
 }
 
@@ -62,7 +62,7 @@ double *Field::get_1d_field_phi()
 #pragma omp parallel for
   for (int i = 0; i < geom1->n_grid_1; i++)
     for (int k = 0; k < geom1->n_grid_2; k++)
-      field_phi_1d[i  *geom1->n_grid_2 + k] = field_phi[i][k];
+      field_phi_1d[i * geom1->n_grid_2 + k] = field_phi[i][k];
   return field_phi_1d;
 }
 
@@ -72,6 +72,6 @@ double *Field::get_1d_field_z()
 #pragma omp parallel for
   for (int i = 0; i < geom1->n_grid_1; i++)
     for (int k = 0; k < geom1->n_grid_2 - 1; k++)
-      field_z_1d[i  *(geom1->n_grid_2 - 1) + k] = field_z[i][k];
+      field_z_1d[i * (geom1->n_grid_2 - 1) + k] = field_z[i][k];
   return field_z_1d;
 }
