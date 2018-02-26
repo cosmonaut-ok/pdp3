@@ -7,6 +7,7 @@
 #include <string.h>
 #include <cstdlib>
 #include "constant.h"
+#include "lib.h"
 
 using namespace std;
 using namespace constant;
@@ -109,6 +110,7 @@ void Particles::set_x_0()
 // calculate Lorentz factor
 double Particles::get_gamma(int i)
 {
+
   double gamma, beta;
 
   beta = (pow(v1[i], 2) + pow(v2[i], 2) + pow(v3[i], 2)) / LIGHT_SPEED_POW_2;
@@ -175,6 +177,10 @@ void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
     {
       // define vars directly in cycle, because of multithreading
       double gamma, b1, b2, b3, e1, e2, e3, vv1, vv2, vv3, const1, const2;
+			// use classical calculations, if velocity lower, than minimal
+			double min_relativistic_velocity = 1e8;
+			bool use_rel; // use relativistic calculations
+
       Triple E_compon(0.0, 0.0, 0.0), B_compon(0.0, 0.0, 0.0);
 
       // check if x1 and x3 are correct
@@ -199,9 +205,13 @@ void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
       vv2 = (abs(v2[i]) < 1e-15) ? 0 : v2[i];
       vv3 = (abs(v3[i]) < 1e-15) ? 0 : v3[i];
 
+			// 0. calculate, if we should use classical calculations
+			if (v1[i] > min_relativistic_velocity || v2[i] > min_relativistic_velocity || v3[i] > min_relativistic_velocity)
+				use_rel = true;
+
       // 1. Multiplication by relativistic factor
       // u(n-1/2) = gamma(n-1/2)*v(n-1/2)
-      gamma = get_gamma(i);
+      gamma = use_rel ? get_gamma(i) : 1;
       //
       v1[i] = gamma*vv1;
       v2[i] = gamma*vv2;
@@ -216,7 +226,7 @@ void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
       // 3. Rotation in the magnetic field
       // u" = u' + 2/(1+B'^2)[(u' + [u'xB'(n)])xB'(n)]
       // B'(n) = B(n)*q*dt/2/mass/gamma(n)
-      gamma = get_gamma_inv(i);
+      gamma = use_rel ? get_gamma_inv(i) : 1;
       b1 = b1/gamma;
       b2 = b2/gamma;
       b3 = b3/gamma;
