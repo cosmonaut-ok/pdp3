@@ -116,19 +116,19 @@ void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
     if (is_alive[i])
     {
       // define vars directly in cycle, because of multithreading
-      // double vv1, vv2, vv3, const1, const2;
       Triple E_compon(0.0, 0.0, 0.0), B_compon(0.0, 0.0, 0.0);
-      double min_relativistic_velocity = 1e4;
+      double min_relativistic_velocity = 1e8;
+
       // check if x1 and x3 are correct
       if (isnan(x1[i]) || isinf(x1[i]) != 0 || isnan(x3[i]) || isinf(x3[i]) != 0)
       {
         cerr << "ERROR(step_v): x1[" << i << "] or x3[" << i << "] is not valid number. Can not continue." << endl;
         exit(1);
       }
-      // q*t/2*m TODO: what constant is it?
+      // q*t/2*m : part of a*t without E component and relativistic gamma
       double const1 = charge_array[i]*t->delta_t/2.0/mass_array[i];
 
-      // do not caluculate gamma for low velocities.
+      // do not caluculate gamma for velocities, lower, than min_relativistic_velocity.
       // Try to increse calculation speed
       double gamma_r = (abs(v1[i]) > min_relativistic_velocity) ? lib::get_gamma(v1[i]) : 1;
       double gamma_phi = (abs(v2[i]) > min_relativistic_velocity) ? lib::get_gamma(v2[i]) : 1;

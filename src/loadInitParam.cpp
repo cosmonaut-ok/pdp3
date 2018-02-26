@@ -92,14 +92,6 @@ void LoadInitParam::read_xml(const char *xml_file_name)
   }
 }
 
-// bool LoadInitParam::to_bool(string str) {
-//   std::transform(str.begin(), str.end(), str.begin(), ::tolower);
-//   std::istringstream is(str);
-//   bool b;
-//   is >> std::boolalpha >> b;
-//   return b;
-// }
-
 void LoadInitParam::init_particles()
 {
   const char *p_king_section_name = "particle_kind";
