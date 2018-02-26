@@ -118,7 +118,7 @@ void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
       // define vars directly in cycle, because of multithreading
       // double vv1, vv2, vv3, const1, const2;
       Triple E_compon(0.0, 0.0, 0.0), B_compon(0.0, 0.0, 0.0);
-      double min_relativistic_velocity = 1e2;
+      double min_relativistic_velocity = 1e4;
       // check if x1 and x3 are correct
       if (isnan(x1[i]) || isinf(x1[i]) != 0 || isnan(x3[i]) || isinf(x3[i]) != 0)
       {
