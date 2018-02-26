@@ -266,8 +266,8 @@ void Particles::half_step_coord(Time *t)
         exit(1);
       }
       //
-      x1[i] = x1[i] + v1[i]  *half_dt;
-      x3[i] = x3[i] + v3[i]  *half_dt;
+      x1[i] = x1[i] + v1[i] * half_dt;
+      x3[i] = x3[i] + v3[i] * half_dt;
 
       if (x1[i] > x1_wall)
       {
@@ -521,7 +521,7 @@ double Particles::random_reverse(double vel, int power)
   {
     ost = int_vel % power;
 
-    r = r + ost*pow((double)power,(-order));
+    r = r + ost * pow((double)power, (-order));
 
     int_vel = (int_vel - ost)/power;
     order = order+1;
@@ -534,8 +534,8 @@ void Particles::load_spatial_distribution(double n1, double n2, double left_plas
   // calculate number of electrons in a big particle
   double rand_r;
   double rand_z;
-  double dr = geom1->dr*1.00000001;// TODO: why?
-  double dz = geom1->dz*1.00000001;// TODO: why?
+  double dr = geom1->dr;
+  double dz = geom1->dz;
   double dn = n2 - n1;
   switch (type)
   {
@@ -669,7 +669,7 @@ void Particles::simple_j_weighting(Time *time1,
     //calculate current in [i+1,k] cell//
     wj = charge_array[p_number]/(2*dr*dz*delta_t*2*PI*(i_n+1)*dr*dr) *
       (k*delta_z*delta_z/2.0+delta_z*b + delta_z*dr + dr*dr/k *
-       (0.25-(i_n+0.5)*(i_n+0.5))  *log((k*delta_z+b)/b));
+       (0.25-(i_n+0.5)*(i_n+0.5)) * log((k*delta_z+b)/b));
     // set new weighting current value
     j1->set_j3(i_n+1,k_n, wj);
 
@@ -684,7 +684,7 @@ void Particles::simple_j_weighting(Time *time1,
 
     //weighting jr in [i][k] cell
     wj = charge_array[p_number]/(2*PI*r0*dz*dz*dr*delta_t) *
-      (r0*k*delta_r+k/2.0  *delta_r*(x1_old+delta_r/2.0)+0.5*delta_r*
+      (r0*k*delta_r+k/2.0 * delta_r*(x1_old+delta_r/2.0)+0.5*delta_r*
        (b-k*(2*r0+r1))+ delta_r*(b-k*r1)*(4*r0*r0-dr*dr)/(8*x1_old*(x1_old+delta_r)) +
        (k*(r0*r0/2.0-dr*dr/8.0))*log((x1_old+delta_r)/x1_old));
     j1->set_j1(i_n,k_n, wj);
@@ -727,7 +727,7 @@ void Particles::simple_j_weighting(Time *time1,
 
     //weighting jr in [i][k] cell
     wj = charge_array[p_number]/(2*PI*r0*dz*dz*dr*delta_t) *
-      (r0*k*delta_r+k/2.0  *delta_r*(x1_old+delta_r/2.0)+0.5*delta_r*(b-k*(2*r0+r1))+
+      (r0*k*delta_r+k/2.0 * delta_r*(x1_old+delta_r/2.0)+0.5*delta_r*(b-k*(2*r0+r1))+
        delta_r*(b-k*r1)*(4*r0*r0-dr*dr)/(8*x1_old*(x1_old+delta_r)) +
        (k*(r0*r0/2.0-dr*dr/8.0))*log((x1_old+delta_r)/x1_old));
     j1->set_j1(i_n,k_n, wj);
@@ -776,7 +776,7 @@ void Particles::simple_constrho_j_weighting(Time *time1,
 
     // double b = x3_old- k_n*dz;;
     //weighting jr in [i][k+1] cell
-    //   wj = charge/(2*PI*r0*dz*dz*dr*delta_t)  *();
+    //   wj = charge/(2*PI*r0*dz*dz*dr*delta_t) * ();
     j1->set_j1(i_n, k_n+1, wj);
   }
   // if i cell is equal 0
@@ -787,12 +787,12 @@ void Particles::simple_constrho_j_weighting(Time *time1,
     double k = delta_r/delta_z;
     double b = x1_old;
     // calculate current jz in [i,k] cell
-    // wj = charge/(2.0*dr*dz*delta_t*PI*dr*dr/4.0)  *(dr*delta_z - k*delta_z*delta_z/2.0 - delta_z*b );
+    // wj = charge/(2.0*dr*dz*delta_t*PI*dr*dr/4.0) * (dr*delta_z - k*delta_z*delta_z/2.0 - delta_z*b );
     // set new weighting current value
     j1->set_j3(i_n,k_n, wj);
 
     // calculate current in [i+1,k] cell
-    // wj = charge/(2.0*dr*dz*delta_t*2.0*PI*dr*dr)  *(k*delta_z*delta_z/2.0 + delta_z*dr +delta_z*b);
+    // wj = charge/(2.0*dr*dz*delta_t*2.0*PI*dr*dr) * (k*delta_z*delta_z/2.0 + delta_z*dr +delta_z*b);
     // set new weighting current value
     j1->set_j3(i_n+1,k_n, wj);
 
@@ -807,7 +807,7 @@ void Particles::simple_constrho_j_weighting(Time *time1,
 
     //weighting jr in [i][k] cell
     wj = charge_array[p_number]/(2*PI*r0*dz*dz*dr*delta_t) *
-      (r0*k*delta_r+k/2.0  *delta_r*(x1_old+delta_r/2.0)+0.5*delta_r*(b-k*(2*r0+r1))+
+      (r0*k*delta_r+k/2.0 * delta_r*(x1_old+delta_r/2.0)+0.5*delta_r*(b-k*(2*r0+r1))+
        delta_r*(b-k*r1)*(4*r0*r0-dr*dr)/(8*x1_old*(x1_old+delta_r)) +
        (k*(r0*r0/2.0-dr*dr/8.0))*log((x1_old+delta_r)/x1_old));
     j1->set_j1(i_n,k_n, wj);
@@ -1171,10 +1171,10 @@ void Particles::strict_motion_weighting(Time *time1,
     r2 = (i_n+0.5)*dr;
     r3 = x1_new+0.5*dr;
     if (i_n==0)
-      wj_lower = charge_array[p_number]/(time1->delta_t*PI*dr*dr/4.0)  *PI*(r2*r2-r1*r1)/value_part;
+      wj_lower = charge_array[p_number]/(time1->delta_t*PI*dr*dr/4.0) * PI*(r2*r2-r1*r1)/value_part;
     else
-      wj_lower = charge_array[p_number]/(time1->delta_t*2.0*PI*i_n*dr*dr)  *PI*(r2*r2-r1*r1)/value_part;
-    double wj_upper = charge_array[p_number]/(time1->delta_t*2*PI*(i_n+1)*dr*dr)  *PI*(r3*r3-r2*r2)/value_part;
+      wj_lower = charge_array[p_number]/(time1->delta_t*2.0*PI*i_n*dr*dr) * PI*(r2*r2-r1*r1)/value_part;
+    double wj_upper = charge_array[p_number]/(time1->delta_t*2*PI*(i_n+1)*dr*dr) * PI*(r3*r3-r2*r2)/value_part;
     double wj=0;
     this_j->set_j1(i_n,k_n,0.0);
     this_j->set_j1(i_n,k_n+1,0.0);

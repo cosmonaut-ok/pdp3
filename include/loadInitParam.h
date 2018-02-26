@@ -38,18 +38,18 @@ public:
   void run(void);
 
 public:
-  Geometry  *c_geom;
-  Time  *c_time;
+  Geometry *c_geom;
+  Time *c_time;
   Particles *c_part;
-  Bunch  *c_bunch;
+  Bunch *c_bunch;
   ParticlesList *p_list;
   EField *efield;
   HField *hfield;
-  InputOutputClass  *c_io_class;
-  ChargeDensity  *c_rho_new;
-  ChargeDensity  *c_rho_old;
-  ChargeDensity  *c_rho_bunch;
-  Current  *c_current;
+  InputOutputClass *c_io_class;
+  ChargeDensity *c_rho_new;
+  ChargeDensity *c_rho_old;
+  ChargeDensity *c_rho_bunch;
+  Current *c_current;
   XMLDocument *xml_data;
   int testnumber;
   int data_dump_interval;
