@@ -18,10 +18,10 @@ public:
 
   ~Bunch(void);
 public:
-  double duration; //bunch duration
-  double n_bunch; // bunch density;
-  double vel_bunch; // bunch velocity
-  double radius; // bunch radius
+  double duration; // bunch duration
+  double density;  // bunch density (n_bunch);
+  double velosity; // bunch velocity
+  double radius;   // bunch radius
 public:
   void bunch_inject(Time *time);
   void bunch_inject_calc_E(Geometry *geom,

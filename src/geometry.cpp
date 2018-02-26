@@ -58,13 +58,13 @@ void Geometry::set_pml(double comparative_l_1, double comparative_l_2, double co
                       double sigma1, double sigma2)
 {
   // defining lenght of sigma calculation ion left wall
-  double lenght_sigma_left = dz  *(floor(n_grid_2*comparative_l_1));
+  double lenght_sigma_left = dz * (floor(n_grid_2*comparative_l_1));
 
   // defining lenght of sigma calculation on right wall
-  double lenght_sigma_right = dz  *(floor(n_grid_2*comparative_l_2));
+  double lenght_sigma_right = dz * (floor(n_grid_2*comparative_l_2));
 
   // defining lenght of sigma calculation on z-wall
-  double lenght_sigma_extern = dr  *(floor(n_grid_1*comparative_l_3));
+  double lenght_sigma_extern = dr * (floor(n_grid_1*comparative_l_3));
 
   // if pml is only on z walll
   if ((comparative_l_1 == 0) && (comparative_l_2 == 0) && (comparative_l_3 != 0))
@@ -104,7 +104,7 @@ void Geometry::set_pml(double comparative_l_1, double comparative_l_2, double co
     for(int i=0;i < n_grid_1; i++)
       for(int k=0;k < n_grid_2; k++)
         if ((first_size - dr*(i)) <= lenght_sigma_extern)
-          if (((first_size - dr*(i+1)) < lenght_sigma_extern  *dz *
+          if (((first_size - dr*(i+1)) < lenght_sigma_extern * dz *
                (k)/lenght_sigma_left) && ( (first_size - dr*(i)) <=
                                            (lenght_sigma_extern/lenght_sigma_right *
                                             (second_size - dz*(k)))))
