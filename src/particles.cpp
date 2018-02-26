@@ -133,7 +133,7 @@ void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
       // define vars directly in cycle, because of multithreading
       // double vv1, vv2, vv3, const1, const2;
       Triple E_compon(0.0, 0.0, 0.0), B_compon(0.0, 0.0, 0.0);
-
+			double min_relativistic_velocity = 0;
       // check if x1 and x3 are correct
       if (isnan(x1[i]) || isinf(x1[i]) != 0 || isnan(x3[i]) || isinf(x3[i]) != 0)
       {
@@ -143,12 +143,14 @@ void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
       // q*t/2*m TODO: what constant is it?
       double const1 = charge_array[i]*t->delta_t/2.0/mass_array[i];
 
-			double gamma_r = lib::get_gamma(v1[i]);
-			double gamma_phi = lib::get_gamma(v2[i]);
-			double gamma_z = lib::get_gamma(v3[i]);
-			double gamma_inv_r = lib::get_gamma_inv(v1[i]);
-			double gamma_inv_phi = lib::get_gamma_inv(v2[i]);
-			double gamma_inv_z = lib::get_gamma_inv(v3[i]);
+			// do not caluculate gamma for low velocities.
+			// Try to increse calculation speed
+			double gamma_r = (abs(v1[i]) > min_relativistic_velocity) ? lib::get_gamma(v1[i]) : 1;
+			double gamma_phi = (abs(v2[i]) > min_relativistic_velocity) ? lib::get_gamma(v2[i]) : 1;
+			double gamma_z = (abs(v3[i]) > min_relativistic_velocity) ? lib::get_gamma(v3[i]) : 1;
+			double gamma_inv_r = (abs(v1[i]) > min_relativistic_velocity) ? lib::get_gamma_inv(v1[i]) : 1;
+			double gamma_inv_phi = (abs(v2[i]) > min_relativistic_velocity) ? lib::get_gamma_inv(v2[i]) : 1;
+			double gamma_inv_z = (abs(v3[i]) > min_relativistic_velocity) ? lib::get_gamma_inv(v3[i]) : 1;
 
       E_compon = e_fld->get_field(x1[i],x3[i]);
       B_compon = h_fld->get_field(x1[i],x3[i]);
@@ -161,11 +163,6 @@ void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
       double b1 = (B_compon.first * MAGN_CONST * const1); // / gamma_inv_r;
 			double b2 = (B_compon.second * MAGN_CONST * const1); // / gamma_inv_r;
 			double b3 = (B_compon.third * MAGN_CONST * const1); // / gamma_inv_r;
-
-      // round very small velicities to avoid exceptions
-      // double vv1 = (abs(v1[i]) < 1e-15) ? 0 : v1[i];
-      // double vv2 = (abs(v2[i]) < 1e-15) ? 0 : v2[i];
-      // double vv3 = (abs(v3[i]) < 1e-15) ? 0 : v3[i];
 
       // 1. Multiplication by relativistic factor
       // u(n-1/2) = gamma(n-1/2)*v(n-1/2)
