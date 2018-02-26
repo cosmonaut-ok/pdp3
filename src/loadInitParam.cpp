@@ -13,6 +13,7 @@
 #include "loadInitParam.h"
 #include "time.h"
 #include "tinyxml2.h"
+#include "lib.h"
 
 using namespace std;
 using namespace tinyxml2;
@@ -89,14 +90,6 @@ void LoadInitParam::read_xml(const char *xml_file_name)
     cerr << "ERROR: Can not read configuration file ``" << xml_file_name << "``" << endl;
     exit (78);
   }
-}
-
-bool LoadInitParam::to_bool(string str) {
-  std::transform(str.begin(), str.end(), str.begin(), ::tolower);
-  std::istringstream is(str);
-  bool b;
-  is >> std::boolalpha >> b;
-  return b;
 }
 
 void LoadInitParam::init_particles()
@@ -321,13 +314,13 @@ void LoadInitParam::init_file_saving_parameters ()
                          ->GetText());
 
   // dump data configuration
-  is_dump_e_r = to_bool(dump_data_root->FirstChildElement("E_r")->GetText());
-  is_dump_e_phi = to_bool(dump_data_root->FirstChildElement("E_phi")->GetText());
-  is_dump_e_z = to_bool(dump_data_root->FirstChildElement("E_z")->GetText());
-  is_dump_h_r = to_bool(dump_data_root->FirstChildElement("H_r")->GetText());
-  is_dump_h_phi = to_bool(dump_data_root->FirstChildElement("H_phi")->GetText());
-  is_dump_h_z = to_bool(dump_data_root->FirstChildElement("H_z")->GetText());
-  is_dump_rho_bunch = to_bool(dump_data_root->FirstChildElement("rho_bunch")->GetText());
+  is_dump_e_r = lib::to_bool(dump_data_root->FirstChildElement("E_r")->GetText());
+  is_dump_e_phi = lib::to_bool(dump_data_root->FirstChildElement("E_phi")->GetText());
+  is_dump_e_z = lib::to_bool(dump_data_root->FirstChildElement("E_z")->GetText());
+  is_dump_h_r = lib::to_bool(dump_data_root->FirstChildElement("H_r")->GetText());
+  is_dump_h_phi = lib::to_bool(dump_data_root->FirstChildElement("H_phi")->GetText());
+  is_dump_h_z = lib::to_bool(dump_data_root->FirstChildElement("H_z")->GetText());
+  is_dump_rho_bunch = lib::to_bool(dump_data_root->FirstChildElement("rho_bunch")->GetText());
 
   c_io_class = new InputOutputClass (path_res, path_dump);
 }
