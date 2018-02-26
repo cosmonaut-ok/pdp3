@@ -7,6 +7,7 @@
 #include <string.h>
 #include <cstdlib>
 #include "constant.h"
+#include "lib.h"
 
 #include "lib.h"
 
@@ -150,6 +151,10 @@ void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
       // double b1 = (B_compon.first * MAGN_CONST * const1) / gamma_inv_r;
       // double b2 = (B_compon.second * MAGN_CONST * const1) / gamma_inv_r;
       // double b3 = (B_compon.third * MAGN_CONST * const1) / gamma_inv_r;
+
+			// 0. calculate, if we should use classical calculations
+			if (v1[i] > min_relativistic_velocity || v2[i] > min_relativistic_velocity || v3[i] > min_relativistic_velocity)
+				use_rel = true;
 
       // 1. Multiplication by relativistic factor
       // u(n-1/2) = gamma(n-1/2)*v(n-1/2)
