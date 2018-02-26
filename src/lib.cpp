@@ -28,7 +28,11 @@ using namespace std;
 using namespace constant;
 
 namespace lib
+
 {
+	// C^2 define c^2 to decrease number of operations
+	const double LIGHT_SPEED_POW_2 = pow (LIGHT_SPEED, 2);
+
 	bool to_bool(string str)
 	{
 		std::transform(str.begin(), str.end(), str.begin(), ::tolower);
@@ -42,7 +46,7 @@ namespace lib
 	{
 		double gamma, beta;
 
-		beta = pow(velocity, 2) / pow(LIGHT_SPEED, 2);
+		beta = pow(velocity, 2) / LIGHT_SPEED_POW_2;
 
 		if (beta > 1) // it's VERY BAD! Beta should not be more, than 1
 		{
@@ -67,7 +71,7 @@ namespace lib
 	{
 		double gamma, beta;
 
-		beta = pow(velocity, 2) / pow(LIGHT_SPEED, 2);
+		beta = pow(velocity, 2) / LIGHT_SPEED_POW_2;
 
 		if (beta > 1) // it's VERY BAD! Beta should not be more, than 1
 		{
