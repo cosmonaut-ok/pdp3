@@ -73,5 +73,4 @@ private:
   void init_boundary ();
   void init_bunch();
   void init_file_saving_parameters ();
-  bool to_bool (string str);
 };
