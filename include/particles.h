@@ -64,8 +64,6 @@ public:
   void set_j_0();
   void set_v_0();
   void set_x_0();
-  double get_gamma(int i);
-  double get_gamma_inv(int i);
   void velocity_distribution(double therm_vel);
   void load_spatial_distribution(double n1,
                                  double n2,

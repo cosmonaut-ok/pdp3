@@ -108,21 +108,6 @@ void Particles::set_x_0()
   }
 }
 
-// calculate Lorentz factor
-double Particles::get_gamma(int i)
-{
-  double velocity = sqrt(pow(v1[i], 2) + pow(v2[i], 2) + pow(v3[i], 2));
-  // double gamma = get_gamma(velocity);
-  return lib::get_gamma(velocity);
-}
-
-// clculate reciprocal Lorentz factor (1/gamma), aka ``alpha''
-double Particles::get_gamma_inv(int i) // TODO: it is not alpha
-{
-  double velocity = sqrt(pow(v1[i], 2) + pow(v2[i], 2) + pow(v3[i], 2));
-  return lib::get_gamma_inv(velocity);
-}
-
 void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
 {
 
@@ -133,7 +118,7 @@ void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
       // define vars directly in cycle, because of multithreading
       // double vv1, vv2, vv3, const1, const2;
       Triple E_compon(0.0, 0.0, 0.0), B_compon(0.0, 0.0, 0.0);
-      double min_relativistic_velocity = 0;
+      double min_relativistic_velocity = 1e2;
       // check if x1 and x3 are correct
       if (isnan(x1[i]) || isinf(x1[i]) != 0 || isnan(x3[i]) || isinf(x3[i]) != 0)
       {
