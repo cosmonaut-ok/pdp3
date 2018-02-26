@@ -20,7 +20,7 @@ public:
 public:
   double duration; // bunch duration
   double density;  // bunch density (n_bunch);
-  double velosity; // bunch velocity
+  double velocity; // bunch velocity
   double radius;   // bunch radius
 public:
   void bunch_inject(Time *time);

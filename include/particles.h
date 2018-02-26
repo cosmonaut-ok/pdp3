@@ -57,6 +57,9 @@ public:
 public:
   void charge_weighting(ChargeDensity *ro1);
   void step_v(EField *e_fld, HField *h_fld, Time *t);
+
+	void calc_velocity(EField *e_fld, HField *h_fld, Time *t); // step_v replacement
+
   virtual void half_step_coord(Time *t);
   void set_j_0();
   void set_v_0();
