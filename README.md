@@ -1,4 +1,5 @@
-# pdp3
+# PDP3
+
 Renew PDP3 project
 
 [![Travis Build Status](https://api.travis-ci.org/cosmonaut-ok/pdp3.svg?branch=master)](https://travis-ci.org/cosmonaut-ok/pdp3)
