@@ -14,6 +14,9 @@ DEFINES               =
 INCLUDE_PATH          = -I$(INCLUDEDIR)
 LIBRARY_PATH          =
 LIBRARIES             =
+DOXYGEN               = doxygen
+DOXYGEN_CONFIG        = doc/doxygen.conf
+DOXYGEN_FORMATS       = latex html
 
 ### pdp3 sources and settings
 pdp3_MODULE           = pdp3
@@ -80,10 +83,13 @@ CXXFLAGS = ${CFLAGS} #  -fopenmp
 all: prepare $(SUBDIRS) $(LIBS) $(EXES)
 
 ### Build rules
-.PHONY: all clean dummy check-syntax prepare
+.PHONY: all clean dummy check-syntax prepare doxygen
 
 $(SUBDIRS): dummy
 	@cd $@ && $(MAKE)
+
+$(DOXYGEN_FORMATS): dummy
+	@cd doc/$@ && test -f Makefile && $(MAKE)
 
 # Implicit rules
 .SUFFIXES: .cpp .cxx
@@ -107,13 +113,17 @@ CLEAN_FILES  = y.tab.c y.tab.h lex.yy.c core *.orig *.rej \
 
 BUILD_DIRS = pdp3_result pdp3_result/Dump $(OBJDIR)
 
-clean: $(SUBDIRS:%=%/__clean__) $(EXTRASUBDIRS:%=%/__clean__) $(TESTSUBDIRS:%=%/__clean__)
+clean: $(SUBDIRS:%=%/__clean__) $(EXTRASUBDIRS:%=%/__clean__) $(TESTSUBDIRS:%=%/__clean__) $(DOXYGEN_FORMATS:%=%/__clean__)
 	$(RM) $(pdp3_OBJS) $(CLEAN_FILES)
 	$(RM) $(LIBS) $(EXES) $(EXES:%=%.so)
 	$(RM) -r $(BUILD_DIRS) $(ROOTDIR)/python/__pycache__/
+	$(RM) -r doc/${$(DOXYGEN_FORMATS)}
 
 $(SUBDIRS:%=%/__clean__): dummy
 	cd `dirname $@` && $(MAKE) clean
+
+$(DOXYGEN_FORMATS:%=%/__clean__): dummy
+	cd `dirname doc/$@` && test -f Makefile && $(MAKE) clean || return 0
 
 
 $(EXTRASUBDIRS:%=%/__clean__): dummy
@@ -148,3 +158,8 @@ check-syntax:
 
 prepare:
 	$(MKDIR) -p $(BUILD_DIRS)
+
+doxygen:
+	$(DOXYGEN) $(DOXYGEN_CONFIG)
+
+doc: doxygen doc/latex
