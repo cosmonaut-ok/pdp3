@@ -88,8 +88,8 @@ all: prepare $(SUBDIRS) $(LIBS) $(EXES)
 $(SUBDIRS): dummy
 	@cd $@ && $(MAKE)
 
-$(DOXYGEN_FORMATS): dummy
-	@cd doc/$@ && test -f Makefile && $(MAKE)
+$(DOXYGEN_FORMATS): doxygen
+	@cd doc/$@ && test -f Makefile && $(MAKE) || return 0
 
 # Implicit rules
 .SUFFIXES: .cpp .cxx
@@ -165,4 +165,4 @@ prepare:
 doxygen:
 	$(DOXYGEN) $(DOXYGEN_CONFIG)
 
-doc: doxygen doc/latex
+doc: doxygen $(DOXYGEN_FORMATS)
