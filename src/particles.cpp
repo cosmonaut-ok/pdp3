@@ -132,23 +132,20 @@ void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
       double gamma_r = (abs(v1[i]) > min_relativistic_velocity) ? lib::get_gamma(v1[i]) : 1;
       double gamma_phi = (abs(v2[i]) > min_relativistic_velocity) ? lib::get_gamma(v2[i]) : 1;
       double gamma_z = (abs(v3[i]) > min_relativistic_velocity) ? lib::get_gamma(v3[i]) : 1;
-      // double gamma_inv_r = (abs(v1[i]) > min_relativistic_velocity) ? lib::get_gamma_inv(v1[i]) : 1;
-      // double gamma_inv_phi = (abs(v2[i]) > min_relativistic_velocity) ? lib::get_gamma_inv(v2[i]) : 1;
-      // double gamma_inv_z = (abs(v3[i]) > min_relativistic_velocity) ? lib::get_gamma_inv(v3[i]) : 1;
+      double gamma_inv_r = (abs(v1[i]) > min_relativistic_velocity) ? lib::get_gamma_inv(v1[i]) : 1;
+      double gamma_inv_phi = (abs(v2[i]) > min_relativistic_velocity) ? lib::get_gamma_inv(v2[i]) : 1;
+      double gamma_inv_z = (abs(v3[i]) > min_relativistic_velocity) ? lib::get_gamma_inv(v3[i]) : 1;
 
       E_compon = e_fld->get_field(x1[i],x3[i]);
-			// WARNING!: we still have no B_component. Should be fixed in future
-      // B_compon = h_fld->get_field(x1[i],x3[i]);
+      B_compon = h_fld->get_field(x1[i],x3[i]);
 
       double e1 = (E_compon.first * const1) / pow(gamma_r, 3);
       double e2 = (E_compon.second * const1) / pow(gamma_phi, 3);
       double e3 = (E_compon.third * const1) / pow(gamma_z, 3);
 
-			// WARNING!: we still have no B_component. Should be fixed in future
-      // TODO: is it true?
-      // double b1 = (B_compon.first * MAGN_CONST * const1) / gamma_inv_r;
-      // double b2 = (B_compon.second * MAGN_CONST * const1) / gamma_inv_r;
-      // double b3 = (B_compon.third * MAGN_CONST * const1) / gamma_inv_r;
+      double b1 = (B_compon.first * MAGN_CONST * const1) / gamma_inv_r; // TODO: is it true with gamma?
+      double b2 = (B_compon.second * MAGN_CONST * const1) / gamma_inv_phi; // TODO: is it true with gamma?
+      double b3 = (B_compon.third * MAGN_CONST * const1) / gamma_inv_z; // TODO: is it true with gamma?
 
       // 1. Multiplication by relativistic factor
       // u(n-1/2) = gamma(n-1/2)*v(n-1/2)
@@ -164,23 +161,22 @@ void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
       v2[i] = v2[i] + e2;
       v3[i] = v3[i] + e3;
 
-			// WARNING!: we still have no B_component. Should be fixed in future
-      // // 3. Rotation in the magnetic field
-      // // u" = u' + 2/(1+B'^2)[(u' + [u'xB'(n)])xB'(n)]
-      // // B'(n) = B(n)*q*dt/2/mass/gamma(n)
-      // double const2 = 2.0/(1.0 + pow(b1, 2) + pow(b2, 2) + pow(b3, 2));
+      // 3. Rotation in the magnetic field
+      // u" = u' + 2/(1+B'^2)[(u' + [u'xB'(n)])xB'(n)]
+      // B'(n) = B(n)*q*dt/2/mass/gamma(n)
+      double const2 = 2.0/(1.0 + pow(b1, 2) + pow(b2, 2) + pow(b3, 2));
 
-      // v1[i] = v1[i] + const2 * (
-      //   (v2[i] - v1[i] * b3 + v3[i] * b1) * b3 -
-      //   (v3[i] + v1[i] * b2 - v2[i] * b1) * b2);
+      v1[i] = v1[i] + const2 * (
+        (v2[i] - v1[i] * b3 + v3[i] * b1) * b3 -
+        (v3[i] + v1[i] * b2 - v2[i] * b1) * b2);
 
-      // v2[i] = v2[i] + const2 * (
-      //   -(v1[i] + v2[i] * b3 - v3[i] * b2) * b3 +
-      //   (v3[i] + v1[i] * b2 - v2[i] * b1) * b1);
+      v2[i] = v2[i] + const2 * (
+        -(v1[i] + v2[i] * b3 - v3[i] * b2) * b3 +
+        (v3[i] + v1[i] * b2 - v2[i] * b1) * b1);
 
-      // v3[i] = v3[i] + const2 * (
-      //   (v1[i] + v2[i] * b3 - v3[i] * b2) * b2 -
-      //   (v2[i] - v1[i] * b3 + v3[i] * b1) * b1);
+      v3[i] = v3[i] + const2 * (
+        (v1[i] + v2[i] * b3 - v3[i] * b2) * b2 -
+        (v2[i] - v1[i] * b3 + v3[i] * b1) * b1);
 
       // 4. Half acceleration in the electric field
       // u(n+1/2) = u(n) + q*dt/2/m*E(n)
