@@ -24,6 +24,10 @@ class Pdp3Movie:
         self.__cfg = cfg
         self.__plot_builder = PDP3PlotBuilder(self.__cfg)
 
+        ## define files data file sets range
+        self.start_data_set = 0
+        self.end_data_set = 1000
+
         ## define public object fields
         self.data_file_e_r_pattern = 'e_r'
         self.data_file_e_z_pattern = 'e_z'
@@ -121,7 +125,7 @@ class Pdp3Movie:
             movie_file = '/dev/null'
 
         with writer.saving(self.__plot_builder.figure, movie_file, self.video_dpi):
-            for k in range(0, fpf):
+            for k in range(self.start_data_set, self.end_data_set):
                 tstart = k*fpf
                 tend = ((k+1)*fpf-1)
                 i = 1;
@@ -187,6 +191,12 @@ def main():
     parser.add_argument('--video_file', type=str,
                         help='Full path to output video file')
 
+    parser.add_argument('--start_data_set', type=int, default=0,
+                        help='Start number of data files set')
+
+    parser.add_argument('--end_data_set', type=int, default=1000,
+                        help='End number of data files set')
+
     parser.add_argument('--no-view', action='store_true', help='View animation interactively')
 
     parser.add_argument('--view-only', action='store_true', default=False,
@@ -221,6 +231,9 @@ def main():
         config = Parameters(args.properties_path, args.video_file, clim_e_r, clim_e_z)
 
         movie = Pdp3Movie(config)
+
+        movie.start_data_set = args.start_data_set
+        movie.end_data_set = args.end_data_set
         ################################################################################################
         #################### configure plot and movie parameters #######################################
         ################################################################################################
