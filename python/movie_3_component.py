@@ -127,7 +127,7 @@ class Pdp3Movie:
         with writer.saving(self.__plot_builder.figure, movie_file, self.video_dpi):
             for k in range(self.start_data_set, self.end_data_set):
                 tstart = k*fpf
-                tend = ((k+1)*fpf-1)
+                tend = ((k+1)*fpf+1)
                 i = 1;
 
                 if not os.path.isfile(data_file_e_r + str(k)) \
@@ -225,8 +225,6 @@ def main():
     clim_e_z = list(map(int, args.clim_e_z.split(':'))) if args.clim_e_z else default_clim
 
     data_set_range = list(map(int, args.data_set_range.split(':'))) if args.data_set_range else default_data_set_range
-
-    file_delta = 100
 
     # check if config file exists
     if os.path.isfile(args.properties_path):
