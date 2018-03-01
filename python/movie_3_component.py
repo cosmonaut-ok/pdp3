@@ -191,11 +191,11 @@ def main():
     parser.add_argument('--video_file', type=str,
                         help='Full path to output video file')
 
-    parser.add_argument('--start_data_set', type=int, default=0,
-                        help='Start number of data files set')
+    default_data_set_range = [0, 10000]
 
-    parser.add_argument('--end_data_set', type=int, default=1000,
-                        help='End number of data files set')
+    parser.add_argument('--data_set_range', type=str,
+                        help='Range of data files set (e.g. 2:10 is E_r2-Er_10, E_z2-E_z10...). Default %s'
+                        % ':'.join(map(str, default_data_set_range)))
 
     parser.add_argument('--no-view', action='store_true', help='View animation interactively')
 
@@ -223,6 +223,9 @@ def main():
 
     clim_e_r = list(map(int, args.clim_e_r.split(':'))) if args.clim_e_r else default_clim
     clim_e_z = list(map(int, args.clim_e_z.split(':'))) if args.clim_e_z else default_clim
+
+    data_set_range = list(map(int, args.data_set_range.split(':'))) if args.data_set_range else default_data_set_range
+
     file_delta = 100
 
     # check if config file exists
@@ -232,11 +235,12 @@ def main():
 
         movie = Pdp3Movie(config)
 
-        movie.start_data_set = args.start_data_set
-        movie.end_data_set = args.end_data_set
         ################################################################################################
         #################### configure plot and movie parameters #######################################
         ################################################################################################
+        movie.start_data_set = data_set_range[0]
+        movie.end_data_set = data_set_range[1]
+
         movie.data_file_e_r_pattern = 'E_r'
         movie.data_file_e_z_pattern = 'E_z'
         movie.data_file_e_bunch_density_pattern = 'rho_bunch'
