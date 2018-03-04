@@ -110,7 +110,7 @@ void Particles::set_x_0()
 void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
 {
 
-#pragma omp parallel for // shared(e_fld, h_fld, t)
+#pragma omp parallel for
   for(int i=0; i<number; i++)
     if (is_alive[i])
     {
