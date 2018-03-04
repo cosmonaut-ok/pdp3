@@ -115,7 +115,6 @@ void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
     if (is_alive[i])
     {
       // define vars directly in cycle, because of multithreading
-      // double vv1, vv2, vv3, const1, const2;
       Triple E_compon(0.0, 0.0, 0.0), B_compon(0.0, 0.0, 0.0);
       double min_relativistic_velocity = 1e4;
       // check if x1 and x3 are correct
@@ -124,7 +123,7 @@ void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
         cerr << "ERROR(step_v): x1[" << i << "] or x3[" << i << "] is not valid number. Can not continue." << endl;
         exit(1);
       }
-      // q*t/2*m TODO: what constant is it?
+      // q*t/2*m
       double const1 = charge_array[i]*t->delta_t/2.0/mass_array[i];
 
       // do not caluculate gamma for low velocities.
@@ -147,21 +146,13 @@ void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
       double b2 = (B_compon.second * MAGN_CONST * const1) / gamma_inv_phi; // TODO: is it true with gamma?
       double b3 = (B_compon.third * MAGN_CONST * const1) / gamma_inv_z; // TODO: is it true with gamma?
 
-      // 1. Multiplication by relativistic factor
-      // u(n-1/2) = gamma(n-1/2)*v(n-1/2)
-      // gamma = get_gamma(i);
-      //
-      // v1[i] = gamma*vv1;
-      // v2[i] = gamma*vv2;
-      // v3[i] = gamma*vv3;
-
-      // 2. Half acceleration in the electric field
+      // 1. Half acceleration in the electric field
       // u'(n) = u(n-1/2) + q*dt/2/m*E(n)
       v1[i] = v1[i] + e1;
       v2[i] = v2[i] + e2;
       v3[i] = v3[i] + e3;
 
-      // 3. Rotation in the magnetic field
+      // 2. Rotation in the magnetic field
       // u" = u' + 2/(1+B'^2)[(u' + [u'xB'(n)])xB'(n)]
       // B'(n) = B(n)*q*dt/2/mass/gamma(n)
       double const2 = 2.0/(1.0 + pow(b1, 2) + pow(b2, 2) + pow(b3, 2));
@@ -178,17 +169,11 @@ void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
         (v1[i] + v2[i] * b3 - v3[i] * b2) * b2 -
         (v2[i] - v1[i] * b3 + v3[i] * b1) * b1);
 
-      // 4. Half acceleration in the electric field
+      // 3. Half acceleration in the electric field
       // u(n+1/2) = u(n) + q*dt/2/m*E(n)
       v1[i] = v1[i] + e1;
       v2[i] = v2[i] + e2;
       v3[i] = v3[i] + e3;
-
-      // 5. Division by relativistic factor
-      // gamma = get_gamma_inv(i);
-      // v1[i] = v1[i]/gamma;
-      // v2[i] = v2[i]/gamma;
-      // v3[i] = v3[i]/gamma;
     }
 }
 
