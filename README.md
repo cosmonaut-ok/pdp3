@@ -4,16 +4,6 @@ Renew PDP3 project
 
 [![Travis Build Status](https://api.travis-ci.org/cosmonaut-ok/pdp3.svg?branch=master)](https://travis-ci.org/cosmonaut-ok/pdp3)
 
-RoadMap:
-
-- Refactoring:
-  - move to modern tinyxml2 [ DONE ]
-  - remove CUDA [ DONE ]
-  - algorhythm simplification and optimization
-- paralellize (openMP) [ DONE ]
-- add openCL support
-- migrate image processing from matlab to python+scipy/numpy/etc.
-
 ## System And Software Requirements
 
 - Common:
@@ -28,43 +18,85 @@ RoadMap:
   - MS Visual Studio 2017 or Cygwin with 'make' util (for gcc/clang/icc)
   - anaconda (python scientific environment)
 
-## HOWTO
+## Terms and Legend
 
-### Linux
+* <REQUIRED_VALUE> - required CLI value (ex. application's parameter, required to launch with)
+* [OPTIONAL_VALUE] - optionsl CLI value (ex. application's optional launch parameter)
+* VAR=val - set unix shell environment variable
+* user@host$ - shell terminal prompt for user <user>
+* root@host# - shell terminal prompt for superuser (root). You can reach it by command `su`, or `sudo -i`, or `sudo <command with all arguments>` from your user
+* `# phrase` - comment in code (in shell-like syntax)
 
-1. **CLONE PROJECT**
-```bash
+## HOWTO (Linux)
+
+### 0. Install required software (debian/ubuntu example)
+
+``` shell
+root@host# apt-get install build-essential git doxygen texlive-latex-base
+```
+NOTE: if you are going to use LLVM/clang, you should install different packages
+
+``` shell
+root@host# apt-get install clang-<your faforite version> make git doxygen texlive-latex-base libomp5
+```
+
+### 1. **CLONE PROJECT**
+
+```shell
 user@host$ git clone https://github.com/cosmonaut-ok/pdp3.git
 user@host$ cd pdp3
 user@host$ git submodule update --init # require to enable external libraries
 ```
 
-2. **COMPILE**
+### 2. **COMPILE**
 
-```bash
+* **GCC**
+
+```shell
 # change your current directory to project's root directory
 user@host$ cd /path/to/pdp3/root/directory
-user@host$ make ## optional: COMPILE_FLAGS (see below)
+user@host$ make [COMPILE FLAGS] # see below about COMPILE FLAGS
 ```
 
-NOTE: Compile with pgc++ (uses different openmp flag)
-```bash
-user@host$ make CXX=/path/to/your/pgc++ CFLAGS_OPENMP=-openmp
-```
-#### Built-in make flags
+* **LLVM/Clang**
 
-##### Usage
-```bash
+```shell
+# change your current directory to project's root directory
+user@host$ cd /path/to/pdp3/root/directory
+user@host$ make CXX=clang++-<your faforite version> CFLAGS_OPENMP=-fopenmp=libiomp5 [OTHER COMPILE FLAGS] # see below about COMPILE FLAGS
+```
+
+* **Intel C compiler**
+
+```shell
+# change your current directory to project's root directory
+user@host$ cd /path/to/pdp3/root/directory
+user@host$ make CXX=/path/to/binary/icc
+```
+
+* **PGI (Nvidia) C compiler**
+
+```shell
+# change your current directory to project's root directory
+user@host$ cd /path/to/pdp3/root/directory
+user@host$ make CXX=/path/to/binary/pgc++ CFLAGS="-mp [other pgi-specific compile flags]"
+```
+
+#### Built-in compile flags
+
+**Usage:**
+
+```shell
 user@host$ make [action] FLAG_1=value1 FLAG_2=value2
 # or
 user@host$ FLAG=value make [action]
 ```
 
-##### List
+**List of compile flags, related to PDP3 project:**
 
 - `CXX=/foo/bar++` - Use custom c++ compiler (see supported c++ compilers list)
 - `DEBUG=yes/no`- Compile binary with debug symbols, prepared to use with GDB
-- `SPEEDUP=yes/no` - Increase speed up to 30%, by using unsafe math operations. WARNING! it decreases calculations accuracy and can cause incorrect program working
+- `SPEEDUP=yes/no` - Increase speed up to 30%, by using unsafe math operations (gcc and clang only!). WARNING! it decreases calculations accuracy and can cause incorrect program working
 - `SINGLETHREAD=yes/no` - Compile binary without multithreading support. Disables all parallelization features
 - `CFLAGS="foo bar"` - list of custom CFLAGS (and CXXFLAGS), used by compiler
 
@@ -78,6 +110,8 @@ user@host$ make test # or test-ext for extended testing (require more time)
 4. **RUN**
 
 You need just file `pdp3` and `parameters.xml`. You can copy this files to somewhere, edit `parameters.xml` and run pdp3
+
+NOTE: pgi: OMP_NUM_THREADS=N # !!!
 
 ```bash
 user@host$ mkdir pdp_result # or where you defined in configfile
