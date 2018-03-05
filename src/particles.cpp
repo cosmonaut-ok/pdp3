@@ -107,148 +107,73 @@ void Particles::set_x_0()
   }
 }
 
-// calculate Lorentz factor
-double Particles::get_gamma(int i)
-{
-
-  double gamma, beta;
-
-  beta = (pow(v1[i], 2) + pow(v2[i], 2) + pow(v3[i], 2)) / LIGHT_SPEED_POW_2;
-
-  if (beta > 1) // it's VERY BAD! Beta should not be more, than 1
-  {
-    cerr << "CRITICAL!(get_gamma): Lorentz factor aka gamma is comples. Can not continue." << endl
-         << "\tUsually it happens, when <Time> -> <delta_t> value is too big." << endl
-         << "\tv1[" << i << "] = " << v1[i] << endl
-         << "\tv2[" << i << "] = " << v2[i] << endl
-         << "\tv3[" << i << "] = " << v3[i] << endl;
-    exit(1);
-  }
-
-  gamma = pow(1.0 - beta, -0.5);
-
-  if (isinf(gamma) == 1) { // avoid infinity values
-    cerr << "WARNING(get_gamma): gamma (Lorenz factor) girects to infinity for [v1, v2, v3, i]: ["
-         << v1[i] << ", " << v2[i] << ", " << v3[i] << ", " << i << "]" << endl;
-    return 1e100; // just return some very big value
-  }
-  else
-  {
-    return gamma;
-  }
-}
-
-// clculate reciprocal Lorentz factor (1/gamma), aka ``alpha''
-double Particles::get_gamma_inv(int i) // TODO: it is not alpha
-{
-  double gamma, beta;
-
-  beta = (pow(v1[i], 2) + pow(v2[i], 2) + pow(v3[i], 2)) / LIGHT_SPEED_POW_2;
-
-  if (beta > 1) // it's VERY BAD! Beta should not be more, than 1
-  {
-    cerr << "CRITICAL!(get_gamma_inv): Lorentz factor aka gamma is comples. Can not continue." << endl
-         << "\tUsually it happens, when <Time> -> <delta_t> value is too big." << endl
-         << "\tv1[" << i << "] = " << v1[i] << endl
-         << "\tv2[" << i << "] = " << v2[i] << endl
-         << "\tv3[" << i << "] = " << v3[i] << endl;
-    exit(1);
-  }
-
-  gamma = pow(1.0 + beta, 0.5);
-
-  if (isinf(gamma) == 1) { // avoid infinity values
-    cerr << "WARNING(get_gamma_inv): reciprocal gamma (Lorenz factor) directs to infinity for [v1, v2, v3, i]: ["
-         << v1[i] << ", " << v2[i] << ", " << v3[i] << ", " << i << "]" << endl;
-    return 1e100; // just return some very big value
-  }
-  else
-  {
-    return gamma;
-  }
-}
-
 void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
 {
 
-#pragma omp parallel for shared(e_fld, h_fld, t)
+#pragma omp parallel for
   for(int i=0; i<number; i++)
     if (is_alive[i])
     {
       // define vars directly in cycle, because of multithreading
-      double gamma, b1, b2, b3, e1, e2, e3, vv1, vv2, vv3, const1, const2;
-			// use classical calculations, if velocity lower, than minimal
-			double min_relativistic_velocity = 1e8;
-			bool use_rel; // use relativistic calculations
-
       Triple E_compon(0.0, 0.0, 0.0), B_compon(0.0, 0.0, 0.0);
-
+      double min_relativistic_velocity = 3e7;
       // check if x1 and x3 are correct
       if (isnan(x1[i]) || isinf(x1[i]) != 0 || isnan(x3[i]) || isinf(x3[i]) != 0)
       {
         cerr << "ERROR(step_v): x1[" << i << "] or x3[" << i << "] is not valid number. Can not continue." << endl;
         exit(1);
       }
-      // q*t/2*m TODO: what constant is it?
-      const1 = charge_array[i]*t->delta_t/2.0/mass_array[i];
+      // q*t/2*m
+      double const1 = charge_array[i]*t->delta_t/2.0/mass_array[i];
+
+      // do not caluculate gamma for low velocities.
+      // Try to increse calculation speed
+      double gamma_r = (abs(v1[i]) > min_relativistic_velocity) ? lib::get_gamma(v1[i]) : 1;
+      double gamma_phi = (abs(v2[i]) > min_relativistic_velocity) ? lib::get_gamma(v2[i]) : 1;
+      double gamma_z = (abs(v3[i]) > min_relativistic_velocity) ? lib::get_gamma(v3[i]) : 1;
+      double gamma_inv_r = (abs(v1[i]) > min_relativistic_velocity) ? lib::get_gamma_inv(v1[i]) : 1;
+      double gamma_inv_phi = (abs(v2[i]) > min_relativistic_velocity) ? lib::get_gamma_inv(v2[i]) : 1;
+      double gamma_inv_z = (abs(v3[i]) > min_relativistic_velocity) ? lib::get_gamma_inv(v3[i]) : 1;
+
       E_compon = e_fld->get_field(x1[i],x3[i]);
       B_compon = h_fld->get_field(x1[i],x3[i]);
-      e1 = E_compon.first*const1;
-      e2 = E_compon.second*const1;
-      e3 = E_compon.third*const1;
-      b1 = B_compon.first*MAGN_CONST*const1;
-      b2 = B_compon.second*MAGN_CONST*const1;
-      b3 = B_compon.third*MAGN_CONST*const1;
 
-      // round very small velicities to avoid exceptions
-      vv1 = (abs(v1[i]) < 1e-15) ? 0 : v1[i];
-      vv2 = (abs(v2[i]) < 1e-15) ? 0 : v2[i];
-      vv3 = (abs(v3[i]) < 1e-15) ? 0 : v3[i];
+      double e1 = (E_compon.first * const1) / pow(gamma_r, 3);
+      double e2 = (E_compon.second * const1) / pow(gamma_phi, 3);
+      double e3 = (E_compon.third * const1) / pow(gamma_z, 3);
 
-			// 0. calculate, if we should use classical calculations
-			if (v1[i] > min_relativistic_velocity || v2[i] > min_relativistic_velocity || v3[i] > min_relativistic_velocity)
-				use_rel = true;
+      double b1 = (B_compon.first * MAGN_CONST * const1) / gamma_inv_r; // TODO: is it true with gamma?
+      double b2 = (B_compon.second * MAGN_CONST * const1) / gamma_inv_phi; // TODO: is it true with gamma?
+      double b3 = (B_compon.third * MAGN_CONST * const1) / gamma_inv_z; // TODO: is it true with gamma?
 
-      // 1. Multiplication by relativistic factor
-      // u(n-1/2) = gamma(n-1/2)*v(n-1/2)
-      gamma = use_rel ? get_gamma(i) : 1;
-      //
-      v1[i] = gamma*vv1;
-      v2[i] = gamma*vv2;
-      v3[i] = gamma*vv3;
-
-      // 2. Half acceleration in the electric field
+      // 1. Half acceleration in the electric field
       // u'(n) = u(n-1/2) + q*dt/2/m*E(n)
       v1[i] = v1[i] + e1;
       v2[i] = v2[i] + e2;
       v3[i] = v3[i] + e3;
 
-      // 3. Rotation in the magnetic field
+      // 2. Rotation in the magnetic field
       // u" = u' + 2/(1+B'^2)[(u' + [u'xB'(n)])xB'(n)]
       // B'(n) = B(n)*q*dt/2/mass/gamma(n)
-      gamma = use_rel ? get_gamma_inv(i) : 1;
-      b1 = b1/gamma;
-      b2 = b2/gamma;
-      b3 = b3/gamma;
-      const2 = 2.0/(1.0 + b1*b1 + b2*b2 + b3*b3);
-      vv1 = v1[i];
-      vv2 = v2[i];
-      vv3 = v3[i];
-      v1[i] = vv1 + const2*((vv2 - vv1*b3 + vv3*b1)*b3 - (vv3 + vv1*b2 - vv2*b1)*b2);
-      v2[i] = vv2 + const2*(-(vv1 + vv2*b3 - vv3*b2)*b3 + (vv3 + vv1*b2 - vv2*b1)*b1);
-      v3[i] = vv3 + const2*((vv1 + vv2*b3 - vv3*b2)*b2 - (vv2 - vv1*b3 + vv3*b1)*b1);
+      double const2 = 2.0/(1.0 + pow(b1, 2) + pow(b2, 2) + pow(b3, 2));
 
-      // 4. Half acceleration in the electric field
+      v1[i] = v1[i] + const2 * (
+        (v2[i] - v1[i] * b3 + v3[i] * b1) * b3 -
+        (v3[i] + v1[i] * b2 - v2[i] * b1) * b2);
+
+      v2[i] = v2[i] + const2 * (
+        -(v1[i] + v2[i] * b3 - v3[i] * b2) * b3 +
+        (v3[i] + v1[i] * b2 - v2[i] * b1) * b1);
+
+      v3[i] = v3[i] + const2 * (
+        (v1[i] + v2[i] * b3 - v3[i] * b2) * b2 -
+        (v2[i] - v1[i] * b3 + v3[i] * b1) * b1);
+
+      // 3. Half acceleration in the electric field
       // u(n+1/2) = u(n) + q*dt/2/m*E(n)
       v1[i] = v1[i] + e1;
       v2[i] = v2[i] + e2;
       v3[i] = v3[i] + e3;
-
-      // 5. Division by relativistic factor
-      gamma = get_gamma_inv(i);
-      v1[i] = v1[i]/gamma;
-      v2[i] = v2[i]/gamma;
-      v3[i] = v3[i]/gamma;
     }
 }
 
@@ -438,9 +363,9 @@ void Particles::velocity_distribution(double tempr_ev)
   double therm_vel = sqrt(tempr_ev*2.0*EL_CHARGE/
                           (this->init_const_mass*EL_MASS));
   // double R =0; // number from [0;1]
-	// TODO: why 5e6?
+  // TODO: why 5e6?
   double dv = therm_vel/0.5e7; // velocity step in calculation integral
-	// TODO: why 9.0?
+  // TODO: why 9.0?
   double cutoff_vel = 9.0*therm_vel; // cutoff velocity
   int lenght_arr = (int)cutoff_vel/dv;
   double s = 0;
@@ -451,7 +376,7 @@ void Particles::velocity_distribution(double tempr_ev)
   // part of numerical integral calculation
   for (int i=0; i<lenght_arr; i++)
   {
-		double ds = 0;
+    double ds = 0;
     ds = exp(-dv*i*dv*i/const1)*dv;
     s = s+ds;
     integ_array[i] = s;

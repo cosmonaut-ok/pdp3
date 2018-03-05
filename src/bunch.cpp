@@ -21,9 +21,9 @@ Bunch::Bunch(char *p_name,
   duration = b_duration;
   radius = b_radius;
   density = b_density;
-  velosity = b_init_velocity;
+  velocity = b_init_velocity;
   //
-  double b_lenght = duration*velosity;
+  double b_lenght = duration*velocity;
   double n_in_big = PI * pow(radius, 2) * b_lenght * density / number;
   charge *= n_in_big;
   mass *= n_in_big;
@@ -46,7 +46,7 @@ Bunch::~Bunch(void)
 
 void Bunch::bunch_inject(Time *time)
 {
-  double dl = velosity * time->delta_t;
+  double dl = velocity * time->delta_t;
   int step_num = duration / time->delta_t;
   int particles_in_step = number / step_num;
   int start_number = time->current_time / time->delta_t * particles_in_step;
@@ -67,7 +67,7 @@ void Bunch::bunch_inject(Time *time)
 
       x1[i+start_number] = sqrt(half_r_cell_size_pow_2 + const1 * rand_i);
       x3[i+start_number] = dl * rand_z + half_z_cell_size;
-      v3[i+start_number] = velosity;
+      v3[i+start_number] = velocity;
       v1[i+start_number] = 0;
       v2[i+start_number] = 0; // fi velocity;
       is_alive[i+start_number] = true;
