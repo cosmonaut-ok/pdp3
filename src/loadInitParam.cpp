@@ -362,7 +362,7 @@ void LoadInitParam::dump_data(int step_number)
                          frames_per_file, c_geom->n_grid_1 - 1, c_geom->n_grid_2 - 1);
 
   if (is_dump_h_r)
-    c_io_class->out_data("H_e", hfield->field_r, step_number,
+    c_io_class->out_data("H_r", hfield->field_r, step_number,
                          frames_per_file, c_geom->n_grid_1 - 1, c_geom->n_grid_2 - 1);
 
   if (is_dump_h_phi)
