@@ -20,21 +20,21 @@ Renew PDP3 project
 
 ## Terms and Legend
 
-* <REQUIRED_VALUE> - required CLI value (ex. application's parameter, required to launch with)
-* [OPTIONAL_VALUE] - optionsl CLI value (ex. application's optional launch parameter)
-* VAR=val - set unix shell environment variable
-* user@host$ - shell terminal prompt for user <user>
-* root@host# - shell terminal prompt for superuser (root). You can reach it by command `su`, or `sudo -i`, or `sudo <command with all arguments>` from your user
+* `<REQUIRED_VALUE>` - required CLI value (ex. application's parameter, required to launch with)
+* `[OPTIONAL_VALUE]` - optionsl CLI value (ex. application's optional launch parameter)
+* `VAR=val` - set unix shell environment variable
+* `user@host$` - shell terminal prompt for user <user>
+* `root@host#` - shell terminal prompt for superuser (root). It can be reached by commands `su`, or `sudo -i`, or `sudo <command with all arguments>` from your user
 * `# phrase` - comment in code (in shell-like syntax)
 
 ## HOWTO (Linux)
 
-### 0. Install required software (debian/ubuntu example)
+### 0. Install prerequired software (debian/ubuntu example)
 
 ``` shell
 root@host# apt-get install build-essential git doxygen texlive-latex-base
 ```
-NOTE: if you are going to use LLVM/clang, you should install different packages
+> NOTE: if you are going to use LLVM/clang, you should install different packages
 
 ``` shell
 root@host# apt-get install clang-<your faforite version> make git doxygen texlive-latex-base libomp5
@@ -66,14 +66,6 @@ user@host$ cd /path/to/pdp3/root/directory
 user@host$ make CXX=clang++-<your faforite version> CFLAGS_OPENMP=-fopenmp=libiomp5 [OTHER COMPILE FLAGS] # see below about COMPILE FLAGS
 ```
 
-* **Intel C compiler**
-
-```shell
-# change your current directory to project's root directory
-user@host$ cd /path/to/pdp3/root/directory
-user@host$ make CXX=/path/to/binary/icc
-```
-
 * **PGI (Nvidia) C compiler**
 
 ```shell
@@ -82,7 +74,7 @@ user@host$ cd /path/to/pdp3/root/directory
 user@host$ make CXX=/path/to/binary/pgc++ CFLAGS="-mp [other pgi-specific compile flags]"
 ```
 
-#### Built-in compile flags
+#### Compile flags
 
 **Usage:**
 
@@ -92,50 +84,78 @@ user@host$ make [action] FLAG_1=value1 FLAG_2=value2
 user@host$ FLAG=value make [action]
 ```
 
-**List of compile flags, related to PDP3 project:**
+**List of built-in compile flags, accepted by PDP3 project:**
 
-- `CXX=/foo/bar++` - Use custom c++ compiler (see supported c++ compilers list)
 - `DEBUG=yes/no`- Compile binary with debug symbols, prepared to use with GDB
 - `SPEEDUP=yes/no` - Increase speed up to 30%, by using unsafe math operations (gcc and clang only!). WARNING! it decreases calculations accuracy and can cause incorrect program working
 - `SINGLETHREAD=yes/no` - Compile binary without multithreading support. Disables all parallelization features
-- `CFLAGS="foo bar"` - list of custom CFLAGS (and CXXFLAGS), used by compiler
+- `CXX=/foo/bar++` - Use custom c++ compiler (see supported c++ compilers list)
+- `CXXFLAGS="foo bar"` - custom C++ compile flags, used by compiler (overrides all autogeneration flags)
+- `CFLAGS="foo bar"` - same as CFLAGS
+  - `CFLAGS_NO_OPENMP` - used to customize flags, when openmp disabled (used for CXXFLAGS autogeneration)
+  - `CFLAGS_OPENMP` -  - used to customize flags, when openmp enabled (used for CXXFLAGS autogeneration)
+  - `CFLAGS_DEBUG` - used to customize flags, used when debug enabled (used for CXXFLAGS autogeneration)
+  - `CFLAGS_SPEEDUP` - used to customize flags, used when fast-math and other speedup options enabled (used for CXXFLAGS autogeneration)
+- `LDFLAGS` -  custom C++ linker flags
 
+### 3. **TEST (optional)**
 
-3. **TEST (optional)**
+**Functional (end-to-end) testing:**
 
-```bash
+```shell
 user@host$ make test # or test-ext for extended testing (require more time)
 ```
 
-4. **RUN**
+**Unit testing:**
 
-You need just file `pdp3` and `parameters.xml`. You can copy this files to somewhere, edit `parameters.xml` and run pdp3
-
-NOTE: pgi: OMP_NUM_THREADS=N # !!!
-
-```bash
-user@host$ mkdir pdp_result # or where you defined in configfile
-user@host$ ./pdp3 [ -h ] | [ -f /path/to/parameters.xml ] # used parameters.xml from current directory, if calling without any options
-## or (much better)
-user@host$ nice -20 ./pdp3 [ -h ] | [ -f /path/to/parameters.xml ] # give some power to pdp3!
+```shell
+user@host$ make test-unit
 ```
 
-NOTE: it can take several days or weeks, and several hundreds gigabytes of diskspace (yep, it is science, my deer friend).
+### 4. **RUN**
 
-5. **VISUALIZATION**
+After compilation finished, you just need binary file `pdp3` and `parameters.xml`. You can copy this files to somewhere, edit `parameters.xml` and run pdp3
 
-After your application finished modeling, you can build some visual model from generated data. Use Mathlab for it (I know, that it is not good and matlab is not free. I plan to migrate visualization code to python+matplotlib+scipy. I will do it. I promise :) ).
+```shell
+user@host$ mkdir pdp_result # or where you defined in parameters.xml. PDP3 does not use smth. like BOOST::filesystem to operate with directories
+user@host$ /path/to/pdp3 [ -h ] | [ -f /path/to/parameters.xml ] # used parameters.xml from current directory, if calling without any options
+# or (much better), launch it as high-priority process
+user@host$ nice -20 /path/to/pdp3 [ -h ] | [ -f /path/to/parameters.xml ] # give some power to pdp3!
+```
+
+> NOTE: it can take several days or weeks, and several hundreds gigabytes of diskspace (yep, it is science, my deer friend).
+
+### 5. **Visualization (generate images or animation)**
+
+After your application finished modeling, you can build some visual model from generated data. Use python with matplotlib and numpy. [Anaconda](https://www.anaconda.com/download/#linux) as python distribution is recommended.
+
+**...butt... if you don't want to use anaconda....:**
 
 ``` shell
-user@host$ cd /path/to/pdp3/matlab
-user@host$ matlab -nodesktop -nosplash # f*ck that GUI sh*it!
-...
->> rho_movie_create_light3_from_parameters('/path/to/parameters.xml') # it can take several hours
->> exit() # to exit after visualization finished
+root@host# apt-get install python3 python3-matplotlib python3-numpy python3-scipy
 ```
 
-After visualization finished, please, look into directory with `parameters.xml` and find vieo file `field_movie.avi` there. Also, you can find other matlab scripts in `./matlab` pdp3 subdir.
+**Pre-required software (for animation):**
 
+``` shell
+root@host# apt-get install ffmpeg
+```
+
+**Animation generation:**
+
+``` shell
+user@host$ /path/to/repository/with/pdp3/python/movie_3_component.py /path/to/parameters.xml
+# USE: /path/to/repository/with/pdp3/python/movie_3_component.py -h to see list of all available options
+```
+
+**Images generation:**
+
+``` shell
+user@host$ /path/to/repository/with/pdp3/python/images_3_component.py /path/to/parameters.xml --data_set_range=1:2 --frame_range=3:4
+# USE: /path/to/repository/with/pdp3/python/images_3_component.py -h to see list of all available options
+```
+
+WAT is *data_set_range* and *frame_range* ? PDP3 saves every modeling frame (step) to file. Number of such frames in one file can be defined in in parameters.xml. So, you getting output as set of files with set of frames in each file. When you generate images, you can define range of files from which you going to generate images and range of frames in each file, from which that images will be generated.
 
 ## Hacking
 
