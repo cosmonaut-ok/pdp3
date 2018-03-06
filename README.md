@@ -50,7 +50,7 @@ user@host$ git submodule update --init # require to enable external libraries
 
 ### 2. **COMPILE**
 
-* **GCC**
+* **GCC (recommended)**
 
 ```shell
 # change your current directory to project's root directory
