@@ -2,6 +2,7 @@ MKDIR                 = mkdir
 ROOTDIR               = .
 SRCDIR                = $(ROOTDIR)/src
 OBJDIR                = $(ROOTDIR)/obj
+TARGETDIR             ?= $(ROOTDIR)/target
 INCLUDEDIR            = $(ROOTDIR)/include
 SUBDIRS               =
 TESTSUBDIRS           = test/unit
@@ -28,6 +29,7 @@ pdp3_LDFLAGS          =
 pdp3_ARFLAGS          =
 pdp3_LIBRARY_PATH     =
 pdp3_LIBRARIES        =
+pdp3_RESULT_DIR       = 'pdp3_result'
 
 ### tinyxml2 sources and settings
 tinyxml2_SUBDIR := $(ROOTDIR)/lib/tinyxml2
@@ -140,7 +142,7 @@ $(pdp3_MODULE): $(pdp3_OBJS)
 	$(CXX) $(CXXFLAGS) $(CXXEXTRA) $(DEFINCL) $(LDFLAGS) -o $@ $(pdp3_OBJS) $(pdp3_LIBRARY_PATH) $(pdp3_LIBRARIES:%=-l%)
 
 mrproper: clean
-	$(RM) -r $(TESTDIR) *.avi
+	$(RM) -r $(TESTDIR) *.avi $(TARGETDIR)
 
 run: bootstrap
 	./pdp3
@@ -166,3 +168,8 @@ doxygen:
 	$(DOXYGEN) $(DOXYGEN_CONFIG)
 
 doc: doxygen $(DOXYGEN_FORMATS)
+
+dist: all
+	$(MKDIR) -p $(TARGETDIR)/$(pdp3_RESULT_DIR)
+	cp pdp3 $(TARGETDIR)
+	sed "s/<path_to_result>.*<\/path_to_result>/<path_to_result>${pdp3_RESULT_DIR}\/<\/path_to_result>/g" parameters.xml > $(TARGETDIR)/parameters.xml
