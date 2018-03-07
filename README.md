@@ -97,6 +97,7 @@ user@host$ FLAG=value make [action]
   - `CFLAGS_DEBUG` - used to customize flags, used when debug enabled (used for CXXFLAGS autogeneration)
   - `CFLAGS_SPEEDUP` - used to customize flags, used when fast-math and other speedup options enabled (used for CXXFLAGS autogeneration)
 - `LDFLAGS` -  custom C++ linker flags
+- `TARGETDIR` - used with `make dist`, which prepares all, required to start modeling in separate directory
 
 ### 3. **TEST (optional)**
 
@@ -112,7 +113,17 @@ user@host$ make test # or test-ext for extended testing (require more time)
 user@host$ make test-unit
 ```
 
-### 4. **RUN**
+### 4. **INSTALLATION (optional)**
+
+You can install already compiled pdp3 with it's configfile (aka properties.xml) and required subdirs to separate directory. Just run
+
+``` shell
+user@host$ make dist [TARGETDIR=/path/to/some/target/directory]
+```
+
+Than, you can enter this directory and run pdp3
+
+### 5. **RUN**
 
 After compilation finished, you just need binary file `pdp3` and `parameters.xml`. You can copy this files to somewhere, edit `parameters.xml` and run pdp3
 
