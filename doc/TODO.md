@@ -1,5 +1,15 @@
 # TODO
 
+## RoadMap
+
+- Refactoring:
+  - move to modern tinyxml2 [ DONE ]
+  - remove CUDA [ DONE ]
+  - algorhythm simplification and optimization [ IN PROGRESS ]
+- paralellize (openMP) [ DONE ]
+- add openCL support
+- migrate image processing from matlab to python+scipy/numpy/etc.
+
 ## Technologies to research and (maybe) implement
 
 - C++ actor framework (CLF)
