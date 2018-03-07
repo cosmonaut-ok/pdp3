@@ -129,7 +129,7 @@ user@host$ nice -20 /path/to/pdp3 [ -h ] | [ -f /path/to/parameters.xml ] # give
 
 After your application finished modeling, you can build some visual model from generated data. Use python with matplotlib and numpy. [Anaconda](https://www.anaconda.com/download/#linux) as python distribution is recommended.
 
-**...butt... if you don't want to use anaconda....:**
+**...butt... if you don't want to use anaconda...:**
 
 ``` shell
 root@host# apt-get install python3 python3-matplotlib python3-numpy python3-scipy
@@ -176,68 +176,75 @@ WAT is *data_set_range* and *frame_range* ? PDP3 saves every modeling frame (ste
 - Comments: '//' at line begining
 - File naming: lowercase
 
-### Working with GIT
+### GIT
 
-### Before work
+#### Before working
 
 1. Make sure, that you have clean repository and there are no unstaged untracked and uncommited files.
 
-```bash
+``` shell
 user@host$ git status
 ```
-  1) If you have such files, you should remove them or move out of your working directory (with pdp3), than reset repository
-  ```bash
-  user@host$ git reset --hard
-  ```
+> NOTE: If you have such files, you commit, remove or move out of your working directory (with pdp3), than reset repository
+> Also, you can just reset repository
+	``` shell
+	user@host$ git reset --hard
+	```
+
 2. Sync with upstream
-```bash
-user@host$ git checkout master ## switch to master branch
-user@host$ git pull origin master ## get latest stable code
+
+``` shell
+user@host$ git fetch origin --tags
 ```
 
-### Begining work
+#### Working
 
 1. Checkout to new branch
-```bash
-user@host$ git checkout -b your-branch-name # use only `-` as delimiters for better compatability
+
+``` shell
+user@host$ git checkout -b <your-branch-name> # use only `-` as word delimiters for better compatability
 ```
 
 2. Make changes, write new code, add new features, experiment etc.
 
 3. Commit your changes (do it as often, as save word document ;) ) and push to upstream
-```bash
-user@host$ git commit -a -m "your comment"
-user@host$ git push origin your-branch-name
+
+``` shell
+user@host$ git add . # or git add your/selected/files
+user@host$ git commit -m "<your comment>"
+user@host$ git push origin <your-branch-name>
 ```
 
-### Ending work
+#### After working
 
-When you end some logical step of your working, you should merge your changes to master branch to stable code. You can do it, using "Pull request" in github
+When you finish some logical step of your work, you should merge your changes to master branch (as stable code). You can do it, using "Pull request" in github
 
 1. Go to https://github.com/cosmonaut-ok/pdp3/pulls
 
 2. Press "New pull request" and choose "master" as base branch and "your-branch-name" as compare. Scroll to view changes against master branch
 
-3. When all ok, press "Create pull request" and confirm.
+3. When all is ok, press "Create pull request" and confirm.
 
-4. Wait for travis testing ends and (if they passed), merge your changes to master branch
+4. Wait for travis testing ends and (if they passed), merge your changes to master branch (squash and merge).
 
 ### Debug
 
-Linux:
+**Linux:**
+
 1. build project with DEBUG option
 
-```bash
+``` shell
 user@host$ DEBUG=yes make
 ```
 or
-```bash
+
+``` shell
 user@host$ make DEBUG=yes
 ```
 
 2. run with gdb
 
-```bash
+``` shell
 user@host$ gdb ./pdp3
 (gdb) run ## or perform some modifications first than run, e.g. set breakpoints
 ```
