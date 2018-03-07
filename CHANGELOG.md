@@ -1,6 +1,8 @@
 CURRENT
 =======
 
+- Add make target 'dist' to automatically prepare pdp3 run environment
+
 - Improve velocity calculaction algorhythm
 
 - Add image set generation python script (#24)
