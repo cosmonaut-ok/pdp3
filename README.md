@@ -33,12 +33,12 @@ Renew PDP3 project
 #### 0. INSTALL PREREQUIRED SOFTWARE (debian/ubuntu example)
 
 ``` shell
-root@host# apt-get install build-essential git doxygen texlive-latex-base
+root@host# apt-get install build-essential git doxygen texlive-latex-base texlive-latex-extra
 ```
 > NOTE: if you are going to use LLVM/clang, you should install different packages
 
 ``` shell
-root@host# apt-get install clang-<your faforite version> make git doxygen texlive-latex-base libomp5
+root@host# apt-get install clang-<your faforite version> make git doxygen texlive-latex-base texlive-latex-extra libomp5
 ```
 
 #### 1. **CLONE PROJECT**
