@@ -16,8 +16,10 @@ INCLUDE_PATH          = -I$(INCLUDEDIR)
 LIBRARY_PATH          =
 LIBRARIES             =
 DOXYGEN               = doxygen
-DOXYGEN_CONFIG        = doc/doxygen.conf
-DOXYGEN_FORMATS       = latex html
+DOXYGEN_CONFIGS       = doc/app.conf doc/vis.conf doc/report.conf
+DOXYGEN_FORMATS       = latex html rtf
+DOXYGEN_DIRS          = doc/app doc/vis doc/report
+ROOTDIR               = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
 ### pdp3 sources and settings
 pdp3_MODULE           = pdp3
@@ -91,7 +93,7 @@ $(SUBDIRS): dummy
 	@cd $@ && $(MAKE)
 
 $(DOXYGEN_FORMATS): doxygen
-	@cd doc/$@ && test -f Makefile && $(MAKE) || return 0
+	@for i in $(DOXYGEN_DIRS); do test -d $(ROOTDIR)/$$i/$@ && cd $(ROOTDIR)/$$i/$@ && test -f Makefile && $(MAKE) || return 0; done
 
 # Implicit rules
 .SUFFIXES: .cpp .cxx
@@ -122,7 +124,7 @@ clean: $(SUBDIRS:%=%/__clean__) $(EXTRASUBDIRS:%=%/__clean__) $(TESTSUBDIRS:%=%/
 	$(RM) $(pdp3_OBJS) $(CLEAN_FILES)
 	$(RM) $(LIBS) $(EXES) $(EXES:%=%.so)
 	$(RM) -r $(BUILD_DIRS) $(ROOTDIR)/python/__pycache__/
-	cd doc && $(RM) -r $(DOXYGEN_FORMATS)
+	$(RM) -r $(DOXYGEN_DIRS)
 
 $(SUBDIRS:%=%/__clean__): dummy
 	-cd `dirname $@` && $(MAKE) clean
@@ -165,7 +167,7 @@ prepare:
 	$(MKDIR) -p $(BUILD_DIRS)
 
 doxygen:
-	$(DOXYGEN) $(DOXYGEN_CONFIG)
+	for i in $(DOXYGEN_CONFIGS); do $(DOXYGEN) $$i; done
 
 doc: doxygen $(DOXYGEN_FORMATS)
 

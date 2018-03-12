@@ -1,10 +1,11 @@
-# PDP3
+PDP3
+====
 
 Renew PDP3 project
 
 [![Travis Build Status](https://api.travis-ci.org/cosmonaut-ok/pdp3.svg?branch=master)](https://travis-ci.org/cosmonaut-ok/pdp3)
 
-## System And Software Requirements
+### System And Software Requirements
 
 - Common:
   - C++ compiler: gcc 4.9+ or LLVM/clang 3.9+ or Intel C++ compiler 18.0+ (experimental, tests fails, but still working) or PGI compiler (experimental) or MSVS 2013 (single thread only)
@@ -18,7 +19,7 @@ Renew PDP3 project
   - MS Visual Studio 2017 or Cygwin with 'make' util (for gcc/clang/icc)
   - anaconda (python scientific environment)
 
-## Terms and Legend
+### Terms and Legend
 
 * `<REQUIRED_VALUE>` - required CLI value (ex. application's parameter, required to launch with)
 * `[OPTIONAL_VALUE]` - optionsl CLI value (ex. application's optional launch parameter)
@@ -27,9 +28,9 @@ Renew PDP3 project
 * `root@host#` - shell terminal prompt for superuser (root). It can be reached by commands `su`, or `sudo -i`, or `sudo <command with all arguments>` from your user
 * `# phrase` - comment in code (in shell-like syntax)
 
-## HOWTO (Linux)
+### HOWTO (Linux)
 
-### 0. Install prerequired software (debian/ubuntu example)
+#### 0. INSTALL PREREQUIRED SOFTWARE (debian/ubuntu example)
 
 ``` shell
 root@host# apt-get install build-essential git doxygen texlive-latex-base
@@ -40,7 +41,7 @@ root@host# apt-get install build-essential git doxygen texlive-latex-base
 root@host# apt-get install clang-<your faforite version> make git doxygen texlive-latex-base libomp5
 ```
 
-### 1. **CLONE PROJECT**
+#### 1. **CLONE PROJECT**
 
 ```shell
 user@host$ git clone https://github.com/cosmonaut-ok/pdp3.git
@@ -48,7 +49,7 @@ user@host$ cd pdp3
 user@host$ git submodule update --init # require to enable external libraries
 ```
 
-### 2. **COMPILE**
+#### 2. **COMPILE**
 
 * **GCC (recommended)**
 
@@ -99,7 +100,7 @@ user@host$ FLAG=value make [action]
 - `LDFLAGS` -  custom C++ linker flags
 - `TARGETDIR` - used with `make dist`, which prepares all, required to start modeling in separate directory
 
-### 3. **TEST (optional)**
+#### 3. **TEST (optional)**
 
 **Functional (end-to-end) testing:**
 
@@ -113,7 +114,7 @@ user@host$ make test # or test-ext for extended testing (require more time)
 user@host$ make test-unit
 ```
 
-### 4. **INSTALLATION (optional)**
+#### 4. **INSTALLATION (optional)**
 
 You can install already compiled pdp3 with it's configfile (aka properties.xml) and required subdirs to separate directory. Just run
 
@@ -123,7 +124,7 @@ user@host$ make dist [TARGETDIR=/path/to/some/target/directory]
 
 Than, you can enter this directory and run pdp3
 
-### 5. **RUN**
+#### 5. **RUN**
 
 After compilation finished, you just need binary file `pdp3` and `parameters.xml`. You can copy this files to somewhere, edit `parameters.xml` and run pdp3
 
@@ -136,7 +137,7 @@ user@host$ nice -20 /path/to/pdp3 [ -h ] | [ -f /path/to/parameters.xml ] # give
 
 > NOTE: it can take several days or weeks, and several hundreds gigabytes of diskspace (yep, it is science, my deer friend).
 
-### 5. **Visualization (generate images or animation)**
+#### 6. **VISUALIZATION (generate images or animation)**
 
 After your application finished modeling, you can build some visual model from generated data. Use python with matplotlib and numpy. [Anaconda](https://www.anaconda.com/download/#linux) as python distribution is recommended.
 
@@ -168,9 +169,9 @@ user@host$ /path/to/repository/with/pdp3/python/images_3_component.py /path/to/p
 
 WAT is *data_set_range* and *frame_range* ? PDP3 saves every modeling frame (step) to file. Number of such frames in one file can be defined in in parameters.xml. So, you getting output as set of files with set of frames in each file. When you generate images, you can define range of files from which you going to generate images and range of frames in each file, from which that images will be generated.
 
-## Hacking
+### Hacking
 
-### Coding Style
+#### Coding Style
 
 - Indentication: 2 spaces
 - Braces: BSD style
@@ -187,9 +188,9 @@ WAT is *data_set_range* and *frame_range* ? PDP3 saves every modeling frame (ste
 - Comments: '//' at line begining
 - File naming: lowercase
 
-### GIT
+#### GIT
 
-#### Before working
+##### Before working
 
 1. Make sure, that you have clean repository and there are no unstaged untracked and uncommited files.
 
@@ -208,7 +209,7 @@ user@host$ git status
 user@host$ git fetch origin --tags
 ```
 
-#### Working
+##### Working
 
 1. Checkout to new branch
 
@@ -226,7 +227,7 @@ user@host$ git commit -m "<your comment>"
 user@host$ git push origin <your-branch-name>
 ```
 
-#### After working
+##### After working
 
 When you finish some logical step of your work, you should merge your changes to master branch (as stable code). You can do it, using "Pull request" in github
 
@@ -238,7 +239,7 @@ When you finish some logical step of your work, you should merge your changes to
 
 4. Wait for travis testing ends and (if they passed), merge your changes to master branch (squash and merge).
 
-### Debug
+#### Debug
 
 **Linux:**
 
