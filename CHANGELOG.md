@@ -1,15 +1,23 @@
+CHANGELOG
+---------
+
 CURRENT
 =======
 
-- Add make target 'dist' to automatically prepare pdp3 run environment
+release-20180314
+================
 
-- Improve velocity calculaction algorhythm
+- add documentation generation
 
-- Add image set generation python script (#24)
+- add make target 'dist' to automatically prepare pdp3 run environment
 
-- Add data files set range feature for building video
+- improve velocity calculaction algorhythm
 
-- Fix early gcc/clang build error, update tinyxml
+- add image set generation python script (#24)
+
+- add data files set range feature for building video
+
+- fix early gcc/clang build error, update tinyxml
 
 - add automatic documentation generation with doxygen
 
