@@ -12,7 +12,7 @@ Renew PDP3 project
   - git (to get sources)
 - Linux:
   - 'make' util
-  - libgomp or libgomp (for clang or gcc)
+  - libomp5 or libgomp (for clang or gcc)
   - python+matplotlib+numpy (or anaconda - python scientific environment)
 - Windows:
   - MS Visual Studio 2017 or Cygwin with 'make' util (for gcc/clang/icc)
