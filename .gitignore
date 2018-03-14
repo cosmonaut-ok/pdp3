@@ -311,5 +311,6 @@ temp/
 test/unit/main
 obj/
 
-doc/latex
-doc/html
+doc/app
+doc/vis
+doc/report
