@@ -1,5 +1,4 @@
-PDP3
-====
+# PDP3
 
 Renew PDP3 project
 
@@ -28,9 +27,9 @@ Renew PDP3 project
 * `root@host#` - shell terminal prompt for superuser (root). It can be reached by commands `su`, or `sudo -i`, or `sudo <command with all arguments>` from your user
 * `# phrase` - comment in code (in shell-like syntax)
 
-### HOWTO (Linux)
+### HOWTO (linux, debian/ubuntu example)
 
-#### 0. INSTALL PREREQUIRED SOFTWARE (debian/ubuntu example)
+#### 0. INSTALL PREREQUIRED SOFTWARE
 
 ``` shell
 root@host# apt-get install build-essential git doxygen texlive-latex-base texlive-latex-extra
@@ -92,7 +91,7 @@ user@host$ FLAG=value make [action]
 - `SINGLETHREAD=yes/no` - Compile binary without multithreading support. Disables all parallelization features
 - `CXX=/foo/bar++` - Use custom c++ compiler (see supported c++ compilers list)
 - `CXXFLAGS="foo bar"` - custom C++ compile flags, used by compiler (overrides all autogeneration flags)
-- `CFLAGS="foo bar"` - same as CFLAGS
+- `CFLAGS="foo bar"` - same as CXXFLAGS
   - `CFLAGS_NO_OPENMP` - used to customize flags, when openmp disabled (used for CXXFLAGS autogeneration)
   - `CFLAGS_OPENMP` -  - used to customize flags, when openmp enabled (used for CXXFLAGS autogeneration)
   - `CFLAGS_DEBUG` - used to customize flags, used when debug enabled (used for CXXFLAGS autogeneration)
@@ -122,7 +121,7 @@ You can install already compiled pdp3 with it's configfile (aka properties.xml) 
 user@host$ make dist [TARGETDIR=/path/to/some/target/directory]
 ```
 
-Than, you can enter this directory and run pdp3
+Than, you can go to this directory and run pdp3
 
 #### 5. **RUN**
 
@@ -130,18 +129,18 @@ After compilation finished, you just need binary file `pdp3` and `parameters.xml
 
 ```shell
 user@host$ mkdir pdp_result # or where you defined in parameters.xml. PDP3 does not use smth. like BOOST::filesystem to operate with directories
+# NOTE: if you preformed `make dist`, you just need `cd /path/to/target/dir`, edit `parameters.xml` (optional) and run `./pdp3`
 user@host$ /path/to/pdp3 [ -h ] | [ -f /path/to/parameters.xml ] # used parameters.xml from current directory, if calling without any options
 # or (much better), launch it as high-priority process
 user@host$ nice -20 /path/to/pdp3 [ -h ] | [ -f /path/to/parameters.xml ] # give some power to pdp3!
 ```
-
-> NOTE: it can take several days or weeks, and several hundreds gigabytes of diskspace (yep, it is science, my deer friend).
+> NOTE: it can take several days or weeks, and several hundred gigabytes of diskspace (yep, it is science, my deer friend).
 
 #### 6. **VISUALIZATION (generate images or animation)**
 
 After your application finished modeling, you can build some visual model from generated data. Use python with matplotlib and numpy. [Anaconda](https://www.anaconda.com/download/#linux) as python distribution is recommended.
 
-**...butt... if you don't want to use anaconda...:**
+**...but... if you don't want to use anaconda...:**
 
 ``` shell
 root@host# apt-get install python3 python3-matplotlib python3-numpy python3-scipy
@@ -159,6 +158,7 @@ root@host# apt-get install ffmpeg
 user@host$ /path/to/repository/with/pdp3/python/movie_3_component.py /path/to/parameters.xml
 # USE: /path/to/repository/with/pdp3/python/movie_3_component.py -h to see list of all available options
 ```
+> NOTE: you may use smth. like `python3 /path/to/repository/with/pdp3/python/movie_3_component.py /path/to/parameters.xml`, if you don't use anaconda.
 
 **Images generation:**
 
@@ -199,9 +199,9 @@ user@host$ git status
 ```
 > NOTE: If you have such files, you commit, remove or move out of your working directory (with pdp3), than reset repository
 > Also, you can just reset repository
-	``` shell
-	user@host$ git reset --hard
-	```
+``` shell
+user@host$ git reset --hard
+```
 
 2. Sync with upstream
 
@@ -219,7 +219,7 @@ user@host$ git checkout -b <your-branch-name> # use only `-` as word delimiters 
 
 2. Make changes, write new code, add new features, experiment etc.
 
-3. Commit your changes (do it as often, as save word document ;) ) and push to upstream
+3. Commit your changes (do it as often, as you press `Ctrl+s` ;) ) and push to upstream
 
 ``` shell
 user@host$ git add . # or git add your/selected/files
