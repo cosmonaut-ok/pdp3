@@ -32,12 +32,12 @@ Renew PDP3 project
 #### 0. INSTALL PREREQUIRED SOFTWARE
 
 ``` shell
-root@host# apt-get install build-essential git doxygen texlive-latex-base texlive-latex-extra
+root@host# apt-get install build-essential git
 ```
 > NOTE: if you are going to use LLVM/clang, you should install different packages
 
 ``` shell
-root@host# apt-get install clang-<your faforite version> make git doxygen texlive-latex-base texlive-latex-extra libomp5
+root@host# apt-get install clang-<your faforite version> make git libomp5
 ```
 
 #### 1. **CLONE PROJECT**
@@ -168,6 +168,27 @@ user@host$ /path/to/repository/with/pdp3/python/images_3_component.py /path/to/p
 ```
 
 WAT is *data_set_range* and *frame_range* ? PDP3 saves every modeling frame (step) to file. Number of such frames in one file can be defined in in parameters.xml. So, you getting output as set of files with set of frames in each file. When you generate images, you can define range of files from which you going to generate images and range of frames in each file, from which that images will be generated.
+
+#### 7. **DOCUMENTATION GENERATION** (optional)
+
+**Pre-required software:**
+
+``` shell
+root@host# doxygen texlive-latex-base texlive-latex-extra
+```
+**Generate:**
+
+``` shell
+user@host$ make doc
+```
+Find documentation in:
+
+- PDF
+  `doc/app/latex/refman.pdf` - application
+  `doc/vis/latex/refman.pdf` - visualization
+- HTML
+  `doc/app/html/index.xhtml` - application
+  `doc/vis/html/index.xhtml` - visualization
 
 ### Hacking
 
