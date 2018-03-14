@@ -144,7 +144,7 @@ $(pdp3_MODULE): $(pdp3_OBJS)
 	$(CXX) $(CXXFLAGS) $(CXXEXTRA) $(DEFINCL) $(LDFLAGS) -o $@ $(pdp3_OBJS) $(pdp3_LIBRARY_PATH) $(pdp3_LIBRARIES:%=-l%)
 
 mrproper: clean
-	$(RM) -r $(TESTDIR) *.avi $(TARGETDIR)
+	$(RM) -r $(TESTDIR) *.avi $(TARGETDIR) *.zip
 
 run: bootstrap
 	./pdp3
@@ -171,7 +171,14 @@ doxygen:
 
 doc: doxygen $(DOXYGEN_FORMATS)
 
-dist: all
+prepare_environment: all
 	$(MKDIR) -p $(TARGETDIR)/$(pdp3_RESULT_DIR)
 	cp pdp3 $(TARGETDIR)
 	sed "s/<path_to_result>.*<\/path_to_result>/<path_to_result>${pdp3_RESULT_DIR}\/<\/path_to_result>/g" parameters.xml > $(TARGETDIR)/parameters.xml
+
+dist: prepare_environment doc
+	cp -r python $(TARGETDIR)/visualization
+	mkdir -p $(TARGETDIR)/doc
+	cp doc/app/latex/refman.pdf $(TARGETDIR)/doc/pdp3.pdf
+	cp doc/vis/latex/refman.pdf $(TARGETDIR)/doc/visualization.pdf
+	zip -r `basename $(TARGETDIR)`.zip $(TARGETDIR)

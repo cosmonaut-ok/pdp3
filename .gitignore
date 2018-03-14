@@ -314,3 +314,4 @@ obj/
 doc/app
 doc/vis
 doc/report
+*.zip
