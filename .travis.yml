@@ -86,6 +86,7 @@ script:
     else
       make test CFLAGS_OPENMP=${CFLAGS_OPENMP};
     fi
+    make test-unit
 
 after_script:
   - make mrproper
