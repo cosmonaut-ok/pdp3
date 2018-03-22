@@ -15,7 +15,7 @@
    version="1.1"
    id="SVGRoot"
    inkscape:version="0.92.1 r15371"
-   sodipodi:docname="cell &amp; components.svg">
+   sodipodi:docname="cell_and_components.svg">
   <sodipodi:namedview
      id="base"
      pagecolor="#ffffff"
@@ -24,15 +24,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.98994949"
-     inkscape:cx="615.43815"
-     inkscape:cy="411.43011"
+     inkscape:cx="137.32527"
+     inkscape:cy="467.99865"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer3"
+     inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1920"
-     inkscape:window-height="991"
+     inkscape:window-width="1366"
+     inkscape:window-height="667"
      inkscape:window-x="0"
-     inkscape:window-y="30"
+     inkscape:window-y="36"
      inkscape:window-maximized="1" />
   <defs
      id="defs10">
@@ -828,28 +828,7 @@
        id="path5973"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cc" />
-    <flowRoot
-       xml:space="preserve"
-       id="flowRoot5994"
-       style="font-style:normal;font-weight:normal;font-size:24px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       transform="scale(0.26458333)"><flowRegion
-         id="flowRegion5996"><rect
-           id="rect5998"
-           width="457.59915"
-           height="293.95435"
-           x="690.94434"
-           y="61.34021" /></flowRegion><flowPara
-         id="flowPara6020" /></flowRoot>    <flowRoot
-       xml:space="preserve"
-       id="flowRoot6034"
-       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"><flowRegion
-         id="flowRegion6036"><rect
-           id="rect6038"
-           width="1.0101526"
-           height="79.802048"
-           x="957.62463"
-           y="341.15247" /></flowRegion><flowPara
-         id="flowPara6040" /></flowRoot>    <path
+    <path
        style="display:inline;fill:none;fill-rule:evenodd;stroke:#0134f2;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:4, 1;stroke-dashoffset:0;stroke-opacity:1;marker-start:url(#DotS);marker-end:url(#marker2091)"
        d="M 35.546847,93.203219 H 52.117558"
        id="path6253"
@@ -927,30 +906,6 @@
        id="path6253-1-3-19"
        inkscape:connector-type="polyline"
        inkscape:connector-curvature="0" />
-    <flowRoot
-       xml:space="preserve"
-       id="flowRoot10495"
-       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       transform="scale(0.26458333)"><flowRegion
-         id="flowRegion10497"><rect
-           id="rect10499"
-           width="38.385796"
-           height="40.406101"
-           x="380.82751"
-           y="233.06612" /></flowRegion><flowPara
-         id="flowPara10501">HHHH</flowPara></flowRoot>    <text
-       xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="99.958809"
-       y="70.752579"
-       id="text10505"><tspan
-         sodipodi:role="line"
-         id="tspan10503"
-         x="99.958809"
-         y="70.752579"
-         style="stroke-width:0.26458332px">H<tspan
-   style="font-size:6.3499999px"
-   id="tspan10513">fi</tspan></tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
@@ -1202,6 +1157,19 @@
        id="path6253-1-3-8-6"
        inkscape:connector-type="polyline"
        inkscape:connector-curvature="0" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="93.35321"
+       y="81.291962"
+       id="text10505-4-3"><tspan
+         sodipodi:role="line"
+         id="tspan10503-7-6"
+         x="93.35321"
+         y="81.291962"
+         style="stroke-width:0.26458332px">H<tspan
+   style="font-size:6.3499999px;stroke-width:0.26458332px"
+   id="tspan10513-8-7">fi</tspan></tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"
