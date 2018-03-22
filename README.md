@@ -174,7 +174,7 @@ WAT is *data_set_range* and *frame_range* ? PDP3 saves every modeling frame (ste
 **Pre-required software:**
 
 ``` shell
-root@host# doxygen texlive-latex-base texlive-latex-extra
+root@host# doxygen texlive-latex-base texlive-latex-extra imagemagick
 ```
 **Generate:**
 
