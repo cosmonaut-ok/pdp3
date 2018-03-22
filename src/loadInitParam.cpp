@@ -33,43 +33,50 @@ LoadInitParam::LoadInitParam(void)
 
 LoadInitParam::LoadInitParam(char *xml_file_name)
 {
-  // NOTE: all system init is too huge,
-  // so we use several "subconstructors"
-  // to initialize different parts of system
+  //! Constructor to initialize start parameters
+  //! from parameters.xml and fill particle arrays.
+  //! each step is separate method
+  
+  //! NOTE: all system init is too huge,
+  //! so we use several "subconstructors"
+  //! to initialize different parts of system
 
   // define openmp-related options when openmp enabled
 #ifdef _OPENMP
   omp_set_dynamic(0); // Explicitly disable dynamic teams
 #endif
 
-  // read XML config file
+  //! Steps to initialize:
+  
+  //! 1. read XML config file
   cout << "Reading configuration file ``" << xml_file_name << "``" << endl;
   read_xml(xml_file_name);
 
-  // load Geometry parameters
+  //! 2. load Geometry parameters
   cout << "Initializing Geometry Parameters" << endl;
   init_geometry();
 
-  // creating field objects
+  //! 3. creating field objects
   cout << "Initializing E/M Fields Data" << endl;
   init_fields ();
 
-  // load time parameters
+  //! 4. load time parameters
   cout << "Initializing Time Data" << endl;
   init_time ();
 
-  // load particle parameters
+  //! 5. load particle parameters
   cout << "Initializing Particles Data" << endl;
   init_particles();
 
-  // load bunch
+  //! 6. load bunch
   cout << "Initializing Particles Bunch Data" << endl;
   init_bunch();
 
-  cout << "Initializing Bounrary Conditions Data" << endl;
+  //! 7. load boundary conditions
+  cout << "Initializing Boundary Conditions Data" << endl;
   init_boundary();
 
-  // load File Path
+  //! 8. load File Path
   cout << "Initializing File System Paths" << endl;
   init_file_saving_parameters();
 
@@ -82,6 +89,7 @@ LoadInitParam::~LoadInitParam(void)
 
 void LoadInitParam::read_xml(const char *xml_file_name)
 {
+  //! read given xml file and fill xml_data class variable
   xml_data = new XMLDocument(true, COLLAPSE_WHITESPACE);
 
   XMLError e_result = xml_data->LoadFile(xml_file_name);
@@ -94,6 +102,8 @@ void LoadInitParam::read_xml(const char *xml_file_name)
 
 void LoadInitParam::init_particles()
 {
+  //! initialize particles charge, mass, number,
+  //! density and temperature for all particle kinds
   const char *p_king_section_name = "particle_kind";
   XMLElement *root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
   XMLElement *particle_kind = root
@@ -110,10 +120,10 @@ void LoadInitParam::init_particles()
 
   Particles *prtls;
 
-  // initialize particles list
+  //! initialize particles list (array)
   p_list = new ParticlesList();
 
-  // creating rho and current arrays
+  //! creating rho and current arrays
   // WARNING! should be called after geometry initialized
   c_rho_new = new ChargeDensity(c_geom);
   c_rho_old = new ChargeDensity(c_geom);
@@ -132,7 +142,7 @@ void LoadInitParam::init_particles()
     right_density = atof(particle_kind->FirstChildElement("right_density")->GetText());
     temperature = atof(particle_kind->FirstChildElement("temperature")->GetText());
 
-    // init and setup particles properties
+    //! init and setup particles properties
     prtls = new Particles(strcpy(new char [50], p_name), charge, mass, number, c_geom);
 		p_list->part_list.push_back(prtls); // push particles to particles list vector
 
@@ -147,7 +157,8 @@ void LoadInitParam::init_particles()
 
 void LoadInitParam::init_bunch()
 {
-  // initialize particles bunch data
+  //! initialize particles bunch data
+  //! particles bunch should be injected to plasma
   XMLElement *root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
   XMLElement *sub_root =root->FirstChildElement (BUNCH_PARAMS_NAME);
 
@@ -184,6 +195,7 @@ void LoadInitParam::init_bunch()
 
 void LoadInitParam::init_boundary ()
 {
+  //! initialize boundaries and boundary conditions
   XMLElement *root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
   XMLElement *sub_root =root->FirstChildElement (BOUNDARY_MAXWELL_PARAMS_NAME);
   //
@@ -215,6 +227,7 @@ void LoadInitParam::init_boundary ()
 
 void LoadInitParam::init_geometry ()
 {
+  //! initialize geometry
   XMLElement *root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
   XMLElement *sub_root =root->FirstChildElement (GEOMETRY_PARAMS_NAME);
   XMLElement *pml_sub_root =root->FirstChildElement (PML_PARAMS_NAME);
@@ -251,7 +264,8 @@ void LoadInitParam::init_geometry ()
 
   c_geom = new Geometry(r_size, z_size, n_grid_r, n_grid_z);
 
-  // add PML to geometry
+  //! add PML to geometry
+  //! Perfectly Matched Layer description: https://en.wikipedia.org/wiki/Perfectly_matched_layer
   if ((comp_l_1 != 0) || (comp_l_2 != 0) || (comp_l_3 != 0))
     c_geom->set_pml(comp_l_1, comp_l_2, comp_l_3, sigma_1_t, sigma_2_t);
 
@@ -260,6 +274,7 @@ void LoadInitParam::init_geometry ()
 
 void LoadInitParam::init_fields ()
 {
+  //! initialize electrical and magnetic fields
   efield = new EField(c_geom);
   hfield = new HField(c_geom);
   efield->boundary_conditions();
@@ -270,6 +285,7 @@ void LoadInitParam::init_fields ()
 
 void LoadInitParam::init_time ()
 {
+  //! initialize time parameters: `start_time`, `relaxation_time` `end_time` and `delta_t`
   XMLElement *root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
   XMLElement *sub_root =root->FirstChildElement (TIME_PARAMS_NAME);
   //
@@ -295,6 +311,8 @@ void LoadInitParam::init_time ()
 
 void LoadInitParam::init_file_saving_parameters ()
 {
+  //! initialize file saving parameters, like path to computed data files,
+  //! path to system state data files max frames number, placed to one file etc.
   XMLElement *root = xml_data->FirstChildElement (INITIAL_PARAMS_NAME);
   XMLElement *sub_root = root->FirstChildElement (FILE_SAVE_PARAMS_NAME);
   XMLElement *dump_data_root = sub_root->FirstChildElement ("dump_data");
@@ -313,7 +331,7 @@ void LoadInitParam::init_file_saving_parameters ()
                          ->FirstChildElement("frames_per_file")
                          ->GetText());
 
-  // dump data configuration
+  //! choose, which parameters should be dumped to data files
   is_dump_e_r = lib::to_bool(dump_data_root->FirstChildElement("E_r")->GetText());
   is_dump_e_phi = lib::to_bool(dump_data_root->FirstChildElement("E_phi")->GetText());
   is_dump_e_z = lib::to_bool(dump_data_root->FirstChildElement("E_z")->GetText());
@@ -327,6 +345,7 @@ void LoadInitParam::init_file_saving_parameters ()
 
 void LoadInitParam::dump_system_state()
 {
+  //! dump system state to file set
   c_io_class->out_field_dump((char*)"E_r", efield->field_r, c_geom->n_grid_1 - 1, c_geom->n_grid_2 - 1);
   c_io_class->out_field_dump((char*)"E_phi", efield->field_phi, c_geom->n_grid_1 - 1, c_geom->n_grid_2 - 1);
   c_io_class->out_field_dump((char*)"E_z", efield->field_z, c_geom->n_grid_1 - 1, c_geom->n_grid_2 - 1);
@@ -348,7 +367,7 @@ void LoadInitParam::dump_system_state()
 
 void LoadInitParam::dump_data(int step_number)
 {
-
+  //! dump claculated data frames (for fields etc.) to files set
   if (is_dump_e_r)
     c_io_class->out_data("E_r", efield->field_r, step_number,
                          frames_per_file, c_geom->n_grid_1 - 1, c_geom->n_grid_2 - 1);
@@ -380,6 +399,8 @@ void LoadInitParam::dump_data(int step_number)
 
 void LoadInitParam::run(void)
 {
+  //! Launch calculation.
+  //! THIS IS ENTRY POINT TO MAIN PDP3 CALCULATION CYCLE
   cout << endl << "Launch Simulation" << endl << endl;
 
   int step_number = 0;
@@ -388,21 +409,23 @@ void LoadInitParam::run(void)
 
   p_list->create_coord_arrays();
 
-  while (c_time->current_time <= c_time->end_time)
+  while (c_time->current_time <= c_time->end_time) //! Main calculation cycle
   {
-    // 0. inject bunch
+    //! Steps:
+    
+    //! 1. inject bunch
     c_bunch->bunch_inject(c_time);
 
-    // 1. Calculate H field
+    //! 2. Calculate H field
     hfield->calc_field(efield, c_time);
 
-    // 2. Calculate v
+    //! 3. Calculate v
     c_current->reset_j();
     c_rho_old->reset_rho();
     c_rho_bunch->reset_rho();
     p_list->step_v(efield, hfield, c_time);
 
-    // 3. Calculate x, calculate J
+    //! 4. Calculate x, calculate J
     p_list->copy_coords();
     // p_list->charge_weighting(c_rho_old); //continuity equation
     p_list->half_step_coord(c_time);
@@ -410,17 +433,17 @@ void LoadInitParam::run(void)
     p_list->half_step_coord(c_time);
     p_list->j_weighting(c_time,c_current);
 
-    // 4. Calculate E
+    //! 5. Calculate E
     // maxwell_rad.probe_mode_exitation(&geom1,&current1, 1,7e8, time1.current_time);
     efield->calc_field(hfield,c_time, c_current);
 
-    //continuity equation
-    c_rho_new->reset_rho();
+    //! 6. Continuity equation
+    c_rho_new->reset_rho(); // TODO: is it 4?
 
-    p_list->charge_weighting(c_rho_new); //continuity equation
+    p_list->charge_weighting(c_rho_new); // continuity equation
     //bool res = continuity_equation(c_time, c_geom, c_current, c_rho_old, c_rho_new);
 
-    // print header on every 20 logging steps
+    //! print header on every 20 logging steps
     if  ((int)(c_time->current_time / c_time->delta_t) % (data_dump_interval*20) == 0)
     {
       cout << endl
@@ -431,7 +454,7 @@ void LoadInitParam::run(void)
            << endl;
     }
 
-    // dump data to corresponding files
+    //! dump data to corresponding files every `parameters.xml->file_save_parameters->data_dump_interval` steps
     if  ((int)(c_time->current_time / c_time->delta_t) % data_dump_interval == 0)
     {
       sprintf(avg_step_exec_time, "%.2f", (double)(time(0) - t1) / data_dump_interval);
