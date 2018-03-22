@@ -167,6 +167,7 @@ prepare:
 	$(MKDIR) -p $(BUILD_DIRS)
 
 doxygen:
+	for i in $(shell ls doc/*.svg); do convert $$i $$(dirname $$i)/$$(basename $$i .svg).png; done
 	for i in $(DOXYGEN_CONFIGS); do $(DOXYGEN) $$i; done
 
 doc: doxygen $(DOXYGEN_FORMATS)
