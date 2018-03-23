@@ -7,6 +7,8 @@ branches:
     - /^.*-with-ci$/
 
 matrix:
+  allow_failure:
+    env: REAL_CC=gcc-4.9 REAL_CXX=g++-4.9
   fast_finish: true
   include:
     ## GCC
@@ -74,6 +76,10 @@ install:
 
 before_install:
   - echo 'Europe/Kiev' | sudo tee /etc/timezone
+  - sudo add-apt-repository -y ppa:jonathonf/ffmpeg-3
+  - sudo apt-get update
+  - sudo apt-get -qq -y install python3 python3-matplotlib python3-numpy python3-scipy ffmpeg xvfb virtualenv
+  - virtualenv --python=python3.6 py3; source py3/bin/activate; pip install matplotlib numpy scipy
 
 before_script:
   - export CC=${REAL_CC}
@@ -81,12 +87,16 @@ before_script:
 
 script:
   - |
+    set -e
     make test-unit CXXFLAGS="-m64 -mcmodel=medium -O2 ${CFLAGS_OPENMP}"
     if [ $TRAVIS_BRANCH = 'master' ]; then
       make test-ext CFLAGS_OPENMP=${CFLAGS_OPENMP};
     else
       make test CFLAGS_OPENMP=${CFLAGS_OPENMP};
     fi
+    source py3/bin/activate
+    xvfb-run python python/movie_3_component.py testdir/parameters.xml --no-view
+    test -f testdir/field_movie.avi
 
 after_script:
   - make mrproper
