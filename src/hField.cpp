@@ -125,10 +125,11 @@ void HField::calc_field(EField *e_field1, Time *time1)
   double alpha;
 
   // Hr - last i value
+#pragma omp parallel for
   for(int k=0; k<(geom1->n_grid_2-1); k++)
   {
     int i=geom1->n_grid_1-1;
-    alpha=((e_field1->field_phi[i][k+1]-e_field1->field_phi[i][k])/geom1->dz)/MAGN_CONST;
+    alpha=(e_field1->field_phi[i][k+1]-e_field1->field_phi[i][k])/(geom1->dz*MAGN_CONST);
 
     field_r_half_time[i][k]=field_r[i][k]+alpha*time1->delta_t/2;
     field_r[i][k] = field_r[i][k]+alpha*time1->delta_t;
