@@ -409,7 +409,8 @@ void LoadInitParam::run(void)
 
   p_list->create_coord_arrays();
 
-  while (c_time->current_time <= c_time->end_time) //! Main calculation cycle
+  //! Main calculation cycle
+  while (c_time->current_time <= c_time->end_time)
   {
     //! Steps:
 
@@ -428,6 +429,7 @@ void LoadInitParam::run(void)
     //! 4. Calculate x, calculate J
     p_list->copy_coords();
 
+    //! FIXME: for some reason charge_weighting has no effect on result
     // p_list->charge_weighting(c_rho_old); //continuity equation
 
     p_list->half_step_coord(c_time);
@@ -437,13 +439,13 @@ void LoadInitParam::run(void)
 
     //! 5. Calculate E
     // maxwell_rad.probe_mode_exitation(&geom1,&current1, 1,7e8, time1.current_time);
-    efield->calc_field(hfield,c_time, c_current);
+    efield->calc_field(hfield, c_time, c_current);
 
     //! 6. Continuity equation
     c_rho_new->reset_rho(); // TODO: is it 4?
 
-    p_list->charge_weighting(c_rho_new); // continuity equation
-    //bool res = continuity_equation(c_time, c_geom, c_current, c_rho_old, c_rho_new);
+    //! FIXME: for some reason charge_weighting has no effect on result
+    // p_list->charge_weighting(c_rho_new); // continuity equation
 
     //! print header on every 20 logging steps
     if  ((int)(c_time->current_time / c_time->delta_t) % (data_dump_interval*20) == 0)
