@@ -110,72 +110,109 @@ void Particles::set_x_0()
 void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
 {
 
-#pragma omp parallel for
+#pragma omp parallel for shared(e_fld, h_fld, t)
   for(int i=0; i<number; i++)
     if (is_alive[i])
     {
       // define vars directly in cycle, because of multithreading
+      double gamma, gamma_inv, b1, b2, b3, e1, e2, e3, vv1, vv2, vv3, const1, const2;
+			// use classical calculations, if velocity lower, than minimal
+			double min_relativistic_velocity = 1e8;
+			bool use_rel; // use relativistic calculations
+
       Triple E_compon(0.0, 0.0, 0.0), B_compon(0.0, 0.0, 0.0);
-      double min_relativistic_velocity = 3e7;
+
       // check if x1 and x3 are correct
       if (isnan(x1[i]) || isinf(x1[i]) != 0 || isnan(x3[i]) || isinf(x3[i]) != 0)
       {
         cerr << "ERROR(step_v): x1[" << i << "] or x3[" << i << "] is not valid number. Can not continue." << endl;
         exit(1);
       }
-      // q*t/2*m
-      double const1 = charge_array[i]*t->delta_t/2.0/mass_array[i];
-
-      // do not caluculate gamma for low velocities.
-      // Try to increse calculation speed
-      double gamma_r = (abs(v1[i]) > min_relativistic_velocity) ? lib::get_gamma(v1[i]) : 1;
-      double gamma_phi = (abs(v2[i]) > min_relativistic_velocity) ? lib::get_gamma(v2[i]) : 1;
-      double gamma_z = (abs(v3[i]) > min_relativistic_velocity) ? lib::get_gamma(v3[i]) : 1;
-      double gamma_inv_r = (abs(v1[i]) > min_relativistic_velocity) ? lib::get_gamma_inv(v1[i]) : 1;
-      double gamma_inv_phi = (abs(v2[i]) > min_relativistic_velocity) ? lib::get_gamma_inv(v2[i]) : 1;
-      double gamma_inv_z = (abs(v3[i]) > min_relativistic_velocity) ? lib::get_gamma_inv(v3[i]) : 1;
+      //! \f$ const1 = \frac{q t}{2 m} \f$
+      //! where \f$ q, m \f$ - particle charge and mass, \f$ t = \frac{\Delta t_{step}}{2} \f$
+      const1 = charge_array[i]*t->delta_t/2.0/mass_array[i];
 
       E_compon = e_fld->get_field(x1[i],x3[i]);
       B_compon = h_fld->get_field(x1[i],x3[i]);
 
-      double e1 = (E_compon.first * const1) / pow(gamma_r, 3);
-      double e2 = (E_compon.second * const1) / pow(gamma_phi, 3);
-      double e3 = (E_compon.third * const1) / pow(gamma_z, 3);
+      e1 = E_compon.first*const1;
+      e2 = E_compon.second*const1;
+      e3 = E_compon.third*const1;
 
-      double b1 = (B_compon.first * MAGN_CONST * const1) / gamma_inv_r; // TODO: is it true with gamma?
-      double b2 = (B_compon.second * MAGN_CONST * const1) / gamma_inv_phi; // TODO: is it true with gamma?
-      double b3 = (B_compon.third * MAGN_CONST * const1) / gamma_inv_z; // TODO: is it true with gamma?
+      b1 = B_compon.first*MAGN_CONST*const1;
+      b2 = B_compon.second*MAGN_CONST*const1;
+      b3 = B_compon.third*MAGN_CONST*const1;
 
-      // 1. Half acceleration in the electric field
-      // u'(n) = u(n-1/2) + q*dt/2/m*E(n)
+      // round very small velicities to avoid exceptions
+      vv1 = (abs(v1[i]) < 1e-15) ? 0 : v1[i];
+      vv2 = (abs(v2[i]) < 1e-15) ? 0 : v2[i];
+      vv3 = (abs(v3[i]) < 1e-15) ? 0 : v3[i];
+
+			//! 0. check, if we should use classical calculations.
+      //! Required to increase modeling speed
+      gamma = 1;
+      gamma_inv = 1;
+			if (v1[i] > min_relativistic_velocity || v2[i] > min_relativistic_velocity || v3[i] > min_relativistic_velocity)
+      {
+        use_rel = true;
+        double sq_velocity = pow(x1[i], 2) + pow(x3[i], 2) + pow(x3[i], 2);
+        gamma = lib::get_gamma(sq_velocity);
+        gamma_inv = lib::get_gamma(sq_velocity);
+      }
+
+      //! 1. Multiplication by relativistic factor (only for relativistic case)
+      //! \f$ u_{n-\frac{1}{2}} = \gamma_{n-\frac{1}{2}}*v_{n-\frac{1}{2}} \f$
+      if (use_rel) {
+        v1[i] = gamma * vv1;
+        v2[i] = gamma * vv2;
+        v3[i] = gamma * vv3;
+      }
+
+      //! 2. Half acceleration in the electric field
+      //! \f$ u'_n = u_{n-\frac{1}{2}} + \frac{q dt}{2 m  E(n)} \f$
+      //! \f$ u'_n = u_{n-1/2} + \frac{q dt}{2 m E(n)} \f$
       v1[i] = v1[i] + e1;
       v2[i] = v2[i] + e2;
       v3[i] = v3[i] + e3;
 
-      // 2. Rotation in the magnetic field
-      // u" = u' + 2/(1+B'^2)[(u' + [u'xB'(n)])xB'(n)]
-      // B'(n) = B(n)*q*dt/2/mass/gamma(n)
-      double const2 = 2.0/(1.0 + pow(b1, 2) + pow(b2, 2) + pow(b3, 2));
+      //! 3. Rotation in the magnetic field
+      //! \f$ u" = u' + \frac{2}{1+B'^2}   [(u' + [u' \times B'(n)] ) \times B'(n)] \f$,
+      //! \f$  B'(n) = \frac{B(n) q dt}{2 m * \gamma_n} \f$
+      if (use_rel) {
+        b1 = b1 / gamma_inv;
+        b2 = b2 / gamma_inv;
+        b3 = b3 / gamma_inv;
+      }
 
-      v1[i] = v1[i] + const2 * (
-        (v2[i] - v1[i] * b3 + v3[i] * b1) * b3 -
-        (v3[i] + v1[i] * b2 - v2[i] * b1) * b2);
+      //! \f$ const2 = \frac{2}{1 + b_1^2 + b_2^2 + b_3^2} \f$
+      const2 = 2.0 / (1.0 + b1*b1 + b2*b2 + b3*b3);
+      vv1 = v1[i];
+      vv2 = v2[i];
+      vv3 = v3[i];
+      v1[i] = vv1 + const2*((vv2 - vv1*b3 + vv3*b1)*b3 - (vv3 + vv1*b2 - vv2*b1)*b2);
+      v2[i] = vv2 + const2*(-(vv1 + vv2*b3 - vv3*b2)*b3 + (vv3 + vv1*b2 - vv2*b1)*b1);
+      v3[i] = vv3 + const2*((vv1 + vv2*b3 - vv3*b2)*b2 - (vv2 - vv1*b3 + vv3*b1)*b1);
 
-      v2[i] = v2[i] + const2 * (
-        -(v1[i] + v2[i] * b3 - v3[i] * b2) * b3 +
-        (v3[i] + v1[i] * b2 - v2[i] * b1) * b1);
-
-      v3[i] = v3[i] + const2 * (
-        (v1[i] + v2[i] * b3 - v3[i] * b2) * b2 -
-        (v2[i] - v1[i] * b3 + v3[i] * b1) * b1);
-
-      // 3. Half acceleration in the electric field
-      // u(n+1/2) = u(n) + q*dt/2/m*E(n)
+      //! 4. Half acceleration in the electric field
+      //! \f$ u_{n+\frac{1}{2}} = u_n + \frac{q dt}{2 m E(n)} \f$
       v1[i] = v1[i] + e1;
       v2[i] = v2[i] + e2;
       v3[i] = v3[i] + e3;
+
+      //! 5. Division by relativistic factor
+      if (use_rel) {
+        v1[i] = v1[i] / gamma_inv;
+        v2[i] = v2[i] / gamma_inv;
+        v3[i] = v3[i] / gamma_inv;
+      }
+
+      //! 6. TODO: back to RZ velocities
     }
 }
+
+
+
+
 
 void Particles::half_step_coord(Time *t)
 {
