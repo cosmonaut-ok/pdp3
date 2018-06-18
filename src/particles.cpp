@@ -210,10 +210,6 @@ void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
     }
 }
 
-
-
-
-
 void Particles::half_step_coord(Time *t)
 {
 // #pragma omp parallel for shared(dr, dz, x1_wall, x3_wall, half_dr, half_dz, x1_wallX2, x3_wallX2, half_dt)
