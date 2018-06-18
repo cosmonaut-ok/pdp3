@@ -36,7 +36,7 @@ LoadInitParam::LoadInitParam(char *xml_file_name)
   //! Constructor to initialize start parameters
   //! from parameters.xml and fill particle arrays.
   //! each step is separate method
-  
+
   //! NOTE: all system init is too huge,
   //! so we use several "subconstructors"
   //! to initialize different parts of system
@@ -47,7 +47,7 @@ LoadInitParam::LoadInitParam(char *xml_file_name)
 #endif
 
   //! Steps to initialize:
-  
+
   //! 1. read XML config file
   cout << "Reading configuration file ``" << xml_file_name << "``" << endl;
   read_xml(xml_file_name);
@@ -412,7 +412,7 @@ void LoadInitParam::run(void)
   while (c_time->current_time <= c_time->end_time) //! Main calculation cycle
   {
     //! Steps:
-    
+
     //! 1. inject bunch
     c_bunch->bunch_inject(c_time);
 
@@ -427,11 +427,13 @@ void LoadInitParam::run(void)
 
     //! 4. Calculate x, calculate J
     p_list->copy_coords();
+
     // p_list->charge_weighting(c_rho_old); //continuity equation
+
     p_list->half_step_coord(c_time);
     p_list->azimuthal_j_weighting(c_time, c_current);
     p_list->half_step_coord(c_time);
-    p_list->j_weighting(c_time,c_current);
+    p_list->j_weighting(c_time, c_current);
 
     //! 5. Calculate E
     // maxwell_rad.probe_mode_exitation(&geom1,&current1, 1,7e8, time1.current_time);
