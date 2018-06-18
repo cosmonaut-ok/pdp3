@@ -123,6 +123,7 @@ void EField::calc_field(HField *h_field1,
   double dz = geom1->dz;
 
   //// Er first[i] value
+#pragma omp parallel for
   for(int k=1; k<(geom1->n_grid_2-1); k++)
   {
     int i=0;
