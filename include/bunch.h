@@ -28,5 +28,4 @@ public:
                            EField  *E_bunch,
                            EField *E,
                            Time *time);
-  virtual void half_step_coord(Time *t);
 };
