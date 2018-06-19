@@ -31,7 +31,7 @@ pdp3_LDFLAGS          =
 pdp3_ARFLAGS          =
 pdp3_LIBRARY_PATH     =
 pdp3_LIBRARIES        =
-pdp3_RESULT_DIR       = 'pdp3_result'
+pdp3_RESULT_DIR       = pdp3_result
 
 ### tinyxml2 sources and settings
 tinyxml2_SUBDIR := $(ROOTDIR)/lib/tinyxml2
