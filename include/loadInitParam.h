@@ -64,6 +64,8 @@ public:
   bool is_dump_h_z;
   bool is_dump_rho_bunch;
 
+  bool is_debug;
+
 private:
   void read_xml(const char *xml_file_name);
   void init_geometry ();

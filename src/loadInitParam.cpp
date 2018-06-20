@@ -98,6 +98,9 @@ void LoadInitParam::read_xml(const char *xml_file_name)
     cerr << "ERROR: Can not read configuration file ``" << xml_file_name << "``" << endl;
     exit (78);
   }
+  //! set DEBUG flag
+  XMLElement *root = xml_data->FirstChildElement(INITIAL_PARAMS_NAME);
+  is_debug = lib::to_bool(root->FirstChildElement("debug")->GetText());
 }
 
 void LoadInitParam::init_particles()
@@ -137,7 +140,9 @@ void LoadInitParam::init_particles()
 
     charge = atof(particle_kind->FirstChildElement("charge")->GetText());
     mass = atof(particle_kind->FirstChildElement("mass")->GetText());
-    number = atof(particle_kind->FirstChildElement("number")->GetText());
+    number = is_debug ?
+      atof(particle_kind->FirstChildElement("debug_number")->GetText()) :
+      atof(particle_kind->FirstChildElement("number")->GetText());
     left_density = atof(particle_kind->FirstChildElement("left_density")->GetText());
     right_density = atof(particle_kind->FirstChildElement("right_density")->GetText());
     temperature = atof(particle_kind->FirstChildElement("temperature")->GetText());
@@ -170,9 +175,13 @@ void LoadInitParam::init_bunch()
   double mass = atof(sub_root
                      ->FirstChildElement("mass")
                      ->GetText());
-  double number = atof(sub_root
-                       ->FirstChildElement("number")
-                       ->GetText());
+  double number = is_debug ?
+    atof(sub_root
+         ->FirstChildElement("debug_number")
+         ->GetText()) :
+    atof(sub_root
+         ->FirstChildElement("number")
+         ->GetText());
   double duration = atof(sub_root
                          ->FirstChildElement("duration")
                          ->GetText());
@@ -239,12 +248,20 @@ void LoadInitParam::init_geometry ()
   double z_size = atof(sub_root->
                        FirstChildElement("z_size")->
                        GetText());
-  int n_grid_r = atoi(sub_root->
-                      FirstChildElement("n_grid_r")->
-                      GetText());
-  int n_grid_z = atoi(sub_root->
-                      FirstChildElement("n_grid_z")->
-                      GetText());
+  int n_grid_r = is_debug ?
+    atoi(sub_root->
+         FirstChildElement("debug_n_grid_r")->
+         GetText()) :
+    atoi(sub_root->
+         FirstChildElement("n_grid_r")->
+         GetText());
+  int n_grid_z = is_debug ?
+    atoi(sub_root->
+         FirstChildElement("debug_n_grid_z")->
+         GetText()) :
+    atoi(sub_root->
+         FirstChildElement("n_grid_z")->
+         GetText());
   // PML
   double comp_l_1 = atof(pml_sub_root->
                          FirstChildElement("comparative_l_1")->
@@ -321,9 +338,13 @@ void LoadInitParam::init_file_saving_parameters ()
   char *path_res = (char*)sub_root->FirstChildElement("path_to_result")->GetText();
   char *path_dump = (char*)sub_root->FirstChildElement("path_to_save_state")->GetText();
 
-  data_dump_interval = atoi(sub_root
-                            ->FirstChildElement("data_dump_interval")
-                            ->GetText());
+  data_dump_interval = is_debug ?
+    atoi(sub_root
+         ->FirstChildElement("debug_data_dump_interval")
+         ->GetText()) :
+    atoi(sub_root
+         ->FirstChildElement("data_dump_interval")
+         ->GetText());
   system_state_dump_interval = atoi(sub_root
                                     ->FirstChildElement("system_state_dump_interval")
                                     ->GetText());
