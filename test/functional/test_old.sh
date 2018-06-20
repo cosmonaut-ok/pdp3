@@ -22,18 +22,18 @@ cat<<EOF>${TESTDIR}/parameters.xml
 <initial_parameters>
 
   <geometry>
-    <r_size>0.25</r_size>
-    <z_size>2.0</z_size>
-    <n_grid_r>255</n_grid_r>
-    <n_grid_z>2047</n_grid_z>
+    <r_size>   0.25  </r_size>
+    <z_size>  2.0  </z_size>
+    <n_grid_r>  255  </n_grid_r>
+    <n_grid_z> 2047</n_grid_z>
   </geometry>
 
   <pml>
     <comparative_l_1>0</comparative_l_1>
-    <comparative_l_2>0</comparative_l_2>
-    <comparative_l_3>0</comparative_l_3>
-    <sigma_1>1e-5</sigma_1>
-    <sigma_2>7e-2</sigma_2>
+    <comparative_l_2> 0 </comparative_l_2>
+    <comparative_l_3> 0 </comparative_l_3>
+    <sigma_1> 0.00001 </sigma_1>
+    <sigma_2> 0.07 </sigma_2>
   </pml>
 
   <time>
@@ -44,48 +44,48 @@ cat<<EOF>${TESTDIR}/parameters.xml
     <delta_t>1e-12</delta_t>
   </time>
 
-  <number_of_part_kinds>2</number_of_part_kinds>
+  <number_of_part_kinds>  2 </number_of_part_kinds>
 
 
-  <particles>
+    <particles>
     <particle_kind>
       <name>Electrons</name>
-      <charge>-1</charge>
-      <mass>1</mass>
-      <number>1e5</number>
-      <left_density>2e16</left_density>
-      <right_density>2.05e16</right_density>
-      <temperature>1.0</temperature>
+      <charge> -1 </charge>
+      <mass> 1 </mass>
+      <number> 1e6</number>
+      <left_density> 2e14</left_density>
+      <right_density>2.05e14  </right_density>
+      <temperature> 1.0 </temperature>
     </particle_kind>
 
     <particle_kind>
       <name>Ions</name>
-      <charge>1</charge>
-      <mass>1836</mass>
-      <number>1e5</number>
-      <left_density>2e16</left_density>
-      <right_density>2.05e16</right_density>
-      <temperature>0.1</temperature>
+      <charge> 1 </charge>
+      <mass> 1836 </mass>
+      <number> 1e6 </number>
+      <left_density> 2e14 </left_density>
+      <right_density> 2.05e14 </right_density>
+      <temperature> 0.1 </temperature>
     </particle_kind>
   </particles>
 
 
   <particles_bunch>
     <name> Electrons </name>
-    <charge>-1</charge>
-    <mass>1</mass>
-    <number>1e6</number>
+    <charge> -1 </charge>
+    <mass> 1 </mass>
+    <number> 1e6</number>
     <duration>1e-8</duration>
     <radius>0.02</radius>
-    <density>1e15</density>
-    <initial_velocity>2e8</initial_velocity>
+    <density> 1e13 </density>
+    <initial_velocity> 3e7 </initial_velocity>
   </particles_bunch>
 
 
   <boundary_maxwell_conditions>
-    <e_fi_upper>0</e_fi_upper>
-    <e_fi_left>0</e_fi_left>
-    <e_fi_right>0</e_fi_right>
+    <e_fi_upper> 0  </e_fi_upper>
+    <e_fi_left> 0 </e_fi_left>
+    <e_fi_right> 0 </e_fi_right>
   </boundary_maxwell_conditions>
 
   <boundary_conditions type = "dirichlet">0</boundary_conditions>
