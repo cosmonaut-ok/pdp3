@@ -17,7 +17,7 @@ LIBRARY_PATH          =
 LIBRARIES             =
 DOXYGEN               = doxygen
 DOXYGEN_CONFIGS       = doc/app.conf doc/vis.conf
-DOXYGEN_FORMATS       = latex html rtf
+DOXYGEN_FORMATS       ?= latex html rtf
 DOXYGEN_DIRS          = doc/app doc/vis
 ROOTDIR               = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
