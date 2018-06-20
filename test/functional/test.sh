@@ -21,9 +21,13 @@ cat<<EOF>${TESTDIR}/parameters.xml
 <!-- edited with XMLSpy v2011 rel. 2 -->
 <initial_parameters>
 
+  <debug>false</debug>
+
   <geometry>
     <r_size>0.25</r_size>
     <z_size>2.0</z_size>
+    <debug_n_grid_r>15</debug_n_grid_r>
+    <debug_n_grid_z>127</debug_n_grid_z>
     <n_grid_r>255</n_grid_r>
     <n_grid_z>2047</n_grid_z>
   </geometry>
@@ -52,6 +56,7 @@ cat<<EOF>${TESTDIR}/parameters.xml
       <name>Electrons</name>
       <charge>-1</charge>
       <mass>1</mass>
+      <debug_number>1e2</debug_number>
       <number>1e5</number>
       <left_density>2e16</left_density>
       <right_density>2.05e16</right_density>
@@ -62,6 +67,7 @@ cat<<EOF>${TESTDIR}/parameters.xml
       <name>Ions</name>
       <charge>1</charge>
       <mass>1836</mass>
+      <debug_number>1e2</debug_number>
       <number>1e5</number>
       <left_density>2e16</left_density>
       <right_density>2.05e16</right_density>
@@ -74,6 +80,7 @@ cat<<EOF>${TESTDIR}/parameters.xml
     <name> Electrons </name>
     <charge>-1</charge>
     <mass>1</mass>
+    <debug_number>1e2</debug_number>
     <number>1e6</number>
     <duration>1e-8</duration>
     <radius>0.02</radius>
@@ -93,6 +100,7 @@ cat<<EOF>${TESTDIR}/parameters.xml
   <file_save_parameters>
     <path_to_result>pdp3_result/</path_to_result>
     <path_to_save_state>pdp3_result/dump/</path_to_save_state>
+    <debug_data_dump_interval>5</debug_data_dump_interval>
     <data_dump_interval>5</data_dump_interval>
     <frames_per_file>100</frames_per_file>
     <system_state_dump_interval>1000</system_state_dump_interval>
@@ -121,7 +129,7 @@ cd pdp3_result
 success="true"
 for i in `find . -type f`; do
     bn=`basename $i`
-    true_md5sum="$(grep ${bn} ../../${TRUE_MD5} | cut -d';' -f1)"
+    true_md5sum="$(egrep ${bn}$ ../../${TRUE_MD5} | cut -d';' -f1)"
     actual_md5sum="$(md5sum ${bn} | cut -d' ' -f1)"
     test "${true_md5sum}" == "${actual_md5sum}" || success="false"
 done
