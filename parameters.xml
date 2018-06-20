@@ -18,16 +18,16 @@
     <comparative_l_1>0</comparative_l_1>
     <comparative_l_2>0</comparative_l_2>
     <comparative_l_3>0</comparative_l_3>
-    <sigma_1>1e-5</sigma_1> <!-- 0.00001 -->
-    <sigma_2>7e-2</sigma_2> <!-- 0.07 -->
+    <sigma_1>1e-5</sigma_1>
+    <sigma_2>7e-2</sigma_2>
   </pml>
 
   <time>
     <start_time>0</start_time>
     <relaxation_time>0</relaxation_time>
     <current_time>0</current_time>
-    <end_time>5e-8</end_time> <!-- 50000 steps -->
-    <delta_t>1e-12</delta_t>
+    <end_time>5e-8</end_time>
+    <delta_t>1e-13</delta_t>
   </time>
 
   <!-- number_of_part_kinds: 2 -->
@@ -39,8 +39,8 @@
       <mass>1</mass> <!-- electron mass -->
       <number>1e6</number>
       <debug_number>1e4</debug_number>
-      <left_density>2e14</left_density>
-      <right_density>2.05e14</right_density>
+      <left_density>1e16</left_density>
+      <right_density>1.05e16</right_density>
       <temperature>1.0</temperature>
     </particle_kind>
 
@@ -50,8 +50,8 @@
       <mass>1836</mass> <!-- electron mass -->
       <number>1e6</number>
       <debug_number>1e4</debug_number>
-      <left_density>2e14</left_density>
-      <right_density>2.05e14</right_density>
+      <left_density>1e16</left_density>
+      <right_density>1.05e16</right_density>
       <temperature>0.1</temperature>
     </particle_kind>
   </particles>
@@ -62,10 +62,10 @@
     <mass>1</mass>
     <number>1e6</number>
     <debug_number>1e4</debug_number>
-    <duration>1e-8</duration>
+    <duration>1e-10</duration>
     <radius>0.02</radius>
-    <density>1e13</density>
-    <initial_velocity>3e7</initial_velocity>
+    <density>1e15</density>
+    <initial_velocity>2e8</initial_velocity>
   </particles_bunch>
 
   <boundary_maxwell_conditions>
