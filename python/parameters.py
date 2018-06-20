@@ -3,6 +3,7 @@
 import os
 from xml.dom import minidom
 from numpy import *
+import json
 
 class Parameters:
     def __init__(self, parameters_file, movie_file=None, clim_e_field_r=[0,1], clim_e_field_z=[0,1]):
@@ -16,10 +17,20 @@ class Parameters:
         ## read parameters_file
         dom_root = minidom.parse(parameters_file)
 
+        # check, if debug used
+        is_debug = json.loads(dom_root.getElementsByTagName('debug')[0].firstChild.data.lower())
+
+        if is_debug:
+            n_grid_r_name = 'debug_n_grid_r'
+            n_grid_z_name = 'debug_n_grid_z'
+        else:
+            n_grid_r_name = 'n_grid_r'
+            n_grid_z_name = 'n_grid_z'            
+            
         # get geometry parameters for gird and ticks
         geometry = dom_root.getElementsByTagName('geometry')[0]
-        self.r_grid_count = int(geometry.getElementsByTagName('n_grid_r')[0].firstChild.data)-1
-        self.z_grid_count = int(geometry.getElementsByTagName('n_grid_z')[0].firstChild.data)-1
+        self.r_grid_count = int(geometry.getElementsByTagName(n_grid_r_name)[0].firstChild.data)-1
+        self.z_grid_count = int(geometry.getElementsByTagName(n_grid_z_name)[0].firstChild.data)-1
         self.r_size = float(geometry.getElementsByTagName('r_size')[0].firstChild.data)
         self.z_size = float(geometry.getElementsByTagName('z_size')[0].firstChild.data)
 
