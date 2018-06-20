@@ -2,11 +2,16 @@
 <!-- edited with XMLSpy v2011 rel. 2 -->
 <initial_parameters>
 
+  <!-- use debug mode with low resolution and macroparticles number and long data dump interval -->
+  <debug>false</debug>
+
   <geometry>
     <r_size>0.25</r_size>
     <z_size>2.0</z_size>
     <n_grid_r>255</n_grid_r>
     <n_grid_z>2047</n_grid_z>
+    <debug_n_grid_r>31</debug_n_grid_r>
+    <debug_n_grid_z>255</debug_n_grid_z>
   </geometry>
 
   <pml>
@@ -32,7 +37,8 @@
       <name>electrons</name>
       <charge>-1</charge>
       <mass>1</mass> <!-- electron mass -->
-      <number>1e6</number> <!-- todo: cells? -->
+      <number>1e6</number>
+      <debug_number>1e4</debug_number>
       <left_density>2e14</left_density>
       <right_density>2.05e14</right_density>
       <temperature>1.0</temperature>
@@ -43,6 +49,7 @@
       <charge>1</charge>
       <mass>1836</mass> <!-- electron mass -->
       <number>1e6</number>
+      <debug_number>1e4</debug_number>
       <left_density>2e14</left_density>
       <right_density>2.05e14</right_density>
       <temperature>0.1</temperature>
@@ -54,6 +61,7 @@
     <charge>-1</charge>
     <mass>1</mass>
     <number>1e6</number>
+    <debug_number>1e4</debug_number>
     <duration>1e-8</duration>
     <radius>0.02</radius>
     <density>1e13</density>
@@ -74,6 +82,7 @@
     <compress_result>true</compress_result><!-- not implemented -->
     <!-- -->
     <data_dump_interval>5</data_dump_interval>
+    <debug_data_dump_interval>20</debug_data_dump_interval>
     <frames_per_file>100</frames_per_file> <!-- how many image frames should be placed in one data file -->
     <system_state_dump_interval>1000</system_state_dump_interval>
     <!-- <time_step>100</time_step>-->
