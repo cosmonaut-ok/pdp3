@@ -27,23 +27,26 @@ namespace lib
     return b;
   }
 
-  double get_gamma (double velocity)
+  double get_gamma (double sq_velocity)
   {
+    //! get_gamma takes squared velocity,
+    //! only because of some features of code
+    //! and optimisation issues
     double gamma, beta;
 
-    beta = pow(velocity, 2) / LIGHT_SPEED_POW_2;
+    beta = sq_velocity / LIGHT_SPEED_POW_2;
 
     if (beta > 1) // it's VERY BAD! Beta should not be more, than 1
     {
       cerr << "CRITICAL!(get_gamma): Lorentz factor aka gamma is complex. Can not continue." << endl
-           << "\tvelocity is: " << velocity << endl;
+           << "\tvelocity is: " << sqrt(sq_velocity) << endl;
       exit(1);
     }
 
     gamma = pow(1.0 - beta, -0.5);
 
     if (isinf(gamma) == 1) { // avoid infinity values
-      cerr << "WARNING(get_gamma): gamma (Lorenz factor) girects to infinity for velocity" << velocity << endl;
+      cerr << "WARNING(get_gamma): gamma (Lorenz factor) girects to infinity for velocity" << sqrt(sq_velocity) << endl;
       return 1e100; // just return some very big value
     }
     else
@@ -52,16 +55,19 @@ namespace lib
     }
   }
 
-  double get_gamma_inv (double velocity)
+  double get_gamma_inv (double sq_velocity)
   {
+    //! get_gamma_inv takes squared velocity,
+    //! only because of some features of code
+    //! and optimisation issues
     double gamma, beta;
 
-    beta = pow(velocity, 2) / LIGHT_SPEED_POW_2;
+    beta = sq_velocity / LIGHT_SPEED_POW_2;
 
     if (beta > 1) // it's VERY BAD! Beta should not be more, than 1
     {
       cerr << "CRITICAL!(get_gamma_inv): Lorentz factor aka gamma is complex. Can not continue." << endl
-           << "\tvelocity is: " << velocity << endl;
+           << "\tvelocity is: " << sqrt(sq_velocity) << endl;
       exit(1);
     }
 
@@ -69,7 +75,7 @@ namespace lib
     gamma = pow(1.0 + beta, 0.5);
 
     if (isinf(gamma) == 1) { // avoid infinity values
-      cerr << "WARNING(get_gamma_inv): gamma (Lorenz factor) girects to infinity for velocity" << velocity << endl;
+      cerr << "WARNING(get_gamma_inv): gamma (Lorenz factor) girects to infinity for velocity" << sqrt(sq_velocity) << endl;
       return 1e100; // just return some very big value
     }
     else
