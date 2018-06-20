@@ -265,17 +265,21 @@ When you finish some logical step of your work, you should merge your changes to
 **Linux:**
 
 1. build project with DEBUG option
-
-``` shell
-user@host$ DEBUG=yes make
-```
-or
-
 ``` shell
 user@host$ make DEBUG=yes
 ```
 
-2. run with gdb
+2. Set options `debug` to `true`,
+
+3. Check out options
+   - `particles->particles_kind->debug_number` (at least `1e4` is recommended)
+   - `particles_bunch->debug_number` (at least `1e4` is recommended)
+   - `geometry->debug_n_grid_r`
+   - `geometry->debug_n_grid_z`
+   - `file_save_parameters->debug_data_dump_interval`
+in `parameters.xml` file before project run.
+
+4. run with gdb
 
 ``` shell
 user@host$ gdb ./pdp3
