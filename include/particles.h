@@ -101,7 +101,6 @@ public:
                                int p_number);
   void azimuthal_j_weighting(Time *time1,
                              Current *j1);
-  double  random_reverse(double vel, int power);
   void set_simple_cell(int **cell_arr_jr,
                        int **cell_arr_jz,
                        int start_number,
