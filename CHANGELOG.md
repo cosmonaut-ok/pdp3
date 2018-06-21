@@ -4,6 +4,22 @@ CHANGELOG
 CURRENT
 =======
 
+- move random_reverse function to lib.cpp as common for all code
+
+- update defaults of parameters.xml to more realistic
+
+- Add jupyter notebook for fast quick wavelength calculation
+
+- Add debug option to parameters.xml
+
+- remove half_step_coord from bunch as duplicated in parent class
+
+- back to old step_v algorithm
+
+- add some doxy-documentation
+
+- add make target improve target
+
 release-20180314
 ================
 
