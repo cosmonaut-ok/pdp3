@@ -83,4 +83,23 @@ namespace lib
       return gamma;
     }
   }
+
+  double random_reverse(double vel, int power)
+  {
+    int int_vel =(int) floor(vel);
+    double ost = 0;
+    double r = 0;
+    int order = 1;
+    while(int_vel >= 1)
+    {
+      ost = int_vel % power;
+
+      r = r + ost * pow((double)power, (-order));
+
+      int_vel = (int_vel - ost)/power;
+      order = order+1;
+    }
+    return r;
+  }
+
 }
