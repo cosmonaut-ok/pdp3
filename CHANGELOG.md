@@ -20,6 +20,8 @@ CURRENT
 
 - add make target improve target
 
+- minor fixes
+
 release-20180314
 ================
 
