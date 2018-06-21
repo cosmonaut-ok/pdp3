@@ -2,6 +2,7 @@
 #include "pdp3Time.h"
 #include "poissonDirichlet.h"
 #include "constant.h"
+#include "lib.h"
 
 using namespace constant;
 
@@ -62,8 +63,8 @@ void Bunch::bunch_inject(Time *time)
 #pragma omp for
     for(int i = 0; i < particles_in_step; i++)
     {
-      double rand_i = random_reverse(start_number + i, 9); // TODO: why 9 and 11?
-      double rand_z = random_reverse(start_number + i, 11);
+      double rand_i = lib::random_reverse(start_number + i, 9); // TODO: why 9 and 11?
+      double rand_z = lib::random_reverse(start_number + i, 11);
 
       x1[i+start_number] = sqrt(half_r_cell_size_pow_2 + const1 * rand_i);
       x3[i+start_number] = dl * rand_z + half_z_cell_size;

@@ -418,9 +418,9 @@ void Particles::velocity_distribution(double tempr_ev)
 #pragma omp parallel for shared(integ_array, lenght_arr, const1, dv)
   for(int i_n=0; i_n<number; i_n++)
   {
-    double Rr = random_reverse(i_n,3);
-    double Rfi = random_reverse(i_n,5);
-    double Rz = random_reverse(i_n,7);
+    double Rr = lib::random_reverse(i_n,3);
+    double Rfi = lib::random_reverse(i_n,5);
+    double Rz = lib::random_reverse(i_n,7);
     double t_z = sqrt(PI/2.0)*therm_vel;
     // R = rand()/(double)32768;
     double f_vr = Rr*t_z;
@@ -479,24 +479,6 @@ void Particles::velocity_distribution(double tempr_ev)
   delete []integ_array;
 }
 
-double Particles::random_reverse(double vel, int power)
-{
-  int int_vel =(int) floor(vel);
-  double ost = 0;
-  double r = 0;
-  int order = 1;
-  while(int_vel >= 1)
-  {
-    ost = int_vel % power;
-
-    r = r + ost * pow((double)power, (-order));
-
-    int_vel = (int_vel - ost)/power;
-    order = order+1;
-  }
-  return r;
-}
-
 void Particles::load_spatial_distribution(double n1, double n2, double left_plasma_boundary, int type)
 {
   // calculate number of electrons in a big particle
@@ -515,8 +497,8 @@ void Particles::load_spatial_distribution(double n1, double n2, double left_plas
 #pragma omp parallel for shared (dr, dz, dn, left_plasma_boundary, n1)
     for(int n = 0; n < number; n++)
     {
-      rand_r = random_reverse(n, 13); // TODO: why 11 and 13?
-      rand_z = random_reverse(number - 1 - n, 11);
+      rand_r = lib::random_reverse(n, 13); // TODO: why 11 and 13?
+      rand_z = lib::random_reverse(number - 1 - n, 11);
       x1[n] = sqrt(rand_r*geom1->first_size*(geom1->first_size-dr)+dr*dr/4.0);
       //x3[n] = (geom1->second_size - dz)*sqrt(rand_z) + dz/2.0;
       x3[n] = (geom1->second_size - left_plasma_boundary - dz)/dn*(sqrt(n1*n1 + rand_z*(2*n1*dn + dn*dn)) - n1) +
@@ -537,13 +519,13 @@ void Particles::load_spatial_distribution(double n1, double n2, double left_plas
 #pragma omp parallel for shared (sigma, R_sq, dz)
     for (int i = 0; i<number;i++)
     {
-      rand_r = random_reverse(i,13);
+      rand_r = lib::random_reverse(i,13);
       double int_rd =   exp(-dr*dr/(8.0*sigma*sigma));
       x1[i]=sigma*sqrt(-2.0*log(int_rd - rand_r*(int_rd-exp(-R_sq/(2.0*sigma*sigma)))));
 
       //x1[i] = (geom1->first_size - dr)*(rand_r)*rand_r + dr/2.0;
       // double tt = exp(-R_sq/(2.0*sigma*sigma));
-      rand_z = random_reverse(number - 1 - i, 11);
+      rand_z = lib::random_reverse(number - 1 - i, 11);
       x3[i] = (geom1->second_size - dz/2.0)*rand_z + dz/2.0;
       //x3[i] = (geom1->second_size - left_plasma_boundary - dz)/dn*(sqrt(n1*n1 + rand_z*(2*n1*dn + dn*dn)) - n1) + left_plasma_boundary + dz/2.0;
     }
@@ -582,8 +564,8 @@ void Particles::load_spatial_distribution_with_variable_mass(double n1,
         exit(1);
       }
 
-      rand_r = random_reverse(n,13);
-      rand_z = random_reverse(number - 1 - n,11);
+      rand_r = lib::random_reverse(n,13);
+      rand_z = lib::random_reverse(number - 1 - n,11);
       x1[n] = (geom1->first_size - dr)*(rand_r) + dr/2.0;
       n_in_big =N_real_i*x1[n]/N_big_for_cell;
       charge_array[n]=charge *n_in_big;
