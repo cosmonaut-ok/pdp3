@@ -1,22 +1,8 @@
-#include <algorithm>
-#include <iomanip>
-#include <ctime>
-#include <math.h>
-
-// enable openmp optional
-#ifdef _OPENMP
-#include <omp.h>
-#else
-#define omp_get_thread_num() 0
-#endif
-
 #include "loadInitParam.h"
-#include "time.h"
-#include "tinyxml2.h"
-#include "lib.h"
 
 using namespace std;
 using namespace tinyxml2;
+using namespace math::fourier;
 
 #define INITIAL_PARAMS_NAME "initial_parameters"
 #define PML_PARAMS_NAME "pml"
@@ -376,11 +362,11 @@ void LoadInitParam::dump_system_state()
   for(unsigned int i=0; i<p_list->part_list.size(); i++)
   {
     c_io_class->out_coord_dump(p_list->part_list[i]->name,
-                               p_list->part_list[i]->x1, p_list->part_list[i]->x3,
+                               p_list->part_list[i]->coord,
                                p_list->part_list[i]->number);
 
     c_io_class->out_velocity_dump(p_list->part_list[i]->name,
-                                  p_list->part_list[i]->v1, p_list->part_list[i]->v2, p_list->part_list[i]->v3,
+                                  p_list->part_list[i]->vel,
                                   p_list->part_list[i]->number);
 
   }

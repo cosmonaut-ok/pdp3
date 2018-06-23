@@ -1,9 +1,9 @@
-#pragma once
-
-// #include <fstream.h>
 #include <sstream>
 #include <iostream>
 #include <math.h>
+#include <algorithm>
+
+#include "constant.h"
 
 using namespace std;
 
