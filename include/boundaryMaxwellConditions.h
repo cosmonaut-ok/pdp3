@@ -1,6 +1,7 @@
-#pragma once
+#include "constant.h"
+
+#include "geometry.h"
 #include "eField.h"
-#include "current.h"
 
 class BoundaryMaxwellConditions
 {

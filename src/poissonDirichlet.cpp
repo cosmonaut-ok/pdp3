@@ -1,7 +1,7 @@
 #include "poissonDirichlet.h"
-#include "constant.h"
 
 using namespace constant;
+using namespace math::fourier;
 
 PoissonDirichlet::PoissonDirichlet(Geometry *cyl_geom):Poisson(cyl_geom)
 {

@@ -1,7 +1,7 @@
 #include "poissonNeumann.h"
-#include "constant.h"
 
 using namespace constant;
+using namespace math::fourier;
 
 PoissonNeumann::PoissonNeumann(Geometry *cyl_geom):Poisson(cyl_geom)
 {
