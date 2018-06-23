@@ -1,4 +1,4 @@
-#include "triple.h"
+#include "math/triple.h"
 
 Triple::Triple(double f, double s, double t)
 {

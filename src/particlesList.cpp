@@ -82,7 +82,7 @@ void ParticlesList::copy_coords()
 #pragma omp parallel for shared (k)
     for(int i=0;i<part_list[k]->number;i++)
     {
-      x1_old[k][i]=part_list[k]->x1[i];
-      x3_old[k][i]=part_list[k]->x3[i];
+      x1_old[k][i]=part_list[k]->coord[i][0];
+      x3_old[k][i]=part_list[k]->coord[i][2];
     }
 }

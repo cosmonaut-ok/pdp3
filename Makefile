@@ -1,9 +1,9 @@
 MKDIR                 = mkdir
-ROOTDIR               = .
-SRCDIR                = $(ROOTDIR)/src
-OBJDIR                = $(ROOTDIR)/obj
-TARGETDIR             ?= $(ROOTDIR)/target
-INCLUDEDIR            = $(ROOTDIR)/include
+ROOTDIR               = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+SRCDIR                = $(ROOTDIR)src
+OBJDIR                = $(ROOTDIR)obj
+TARGETDIR             ?= $(ROOTDIR)target
+INCLUDEDIR            = $(ROOTDIR)include
 SUBDIRS               =
 TESTSUBDIRS           = test/unit
 EXES                  = pdp3
@@ -19,13 +19,12 @@ DOXYGEN               = doxygen
 DOXYGEN_CONFIGS       = doc/app.conf doc/vis.conf
 DOXYGEN_FORMATS       ?= latex html rtf
 DOXYGEN_DIRS          = doc/app doc/vis
-ROOTDIR               = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
 ### pdp3 sources and settings
 pdp3_MODULE           = pdp3
 pdp3_C_SRCS           =
 
-pdp3_CXX_SRCS := $(wildcard $(SRCDIR)/*.cpp)
+pdp3_CXX_SRCS := $(wildcard $(SRCDIR)/*.cpp) $(wildcard $(SRCDIR)/math/*.cpp)
 
 pdp3_LDFLAGS          =
 pdp3_ARFLAGS          =
@@ -34,7 +33,7 @@ pdp3_LIBRARIES        =
 pdp3_RESULT_DIR       = pdp3_result
 
 ### tinyxml2 sources and settings
-tinyxml2_SUBDIR := $(ROOTDIR)/lib/tinyxml2
+tinyxml2_SUBDIR := $(ROOTDIR)lib/tinyxml2
 INCLUDE_PATH += -I$(tinyxml2_SUBDIR)
 SUBDIRS += $(tinyxml2_SUBDIR)
 pdp3_LIBRARIES += tinyxml2
@@ -115,7 +114,7 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 CLEAN_FILES  = y.tab.c y.tab.h lex.yy.c core *.orig *.rej \
                \\\#*\\\# *~ *% .\\\#*
 
-BUILD_DIRS = pdp3_result pdp3_result/Dump $(OBJDIR)
+BUILD_DIRS = pdp3_result pdp3_result/Dump $(OBJDIR) $(OBJDIR)/math
 space :=
 space +=
 comma :=,

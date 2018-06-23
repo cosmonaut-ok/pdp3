@@ -1,9 +1,6 @@
-#pragma once
-#include "particles.h"
 #include <vector>
-#include "chargeDensity.h"
-#include "eField.h"
-#include "hField.h"
+
+#include "particles.h"
 
 using namespace std;
 

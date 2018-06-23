@@ -1,6 +1,9 @@
-#pragma once
 #include <fstream>
 #include <iostream>
+#include <string>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 using namespace std;
 class InputOutputClass
@@ -29,12 +32,9 @@ public:
                  int number,
                  int particles_number);
   void out_coord_dump(char *comp_name,
-                      double *coord_r,
-                      double *coord_z,
+                      double **coord,
                       int particles_number);
   void out_velocity_dump(char *comp_name,
-                         double *v1,
-                         double *v2,
-                         double *v3,
+                         double **vel,
                          int particles_number);
 };
