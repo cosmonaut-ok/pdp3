@@ -1,7 +1,6 @@
 #include "field.h"
 
 using namespace std;
-// using namespace constant;
 
 Field::Field()
 {

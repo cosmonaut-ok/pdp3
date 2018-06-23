@@ -1,7 +1,11 @@
-#pragma once
-#include "hField.h"
+#include <fstream>
+
+#include "math/fourier.h"
+
+#include "constant.h"
+
 #include "eField.h"
-#include "chargeDensity.h"
+#include "geometry.h"
 
 class Poisson
 {
