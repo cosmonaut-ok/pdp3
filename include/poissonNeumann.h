@@ -1,5 +1,5 @@
-#pragma once
 #include "poisson.h"
+#include "constant.h"
 
 class PoissonNeumann :
   public Poisson
