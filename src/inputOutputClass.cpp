@@ -1,8 +1,4 @@
 #include "inputOutputClass.h"
-#include <string>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 InputOutputClass::InputOutputClass(void)
 {
@@ -98,32 +94,33 @@ void InputOutputClass::out_coord(char *comp_name,
 }
 
 void InputOutputClass::out_coord_dump(char *comp_name ,
-                                        double *coord_r,
-                                        double *coord_z,
-                                        int particles_number)
+                                      double **coord,
+                                      // double *coord_r,
+                                      // double *coord_z,
+                                      int particles_number)
 {
   char st_name[100] ;
 
   strcat(strcpy(st_name,this->path_dump),"_coords_");
 
-  //char path[50] = "D:/pdp3 files/_results/";
   strcat(st_name,comp_name);
   ofstream out_val(st_name);
   out_val.setf(std::ios_base::scientific);
   out_val.precision(14);
   for (int i=0; i<particles_number;i++)
   {
-    out_val<<coord_r[i]<<" ";
-    out_val<<coord_z[i]<<" ";
+    out_val<<coord[i][0]<<" ";
+    out_val<<coord[i][2]<<" ";
   }
   out_val.close();
 }
 
 void InputOutputClass::out_velocity_dump(char *comp_name,
-                                            double *v1,
-                                            double *v2,
-                                            double *v3,
-                                            int particles_number)
+                                         double **vel,
+                                         // double *v1,
+                                         // double *v2,
+                                         // double *v3,
+                                         int particles_number)
 {
   char st_name[100] ;
 
@@ -135,9 +132,11 @@ void InputOutputClass::out_velocity_dump(char *comp_name,
   out_val.precision(14);
   for (int i=0; i<particles_number;i++)
   {
-    out_val<<v1[i]<<" ";
-    out_val<<v2[i]<<" ";
-    out_val<<v3[i]<<" ";
+    for (int j=0; j<3; j++)
+      out_val<<vel[i][j]<<" ";
+    // out_val<<v1[i]<<" ";
+    // out_val<<v2[i]<<" ";
+    // out_val<<v3[i]<<" ";
   }
 
   out_val.close();

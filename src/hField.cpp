@@ -1,8 +1,4 @@
 #include "hField.h"
-#include "eField.h"
-#include <cstdlib>
-#include <math.h>
-#include "constant.h"
 
 using namespace constant;
 
