@@ -1,25 +1,28 @@
-#pragma once
-
 #include <fstream>
 #include <iostream>
-#include <math.h>
-
-#include "field.h"
-#include "eField.h"
-#include "hField.h"
-#include "pdp3Time.h"
-#include "particles.h"
-#include "fourier.h"
-#include "poisson.h"
-#include "poissonNeumann.h"
-#include "poissonDirichlet.h"
-#include "particlesList.h"
-#include "boundaryMaxwellConditions.h"
-#include "inputOutputClass.h"
-#include "bunch.h"
-#include "time.h"
+#include <iomanip>
 
 #include "tinyxml2.h"
+
+// enable openmp optional
+#ifdef _OPENMP
+#include <omp.h>
+#else
+#define omp_get_thread_num() 0
+#endif
+
+#include "math/fourier.h"
+
+#include "boundaryMaxwellConditions.h"
+#include "bunch.h"
+#include "current.h"
+#include "geometry.h"
+#include "hField.h"
+#include "inputOutputClass.h"
+#include "particles.h"
+#include "particlesList.h"
+#include "pdp3Time.h"
+#include "poissonDirichlet.h"
 
 using namespace std;
 using namespace tinyxml2;

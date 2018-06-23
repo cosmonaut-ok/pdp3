@@ -1,4 +1,3 @@
-#include <math.h>
 #include "geometry.h"
 
 Geometry::Geometry()

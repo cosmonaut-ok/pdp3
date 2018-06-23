@@ -1,12 +1,19 @@
 #pragma once
+
+#include <string.h>
+
+#include "math/triple.h"
+#include "math/triple_vector.h"
+
+#include "lib.h"
+#include "constant.h"
+
 #include "geometry.h"
 #include "pdp3Time.h"
 #include "chargeDensity.h"
 #include "current.h"
-#include "triple.h"
-#include "particlesList.h"
-#include <fstream>
-#include <iostream>
+#include "eField.h"
+#include "hField.h"
 
 using namespace std;
 
@@ -31,19 +38,36 @@ public:
   // The specie charge in electron charges
   double charge;
   // The specie  *mass
-  double mass; // in electron in electron masses
+  double mass; // in electron masses
   double *mass_array;
   double *charge_array;
   double init_const_mass;
   // Number of particles
   int number;
-  // Particles' coordinates
-  double *x1; //r
-  double *x3; //z
-  // Particles' velocity
-  double *v1; //vr
-  double *v2; //vphi
-  double *v3; //vz
+
+  //! Array of particle coodrinates
+  //! in format:
+  //! \f$ [ [r_1, \phi_1, z_1 ], [ [r_2, \phi_2, z_2 ] ... ] \f$ and
+  //! So, it is 2D array from particles
+  //! which includes arrays of coordinate
+  //! components per particle
+  //!
+  //! You can call: coord[particle_number][component_number]
+  //! to get required coordinate component:
+  //! \f$ 0 for r, 1 for \phi (zeros), 2 for z \f$ )
+  double **coord;
+
+  //! Array of particle velocities
+  //! in format:
+  //! \f$ [ [v_{r_1}, v_{\phi_1}, v_{z_1} ], [ [v_{r_2}, v_{\phi_2}, v_{z_2} ] ... ] \f$
+  //! So, it is 2D array from particles
+  //! which includes arrays of velocity
+  //! components per particle
+  //!
+  //! You can call: coord[particle_number][component_number]
+  //! to get required velocity component:
+  //! \f$ 0 for r, 1 for \phi, 2 for z \f$
+  double **vel;
 
   //indicator if particle is still alive
   int *is_alive;
