@@ -121,7 +121,7 @@ void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
       if (vel[i][0] > min_relativistic_velocity || vel[i][1] > min_relativistic_velocity || vel[i][2] > min_relativistic_velocity)
       {
         use_rel = true;
-        double sq_velocity = pow(coord[i][0], 2) + pow(coord[i][2], 2) + pow(coord[i][2], 2);
+        double sq_velocity = pow(vel[i][0], 2) + pow(vel[i][1], 2) + pow(vel[i][2], 2);
         gamma = lib::get_gamma(sq_velocity);
         gamma_inv = lib::get_gamma(sq_velocity);
       }
