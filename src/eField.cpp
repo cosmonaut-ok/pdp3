@@ -1,12 +1,8 @@
 #include "eField.h"
-#include "hField.h"
-#include "math.h"
-#include "fourier.h"
-#include <fstream>
-#include "constant.h"
 
 using namespace std;
 using namespace constant;
+using namespace math::fourier;
 
 EField::EField()
 {
