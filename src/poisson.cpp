@@ -1,5 +1,4 @@
 #include "poisson.h"
-#include "constant.h"
 
 using namespace constant;
 

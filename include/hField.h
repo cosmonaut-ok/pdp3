@@ -1,10 +1,11 @@
 #pragma once
-#include "pdp3Time.h"
-#include "particles.h"
-#include "fourier.h"
-#include "current.h"
-#include "triple.h"
+
+#include "math/triple.h"
+#include "constant.h"
+
 #include "field.h"
+#include "pdp3Time.h"
+#include "eField.h"
 
 class EField;
 

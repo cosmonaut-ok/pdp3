@@ -1,3 +1,5 @@
+#pragma once
+
 // WARNING!
 // This header file used only to store
 // physical and mathematical constants
