@@ -1,9 +1,18 @@
 #pragma once
+
+#include <fstream>
+
+#include "math/triple.h"
+#include "math/fourier.h"
+
+#include "constant.h"
+
+#include "geometry.h"
 #include "pdp3Time.h"
 #include "chargeDensity.h"
 #include "current.h"
-#include "triple.h"
 #include "field.h"
+#include "hField.h"
 
 class HField;
 

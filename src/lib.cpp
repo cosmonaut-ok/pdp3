@@ -1,13 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <iostream>
-
-#include <algorithm>
-#include <iomanip>
-#include "constant.h"
-
-#include <math.h>
 #include "lib.h"
 
 using namespace std;

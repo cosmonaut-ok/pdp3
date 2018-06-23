@@ -1,4 +1,3 @@
-#pragma once
 #include "poisson.h"
 
 class PoissonDirichlet :
