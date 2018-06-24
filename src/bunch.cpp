@@ -21,9 +21,9 @@ Bunch::Bunch(char *p_name,
   velocity = b_init_velocity;
   //
   double b_lenght = duration*velocity;
-  double n_in_big = PI * pow(radius, 2) * b_lenght * density / number;
-  charge *= n_in_big;
-  mass *= n_in_big;
+  double n_in_macro = PI * pow(radius, 2) * b_lenght * density / number;
+  charge *= n_in_macro;
+  mass *= n_in_macro;
 
 #pragma omp parallel for
   for(int i=0; i<number; i++)
@@ -44,8 +44,8 @@ Bunch::~Bunch(void)
 void Bunch::bunch_inject(Time *time)
 {
   double dl = velocity * time->delta_t;
-  int step_num = duration / time->delta_t;
-  int particles_in_step = number / step_num;
+  int steps_amount = duration / time->delta_t;
+  int particles_in_step = number / steps_amount;
   int start_number = time->current_time / time->delta_t * particles_in_step;
 
   // very local constants
