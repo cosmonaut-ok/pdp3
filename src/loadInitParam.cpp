@@ -137,7 +137,8 @@ void LoadInitParam::init_particles()
     prtls = new Particles(strcpy(new char [50], p_name), charge, mass, number, c_geom);
 		p_list->part_list.push_back(prtls); // push particles to particles list vector
 
-    prtls->load_spatial_distribution_with_variable_mass(left_density,right_density,0,0);
+    // case 2 is for cylindrical distribution
+    prtls->load_spatial_distribution(left_density, right_density, 0, 2);
     prtls->velocity_distribution(temperature);
     particle_kind = particle_kind->NextSiblingElement(p_king_section_name);
   }
