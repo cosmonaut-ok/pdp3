@@ -440,9 +440,16 @@ void LoadInitParam::run(void)
     // p_list->charge_weighting(c_rho_old); //continuity equation
 
     p_list->half_step_coord(c_time);
+    p_list->back_coordinates_to_rz();
+
     p_list->azimuthal_j_weighting(c_time, c_current);
+
     p_list->half_step_coord(c_time);
+    p_list->back_coordinates_to_rz();
+
     p_list->j_weighting(c_time, c_current);
+
+    p_list->back_velocity_to_rz();
 
     //! 5. Calculate E
     // maxwell_rad.probe_mode_exitation(&geom1,&current1, 1,7e8, time1.current_time);
