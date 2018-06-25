@@ -78,6 +78,15 @@ public:
   //with exsisting routine of Maxwell equations integration
   Geometry *geom1;
   ParticlesList *p_list;
+
+private:
+
+  //! service array to convert coordinates from xy to rz pane
+  double *sin_theta_r;
+
+  //! service array to convert coordinates from xy to rz pane
+  double *cos_theta_r;
+
 public:
   void charge_weighting(ChargeDensity *ro1);
   void step_v(EField *e_fld, HField *h_fld, Time *t);
@@ -144,5 +153,8 @@ public:
                              int *i_return,
                              int *k_return,
                              int *accur);
+
+  void back_coordinates_to_rz();
+  void back_velocity_to_rz();
 
 };
