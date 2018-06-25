@@ -31,6 +31,9 @@ Particles::Particles(char const *p_name,
 
   is_alive = new int[number];
 
+  sin_theta_r = new double[number];
+  cos_theta_r = new double[number];
+
 #pragma omp parallel for
   for (int i = 0; i < number; i++)
   {
@@ -201,8 +204,10 @@ void Particles::half_step_coord(Time *t)
       }
       //
       coord[i][0] = coord[i][0] + vel[i][0] * half_dt;
+      coord[i][1] = coord[i][1] + vel[i][1] * half_dt;
       coord[i][2] = coord[i][2] + vel[i][2] * half_dt;
 
+      //! FIXME: fix wall reflections for r-coordinate
       if (coord[i][0] > x1_wall)
       {
         coord[i][0] = x1_wallX2 - coord[i][0];
@@ -1218,4 +1223,37 @@ void Particles::strict_motion_weighting(Time *time1,
     break;
     }
   }
+}
+
+void Particles::back_coordinates_to_rz()
+{
+  //! implementation of backing coodrinates to rz pane
+  //! taken from https://www.particleincell.com/2015/rz-pic/
+#pragma omp parallel for
+  for (int i=0; i<number; i++)
+    if (is_alive[i])
+    {
+      double r = sqrt(coord[i][0] * coord[i][0] + coord[i][1] * coord[i][1]);
+      sin_theta_r[i] = coord[i][1]/r;
+
+      coord[i][0] = r;
+      coord[i][1] = 0;
+    }
+}
+
+void Particles::back_velocity_to_rz()
+{
+  //! implementation of backing velocities to rz pane
+  //! taken from https://www.particleincell.com/2015/rz-pic/
+#pragma omp parallel for
+  for (int i=0; i<number; i++)
+    if (is_alive[i])
+    {
+      // rotate velocity
+      cos_theta_r[i] = sqrt( 1 - sin_theta_r[i] * sin_theta_r[i] );
+      double u_2 = cos_theta_r[i]*vel[i][0] - sin_theta_r[i]*vel[i][1];
+      double v_2 = sin_theta_r[i]*vel[i][0] + cos_theta_r[i]*vel[i][1];
+      vel[i][0] = u_2;
+      vel[i][1] = v_2;
+    }
 }
