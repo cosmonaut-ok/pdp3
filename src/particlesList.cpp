@@ -86,3 +86,15 @@ void ParticlesList::copy_coords()
       x3_old[k][i]=part_list[k]->coord[i][2];
     }
 }
+
+void ParticlesList::back_coordinates_to_rz()
+{
+  for(size_t i = 0; i < part_list.size(); i++)
+    part_list[i]->back_coordinates_to_rz();
+}
+
+void ParticlesList::back_velocity_to_rz()
+{
+  for(size_t i = 0; i < part_list.size(); i++)
+    part_list[i]->back_velocity_to_rz();
+}
