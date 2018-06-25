@@ -15,27 +15,27 @@ class Parameters:
         self.movie_file = movie_file if movie_file else os.path.join(self.config_path, 'field_movie.avi')
 
         ## read parameters_file
-        dom_root = minidom.parse(parameters_file)
+        self.dom_root = minidom.parse(parameters_file)
 
         # check, if debug used
-        is_debug = json.loads(dom_root.getElementsByTagName('debug')[0].firstChild.data.lower())
+        is_debug = json.loads(self.dom_root.getElementsByTagName('debug')[0].firstChild.data.lower())
 
         if is_debug:
             n_grid_r_name = 'debug_n_grid_r'
             n_grid_z_name = 'debug_n_grid_z'
         else:
             n_grid_r_name = 'n_grid_r'
-            n_grid_z_name = 'n_grid_z'            
-            
+            n_grid_z_name = 'n_grid_z'
+
         # get geometry parameters for gird and ticks
-        geometry = dom_root.getElementsByTagName('geometry')[0]
+        geometry = self.dom_root.getElementsByTagName('geometry')[0]
         self.r_grid_count = int(geometry.getElementsByTagName(n_grid_r_name)[0].firstChild.data)-1
         self.z_grid_count = int(geometry.getElementsByTagName(n_grid_z_name)[0].firstChild.data)-1
         self.r_size = float(geometry.getElementsByTagName('r_size')[0].firstChild.data)
         self.z_size = float(geometry.getElementsByTagName('z_size')[0].firstChild.data)
 
         # get file to save parameters
-        file_save_parameters = dom_root.getElementsByTagName('file_save_parameters')[0]
+        file_save_parameters = self.dom_root.getElementsByTagName('file_save_parameters')[0]
 
         # get data_path
         local_data_path = file_save_parameters.getElementsByTagName('path_to_result')[0].firstChild.data
@@ -59,10 +59,12 @@ class Parameters:
             self.system_state_path = os.path.join(self.config_path, local_system_state_path)
 
         ## get normalization parameters
-        bunch = dom_root.getElementsByTagName('particles_bunch');
+        bunch = self.dom_root.getElementsByTagName('particles_bunch');
         bunch_density = float(bunch.item(0).getElementsByTagName('density')[0].firstChild.data);
+        bunch_initial_velocity = float(bunch.item(0).getElementsByTagName('initial_velocity')[0].firstChild.data);
 
         self.bunch_density = bunch_density # particles density of electron/ion bunch
+        self.bunch_initial_velocity = bunch_initial_velocity # particles velocity of electron/ion bunch
 
         self.clim_e_field_r = clim_e_field_r # r-component of E field
         self.clim_e_field_z = clim_e_field_z # z-component of E field
