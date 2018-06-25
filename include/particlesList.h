@@ -24,4 +24,8 @@ public:
   void azimuthal_j_weighting(Time *time1, Current *j1);
   void create_coord_arrays(void);
   void copy_coords(void);
+
+  void back_coordinates_to_rz();
+  void back_velocity_to_rz();
+
 };
