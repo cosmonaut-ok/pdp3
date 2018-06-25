@@ -285,3 +285,10 @@ in `parameters.xml` file before project run.
 user@host$ gdb ./pdp3
 (gdb) run ## or perform some modifications first than run, e.g. set breakpoints
 ```
+
+#### Tools
+
+Quick analytic calculator of plasma (aka Langmur) frequency, wake wavelength, Debye length etc. from parameters.xml file
+``` shell
+user@host$ ./python/quick_calculator.py <path/to/parameters.xml>
+```
