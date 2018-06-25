@@ -450,19 +450,21 @@ void Particles::velocity_distribution(double tempr_ev)
   delete []integ_array;
 }
 
+
 void Particles::load_spatial_distribution(double n1, double n2, double left_plasma_boundary, int type)
+//! calculate number of charged physical particles in macroparticle
 {
-  // calculate number of electrons in a big particle
   double rand_r;
   double rand_z;
   double dr = geom1->dr;
   double dz = geom1->dz;
   double dn = n2 - n1;
+
   switch (type)
   {
   case 0:
   {
-    double n_in_macro = (PI*geom1->first_size*geom1->first_size*geom1->second_size/number*(n2+n1)/2.0);
+    double n_in_macro = (PI * pow(geom1->first_size, 2) * geom1->second_size / number * (n2 + n1) / 2);
     charge *= n_in_macro;
     mass *= n_in_macro;
 #pragma omp parallel for shared (dr, dz, dn, left_plasma_boundary, n1)
@@ -470,82 +472,59 @@ void Particles::load_spatial_distribution(double n1, double n2, double left_plas
     {
       rand_r = lib::random_reverse(n, 13); // TODO: why 11 and 13?
       rand_z = lib::random_reverse(number - 1 - n, 11);
-      coord[n][0] = sqrt(rand_r*geom1->first_size*(geom1->first_size-dr)+dr*dr/4.0);
+      coord[n][0] = sqrt(rand_r * geom1->first_size * (geom1->first_size - dr) + pow(dr, 2) / 4);
       //coord[n][2] = (geom1->second_size - dz)*sqrt(rand_z) + dz/2.0;
-      coord[n][2] = (geom1->second_size - left_plasma_boundary - dz)/dn*(sqrt(n1*n1 + rand_z*(2*n1*dn + dn*dn)) - n1) +
-        left_plasma_boundary + dz/2.0;
-      mass_array[n]=mass;
-      charge_array[n]=charge;
+      coord[n][2] = (geom1->second_size - left_plasma_boundary - dz) / dn * (sqrt(pow(n1, 2) + rand_z * (2 * n1 * dn + pow(dn, 2))) - n1) + left_plasma_boundary + dz / 2;
+      mass_array[n] = mass;
+      charge_array[n] = charge;
     }
   }
   break;
   case 1: //Normal distribution
   {
     double sigma = 0.01;
-    double n_in_macro = (PI*geom1->second_size*(n2+n1)*sigma*sigma*(1.0-exp(-geom1->first_size*geom1->first_size/(2.0*sigma*sigma)))/number);
+    double n_in_macro = (PI * geom1->second_size * (n2 + n1) * pow(sigma, 2) * (1.0 - exp(-geom1->first_size * geom1->first_size / (2 * pow(sigma, 2)))) / number);
     charge *= n_in_macro;
     mass *= n_in_macro;
-    double R_sq= (geom1->first_size - dr/2.0)*(geom1->first_size - dr/2.0 );
+    double R_sq = (geom1->first_size - dr / 2) * (geom1->first_size - dr / 2);
     // double tt=0;
 #pragma omp parallel for shared (sigma, R_sq, dz)
     for (int i = 0; i<number;i++)
     {
       rand_r = lib::random_reverse(i,13);
-      double int_rd =   exp(-dr*dr/(8.0*sigma*sigma));
+      double int_rd = exp(-dr*dr/(8.0*sigma*sigma));
       coord[i][0]=sigma*sqrt(-2.0*log(int_rd - rand_r*(int_rd-exp(-R_sq/(2.0*sigma*sigma)))));
 
       //coord[i][0] = (geom1->first_size - dr)*(rand_r)*rand_r + dr/2.0;
       // double tt = exp(-R_sq/(2.0*sigma*sigma));
       rand_z = lib::random_reverse(number - 1 - i, 11);
-      coord[i][2] = (geom1->second_size - dz/2.0)*rand_z + dz/2.0;
+      coord[i][2] = (geom1->second_size - dz / 2) * rand_z + dz/2;
       //coord[i][2] = (geom1->second_size - left_plasma_boundary - dz)/dn*(sqrt(n1*n1 + rand_z*(2*n1*dn + dn*dn)) - n1) + left_plasma_boundary + dz/2.0;
     }
   }
   break;
-  }
-}
 
-void Particles::load_spatial_distribution_with_variable_mass(double n1,
-                                                             double n2,
-                                                             double left_plasma_boundary,
-                                                             int type)
-{
-  // calculate number of electrons in a big particle
-  double rand_r;
-  double rand_z;
-  double dr = geom1->dr*1.00000001; // TODO: why?
-  double dz = geom1->dz*1.00000001; // TODO: why?
-  double dn = n2 - n1;
-  switch (type)
+  case 2: // cylindrical distribution
   {
-  case 0:
-  {
-
-    double N_big_for_cell=(double) number/( (double) geom1->n_grid_1*geom1->n_grid_2);
-    double N_real_i = 8.0*PI*(n2+n1)/2.0*dr*dz;
-    double n_in_macro =0;
+    double N_big_for_cell = (double)number / ((double)geom1->n_grid_1 * geom1->n_grid_2);
+    double N_real_i = PI * (n2 + n1) / 2 * dr * dz;
+    double n_in_macro = 0;
 
 #pragma omp parallel for shared(dr, dz, dn, left_plasma_boundary, n1, n2) private(rand_r, rand_z, n_in_macro)
     for(int n = 0; n < number; n++)
     {
-      // check if x1 and x3 are correct
-      if (isnan(coord[n][0]) || isinf(coord[n][0]) != 0 || isnan(coord[n][2]) || isinf(coord[n][2]) != 0)
-      {
-        cerr << "ERROR(load_spatial_distribution_with_variable_mass): x1[" << n << "] or x3[" << n << "] is not valid number. Can not continue." << endl;
-        exit(1);
-      }
-
-      rand_r = lib::random_reverse(n,13);
-      rand_z = lib::random_reverse(number - 1 - n,11);
-      coord[n][0] = (geom1->first_size - dr)*(rand_r) + dr/2.0;
-      n_in_macro =N_real_i*coord[n][0]/N_big_for_cell;
-      charge_array[n]=charge *n_in_macro;
-      mass_array[n]= mass*n_in_macro;
+      rand_r = lib::random_reverse(n, 13);
+      rand_z = lib::random_reverse(number - 1 - n, 11);
+      coord[n][0] = (geom1->first_size - dr) * rand_r + dr / 2;
+      n_in_macro = N_real_i * coord[n][0] / N_big_for_cell;
+      charge_array[n] = charge * n_in_macro;
+      mass_array[n] = mass * n_in_macro;
       //coord[n][2] = (geom1->second_size - dz)*(rand_z) + dz/2;
       //coord[n][2] = (geom1->second_size - dz)*sqrt(rand_z) + dz/2.0;
 
-      coord[n][2] = (geom1->second_size - left_plasma_boundary - dz)/dn*(sqrt(n1*n1 + rand_z*(2*n1*dn + dn*dn)) - n1) +
-        left_plasma_boundary + dz/2.0;
+      coord[n][2] = (geom1->second_size - left_plasma_boundary - dz)
+        / dn * (sqrt(pow(n1, 2) + rand_z * (2 * n1 * dn + pow(dn, 2))) - n1)
+        + left_plasma_boundary + dz / 2;
     }
   }
   break;
