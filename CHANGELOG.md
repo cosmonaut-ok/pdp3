@@ -4,6 +4,20 @@ CHANGELOG
 CURRENT
 =======
 
+- rename directory python to tools
+
+- add quick analytic calculator from parameters.xml
+
+- fix particles distribution loading
+
+- fix cylindrical coordinates pusher
+
+- update python notebook for wake wave calculation
+
+- improve math:
+  - move math functions to separate namespace
+  - add functions for operations with 3D vectors (Triple-class based)
+
 - move random_reverse function to lib.cpp as common for all code
 
 - update defaults of parameters.xml to more realistic

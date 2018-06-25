@@ -95,7 +95,7 @@ script:
       make test CFLAGS_OPENMP=${CFLAGS_OPENMP};
     fi
     source py3/bin/activate
-    xvfb-run python python/movie_3_component.py testdir/parameters.xml --no-view
+    xvfb-run python tools/movie_3_component.py testdir/parameters.xml --no-view
     test -f testdir/field_movie.avi
 
 after_script:
