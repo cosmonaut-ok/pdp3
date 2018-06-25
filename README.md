@@ -155,16 +155,16 @@ root@host# apt-get install ffmpeg
 **Animation generation:**
 
 ``` shell
-user@host$ /path/to/repository/with/pdp3/python/movie_3_component.py /path/to/parameters.xml
-# USE: /path/to/repository/with/pdp3/python/movie_3_component.py -h to see list of all available options
+user@host$ /path/to/repository/with/pdp3/tools/movie_3_component.py /path/to/parameters.xml
+# USE: /path/to/repository/with/pdp3/tools/movie_3_component.py -h to see list of all available options
 ```
-> NOTE: you may use smth. like `python3 /path/to/repository/with/pdp3/python/movie_3_component.py /path/to/parameters.xml`, if you don't use anaconda.
+> NOTE: you may use smth. like `python3 /path/to/repository/with/pdp3/tools/movie_3_component.py /path/to/parameters.xml`, if you don't use anaconda.
 
 **Images generation:**
 
 ``` shell
-user@host$ /path/to/repository/with/pdp3/python/images_3_component.py /path/to/parameters.xml --data_set_range=1:2 --frame_range=3:4
-# USE: /path/to/repository/with/pdp3/python/images_3_component.py -h to see list of all available options
+user@host$ /path/to/repository/with/pdp3/tools/images_3_component.py /path/to/parameters.xml --data_set_range=1:2 --frame_range=3:4
+# USE: /path/to/repository/with/pdp3/tools/images_3_component.py -h to see list of all available options
 ```
 
 WAT is *data_set_range* and *frame_range* ? PDP3 saves every modeling frame (step) to file. Number of such frames in one file can be defined in in parameters.xml. So, you getting output as set of files with set of frames in each file. When you generate images, you can define range of files from which you going to generate images and range of frames in each file, from which that images will be generated.
@@ -290,5 +290,5 @@ user@host$ gdb ./pdp3
 
 Quick analytic calculator of plasma (aka Langmur) frequency, wake wavelength, Debye length etc. from parameters.xml file
 ``` shell
-user@host$ ./python/quick_calculator.py <path/to/parameters.xml>
+user@host$ ./tools/quick_calculator.py <path/to/parameters.xml>
 ```

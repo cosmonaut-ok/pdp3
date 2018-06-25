@@ -122,7 +122,7 @@ comma :=,
 clean: $(SUBDIRS:%=%/__clean__) $(EXTRASUBDIRS:%=%/__clean__) $(TESTSUBDIRS:%=%/__clean__) $(DOXYGEN_FORMATS:%=%/__clean__)
 	$(RM) $(pdp3_OBJS) $(CLEAN_FILES)
 	$(RM) $(LIBS) $(EXES) $(EXES:%=%.so)
-	$(RM) -r $(BUILD_DIRS) $(ROOTDIR)/python/__pycache__/
+	$(RM) -r $(BUILD_DIRS) $(ROOTDIR)/tools/__pycache__/
 	$(RM) -r $(DOXYGEN_DIRS)
 
 $(SUBDIRS:%=%/__clean__): dummy
@@ -177,7 +177,7 @@ prepare_environment: all
 	sed "s/<path_to_result>.*<\/path_to_result>/<path_to_result>${pdp3_RESULT_DIR}\/<\/path_to_result>/g" parameters.xml > $(TARGETDIR)/parameters.xml
 
 dist: prepare_environment doc
-	cp -r python $(TARGETDIR)/visualization
+	cp -r tools $(TARGETDIR)/tools
 	mkdir -p $(TARGETDIR)/doc
 	cp doc/app/latex/refman.pdf $(TARGETDIR)/doc/pdp3.pdf
 	cp doc/vis/latex/refman.pdf $(TARGETDIR)/doc/visualization.pdf
