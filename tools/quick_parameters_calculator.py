@@ -60,11 +60,7 @@ def main():
 
     config = Parameters(args.properties_path)
 
-    dom_root = config.dom_root
-
-    prt = dom_root.getElementsByTagName('particles')[0];
-    prt = prt.getElementsByTagName('particle_kind')
-    for i in prt:
+    for i in config.particles:
         if i.getElementsByTagName('name')[0].firstChild.data == 'electrons':
             left_el_density = float(i.getElementsByTagName('left_density')[0].firstChild.data)
             right_el_density = float(i.getElementsByTagName('right_density')[0].firstChild.data)
@@ -84,6 +80,9 @@ def main():
         print("Expected wake wavelength is %.2g m"%(wake_len))
         print("Expected Debye length is %.4g m"%(debye))
         print("Initial bunch velocity is %.4g m/s"%(config.bunch_initial_velocity))
+        print()
+        print("Estimated bunch passage time is %.4g s"%(config.z_size / config.bunch_initial_velocity))
+        print("Number of calculation steps is %.0g"%((config.end_time - config.start_time) / config.step_interval))
 
 ## call main function
 if __name__ == "__main__":
