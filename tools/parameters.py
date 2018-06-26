@@ -60,8 +60,8 @@ class Parameters:
 
         ## get normalization parameters
         bunch = self.dom_root.getElementsByTagName('particles_bunch');
-        bunch_density = float(bunch.item(0).getElementsByTagName('density')[0].firstChild.data);
-        bunch_initial_velocity = float(bunch.item(0).getElementsByTagName('initial_velocity')[0].firstChild.data);
+        bunch_density = float(bunch.item(0).getElementsByTagName('density')[0].firstChild.data)
+        bunch_initial_velocity = float(bunch.item(0).getElementsByTagName('initial_velocity')[0].firstChild.data)
 
         self.bunch_density = bunch_density # particles density of electron/ion bunch
         self.bunch_initial_velocity = bunch_initial_velocity # particles velocity of electron/ion bunch
@@ -69,3 +69,13 @@ class Parameters:
         self.clim_e_field_r = clim_e_field_r # r-component of E field
         self.clim_e_field_z = clim_e_field_z # z-component of E field
         self.clim_e_field_bunch = [-(bunch_density*1.6e-19), 0] # E field of electron/ion bunch
+
+        # get particles
+        particles = self.dom_root.getElementsByTagName('particles')[0];
+        self.particles = particles.getElementsByTagName('particle_kind')
+
+        # get time
+        time = self.dom_root.getElementsByTagName('time')[0];
+        self.start_time = float(time.getElementsByTagName('start_time')[0].firstChild.data)
+        self.end_time = float(time.getElementsByTagName('end_time')[0].firstChild.data)
+        self.step_interval = float(time.getElementsByTagName('delta_t')[0].firstChild.data)
