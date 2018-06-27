@@ -44,13 +44,6 @@ def wake_length(density, beam_velocity):
     lambda_ = 2* math.pi * beam_velocity / w_p
     return lambda_
 
-
-
-
-####################################################################################################
-
-
-
 def main():
     parser = argparse.ArgumentParser(description='Process some integers.')
     parser.add_argument('properties_path', metavar='properties_path', type=str,
@@ -75,11 +68,14 @@ def main():
         wake_len = wake_length(el_density, config.bunch_initial_velocity)
         el_temperature = eV2kelvin(el_temperature)
         debye = debye_length(el_density, el_temperature)
+        bunch_part_number = math.pi * math.pow(config.bunch_radius, 2) * config.bunch_density * config.bunch_initial_velocity
 
         print("Expected plasma frequency is %.4g Hz"%(w_p/(2 * math.pi)))
         print("Expected wake wavelength is %.2g m"%(wake_len))
         print("Expected Debye length is %.4g m"%(debye))
         print("Initial bunch velocity is %.4g m/s"%(config.bunch_initial_velocity))
+        print("Particles bunch length is %.4g m"%(config.bunch_duration * config.bunch_initial_velocity))
+        print("Number of particles in bunch is %.2g"%(bunch_part_number))
         print()
         print("Estimated bunch passage time is %.4g s"%(config.z_size / config.bunch_initial_velocity))
         print("Number of calculation steps is %.0g"%((config.end_time - config.start_time) / config.step_interval))
