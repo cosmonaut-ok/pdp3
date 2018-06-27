@@ -50,28 +50,9 @@ namespace lib
     //! get_gamma_inv takes squared velocity,
     //! only because of some features of code
     //! and optimisation issues
-    double gamma, beta;
+    double gamma = pow(1.0 + sq_velocity / LIGHT_SPEED_POW_2, 0.5);
 
-    beta = sq_velocity / LIGHT_SPEED_POW_2;
-
-    if (beta > 1) // it's VERY BAD! Beta should not be more, than 1
-    {
-      cerr << "CRITICAL!(get_gamma_inv): Lorentz factor aka gamma is complex. Can not continue." << endl
-           << "\tvelocity is: " << sqrt(sq_velocity) << endl;
-      exit(1);
-    }
-
-    // gamma = pow(1.0 - beta, -0.5);
-    gamma = pow(1.0 + beta, 0.5);
-
-    if (isinf(gamma) == 1) { // avoid infinity values
-      cerr << "WARNING(get_gamma_inv): gamma (Lorenz factor) girects to infinity for velocity" << sqrt(sq_velocity) << endl;
-      return 1e100; // just return some very big value
-    }
-    else
-    {
-      return gamma;
-    }
+    return gamma;
   }
 
   double random_reverse(double vel, int power)
