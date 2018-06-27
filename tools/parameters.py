@@ -61,9 +61,13 @@ class Parameters:
         ## get normalization parameters
         bunch = self.dom_root.getElementsByTagName('particles_bunch');
         bunch_density = float(bunch.item(0).getElementsByTagName('density')[0].firstChild.data)
+        bunch_duration = float(bunch.item(0).getElementsByTagName('duration')[0].firstChild.data)
+        bunch_radius = float(bunch.item(0).getElementsByTagName('radius')[0].firstChild.data)
         bunch_initial_velocity = float(bunch.item(0).getElementsByTagName('initial_velocity')[0].firstChild.data)
 
         self.bunch_density = bunch_density # particles density of electron/ion bunch
+        self.bunch_duration = bunch_duration
+        self.bunch_radius = bunch_radius
         self.bunch_initial_velocity = bunch_initial_velocity # particles velocity of electron/ion bunch
 
         self.clim_e_field_r = clim_e_field_r # r-component of E field
