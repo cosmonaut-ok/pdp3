@@ -68,7 +68,7 @@ def main():
         wake_len = wake_length(el_density, config.bunch_initial_velocity)
         el_temperature = eV2kelvin(el_temperature)
         debye = debye_length(el_density, el_temperature)
-        bunch_part_number = math.pi * math.pow(config.bunch_radius, 2) * config.bunch_density * config.bunch_initial_velocity
+        bunch_part_number = math.pi * math.pow(config.bunch_radius, 2) * config.bunch_duration * config.bunch_initial_velocity * config.bunch_density
 
         print("Expected plasma frequency is %.4g Hz"%(w_p/(2 * math.pi)))
         print("Expected wake wavelength is %.2g m"%(wake_len))
