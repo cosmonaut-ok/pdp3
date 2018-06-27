@@ -83,9 +83,9 @@ void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
     if (is_alive[i])
     {
       // define vars directly in cycle, because of multithreading
-      double gamma, gamma_inv, const1, const2;
+      double gamma, const1, const2, sq_velocity;
       // use classical calculations, if velocity lower, than minimal
-      double min_relativistic_velocity = 1e8;
+      double min_relativistic_velocity = 5e7;
       bool use_rel; // use relativistic calculations
 
       Triple E_compon(0.0, 0.0, 0.0),
@@ -96,7 +96,10 @@ void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
         vtmp(0.0, 0.0, 0.0);
 
       // check if x1 and x3 are correct
-      if (isnan(coord[i][0]) || isinf(coord[i][0]) != 0 || isnan(coord[i][2]) || isinf(coord[i][2]) != 0)
+      if (isnan(coord[i][0]) ||
+          isinf(coord[i][0]) != 0 ||
+          isnan(coord[i][2]) ||
+          isinf(coord[i][2]) != 0)
       {
         cerr << "ERROR(step_v): x1[" << i << "] or x3[" << i << "] is not valid number. Can not continue." << endl;
         exit(1);
@@ -105,8 +108,8 @@ void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
       //! where \f$ q, m \f$ - particle charge and mass, \f$ t = \frac{\Delta t_{step}}{2} \f$
       const1 = charge_array[i]*t->delta_t/2.0/mass_array[i];
 
-      E_compon = e_fld->get_field(coord[i][0],coord[i][2]);
-      B_compon = h_fld->get_field(coord[i][0],coord[i][2]);
+      E_compon = e_fld->get_field(coord[i][0], coord[i][2]);
+      B_compon = h_fld->get_field(coord[i][0], coord[i][2]);
 
       e = math::triple_vector::product(E_compon, const1);
       b = math::triple_vector::product(B_compon, MAGN_CONST * const1);
@@ -120,19 +123,19 @@ void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
       //! 0. check, if we should use classical calculations.
       //! Required to increase modeling speed
       gamma = 1;
-      gamma_inv = 1;
-      if (vel[i][0] > min_relativistic_velocity || vel[i][1] > min_relativistic_velocity || vel[i][2] > min_relativistic_velocity)
-      {
+      if (velocity.first > min_relativistic_velocity ||
+          velocity.second > min_relativistic_velocity ||
+          velocity.third > min_relativistic_velocity)
         use_rel = true;
-        double sq_velocity = pow(vel[i][0], 2) + pow(vel[i][1], 2) + pow(vel[i][2], 2);
-        gamma = lib::get_gamma(sq_velocity);
-        gamma_inv = lib::get_gamma(sq_velocity);
-      }
 
       //! 1. Multiplication by relativistic factor (only for relativistic case)
       //! \f$ u_{n-\frac{1}{2}} = \gamma_{n-\frac{1}{2}}*v_{n-\frac{1}{2}} \f$
       if (use_rel)
+      {
+        sq_velocity = pow(velocity.first, 2) + pow(velocity.second, 2) + pow(velocity.third, 2);
+        gamma = lib::get_gamma(sq_velocity);
         velocity = math::triple_vector::product(velocity, gamma);
+      }
 
       //! 2. Half acceleration in the electric field
       //! \f$ u'_n = u_{n-\frac{1}{2}} + \frac{q dt}{2 m  E(n)} \f$
@@ -143,8 +146,11 @@ void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
       //! \f$ u" = u' + \frac{2}{1+B'^2}   [(u' + [u' \times B'(n)] ) \times B'(n)] \f$,
       //! \f$  B'(n) = \frac{B(n) q dt}{2 m * \gamma_n} \f$
       if (use_rel)
-        b = math::triple_vector::product(b, 1/gamma_inv);
-
+      {
+        sq_velocity = pow(velocity.first, 2) + pow(velocity.second, 2) + pow(velocity.third, 2);
+        gamma = lib::get_gamma_inv(sq_velocity);
+        b = math::triple_vector::product(b, 1/gamma);
+      }
       //! \f$ const2 = \frac{2}{1 + b_1^2 + b_2^2 + b_3^2} \f$
       const2 = 2.0 / (1.0 + b.first * b.first + b.second * b.second + b.third * b.third);
 
@@ -170,8 +176,11 @@ void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
       velocity = math::triple_vector::sum(velocity, e);
 
       //! 5. Division by relativistic factor
-      if (use_rel) {
-        velocity = math::triple_vector::product(velocity, 1/gamma_inv);
+      if (use_rel)
+      {
+        sq_velocity = pow(velocity.first, 2) + pow(velocity.second, 2) + pow(velocity.third, 2);
+        gamma = lib::get_gamma_inv(sq_velocity);
+        velocity = math::triple_vector::product(velocity, 1/gamma);
       }
       vel[i][0] = velocity.first;
       vel[i][1] = velocity.second;
