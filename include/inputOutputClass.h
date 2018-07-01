@@ -25,14 +25,14 @@ public:
                 int z_step);
   void out_field_dump(char *comp_name,double **out_value,int r_step,int z_step);
 
-  void out_coord(char *comp_name,
-                 double *coord_r,
-                 double *coord_z,
+  void out_pos(char *comp_name,
+                 double *pos_r,
+                 double *pos_z,
                  int step_number,
                  int number,
                  int particles_number);
-  void out_coord_dump(char *comp_name,
-                      double **coord,
+  void out_pos_dump(char *comp_name,
+                      double **pos,
                       int particles_number);
   void out_velocity_dump(char *comp_name,
                          double **vel,
