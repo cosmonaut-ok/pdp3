@@ -61,9 +61,9 @@ void InputOutputClass::out_field_dump(char *comp_name,
 }
 
 /////
-void InputOutputClass::out_coord(char *comp_name,
-                                   double *coord_r,
-                                   double *coord_z,
+void InputOutputClass::out_pos(char *comp_name,
+                                   double *pos_r,
+                                   double *pos_z,
                                    int step_number,
                                    int number,
                                    int particles_number)
@@ -86,22 +86,22 @@ void InputOutputClass::out_coord(char *comp_name,
   out_val.precision(14);
   for (int i=0; i<particles_number;i++)
   {
-    out_val<<coord_r[i]<<" ";
-    out_val<<coord_z[i]<<" ";
+    out_val<<pos_r[i]<<" ";
+    out_val<<pos_z[i]<<" ";
   }
 
   out_val.close();
 }
 
-void InputOutputClass::out_coord_dump(char *comp_name ,
-                                      double **coord,
-                                      // double *coord_r,
-                                      // double *coord_z,
+void InputOutputClass::out_pos_dump(char *comp_name ,
+                                      double **pos,
+                                      // double *pos_r,
+                                      // double *pos_z,
                                       int particles_number)
 {
   char st_name[100] ;
 
-  strcat(strcpy(st_name,this->path_dump),"_coords_");
+  strcat(strcpy(st_name,this->path_dump),"_poss_");
 
   strcat(st_name,comp_name);
   ofstream out_val(st_name);
@@ -109,8 +109,8 @@ void InputOutputClass::out_coord_dump(char *comp_name ,
   out_val.precision(14);
   for (int i=0; i<particles_number;i++)
   {
-    out_val<<coord[i][0]<<" ";
-    out_val<<coord[i][2]<<" ";
+    out_val<<pos[i][0]<<" ";
+    out_val<<pos[i][2]<<" ";
   }
   out_val.close();
 }
