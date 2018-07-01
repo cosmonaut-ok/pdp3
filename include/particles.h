@@ -44,17 +44,30 @@ public:
   // Number of particles
   int number;
 
-  //! Array of particle coodrinates
+  //! Array of particle position
   //! in format:
   //! \f$ [ [r_1, \phi_1, z_1 ], [ [r_2, \phi_2, z_2 ] ... ] \f$ and
   //! So, it is 2D array from particles
   //! which includes arrays of coordinate
   //! components per particle
   //!
-  //! You can call: coord[particle_number][component_number]
+  //! You can call: pos[particle_number][component_number]
   //! to get required coordinate component:
   //! \f$ 0 for r, 1 for \phi (zeros), 2 for z \f$ )
-  double **coord;
+  double **pos;
+
+  //! Array of particle old position
+  //! (on previous step. Required for current weighting)
+  //! in format:
+  //! \f$ [ [r_1, \phi_1, z_1 ], [ [r_2, \phi_2, z_2 ] ... ] \f$ and
+  //! So, it is 2D array from particles
+  //! which includes arrays of coordinate
+  //! components per particle
+  //!
+  //! You can call: pos_old[particle_number][component_number]
+  //! to get required coordinate component:
+  //! \f$ 0 for r, 1 for \phi (zeros), 2 for z \f$ )
+  double **pos_old;
 
   //! Array of particle velocities
   //! in format:
@@ -63,7 +76,7 @@ public:
   //! which includes arrays of velocity
   //! components per particle
   //!
-  //! You can call: coord[particle_number][component_number]
+  //! You can call: vel[particle_number][component_number]
   //! to get required velocity component:
   //! \f$ 0 for r, 1 for \phi, 2 for z \f$
   double **vel;
@@ -80,16 +93,16 @@ public:
 
 private:
 
-  //! service array to convert coordinates from xy to rz pane
+  //! service array to convert position from xy to rz pane
   double *sin_theta_r;
 
-  //! service array to convert coordinates from xy to rz pane
+  //! service array to convert position from xy to rz pane
   double *cos_theta_r;
 
 public:
   void charge_weighting(ChargeDensity *ro1);
   void step_v(EField *e_fld, HField *h_fld, Time *t);
-  virtual void half_step_coord(Time *t);
+  virtual void half_step_pos(Time *t);
   void set_j_0();
   void set_v_0();
   void set_x_0();
@@ -121,9 +134,7 @@ public:
                                    int i_n,
                                    int k_n,
                                    int p_number);
-  void j_weighting(Time *time1,
-                   Current *j1,
-                   double *x1,double *x3);
+  void j_weighting(Time *time1, Current *j1);
   void strict_motion_weighting(Time *time1,
                                Current *j1,
                                double x1_new,
@@ -153,7 +164,8 @@ public:
                              int *k_return,
                              int *accur);
 
-  void back_coordinates_to_rz();
+  void back_position_to_rz();
   void back_velocity_to_rz();
 
+  void dump_position_to_old();
 };
