@@ -144,7 +144,6 @@ void LoadInitParam::init_particles()
   }
 
   p_list->charge_weighting(c_rho_new);
-  // p_list->create_coord_arrays();
 }
 
 void LoadInitParam::init_bunch()
@@ -362,8 +361,8 @@ void LoadInitParam::dump_system_state()
   c_io_class->out_field_dump((char*)"H_z", hfield->field_z, c_geom->n_grid_1 - 1, c_geom->n_grid_2 - 1);
   for(unsigned int i=0; i<p_list->part_list.size(); i++)
   {
-    c_io_class->out_coord_dump(p_list->part_list[i]->name,
-                               p_list->part_list[i]->coord,
+    c_io_class->out_pos_dump(p_list->part_list[i]->name,
+                               p_list->part_list[i]->pos,
                                p_list->part_list[i]->number);
 
     c_io_class->out_velocity_dump(p_list->part_list[i]->name,
@@ -415,8 +414,6 @@ void LoadInitParam::run(void)
   time_t t1 = time(0);
   char avg_step_exec_time[24]; // rounded and formatted average step execution time
 
-  p_list->create_coord_arrays();
-
   //! Main calculation cycle
   while (c_time->current_time <= c_time->end_time)
   {
@@ -435,18 +432,18 @@ void LoadInitParam::run(void)
     p_list->step_v(efield, hfield, c_time);
 
     //! 4. Calculate x, calculate J
-    p_list->copy_coords();
+    p_list->dump_position_to_old();
 
     //! FIXME: for some reason charge_weighting has no effect on result
     // p_list->charge_weighting(c_rho_old); //continuity equation
 
-    p_list->half_step_coord(c_time);
-    p_list->back_coordinates_to_rz();
+    p_list->half_step_pos(c_time);
+    p_list->back_position_to_rz();
 
     p_list->azimuthal_j_weighting(c_time, c_current);
 
-    p_list->half_step_coord(c_time);
-    p_list->back_coordinates_to_rz();
+    p_list->half_step_pos(c_time);
+    p_list->back_position_to_rz();
 
     p_list->j_weighting(c_time, c_current);
 
