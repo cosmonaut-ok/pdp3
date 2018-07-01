@@ -1,6 +1,7 @@
 #pragma once
 
-#include "math/triple.h"
+#include "math/tiny_vector3d.h"
+
 #include "constant.h"
 
 #include "field.h"
@@ -24,7 +25,7 @@ public:
   ~HField(void);
   void calc_field(EField *e_field1, Time *time1);
   void set_homogeneous_h(double E_r, double E_phi, double E_z);
-  Triple get_field(double x1, double x3);
+  double* get_field(double x1, double x3);
 
   double *get_1d_field_r();
   double *get_1d_field_phi();
