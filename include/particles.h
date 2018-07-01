@@ -2,8 +2,7 @@
 
 #include <string.h>
 
-#include "math/triple.h"
-#include "math/triple_vector.h"
+#include "math/tiny_vector3d.h"
 
 #include "lib.h"
 #include "constant.h"
