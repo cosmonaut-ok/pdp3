@@ -6,6 +6,11 @@ test -z $TESTDIR && TESTDIR=testingdir
 test -z $TRUE_MD5 && TRUE_MD5=test/functional/true_md5sums
 test -z $TRUE_EXT_MD5 && TRUE_EXT_MD5=test/functional/true_ext_md5sums
 
+## Set some colors
+RED='\e[31m'
+GREEN='\e[32m'
+NC='\e[0m' # No Color
+
 if [ -n "$1" ] && [ "$1" == "extended" ]; then
     END_TIME=1.05e-10
     TRUE_MD5=$TRUE_EXT_MD5
@@ -102,7 +107,7 @@ cat<<EOF>${TESTDIR}/parameters.xml
     <path_to_save_state>pdp3_result/dump/</path_to_save_state>
     <debug_data_dump_interval>5</debug_data_dump_interval>
     <data_dump_interval>5</data_dump_interval>
-    <frames_per_file>100</frames_per_file>
+    <frames_per_file>1</frames_per_file>
     <system_state_dump_interval>1000</system_state_dump_interval>
     <dump_data>
       <E_r>true</E_r>
@@ -131,7 +136,12 @@ for i in `find . -type f`; do
     bn=`basename $i`
     true_md5sum="$(egrep ${bn}$ ../../${TRUE_MD5} | cut -d';' -f1)"
     actual_md5sum="$(md5sum ${bn} | cut -d' ' -f1)"
-    test "${true_md5sum}" == "${actual_md5sum}" || success="false"
+    if test "${true_md5sum}" == "${actual_md5sum}"; then
+	printf "%-20b %-20b\n" "file $bn" "${GREEN}match${NC}"
+    else
+	printf "%-20b %-20b\n" "file $bn" "${RED}not match${NC}"
+	success="false"
+    fi
 done
 
 if [ "$success" == "false" ]; then
