@@ -62,8 +62,8 @@ void Bunch::bunch_inject(Time *time)
       double rand_i = lib::random_reverse(start_number + i, 9); // TODO: why 9 and 11?
       double rand_z = lib::random_reverse(start_number + i, 11);
 
-      coord[i+start_number][0] = sqrt(half_r_cell_size_pow_2 + const1 * rand_i);
-      coord[i+start_number][2] = dl * rand_z + half_z_cell_size;
+      pos[i+start_number][0] = sqrt(half_r_cell_size_pow_2 + const1 * rand_i);
+      pos[i+start_number][2] = dl * rand_z + half_z_cell_size;
       vel[i+start_number][2] = velocity;
       vel[i+start_number][0] = 0;
       vel[i+start_number][1] = 0; // fi velocity;
@@ -71,8 +71,8 @@ void Bunch::bunch_inject(Time *time)
     }
 
 #pragma omp for
-    for(int i = 0; i < number; i++)
-      if(coord[i][2]>(geom1->second_size - half_z_cell_size))
+    for (int i = 0; i < number; i++)
+      if (pos[i][2] > (geom1->second_size - half_z_cell_size))
       {
         is_alive[i]=false;
       }
