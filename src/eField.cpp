@@ -284,8 +284,8 @@ void EField::tridiagonal_solve(const double *a,
     x[i] = d[i] - c[i] * x[i + 1];
 }
 
-// function for electric field weighting
-Triple EField::get_field(double x1, double x3)
+double* EField::get_field(double x1, double x3)
+//! function for electric field weighting
 {
   int i_r = 0; // number of particle i cell
   int k_z = 0; // number of particle k cell
@@ -392,7 +392,7 @@ Triple EField::get_field(double x1, double x3)
   // weighting Efi[i+1][k+1]
   efi += field_phi[i_r+1][k_z+1]*PI*dz2*(r3*r3-r2*r2)/vol_2;
 
-  Triple components(er, efi, ez);
+  double* components = math::tiny_vector3d::mkvector3d(er, efi, ez);
 
   return components;
 }
