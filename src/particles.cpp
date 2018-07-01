@@ -2,6 +2,7 @@
 
 using namespace std;
 using namespace constant;
+using namespace math;
 
 // C^2 define c^2 to decrease number of operations
 const double LIGHT_SPEED_POW_2 = pow (LIGHT_SPEED, 2);
@@ -88,12 +89,10 @@ void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
       double min_relativistic_velocity = 5e7;
       bool use_rel; // use relativistic calculations
 
-      Triple E_compon(0.0, 0.0, 0.0),
-        B_compon(0.0, 0.0, 0.0),
-        e(0.0, 0.0, 0.0),
-        b(0.0, 0.0, 0.0),
-        velocity(0.0, 0.0, 0.0),
-        vtmp(0.0, 0.0, 0.0);
+      double* e;
+      double* b;
+      double vtmp[3];
+      double velocity[3];
 
       // check if x1 and x3 are correct
       if (isnan(coord[i][0]) ||
@@ -106,85 +105,88 @@ void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
       }
       //! \f$ const1 = \frac{q t}{2 m} \f$
       //! where \f$ q, m \f$ - particle charge and mass, \f$ t = \frac{\Delta t_{step}}{2} \f$
-      const1 = charge_array[i]*t->delta_t/2.0/mass_array[i];
+      const1 = charge_array[i]*t->delta_t/(2 * mass_array[i]);
 
-      E_compon = e_fld->get_field(coord[i][0], coord[i][2]);
-      B_compon = h_fld->get_field(coord[i][0], coord[i][2]);
+      e = e_fld->get_field(coord[i][0], coord[i][2]);
+      b = h_fld->get_field(coord[i][0], coord[i][2]);
 
-      e = math::triple_vector::product(E_compon, const1);
-      b = math::triple_vector::product(B_compon, MAGN_CONST * const1);
+      tiny_vector3d::product(e, const1);
+      tiny_vector3d::product(b, MAGN_CONST * const1);
 
       // set velocity vector components and
       // round very small velicities to avoid exceptions
-      velocity.first = (abs(vel[i][0]) < 1e-15) ? 0 : vel[i][0];
-      velocity.second = (abs(vel[i][1]) < 1e-15) ? 0 : vel[i][1];
-      velocity.third = (abs(vel[i][2]) < 1e-15) ? 0 : vel[i][2];
+      velocity[0] = (abs(vel[i][0]) < 1e-15) ? 0 : vel[i][0];
+      velocity[1] = (abs(vel[i][1]) < 1e-15) ? 0 : vel[i][1];
+      velocity[2] = (abs(vel[i][2]) < 1e-15) ? 0 : vel[i][2];
 
       //! 0. check, if we should use classical calculations.
       //! Required to increase modeling speed
       gamma = 1;
-      if (velocity.first > min_relativistic_velocity ||
-          velocity.second > min_relativistic_velocity ||
-          velocity.third > min_relativistic_velocity)
+      if (velocity[0] > min_relativistic_velocity ||
+          velocity[1] > min_relativistic_velocity ||
+          velocity[2] > min_relativistic_velocity)
         use_rel = true;
 
       //! 1. Multiplication by relativistic factor (only for relativistic case)
       //! \f$ u_{n-\frac{1}{2}} = \gamma_{n-\frac{1}{2}}*v_{n-\frac{1}{2}} \f$
       if (use_rel)
       {
-        sq_velocity = pow(velocity.first, 2) + pow(velocity.second, 2) + pow(velocity.third, 2);
+        sq_velocity = tiny_vector3d::squared_sum(velocity);
         gamma = lib::get_gamma(sq_velocity);
-        velocity = math::triple_vector::product(velocity, gamma);
+        tiny_vector3d::product(velocity, gamma);
       }
 
       //! 2. Half acceleration in the electric field
       //! \f$ u'_n = u_{n-\frac{1}{2}} + \frac{q dt}{2 m  E(n)} \f$
       //! \f$ u'_n = u_{n-1/2} + \frac{q dt}{2 m E(n)} \f$
-      velocity = math::triple_vector::sum(velocity, e);
+      tiny_vector3d::add(velocity, e);
 
       //! 3. Rotation in the magnetic field
       //! \f$ u" = u' + \frac{2}{1+B'^2}   [(u' + [u' \times B'(n)] ) \times B'(n)] \f$,
       //! \f$  B'(n) = \frac{B(n) q dt}{2 m * \gamma_n} \f$
       if (use_rel)
       {
-        sq_velocity = pow(velocity.first, 2) + pow(velocity.second, 2) + pow(velocity.third, 2);
+        sq_velocity = tiny_vector3d::squared_sum(velocity);
         gamma = lib::get_gamma_inv(sq_velocity);
-        b = math::triple_vector::product(b, 1/gamma);
+        tiny_vector3d::div(b, gamma);
       }
       //! \f$ const2 = \frac{2}{1 + b_1^2 + b_2^2 + b_3^2} \f$
-      const2 = 2.0 / (1.0 + b.first * b.first + b.second * b.second + b.third * b.third);
+      const2 = 2.0 / (1.0 + tiny_vector3d::squared_sum(b));
 
       // set temporary velocity as old values
       // to calculate magnetic rotation
-      vtmp = velocity;
+      tiny_vector3d::copy_components(velocity, vtmp);
 
-      velocity.first = vtmp.first + const2 * (
-        (vtmp.second - vtmp.first * b.third + vtmp.third * b.first) * b.third
-        - (vtmp.third + vtmp.first * b.second - vtmp.second * b.first) * b.second
+      velocity[0] = vtmp[0] + const2 * (
+        (vtmp[1] - vtmp[0] * b[2] + vtmp[2] * b[0]) * b[2]
+        - (vtmp[2] + vtmp[0] * b[1] - vtmp[1] * b[0]) * b[1]
         );
-      velocity.second = vtmp.second + const2 * (
-        -(vtmp.first + vtmp.second * b.third - vtmp.third * b.second) * b.third
-        + (vtmp.third + vtmp.first * b.second - vtmp.second * b.first) * b.first
+      velocity[1] = vtmp[1] + const2 * (
+        -(vtmp[0] + vtmp[1] * b[2] - vtmp[2] * b[1]) * b[2]
+        + (vtmp[2] + vtmp[0] * b[1] - vtmp[1] * b[0]) * b[0]
         );
-      velocity.third = vtmp.third + const2 * (
-        (vtmp.first + vtmp.second * b.third - vtmp.third * b.second) * b.second
-        - (vtmp.second - vtmp.first * b.third + vtmp.third * b.first) * b.first
+      velocity[2] = vtmp[2] + const2 * (
+        (vtmp[0] + vtmp[1] * b[2] - vtmp[2] * b[1]) * b[1]
+        - (vtmp[1] - vtmp[0] * b[2] + vtmp[2] * b[0]) * b[0]
         );
 
       //! 4. Half acceleration in the electric field
       //! \f$ u_{n+\frac{1}{2}} = u_n + \frac{q dt}{2 m E(n)} \f$
-      velocity = math::triple_vector::sum(velocity, e);
+      tiny_vector3d::add(velocity, e);
 
       //! 5. Division by relativistic factor
       if (use_rel)
       {
-        sq_velocity = pow(velocity.first, 2) + pow(velocity.second, 2) + pow(velocity.third, 2);
+        sq_velocity = tiny_vector3d::squared_sum(velocity);
         gamma = lib::get_gamma_inv(sq_velocity);
-        velocity = math::triple_vector::product(velocity, 1/gamma);
+        tiny_vector3d::div(velocity, gamma);
       }
-      vel[i][0] = velocity.first;
-      vel[i][1] = velocity.second;
-      vel[i][2] = velocity.third;
+      vel[i][0] = velocity[0];
+      vel[i][1] = velocity[1];
+      vel[i][2] = velocity[2];
+
+      delete [] e;
+      delete [] b;
     }
 }
 
