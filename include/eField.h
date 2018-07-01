@@ -2,7 +2,8 @@
 
 #include <fstream>
 
-#include "math/triple.h"
+#include "math/tiny_vector3d.h"
+
 #include "math/fourier.h"
 
 #include "constant.h"
@@ -32,7 +33,7 @@ public:
   void set_homogeneous_efield(double E_r, double E_phi, double E_z);
   void set_fi_on_z();
   void boundary_conditions();
-  Triple get_field(double x1, double x3);
+  double* get_field(double x1, double x3);
   bool test_poisson_equation(ChargeDensity *rho);
   void tridiagonal_solve(const double *a,
                          const double *b,
