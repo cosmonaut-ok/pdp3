@@ -108,7 +108,7 @@ cat<<EOF>${TESTDIR}/parameters.xml
     <debug_data_dump_interval>5</debug_data_dump_interval>
     <data_dump_interval>5</data_dump_interval>
     <frames_per_file>1</frames_per_file>
-    <system_state_dump_interval>1000</system_state_dump_interval>
+    <system_state_dump_interval>2</system_state_dump_interval>
     <dump_data>
       <E_r>true</E_r>
       <E_phi>false</E_phi>
@@ -125,7 +125,7 @@ cat<<EOF>${TESTDIR}/parameters.xml
 EOF
 
 cd ${TESTDIR}
-mkdir -p pdp3_result/Dump
+mkdir -p pdp3_result/dump
 time ./pdp3
 
 cd pdp3_result
@@ -135,11 +135,11 @@ success="true"
 for i in `find . -type f`; do
     bn=`basename $i`
     true_md5sum="$(egrep ${bn}$ ../../${TRUE_MD5} | cut -d';' -f1)"
-    actual_md5sum="$(md5sum ${bn} | cut -d' ' -f1)"
+    actual_md5sum="$(md5sum ${i} | cut -d' ' -f1)"
     if test "${true_md5sum}" == "${actual_md5sum}"; then
-	printf "%-20b %-20b\n" "file $bn" "${GREEN}match${NC}"
+	printf "%-25b %-10b\n" "file $bn" "${GREEN}match${NC}"
     else
-	printf "%-20b %-20b\n" "file $bn" "${RED}not match${NC}"
+	printf "%-25b %-10b\n" "file $bn" "${RED}not match${NC}"
 	success="false"
     fi
 done
