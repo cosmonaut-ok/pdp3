@@ -15,6 +15,82 @@ InputOutputClass::~InputOutputClass(void)
 {
 }
 
+char* InputOutputClass::get_data_path(char const *comp_name, int number=-1)
+{
+  char st_name[100];
+  strcpy(st_name, comp_name);
+
+  if (number != -1)
+  {
+    char str_int [100];
+    sprintf(str_int, "%d", number);
+    strcat(st_name, str_int);
+  }
+
+  char* path = new char[100];
+  strcpy(path, path_result);
+  strcat(path, st_name);
+
+  return path;
+}
+
+char* InputOutputClass::get_dump_path(char const *comp_name)
+{
+  char st_name[100];
+  strcpy(st_name, comp_name);
+  char* path = new char[100];
+  strcpy(path, path_dump);
+  strcat(path, st_name);
+
+  return path;
+}
+
+void InputOutputClass::dump_data(char const *path,
+                                 double **out_value,
+                                 int r_step,
+                                 int z_step,
+                                 bool is_rewrite=false)
+{
+  std::ofstream::openmode omode;
+  if (is_rewrite)
+    omode = ios::trunc;
+  else
+    omode = ios::app;
+
+  ofstream out_val(path, omode);
+
+  // write  values  into file
+  for (int i=0; i<r_step;i++)
+    for(int k=0;k<z_step;k++)
+      out_val<<out_value[i][k]<<" ";
+
+  out_val.close();
+}
+
+void InputOutputClass::dump_components(char const *path,
+                                       double **components,
+                                       int size,
+                                       int dimensions,
+                                       bool is_rewrite=false)
+{
+  std::ofstream::openmode omode;
+  if (is_rewrite)
+    omode = ios::trunc;
+  else
+    omode = ios::app;
+
+  ofstream out_val(path, omode);
+  // write  values  into file
+  for (int i=0; i < size; i++)
+  {
+    for(int k=0; k < dimensions; k++)
+      out_val << components[i][k] << ",";
+    out_val << " ";
+  }
+
+  out_val.close();
+}
+
 void InputOutputClass::out_data(char const *comp_name,
                                   double **out_value,
                                   int step_number,
@@ -22,123 +98,63 @@ void InputOutputClass::out_data(char const *comp_name,
                                   int r_step,
                                   int z_step)
 {
-  int inc_value = step_number/number;
-  char st_name[100];
-  strcpy(st_name, comp_name);
-  char str_int [100];
+  char* path = get_data_path(comp_name, floor(step_number/number));
+  dump_data(path, out_value, r_step, z_step);
 
-  sprintf(str_int, "%d", inc_value);
-  strcat(st_name, str_int);
-  char path[100];
-  strcpy(path, this->path_result);
-  strcat(path, st_name);
-  ofstream out_val(path,ios::app);
-  // write  values  into file
-  for (int i=0; i<r_step;i++)
-    for(int k=0;k<z_step;k++)
-      out_val<<out_value[i][k]<<" ";
-
-  out_val.close();
+  delete [] path;
 }
 
-void InputOutputClass::out_field_dump(char *comp_name,
+void InputOutputClass::out_field_dump(char const *comp_name,
                                         double **out_value,
                                         int r_step,
                                         int z_step)
 {
-  char st_name[100];
+  char* path = get_dump_path(comp_name);
+  dump_data(path, out_value, r_step, z_step, true);
 
-  strcpy(st_name, this->path_dump);
-
-  strcat(st_name, comp_name);
-  ofstream out_val(st_name);
-  // write  values  into file
-  for (int i=0; i<r_step;i++)
-    for(int k=0;k<z_step;k++)
-      out_val<<out_value[i][k]<<" ";
-
-  out_val.close();
+  delete [] path;
 }
 
-/////
 void InputOutputClass::out_pos(char *comp_name,
-                                   double *pos_r,
-                                   double *pos_z,
-                                   int step_number,
-                                   int number,
-                                   int particles_number)
+                               double **pos,
+                               int step_number,
+                               int number,
+                               int particles_number)
 {
-  int inc_value = step_number/number;
-  char st_name[50];
-  strcpy(st_name, comp_name);
-  char str_int [50];
+  char* path = get_data_path(comp_name, floor(step_number/number));
+  dump_components(path, pos, particles_number, 3);
 
-  sprintf(str_int, "%d" ,inc_value);
-  strcat(st_name, str_int);
-  char path[100];
-
-  strcpy(path, this->path_result);
-  strcat(path,st_name);
-  ofstream out_val(path, ios::app);
-
-  // write  values  into file
-  out_val.setf(std::ios_base::scientific);
-  out_val.precision(14);
-  for (int i=0; i<particles_number;i++)
-  {
-    out_val<<pos_r[i]<<" ";
-    out_val<<pos_z[i]<<" ";
-  }
-
-  out_val.close();
+  delete [] path;
 }
 
 void InputOutputClass::out_pos_dump(char *comp_name ,
                                       double **pos,
-                                      // double *pos_r,
-                                      // double *pos_z,
                                       int particles_number)
 {
-  char st_name[100] ;
+  char* path = get_dump_path(comp_name);
+  strcat(path, "_position");
+  dump_components(path, pos, particles_number, 3, true);
 
-  strcat(strcpy(st_name,this->path_dump),"_poss_");
-
-  strcat(st_name,comp_name);
-  ofstream out_val(st_name);
-  out_val.setf(std::ios_base::scientific);
-  out_val.precision(14);
-  for (int i=0; i<particles_number;i++)
-  {
-    out_val<<pos[i][0]<<" ";
-    out_val<<pos[i][2]<<" ";
-  }
-  out_val.close();
+  delete [] path;
 }
 
 void InputOutputClass::out_velocity_dump(char *comp_name,
                                          double **vel,
-                                         // double *v1,
-                                         // double *v2,
-                                         // double *v3,
                                          int particles_number)
 {
-  char st_name[100] ;
+  char* path = get_dump_path(comp_name);
+  strcat(path, "_velocity");
+  dump_components(path, vel, particles_number, 3, true);
 
-  strcat(strcpy(st_name,this->path_dump),"_velocities_");
+  delete [] path;
+}
 
-  strcat(st_name, comp_name);
-  ofstream out_val(st_name);
-  out_val.setf(std::ios_base::scientific);
-  out_val.precision(14);
-  for (int i=0; i<particles_number;i++)
-  {
-    for (int j=0; j<3; j++)
-      out_val<<vel[i][j]<<" ";
-    // out_val<<v1[i]<<" ";
-    // out_val<<v2[i]<<" ";
-    // out_val<<v3[i]<<" ";
-  }
-
+void InputOutputClass::out_current_time_dump(double current_time)
+{
+  char* path = get_dump_path("current_time");
+  ofstream out_val(path, ios::trunc);
+  out_val<<current_time;
   out_val.close();
 
+  delete [] path;
 }
