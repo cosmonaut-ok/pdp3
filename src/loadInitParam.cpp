@@ -353,12 +353,12 @@ void LoadInitParam::init_file_saving_parameters ()
 void LoadInitParam::dump_system_state()
 {
   //! dump system state to file set
-  c_io_class->out_field_dump((char*)"E_r", efield->field_r, c_geom->n_grid_1 - 1, c_geom->n_grid_2 - 1);
-  c_io_class->out_field_dump((char*)"E_phi", efield->field_phi, c_geom->n_grid_1 - 1, c_geom->n_grid_2 - 1);
-  c_io_class->out_field_dump((char*)"E_z", efield->field_z, c_geom->n_grid_1 - 1, c_geom->n_grid_2 - 1);
-  c_io_class->out_field_dump((char*)"H_r", hfield->field_r, c_geom->n_grid_1 - 1, c_geom->n_grid_2 - 1);
-  c_io_class->out_field_dump((char*)"H_phi", hfield->field_phi, c_geom->n_grid_1 - 1, c_geom->n_grid_2 - 1);
-  c_io_class->out_field_dump((char*)"H_z", hfield->field_z, c_geom->n_grid_1 - 1, c_geom->n_grid_2 - 1);
+  c_io_class->out_field_dump("E_r", efield->field_r, c_geom->n_grid_1 - 1, c_geom->n_grid_2 - 1);
+  c_io_class->out_field_dump("E_phi", efield->field_phi, c_geom->n_grid_1 - 1, c_geom->n_grid_2 - 1);
+  c_io_class->out_field_dump("E_z", efield->field_z, c_geom->n_grid_1 - 1, c_geom->n_grid_2 - 1);
+  c_io_class->out_field_dump("H_r", hfield->field_r, c_geom->n_grid_1 - 1, c_geom->n_grid_2 - 1);
+  c_io_class->out_field_dump("H_phi", hfield->field_phi, c_geom->n_grid_1 - 1, c_geom->n_grid_2 - 1);
+  c_io_class->out_field_dump("H_z", hfield->field_z, c_geom->n_grid_1 - 1, c_geom->n_grid_2 - 1);
   for(unsigned int i=0; i<p_list->part_list.size(); i++)
   {
     c_io_class->out_pos_dump(p_list->part_list[i]->name,
@@ -368,7 +368,7 @@ void LoadInitParam::dump_system_state()
     c_io_class->out_velocity_dump(p_list->part_list[i]->name,
                                   p_list->part_list[i]->vel,
                                   p_list->part_list[i]->number);
-
+    c_io_class->out_current_time_dump(c_time->current_time);
   }
 }
 
