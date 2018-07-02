@@ -29,7 +29,7 @@ LoadInitParam::LoadInitParam(char *xml_file_name)
 
   // define openmp-related options when openmp enabled
 #ifdef _OPENMP
-  omp_set_dynamic(0); // Explicitly disable dynamic teams
+  omp_set_dynamic(1); // Explicitly disable dynamic teams
 #endif
 
   //! Steps to initialize:
