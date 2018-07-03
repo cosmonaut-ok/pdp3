@@ -8,6 +8,7 @@ ChargeDensity::ChargeDensity(void)
 ChargeDensity::ChargeDensity(Geometry *geom1_t): geom1(geom1_t)
 {
   rho = new double*[geom1->n_grid_1];
+
 #pragma omp parallel
   {
 #pragma omp for
@@ -35,7 +36,8 @@ double **ChargeDensity::get_rho() const
 
 void ChargeDensity::set_ro_weighting(int i, int k, double value)
 {
-  rho[i][k]=rho[i][k]+value;
+#pragma omp critical
+  rho[i][k] += value;
 }
 
 void ChargeDensity::reset_rho()
