@@ -159,17 +159,20 @@ void Current::j3_add_1d(double *j3_1d)
 //
 void Current::set_j1(int i, int k, double value)
 {
-  j1[i][k] = j1[i][k] + value;
+#pragma omp critical
+  j1[i][k] += value;
 }
 
 void Current::set_j2(int i, int k, double value)
 {
-  j2[i][k] = j2[i][k] + value;
+#pragma omp critical
+  j2[i][k] += value;
 }
 
 void Current::set_j3(int i, int k, double value)
 {
-  j3[i][k]=j3[i][k] + value;
+#pragma omp critical
+  j3[i][k] += value;
 }
 
 void Current::reset_j()
