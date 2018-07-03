@@ -1,5 +1,5 @@
 MKDIR                 = mkdir
-ROOTDIR               = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+ROOTDIR               = ./
 SRCDIR                = $(ROOTDIR)src
 OBJDIR                = $(ROOTDIR)obj
 TARGETDIR             ?= $(ROOTDIR)target
@@ -55,22 +55,25 @@ CXX ?= g++
 RC = wrc
 AR = ar
 
-CFLAGS ?= -m64 -mcmodel=medium
-CFLAGS_SPEEDUP = -ffast-math
-CFLAGS_NO_OPENMP ?= -Wno-unknown-pragmas
+CFLAGS_DEFAULT = -m64 -mcmodel=medium -std=c++1z
+CFLAGS_SPEEDUP = -ffast-math -O3 -funroll-loops -Wno-write-strings -freciprocal-math -fcx-fortran-rules
+CFLAGS_NO_SPEEDUP = -O2
 CFLAGS_OPENMP ?= -fopenmp
-CFLAGS_DEBUG ?= -O0 -Wall -Wextra -g -ggdb -fvar-tracking -ggnu-pubnames -pedantic
+CFLAGS_NO_OPENMP ?= -Wno-unknown-pragmas
+CFLAGS_DEBUG ?= -O0 -Wall -Wextra -ggdb3 -fvar-tracking -ggnu-pubnames -pedantic -time -ftree-vectorizer-verbose=7 -DDEBUG
+
+CFLAGS += $(CFLAGS_DEFAULT)
 
 ## set debug options
 ifeq ($(DEBUG), yes)
 CFLAGS += $(CFLAGS_DEBUG)
-else
-CFLAGS += -O2
 endif
 
 ## set speedup options
 ifeq ($(SPEEDUP), yes)
 CFLAGS += $(CFLAGS_SPEEDUP)
+else
+CFLAGS += $(CFLAGS_NO_SPEEDUP)
 endif
 
 ## set single thread options
