@@ -285,6 +285,13 @@ in `parameters.xml` file before project run.
 user@host$ gdb ./pdp3
 (gdb) run ## or perform some modifications first than run, e.g. set breakpoints
 ```
+5. use experimental features
+
+If you want to experiment and use unsafe features, disabled by default, use "-DEXPERIMENTAL" key in CFLAGS. For example:
+
+``` shell
+user@host$ make CFLAGS="-m64 -mcmodel=medium -DEXPERIMENTAL"
+```
 
 #### Tools
 

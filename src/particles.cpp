@@ -740,6 +740,9 @@ void Particles::j_weighting(Time *time1, Current *j1)
   double dr = geom1->dr;
   double dz = geom1->dz;
 
+#ifdef EXPERIMENTAL
+#pragma omp parallel for shared(dr, dz, time1, j1) default(none)
+#endif
   for (int i=0;i<number;i++)
     if (is_alive[i])
     {
@@ -953,27 +956,30 @@ void Particles::j_weighting(Time *time1, Current *j1)
 }
 void Particles::azimuthal_j_weighting(Time *time1, Current *this_j)
 {
-
-  int r_i=0;  // number of particle i cell
-  int z_k=0;  // number of particle k cell
-
   double dr = geom1->dr;
   double dz = geom1->dz;
-  double r1, r2, r3; // temp variables for calculation
-  double dz1, dz2;   // temp var.: width of k and k+1 cell
 
-  double ro_v =0; // charge density Q/V, V - volume of particle
-  double v_1 =0; // volume of [i][k] cell
-  double v_2= 0; // volume of [i+1][k] cell
-  //double ro_v_2=0; // charge density in i+1 cell
-
-  double rho =0; //charge density in cell
-  double current; // j_phi in cell
-  // double **temp = this_j->get_j2();
-
+#ifdef EXPERIMENTAL
+#pragma omp parallel for shared(dr, dz, time1, this_j) default(none)
+#endif
   for(int i=0;i<number;i++)
     if (is_alive[i])
     {
+      int r_i=0;  // number of particle i cell
+      int z_k=0;  // number of particle k cell
+
+      double r1, r2, r3; // temp variables for calculation
+      double dz1, dz2;   // temp var.: width of k and k+1 cell
+
+      double ro_v =0; // charge density Q/V, V - volume of particle
+      double v_1 =0; // volume of [i][k] cell
+      double v_2= 0; // volume of [i+1][k] cell
+      //double ro_v_2=0; // charge density in i+1 cell
+
+      double rho =0; //charge density in cell
+      double current; // j_phi in cell
+      // double **temp = this_j->get_j2();
+
       // finding number of i and k cell. example: dr = 0.5; r = 0.4; i =0
       r_i = (int)ceil((pos[i][0])/dr)-1;
       z_k = (int)ceil((pos[i][2])/dz)-1;
