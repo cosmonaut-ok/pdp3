@@ -18,9 +18,9 @@ EField::EField(Geometry *geom1_t) : Field (geom1_t)
   //// charge_density
   t_charge_density = new double*[geom1->n_grid_1];
 
-#pragma omp parallel for
   // filling second demension
   // for potential and charge density
+#pragma omp parallel for
   for (int i=0; i<(geom1->n_grid_1); i++)
   {
     fi[i]= new double[geom1->n_grid_2];
@@ -132,6 +132,7 @@ void EField::calc_field(HField *h_field1,
   }
 
   //// Ez=on axis// // ???????????
+#pragma omp parallel for
   for(int k=0; k<(geom1->n_grid_2-1); k++)
   {
     int i=0;
@@ -142,6 +143,7 @@ void EField::calc_field(HField *h_field1,
     field_z[i][k]=field_z[i][k]*koef_e - (j3[i][k]-4.0/dr*h_phi[i][k])*koef_h;
   }
 
+#pragma omp parallel for
   for(int i=1; i<(geom1->n_grid_1-1); i++)
     for(int k=1; k<(geom1->n_grid_2-1); k++)
     {
@@ -153,6 +155,7 @@ void EField::calc_field(HField *h_field1,
       field_z[i][k]=field_z[i][k]*koef_e -(j3[i][k]-(h_phi[i][k]-h_phi[i-1][k])/dr - (h_phi[i][k]+h_phi[i-1][k])/(2.0*dr*i))*koef_h;
     }
 
+#pragma omp parallel for
   for(int i=1; i<(geom1->n_grid_1-1); i++)
   {
     int k=0;
@@ -171,95 +174,95 @@ void EField::set_fi_on_z()
     fi[geom1->n_grid_1-1][k]=0;
 }
 
-// poisson equation solving 2
-void EField::poisson_equation2(Geometry *geom1, ChargeDensity *ro1)
-{
-  // const double epsilon0 = EPSILON0;
-  double phi0(0.0);
-  double *a = new double [geom1->n_grid_1];
-  double *b = new double [geom1->n_grid_1];
-  double *c = new double [geom1->n_grid_1];
-  double *d = new double [geom1->n_grid_1];
-  double *c1 = new double [geom1->n_grid_1];
-  double *d1 = new double [geom1->n_grid_1];
-  double *phi = new double [geom1->n_grid_1];
-  Fourier *four1=0;
+// // poisson equation solving 2
+// void EField::poisson_equation2(Geometry *geom1, ChargeDensity *ro1)
+// {
+//   // const double epsilon0 = EPSILON0;
+//   double phi0(0.0);
+//   double *a = new double [geom1->n_grid_1];
+//   double *b = new double [geom1->n_grid_1];
+//   double *c = new double [geom1->n_grid_1];
+//   double *d = new double [geom1->n_grid_1];
+//   double *c1 = new double [geom1->n_grid_1];
+//   double *d1 = new double [geom1->n_grid_1];
+//   double *phi = new double [geom1->n_grid_1];
+//   Fourier *four1=0;
 
-  // double dr = geom1->dr;
-  double dr2 = geom1->dr*geom1->dr;
+//   // double dr = geom1->dr;
+//   double dr2 = geom1->dr*geom1->dr;
 
-  double **ro = ro1->get_rho();
+//   double **ro = ro1->get_rho();
 
-  // copy charge_density array in to temp array
-#pragma omp parallel for shared (ro)
-  for(int i=0; i<(geom1->n_grid_1); i++)
-    for(int k=0;k<(geom1->n_grid_2); k++)
-      t_charge_density[i][k]= ro[i][k];
+//   // copy charge_density array in to temp array
+// #pragma omp parallel for shared (ro)
+//   for(int i=0; i<(geom1->n_grid_1); i++)
+//     for(int k=0;k<(geom1->n_grid_2); k++)
+//       t_charge_density[i][k]= ro[i][k];
 
-  // call function for cosine transform
+//   // call function for cosine transform
 
-  int temp=geom1->n_grid_2;
+//   int temp=geom1->n_grid_2;
 
-#pragma omp parallel for shared (temp, four1)
-  for (int i=0; i<geom1->n_grid_1; i++)
-    four1->fast_cosine_transform((double**)t_charge_density, temp, i, false);
-    //four1->fast_fourier_transform(t_charge_density, temp, i, false);
+// #pragma omp parallel for shared (temp, four1)
+//   for (int i=0; i<geom1->n_grid_1; i++)
+//     four1->fast_cosine_transform((double**)t_charge_density, temp, i, false);
+//     //four1->fast_fourier_transform(t_charge_density, temp, i, false);
 
-  //set coefficients
-  b[0] = 1.0;
-  c[0] = 1.0;
+//   //set coefficients
+//   b[0] = 1.0;
+//   c[0] = 1.0;
 
-#pragma omp parallel for shared (a, b, c, d, c1, d1, phi, dr2)
-  for (int k = 0; k < geom1->n_grid_2; k++)
-  {
-    b[0] = 1.0;
-    c[0] = -1.0;
-    d[0] = dr2/4.0/EPSILON0*t_charge_density[0][k];
-    for (int i = 1; i < geom1->n_grid_1 -1; i++)
-    {
-      a[i] = (1.0 - 1.0/2.0/(double)i);
-      b[i] = -2.0 + 2.0*(cos(PI*k/(geom1->n_grid_2-1)) - 1)*geom1->dr*geom1->dr/(geom1->dz*geom1->dz);
-      c[i] = (1.0 + 1.0/2.0/(double)i);
-      d[i] = t_charge_density[i][k]*dr2/EPSILON0;
-      c1[i] = (1.0 - 1.0/2.0/(double)i);
-      d1[i] = t_charge_density[i][k]*dr2/EPSILON0;
-    }
-    a[0] = 0;
-    c[geom1->n_grid_1-2] = 0.0;
-    d[geom1->n_grid_1-2] -= phi0;
-    c1[geom1->n_grid_1-2] = 0.0;
-    d1[geom1->n_grid_1-2] -= phi0;
-    tridiagonal_solve(a, b, c, d, phi, geom1->n_grid_1-1);
-    for (int i = 0; i < geom1->n_grid_1 -1; i++)
-      fi[i][k] = phi[i];
-  }
+// #pragma omp parallel for shared (a, b, c, d, c1, d1, phi, dr2)
+//   for (int k = 0; k < geom1->n_grid_2; k++)
+//   {
+//     b[0] = 1.0;
+//     c[0] = -1.0;
+//     d[0] = dr2/4.0/EPSILON0*t_charge_density[0][k];
+//     for (int i = 1; i < geom1->n_grid_1 -1; i++)
+//     {
+//       a[i] = (1.0 - 1.0/2.0/(double)i);
+//       b[i] = -2.0 + 2.0*(cos(PI*k/(geom1->n_grid_2-1)) - 1)*geom1->dr*geom1->dr/(geom1->dz*geom1->dz);
+//       c[i] = (1.0 + 1.0/2.0/(double)i);
+//       d[i] = t_charge_density[i][k]*dr2/EPSILON0;
+//       c1[i] = (1.0 - 1.0/2.0/(double)i);
+//       d1[i] = t_charge_density[i][k]*dr2/EPSILON0;
+//     }
+//     a[0] = 0;
+//     c[geom1->n_grid_1-2] = 0.0;
+//     d[geom1->n_grid_1-2] -= phi0;
+//     c1[geom1->n_grid_1-2] = 0.0;
+//     d1[geom1->n_grid_1-2] -= phi0;
+//     tridiagonal_solve(a, b, c, d, phi, geom1->n_grid_1-1);
+//     for (int i = 0; i < geom1->n_grid_1 -1; i++)
+//       fi[i][k] = phi[i];
+//   }
 
-// call function for inverse cosine transform
-#pragma omp parallel for shared (four1)
-  for (int i=0; i<geom1->n_grid_1; i++)
-    four1->fast_cosine_transform((double**)fi, geom1->n_grid_2, i, true);
+// // call function for inverse cosine transform
+// #pragma omp parallel for shared (four1)
+//   for (int i=0; i<geom1->n_grid_1; i++)
+//     four1->fast_cosine_transform((double**)fi, geom1->n_grid_2, i, true);
 
-  // calculate electric field
-  for (int i=0; i<(geom1->n_grid_1-1); i++)
-    for (int k=1; k<(geom1->n_grid_2); k++)
-      field_r[i][k]=(fi[i][k]-fi[i+1][k])/geom1->dr;
+//   // calculate electric field
+//   for (int i=0; i<(geom1->n_grid_1-1); i++)
+//     for (int k=1; k<(geom1->n_grid_2); k++)
+//       field_r[i][k]=(fi[i][k]-fi[i+1][k])/geom1->dr;
 
-  for (int i=0; i<(geom1->n_grid_1); i++)
-    for (int k=1; k<(geom1->n_grid_2-1); k++)
-      field_z[i][k]=(fi[i][k]-fi[i][k+1])/geom1->dz;
+//   for (int i=0; i<(geom1->n_grid_1); i++)
+//     for (int k=1; k<(geom1->n_grid_2-1); k++)
+//       field_z[i][k]=(fi[i][k]-fi[i][k+1])/geom1->dz;
 
-  ofstream er("er"), ez("ez"); // TODO: WTF?
-#pragma omp parallel for
-  for (int i=1; i<geom1->n_grid_1-1; i++)
-    for (int k=1; k<geom1->n_grid_2-1; k++)
-    {
-      er<<field_r[i][k]<<" ";
-      ez<<field_z[i][k]<<" ";
-    }
-  er.close();
-  ez.close();
+//   ofstream er("er"), ez("ez"); // TODO: WTF?
+// #pragma omp parallel for
+//   for (int i=1; i<geom1->n_grid_1-1; i++)
+//     for (int k=1; k<geom1->n_grid_2-1; k++)
+//     {
+//       er<<field_r[i][k]<<" ";
+//       ez<<field_z[i][k]<<" ";
+//     }
+//   er.close();
+//   ez.close();
 
-}
+// }
 
 void EField::tridiagonal_solve(const double *a,
                                const double *b,
