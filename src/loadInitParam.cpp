@@ -410,6 +410,7 @@ void LoadInitParam::run(void)
   //! THIS IS ENTRY POINT TO MAIN PDP3 CALCULATION CYCLE
   cout << endl << "Launch Simulation" << endl << endl;
 
+  clock_t the_time = 0;
   int step_number = 0;
   time_t t1 = time(0);
   char avg_step_exec_time[24]; // rounded and formatted average step execution time
@@ -418,43 +419,112 @@ void LoadInitParam::run(void)
   while (c_time->current_time <= c_time->end_time)
   {
     //! Steps:
-
+#ifdef PERF_DEBUG
+    the_time = 0;
+    cerr << the_time << " loop iteration begin" << endl;
+    the_time = clock();
+#endif
+    
     //! 1. inject bunch
     c_bunch->bunch_inject(c_time);
-
+#ifdef PERF_DEBUG
+    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_bunch->bunch_inject" << endl;
+    the_time = clock();
+#endif
+    
     //! 2. Calculate H field
     hfield->calc_field(efield, c_time);
+#ifdef PERF_DEBUG
+    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: hfield->calc_field" << endl;
+    the_time = clock();
+#endif
 
     //! 3. Calculate v
     c_current->reset_j();
+#ifdef PERF_DEBUG
+    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_current->reset_j" << endl;
+    the_time = clock();
+#endif
     c_rho_old->reset_rho();
+#ifdef PERF_DEBUG
+    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_rho_old->reset_rho" << endl;
+    the_time = clock();
+#endif
     c_rho_bunch->reset_rho();
+#ifdef PERF_DEBUG
+    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_rho_bunch->reset_rho" << endl;
+    the_time = clock();
+#endif
     p_list->step_v(efield, hfield, c_time);
+#ifdef PERF_DEBUG
+    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: p_list->step_v" << endl;
+    the_time = clock();
+#endif
 
     //! 4. Calculate x, calculate J
     p_list->dump_position_to_old();
-
+    // cout << 4 << endl;
     //! FIXME: for some reason charge_weighting has no effect on result
     // p_list->charge_weighting(c_rho_old); //continuity equation
-
+#ifdef PERF_DEBUG
+    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: p_list->dump_position_to_old" << endl;
+    the_time = clock();
+#endif
+    
     p_list->half_step_pos(c_time);
+#ifdef PERF_DEBUG
+    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: p_list->half_step_pos" << endl;
+    the_time = clock();
+#endif
     p_list->back_position_to_rz();
+#ifdef PERF_DEBUG
+    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: p_list->back_position_to_rz" << endl;
+    the_time = clock();
+#endif
 
     p_list->azimuthal_j_weighting(c_time, c_current);
+#ifdef PERF_DEBUG
+    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: p_list->azimuthal_j_weighting" << endl;
+    the_time = clock();
+#endif
 
     p_list->half_step_pos(c_time);
+#ifdef PERF_DEBUG
+    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: p_list->half_step_pos" << endl;
+    the_time = clock();
+#endif
     p_list->back_position_to_rz();
+#ifdef PERF_DEBUG
+    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: p_list->back_position_to_rz" << endl;
+    the_time = clock();
+#endif
 
     p_list->j_weighting(c_time, c_current);
+#ifdef PERF_DEBUG
+    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: j_weighting" << endl;
+    the_time = clock();
+#endif
 
     p_list->back_velocity_to_rz();
+#ifdef PERF_DEBUG
+    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: back_velocity_to_rz" << endl;
+    the_time = clock();
+#endif
 
     //! 5. Calculate E
     // maxwell_rad.probe_mode_exitation(&geom1,&current1, 1,7e8, time1.current_time);
     efield->calc_field(hfield, c_time, c_current);
-
+#ifdef PERF_DEBUG
+    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: efield->calc_field" << endl;
+    the_time = clock();
+#endif
+    
     //! 6. Continuity equation
     c_rho_new->reset_rho(); // TODO: is it 4?
+#ifdef PERF_DEBUG
+    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_rho_new->reset_rho" << endl;
+    the_time = clock();
+#endif
 
     //! FIXME: for some reason charge_weighting has no effect on result
     // p_list->charge_weighting(c_rho_new); // continuity equation
@@ -482,10 +552,18 @@ void LoadInitParam::run(void)
            << endl;
 
       c_bunch->charge_weighting(c_rho_bunch);
+#ifdef PERF_DEBUG
+      cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_bunch->charge_weighting" << endl;
+      the_time = clock();
+#endif
       // c_rho_old->reset_rho();
       // p_list[0].charge_weighting(c_rho_old);
 
       dump_data(step_number);
+#ifdef PERF_DEBUG
+      cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: dump_data" << endl;
+      the_time = clock();
+#endif
 
       step_number += 1;
       t1 = time(0);
@@ -493,6 +571,10 @@ void LoadInitParam::run(void)
       {
         cout << "Saving system state at " << c_time->current_time << endl;
         dump_system_state();
+#ifdef PERF_DEBUG
+	cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: dump_system_state" << endl;
+	the_time = clock();
+#endif
       }
     }
     c_time->current_time = c_time->current_time + c_time->delta_t;
