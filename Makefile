@@ -60,7 +60,7 @@ CFLAGS_SPEEDUP = -ffast-math -O3 -funroll-loops -Wno-write-strings -freciprocal-
 CFLAGS_NO_SPEEDUP = -O2
 CFLAGS_OPENMP ?= -fopenmp
 CFLAGS_NO_OPENMP ?= -Wno-unknown-pragmas
-CFLAGS_DEBUG ?= -O0 -Wall -Wextra -ggdb3 -fvar-tracking -ggnu-pubnames -pedantic -time -ftree-vectorizer-verbose=7 -DDEBUG
+CFLAGS_DEBUG ?= -O0 -Wall -Wextra -ggdb3 -fvar-tracking -ggnu-pubnames -pedantic -time -ftree-vectorizer-verbose=7 -DDEBUG -DPERF_DEBUG
 
 CFLAGS += $(CFLAGS_DEFAULT)
 
@@ -92,10 +92,10 @@ all: prepare $(SUBDIRS) $(LIBS) $(EXES)
 .PHONY: all clean dummy check-syntax prepare doxygen
 
 $(SUBDIRS): dummy
-	@cd $@ && $(MAKE)
+	cd $@ && $(MAKE)
 
 $(DOXYGEN_FORMATS): doxygen
-	@for i in $(DOXYGEN_DIRS); do test -d $(ROOTDIR)/$$i/$@ && cd $(ROOTDIR)/$$i/$@ && test -f Makefile && $(MAKE) || return 0; done
+	for i in $(DOXYGEN_DIRS); do test -d $(ROOTDIR)/$$i/$@ && cd $(ROOTDIR)/$$i/$@ && test -f Makefile && $(MAKE); done
 
 # Implicit rules
 .SUFFIXES: .cpp .cxx
