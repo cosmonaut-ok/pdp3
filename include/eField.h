@@ -1,8 +1,7 @@
 #pragma once
 
 #include <fstream>
-
-#include "math/tiny_vector3d.h"
+#include "tinyvec3d.h"
 
 #include "math/fourier.h"
 
