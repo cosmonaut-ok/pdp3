@@ -257,7 +257,7 @@ double* HField::get_field(double x1, double x3)
   // weighting Hfi[i+1][k+1]
   hfi = hfi + field_phi_half_time[i_r+1][k_z+1]*PI*dz2*(r3*r3-r2*r2)/vol_2;
 
-  double* components = tiny_vector3d::mkvector3d(hr, hfi, hz);
+  double* components = tinyvec3d::mkvector3d(hr, hfi, hz);
 
   return components;
 }
