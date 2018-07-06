@@ -37,8 +37,14 @@ tinyxml2_SUBDIR := $(ROOTDIR)lib/tinyxml2
 INCLUDE_PATH += -I$(tinyxml2_SUBDIR)
 SUBDIRS += $(tinyxml2_SUBDIR)
 pdp3_LIBRARIES += tinyxml2
-
 LDFLAGS += -L$(tinyxml2_SUBDIR)
+
+### tinyvec3d sources and settings
+tinyvec3d_SUBDIR := $(ROOTDIR)lib/tinyvec3d
+INCLUDE_PATH += -I$(tinyvec3d_SUBDIR)
+SUBDIRS += $(tinyvec3d_SUBDIR)
+pdp3_LIBRARIES += tinyvec3d
+LDFLAGS += -L$(tinyvec3d_SUBDIR)
 
 pdp3_OBJS := $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(pdp3_CXX_SRCS))
 
