@@ -2,7 +2,7 @@
 
 #include <string.h>
 
-#include "math/tiny_vector3d.h"
+#include "tinyvec3d.h"
 
 #include "lib.h"
 #include "constant.h"
