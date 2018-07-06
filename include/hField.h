@@ -1,6 +1,6 @@
 #pragma once
 
-#include "math/tiny_vector3d.h"
+#include "tinyvec3d.h"
 
 #include "constant.h"
 

@@ -112,8 +112,8 @@ void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
       e = e_fld->get_field(pos[i][0], pos[i][2]);
       b = h_fld->get_field(pos[i][0], pos[i][2]);
 
-      tiny_vector3d::product(e, const1);
-      tiny_vector3d::product(b, MAGN_CONST * const1);
+      tinyvec3d::product(e, const1);
+      tinyvec3d::product(b, MAGN_CONST * const1);
 
       // set velocity vector components and
       // round very small velicities to avoid exceptions
@@ -133,31 +133,31 @@ void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
       //! \f$ u_{n-\frac{1}{2}} = \gamma_{n-\frac{1}{2}}*v_{n-\frac{1}{2}} \f$
       if (use_rel)
       {
-        sq_velocity = tiny_vector3d::squared_sum(velocity);
+        sq_velocity = tinyvec3d::squared_sum(velocity);
         gamma = lib::get_gamma(sq_velocity);
-        tiny_vector3d::product(velocity, gamma);
+        tinyvec3d::product(velocity, gamma);
       }
 
       //! 2. Half acceleration in the electric field
       //! \f$ u'_n = u_{n-\frac{1}{2}} + \frac{q dt}{2 m  E(n)} \f$
       //! \f$ u'_n = u_{n-1/2} + \frac{q dt}{2 m E(n)} \f$
-      tiny_vector3d::add(velocity, e);
+      tinyvec3d::add(velocity, e);
 
       //! 3. Rotation in the magnetic field
       //! \f$ u" = u' + \frac{2}{1+B'^2}   [(u' + [u' \times B'(n)] ) \times B'(n)] \f$,
       //! \f$  B'(n) = \frac{B(n) q dt}{2 m * \gamma_n} \f$
       if (use_rel)
       {
-        sq_velocity = tiny_vector3d::squared_sum(velocity);
+        sq_velocity = tinyvec3d::squared_sum(velocity);
         gamma = lib::get_gamma_inv(sq_velocity);
-        tiny_vector3d::div(b, gamma);
+        tinyvec3d::div(b, gamma);
       }
       //! \f$ const2 = \frac{2}{1 + b_1^2 + b_2^2 + b_3^2} \f$
-      const2 = 2.0 / (1.0 + tiny_vector3d::squared_sum(b));
+      const2 = 2.0 / (1.0 + tinyvec3d::squared_sum(b));
 
       // set temporary velocity as old values
       // to calculate magnetic rotation
-      tiny_vector3d::copy_components(velocity, vtmp);
+      tinyvec3d::copy_components(velocity, vtmp);
 
       velocity[0] = vtmp[0] + const2 * (
         (vtmp[1] - vtmp[0] * b[2] + vtmp[2] * b[0]) * b[2]
@@ -174,14 +174,14 @@ void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
 
       //! 4. Half acceleration in the electric field
       //! \f$ u_{n+\frac{1}{2}} = u_n + \frac{q dt}{2 m E(n)} \f$
-      tiny_vector3d::add(velocity, e);
+      tinyvec3d::add(velocity, e);
 
       //! 5. Division by relativistic factor
       if (use_rel)
       {
-        sq_velocity = tiny_vector3d::squared_sum(velocity);
+        sq_velocity = tinyvec3d::squared_sum(velocity);
         gamma = lib::get_gamma_inv(sq_velocity);
-        tiny_vector3d::div(velocity, gamma);
+        tinyvec3d::div(velocity, gamma);
       }
       vel[i][0] = velocity[0];
       vel[i][1] = velocity[1];
