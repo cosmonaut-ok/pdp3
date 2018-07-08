@@ -1,7 +1,7 @@
 MKDIR                 = mkdir
 ROOTDIR               = ./
 SRCDIR                = $(ROOTDIR)src
-OBJDIR                = $(ROOTDIR)obj
+OBJDIR                = $(ROOTDIR)target/obj
 TARGETDIR             ?= $(ROOTDIR)target
 INCLUDEDIR            = $(ROOTDIR)include
 SUBDIRS               =
@@ -73,10 +73,9 @@ CFLAGS += $(CFLAGS_DEFAULT)
 ## set debug options
 ifeq ($(DEBUG), yes)
 CFLAGS += $(CFLAGS_DEBUG)
-endif
 
 ## set speedup options
-ifeq ($(SPEEDUP), yes)
+else ifeq ($(SPEEDUP), yes)
 CFLAGS += $(CFLAGS_SPEEDUP)
 else
 CFLAGS += $(CFLAGS_NO_SPEEDUP)
