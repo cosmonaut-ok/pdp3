@@ -115,19 +115,19 @@ void InputOutputClass::out_field_dump(char const *comp_name,
   delete [] path;
 }
 
-void InputOutputClass::out_pos(char *comp_name,
-                               double **pos,
-                               int step_number,
-                               int number,
-                               int particles_number)
+void InputOutputClass::out_triple(char *comp_name,
+                                  double **triple,
+                                  int step_number,
+                                  int number,
+                                  int particles_number)
 {
   char* path = get_data_path(comp_name, floor(step_number/number));
-  dump_components(path, pos, particles_number, 3);
+  dump_components(path, triple, particles_number, 3);
 
   delete [] path;
 }
 
-void InputOutputClass::out_pos_dump(char *comp_name ,
+void InputOutputClass::out_pos_dump(char *comp_name,
                                       double **pos,
                                       int particles_number)
 {

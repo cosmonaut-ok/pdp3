@@ -24,6 +24,7 @@
 #include "particlesList.h"
 #include "pdp3Time.h"
 #include "poissonDirichlet.h"
+#include "parameters.h"
 
 using namespace std;
 using namespace tinyxml2;
@@ -42,8 +43,8 @@ public:
   void run(void);
 
 public:
-  Geometry *c_geom;
-  Time *c_time;
+  // Geometry *c_geom;
+  // Time *c_time;
   Particles *c_part;
   Bunch *c_bunch;
   ParticlesList *p_list;
@@ -55,6 +56,7 @@ public:
   ChargeDensity *c_rho_bunch;
   Current *c_current;
   XMLDocument *xml_data;
+  Parameters *params;
   int testnumber;
   int data_dump_interval;
   int system_state_dump_interval;
