@@ -50,49 +50,46 @@ cat<<EOF>${TESTDIR}/parameters.xml
     <relaxation_time> 0 </relaxation_time>
     <current_time> 0 </current_time>
     <end_time>${END_TIME}</end_time>
-    <delta_t>1e-12</delta_t>
+    <step_interval>1e-12</step_interval>
   </time>
 
-  <number_of_part_kinds>2</number_of_part_kinds>
-
-
   <particles>
-    <particle_kind>
-      <name>Electrons</name>
+    <particle_specie name="Electrons">
       <charge>-1</charge>
       <mass>1</mass>
-      <debug_number>1e2</debug_number>
-      <number>1e5</number>
+      <macro_count>1e5</macro_count>
+      <debug_macro_count>1e5</debug_macro_count>
       <left_density>2e16</left_density>
       <right_density>2.05e16</right_density>
       <temperature>1.0</temperature>
-    </particle_kind>
+    </particle_specie>
 
-    <particle_kind>
-      <name>Ions</name>
+    <particle_specie name="Ions">
       <charge>1</charge>
       <mass>1836</mass>
-      <debug_number>1e2</debug_number>
-      <number>1e5</number>
+      <macro_count>1e5</macro_count>
+      <debug_macro_count>1e5</debug_macro_count>
       <left_density>2e16</left_density>
       <right_density>2.05e16</right_density>
       <temperature>0.1</temperature>
-    </particle_kind>
+    </particle_specie>
   </particles>
 
-
-  <particles_bunch>
-    <name> Electrons </name>
+  <particle_beam name="Beam">
     <charge>-1</charge>
     <mass>1</mass>
-    <debug_number>1e2</debug_number>
-    <number>1e6</number>
-    <duration>1e-8</duration>
-    <radius>0.02</radius>
-    <density>1e15</density>
     <initial_velocity>2e8</initial_velocity>
-  </particles_bunch>
+    <bunches_count>1</bunches_count> <!-- NOT IMPLEMENTED -->
+    <bunches_distance>0.02</bunches_distance> <!-- NOT IMPLEMENTED -->
 
+    <bunch_macro_count>1e6</bunch_macro_count> <!-- count of macroparticles in one bunch -->
+    <debug_bunch_macro_count>1e4</debug_bunch_macro_count>
+    <!-- <duration>1e-10</duration> -->
+
+    <bunch_length>2</bunch_length>
+    <bunch_radius>0.02</bunch_radius>
+    <bunch_density>1e15</bunch_density>
+  </particle_beam>
 
   <boundary_maxwell_conditions>
     <e_fi_upper>0</e_fi_upper>
@@ -103,8 +100,8 @@ cat<<EOF>${TESTDIR}/parameters.xml
   <boundary_conditions type = "dirichlet">0</boundary_conditions>
 
   <file_save_parameters>
-    <path_to_result>pdp3_result/</path_to_result>
-    <path_to_save_state>pdp3_result/dump/</path_to_save_state>
+    <result_path>pdp3_result/</result_path>
+    <save_state_path>pdp3_result/dump/</save_state_path>
     <debug_data_dump_interval>5</debug_data_dump_interval>
     <data_dump_interval>5</data_dump_interval>
     <frames_per_file>1</frames_per_file>
@@ -116,6 +113,14 @@ cat<<EOF>${TESTDIR}/parameters.xml
       <H_r>false</H_r>
       <H_phi>false</H_phi>
       <H_z>false</H_z>
+      <J_r>true</J_r>
+      <J_phi>false</J_phi>
+      <J_z>true</J_z>
+
+      <position>true</position>
+
+      <velocity>true</velocity>
+
       <rho_bunch>true</rho_bunch>
     </dump_data>
   </file_save_parameters>
