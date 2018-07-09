@@ -41,11 +41,11 @@ public:
                 int r_step,
                 int z_step);
   void out_field_dump(char const *comp_name, double **out_value, int r_step, int z_step);
-  void out_pos(char *comp_name,
-               double **pos,
-               int step_number,
-               int number,
-               int particles_number);
+  void out_triple(char *comp_name,
+                  double **pos,
+                  int step_number,
+                  int number,
+                  int particles_number);
   void out_pos_dump(char *comp_name,
                       double **pos,
                       int particles_number);

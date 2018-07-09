@@ -27,46 +27,48 @@
     <relaxation_time>0</relaxation_time>
     <current_time>0</current_time>
     <end_time>5e-8</end_time>
-    <delta_t>1e-13</delta_t>
+    <step_interval>1e-13</step_interval>
   </time>
 
   <!-- number_of_part_kinds: 2 -->
 
   <particles>
-    <particle_kind>
-      <name>electrons</name>
+    <particle_specie name="electrons">
       <charge>-1</charge>
       <mass>1</mass> <!-- electron mass -->
-      <number>1e6</number>
-      <debug_number>1e4</debug_number>
+      <macro_count>1e6</macro_count>
+      <debug_macro_count>1e6</debug_macro_count>
       <left_density>1e16</left_density>
       <right_density>1.05e16</right_density>
       <temperature>1.0</temperature>
-    </particle_kind>
+    </particle_specie>
 
-    <particle_kind>
-      <name>ions</name>
+    <particle_specie name="ions">
       <charge>1</charge>
       <mass>1836</mass> <!-- electron mass -->
-      <number>1e6</number>
-      <debug_number>1e4</debug_number>
+      <macro_count>1e6</macro_count>
+      <debug_macro_count>1e6</debug_macro_count>
       <left_density>1e16</left_density>
       <right_density>1.05e16</right_density>
       <temperature>0.1</temperature>
-    </particle_kind>
+    </particle_specie>
   </particles>
 
-  <particles_bunch>
-    <name>electrons</name>
+  <particle_beam name="electron_beam">
     <charge>-1</charge>
     <mass>1</mass>
-    <number>1e6</number>
-    <debug_number>1e4</debug_number>
-    <duration>1e-10</duration>
-    <radius>0.02</radius>
-    <density>1e15</density>
     <initial_velocity>2e8</initial_velocity>
-  </particles_bunch>
+    <bunches_count>100</bunches_count> <!-- NOT IMPLEMENTED -->
+    <bunches_distance>0.02</bunches_distance> <!-- NOT IMPLEMENTED -->
+
+    <bunch_macro_count>1e6</bunch_macro_count> <!-- count of macroparticles in one bunch -->
+    <debug_bunch_macro_count>1e4</debug_bunch_macro_count>
+    <!-- <duration>1e-10</duration> -->
+
+    <bunch_length>0.02</bunch_length>
+    <bunch_radius>0.02</bunch_radius>
+    <bunch_density>1e15</bunch_density>
+  </particle_beam>
 
   <boundary_maxwell_conditions>
     <e_fi_upper>0</e_fi_upper>
@@ -77,8 +79,8 @@
   <boundary_conditions type = "dirichlet">0</boundary_conditions>
 
   <file_save_parameters>
-    <path_to_result>pdp3_result/</path_to_result>
-    <path_to_save_state>pdp3_result/dump/</path_to_save_state>
+    <result_path>pdp3_result/</result_path>
+    <save_state_path>pdp3_result/dump/</save_state_path>
     <compress_result>true</compress_result><!-- not implemented -->
     <!-- -->
     <data_dump_interval>5</data_dump_interval>
@@ -94,6 +96,11 @@
       <H_r>false</H_r>
       <H_phi>false</H_phi>
       <H_z>false</H_z>
+      <J_r>false</J_r>
+      <J_phi>false</J_phi>
+      <J_z>false</J_z>
+      <position>false</position>
+      <velocity>false</velocity>
       <rho_bunch>true</rho_bunch>
     </dump_data>
   </file_save_parameters>
