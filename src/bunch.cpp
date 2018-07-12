@@ -11,11 +11,15 @@ Bunch::Bunch(char *p_name,
              double b_duration,
              double b_radius,
              double b_density,
-             double b_init_velocity):Particles(p_name, p_charge, p_mass,
-                                               p_number, geom)
+             double b_init_velocity,
+             int b_number,
+             double h_duration):Particles(p_name, p_charge, p_mass,
+                                          p_number, geom)
 {
   // fill object fields
   duration = b_duration;
+  bunch_number = b_number; // bunch number
+  hole_duration = h_duration; // bunch number
   radius = b_radius;
   density = b_density;
   velocity = b_init_velocity;
@@ -43,17 +47,20 @@ Bunch::~Bunch(void)
 
 void Bunch::bunch_inject(Time *time)
 {
+  double bunch_time_begin = duration * bunch_number + hole_duration * bunch_number;
+  double bunch_time_end = bunch_time_begin + duration;
+
   double dl = velocity * time->delta_t;
-  int steps_amount = duration / time->delta_t;
+  int steps_amount = ceil(duration / time->delta_t);
   int particles_in_step = number / steps_amount;
-  int start_number = time->current_time / time->delta_t * particles_in_step;
+  int start_number = (time->current_time - bunch_time_begin) / time->delta_t * particles_in_step;
 
   // very local constants
   double half_r_cell_size_pow_2 = pow((geom1->dr / 2), 2);
   double half_z_cell_size = geom1->dz / 2.0;
   double const1 = radius * (radius - geom1->dr); // TODO: what is it? and why?
 
-  if (time->current_time<duration)
+  if (time->current_time >= bunch_time_begin && time->current_time < bunch_time_end) // (time->current_time<duration)
 #pragma omp parallel shared(start_number, dl, half_r_cell_size_pow_2, half_z_cell_size, const1)
   {
 #pragma omp for
@@ -62,12 +69,19 @@ void Bunch::bunch_inject(Time *time)
       double rand_i = lib::random_reverse(start_number + i, 9); // TODO: why 9 and 11?
       double rand_z = lib::random_reverse(start_number + i, 11);
 
-      pos[i+start_number][0] = sqrt(half_r_cell_size_pow_2 + const1 * rand_i);
-      pos[i+start_number][2] = dl * rand_z + half_z_cell_size;
-      vel[i+start_number][2] = velocity;
-      vel[i+start_number][0] = 0;
-      vel[i+start_number][1] = 0; // fi velocity;
-      is_alive[i+start_number] = true;
+      if (i+start_number < number)
+      {
+        pos[i+start_number][0] = sqrt(half_r_cell_size_pow_2 + const1 * rand_i);
+        pos[i+start_number][2] = dl * rand_z + half_z_cell_size;
+        vel[i+start_number][2] = velocity;
+        vel[i+start_number][0] = 0;
+        vel[i+start_number][1] = 0; // fi velocity;
+        is_alive[i+start_number] = true;
+      }
+#ifndef _OPENMP
+      else // optimize for singlethread case
+        break;
+#endif
     }
 
 #pragma omp for
