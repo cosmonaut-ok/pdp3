@@ -111,15 +111,11 @@ class Pdp3View:
         data_file_e_z = os.path.join(self.__cfg.data_path, self.data_file_e_z_pattern)
         data_file_bunch_density = os.path.join(self.__cfg.data_path, self.data_file_e_bunch_density_pattern)
 
-        # print(self.start_data_set, self.end_data_set)
-        # print(self.start_frame, self.end_frame)
         # with writer.saving(self.__plot_builder.figure, movie_file, self.video_dpi):
         for k in range(self.start_data_set, self.end_data_set+1):
             tstart = self.start_frame if k == self.start_data_set else k*fpf
             tend = self.end_frame if k == self.end_data_set else ((k+1)*fpf)
             i = 1;
-
-            print(k, tstart, tend)
 
             if not os.path.isfile(data_file_e_r + str(k)) \
                or not os.path.isfile(data_file_e_z + str(k)) \
