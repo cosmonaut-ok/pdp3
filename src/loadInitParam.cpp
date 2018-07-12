@@ -1,17 +1,7 @@
 #include "loadInitParam.h"
 
 using namespace std;
-using namespace tinyxml2;
 using namespace math::fourier;
-
-#define INITIAL_PARAMS_NAME "initial_parameters"
-#define PML_PARAMS_NAME "pml"
-#define GEOMETRY_PARAMS_NAME "geometry"
-// #define TIME_PARAMS_NAME "time"
-#define PARTICLES_PARAMS_NAME "particles"
-#define BUNCH_PARAMS_NAME "particles_bunch"
-#define BOUNDARY_MAXWELL_PARAMS_NAME "boundary_maxwell_conditions"
-#define FILE_SAVE_PARAMS_NAME "file_save_parameters"
 
 LoadInitParam::LoadInitParam(void)
 {
@@ -53,9 +43,9 @@ LoadInitParam::LoadInitParam(char *xml_file_name)
   cout << "Initializing Particles Data" << endl;
   init_particles();
 
-  //! 4. load bunch
+  //! 4. load particles beam
   cout << "Initializing Particles Beam Data" << endl;
-  init_bunch();
+  init_beam();
 
   //! 5. load boundary conditions
   cout << "Initializing Boundary Conditions Data" << endl;
@@ -85,14 +75,14 @@ void LoadInitParam::init_particles()
   c_rho_bunch = new ChargeDensity(params->geom);
   c_current = new Current(params->geom);
 
-  for (int i=0; i < params->particle_species.size(); i++)
+  for (unsigned int i=0; i < params->particle_species.size(); i++)
   {
     particle_specie p_p = params->particle_species[i];
 
     cout << "  Initializing " << p_p.name << " Data" << endl;
 
     //! init and setup particles properties
-    prtls = new Particles(p_p.name, p_p.charge, p_p.mass, p_p.macro_count, params->geom);
+    prtls = new Particles(p_p.name, p_p.charge, p_p.mass, p_p.number_macro, params->geom);
 		p_list->part_list.push_back(prtls); // push particles to particles list vector
 
     // case 2 is for cylindrical distribution
@@ -103,28 +93,34 @@ void LoadInitParam::init_particles()
   p_list->charge_weighting(c_rho_new);
 }
 
-void LoadInitParam::init_bunch()
+void LoadInitParam::init_beam()
 {
   //! initialize particles bunch data
   //! particles bunch should be injected to plasma
   Bunch *prtls;
 
-  // for (unsigned int i=0; i < params->beam_bunches_count)
+  // for (unsigned int i=0; i < params->beam_number_bunches)
   // {
   double duration = params->bunch_lenght / params->beam_initial_velocity;
+  double hole_duration = params->beam_bunches_distance / params->beam_initial_velocity;
 
-  prtls = new Bunch(params->beam_name,
-                    params->beam_particle_charge,
-                    params->beam_particle_mass,
-                    params->bunch_macro_count,
-                    params->geom, // p_list,
-                    duration,
-                    params->bunch_radius,
-                    params->bunch_density,
-                    params->beam_initial_velocity);
-  p_list->part_list.push_back(prtls); // push bunch to particles list vector
-  c_bunch = prtls;
-  // }
+  for (unsigned int i=0; i < params->beam_number_bunches; i++)
+    {
+      prtls = new Bunch(params->beam_name,
+                        params->beam_particle_charge,
+                        params->beam_particle_mass,
+                        params->bunch_number_macro,
+                        params->geom, // p_list,
+                        duration,
+                        params->bunch_radius,
+                        params->bunch_density,
+                        params->beam_initial_velocity,
+                        i,
+                        hole_duration);
+      p_list->part_list.push_back(prtls); // push bunch to particles list vector
+      c_bunches.push_back(prtls); // push bunch to bunches list vector
+      // }
+    }
 }
 
 void LoadInitParam::init_boundary ()
@@ -280,10 +276,11 @@ void LoadInitParam::run(void)
     the_time = clock();
 #endif
 
-    //! 1. inject bunch
-    c_bunch->bunch_inject(params->time);
+    //! 1. inject beam
+    for (unsigned int i=0; i < params->beam_number_bunches; i++)
+	c_bunches[i]->bunch_inject(params->time);
 #ifdef PERF_DEBUG
-    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_bunch->bunch_inject" << endl;
+    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_bunches[i]->bunch_inject" << endl;
     the_time = clock();
 #endif
 
@@ -406,9 +403,10 @@ void LoadInitParam::run(void)
            << left << setw(32) << avg_step_exec_time
            << endl;
 
-      c_bunch->charge_weighting(c_rho_bunch);
+      for (unsigned int i=0; i < params->beam_number_bunches; i++)
+	c_bunches[i]->charge_weighting(c_rho_bunch);
 #ifdef PERF_DEBUG
-      cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_bunch->charge_weighting" << endl;
+      cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_bunches[i]->charge_weighting" << endl;
       the_time = clock();
 #endif
       // c_rho_old->reset_rho();
@@ -422,7 +420,9 @@ void LoadInitParam::run(void)
 
       step_number += 1;
       t1 = time(0);
-      if  ((((int)(params->time->current_time/params->time->delta_t)) % params->dump_system_state_interval == 0) && (step_number != 1))
+      if  ((params->dump_system_state_interval != 0)
+           && (((int)(params->time->current_time/params->time->delta_t)) % params->dump_system_state_interval == 0)
+           && (step_number != 1))
       {
         cout << "Saving system state at " << params->time->current_time << endl;
         dump_system_state();
