@@ -19,6 +19,7 @@ DOXYGEN               = doxygen
 DOXYGEN_CONFIGS       = doc/app.conf doc/vis.conf
 DOXYGEN_FORMATS       ?= latex html rtf
 DOXYGEN_DIRS          = doc/app doc/vis
+RELEASE               = CURRENT
 
 ### pdp3 sources and settings
 pdp3_MODULE           = pdp3
@@ -100,7 +101,7 @@ $(SUBDIRS): dummy
 	cd $@ && $(MAKE)
 
 $(DOXYGEN_FORMATS): doxygen
-	for i in $(DOXYGEN_DIRS); do test -d $(ROOTDIR)/$$i/$@ && cd $(ROOTDIR)/$$i/$@ && test -f Makefile && $(MAKE); done
+	@for i in $(DOXYGEN_DIRS); do test -f $(ROOTDIR)$$i/$@/Makefile && (cd $(ROOTDIR)$$i/$@ && $(MAKE)) || true; done
 
 # Implicit rules
 .SUFFIXES: .cpp .cxx
@@ -151,7 +152,7 @@ $(pdp3_MODULE): $(pdp3_OBJS)
 	$(CXX) $(CXXFLAGS) $(CXXEXTRA) $(DEFINCL) $(LDFLAGS) -o $@ $(pdp3_OBJS) $(pdp3_LIBRARY_PATH) $(pdp3_LIBRARIES:%=-l%)
 
 mrproper: clean
-	$(RM) -r $(TESTDIR) *.avi $(TARGETDIR) *.zip
+	$(RM) -r $(TESTDIR) *.avi $(TARGETDIR) $(RELEASE) $(RELEASE).zip
 
 run: bootstrap
 	./pdp3
@@ -179,14 +180,13 @@ doxygen:
 
 doc: doxygen $(DOXYGEN_FORMATS)
 
-prepare_environment: all
-	$(MKDIR) -p $(TARGETDIR)/$(pdp3_RESULT_DIR)
-	cp pdp3 $(TARGETDIR)
-	sed "s/<path_to_result>.*<\/path_to_result>/<path_to_result>${pdp3_RESULT_DIR}\/<\/path_to_result>/g" parameters.xml > $(TARGETDIR)/parameters.xml
-
-dist: prepare_environment doc
-	cp -r tools $(TARGETDIR)/tools
-	mkdir -p $(TARGETDIR)/doc
-	cp doc/app/latex/refman.pdf $(TARGETDIR)/doc/pdp3.pdf
-	cp doc/vis/latex/refman.pdf $(TARGETDIR)/doc/visualization.pdf
-	zip -r `basename $(TARGETDIR)`.zip $(TARGETDIR)
+dist: all doc
+	$(MKDIR) -p $(RELEASE)/$(pdp3_RESULT_DIR)
+	cp pdp3 $(RELEASE)
+	sed "s/<path_to_result>.*<\/path_to_result>/<path_to_result>${pdp3_RESULT_DIR}\/<\/path_to_result>/g" parameters.xml > $(RELEASE)/parameters.xml
+	cp -r CHANGELOG.md $(RELEASE)
+	cp -r tools $(RELEASE)/tools
+	mkdir -p $(RELEASE)/doc
+	cp doc/app/latex/refman.pdf $(RELEASE)/doc/pdp3.pdf
+	cp doc/vis/latex/refman.pdf $(RELEASE)/doc/visualization.pdf
+	zip -r `basename $(RELEASE)`.zip $(RELEASE)
