@@ -112,7 +112,7 @@ class Pdp3View:
         # with writer.saving(self.__plot_builder.figure, movie_file, self.video_dpi):
         for k in range(self.start_data_set, self.end_data_set):
             tstart = k*fpf
-            tend = ((k+1)*fpf+1)
+            tend = ((k+1)*fpf)
             i = 1;
 
             if not os.path.isfile(data_file_e_r + str(k)) \
