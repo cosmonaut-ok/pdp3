@@ -188,12 +188,12 @@ def main():
     parser.add_argument('properties_path', metavar='properties_path', type=str,
                         help='Full path to properties.xml')
 
-    parser.add_argument('--video_file', type=str,
+    parser.add_argument('--video-file', type=str,
                         help='Full path to output video file')
 
     default_data_set_range = [0, 10000]
 
-    parser.add_argument('--data_set_range', type=str,
+    parser.add_argument('--data-set-range', type=str,
                         help='Range of data files set (e.g. 2:10 is E_r2-Er_10, E_z2-E_z10...). Default %s'
                         % ':'.join(map(str, default_data_set_range)))
 
@@ -204,10 +204,10 @@ def main():
 
     default_clim = [-1e5, 1e5]
 
-    parser.add_argument('--clim_e_r', type=str,
+    parser.add_argument('--clim-e-r', type=str,
                         help='Color limit range for Electrical field longitual component. Default %s'
                         % ':'.join(map(str, default_clim)))
-    parser.add_argument('--clim_e_z', type=str,
+    parser.add_argument('--clim-e-z', type=str,
                         help='Color limit range for Electrical field radial component. Default %s'
                         % ':'.join(map(str, default_clim)))
 
