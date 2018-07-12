@@ -2,8 +2,7 @@
 #include <iostream>
 #include <iomanip>
 #include <ctime>
-
-#include "tinyxml2.h"
+#include <vector>
 
 // enable openmp optional
 #ifdef _OPENMP
@@ -46,7 +45,7 @@ public:
   // Geometry *c_geom;
   // Time *c_time;
   Particles *c_part;
-  Bunch *c_bunch;
+  vector<Bunch*> c_bunches;
   ParticlesList *p_list;
   EField *efield;
   HField *hfield;
@@ -79,6 +78,6 @@ private:
   void init_time ();
   void init_particles ();
   void init_boundary ();
-  void init_bunch();
+  void init_beam();
   void init_file_saving_parameters ();
 };

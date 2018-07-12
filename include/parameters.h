@@ -43,7 +43,7 @@ struct particle_specie {
   char *name;
   unsigned int mass;
   int charge;
-  double macro_count;
+  double number_macro;
   double left_density;
   double right_density;
   double temperature;
@@ -93,15 +93,15 @@ public:
   int beam_particle_charge;
   //! particles mass in beam
   unsigned int beam_particle_mass;
-  //! count of particles in beam
-  unsigned int beam_bunches_count;
+  //! number of particles in beam
+  unsigned int beam_number_bunches;
   //! distance between bunches in beam
   double beam_bunches_distance;
   //! initial velocity of bunches in beam
   //! (mean, it is equal for all bucnhes in beam)
   double beam_initial_velocity;
-  //! count of macroparticles in bunch
-  unsigned int bunch_macro_count;
+  //! number of macroparticles in bunch
+  unsigned int bunch_number_macro;
   //! length of bunch
   double bunch_lenght;
   //! radius of bunch
@@ -144,7 +144,10 @@ public:
   bool dump_current_phi = false;
   bool dump_current_z = false;
 
-public:
+private:
+  XMLElement* xml_data;
+  XMLElement* try_first_child(XMLElement* element, const char* name);
+
   void init_particles();
   void init_beam();
   void init_geometry();
@@ -153,15 +156,4 @@ public:
   void init_boundary();
   void init_data_dump_parameters();
 
-private:
-  XMLDocument *xml_data;
-
-  /* void read_xml(const char *xml_file_name); */
-  /* void init_geometry (); */
-  /* void init_fields (); */
-  /* void init_time (); */
-  /* void init_particles (); */
-  /* void init_boundary (); */
-  /* void init_bunch(); */
-  /* void init_file_saving_parameters (); */
 };
