@@ -221,8 +221,8 @@ def main():
     if args.dry_run:
         write = False
 
-    clim_e_r = list(map(int, args.clim_e_r.split(':'))) if args.clim_e_r else default_clim
-    clim_e_z = list(map(int, args.clim_e_z.split(':'))) if args.clim_e_z else default_clim
+    clim_e_r = list(map(float, args.clim_e_r.split(':'))) if args.clim_e_r else default_clim
+    clim_e_z = list(map(float, args.clim_e_z.split(':'))) if args.clim_e_z else default_clim
 
     data_set_range = list(map(int, args.data_set_range.split(':'))) if args.data_set_range else default_data_set_range
 
