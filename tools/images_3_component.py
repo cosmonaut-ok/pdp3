@@ -47,12 +47,13 @@ class Pdp3Images:
         self.E_z_plot_name = r'$E_z$'
         self.E_bunch_density_plot_name = r'$\rho_{beam}$'
 
-    def get_file_frame(self):
-        number_frames = self.timestamp / self.__cfg.step_interval
-        fpf = self.__cfg.frames_per_file
-        file_number = int(number_frames // fpf)
-        frame_number = int(number_frames % fpf)
-        return [file_number, frame_number]
+    # def get_file_frame(self):
+    #     number_frames = self.timestamp / self.__cfg.step_interval / self.__cfg.data_dump_interval
+    #     fpf = self.__cfg.frames_per_file
+    #     file_number = int(number_frames // fpf)
+    #     frame_number = int(number_frames % fpf)
+    #     return [file_number, frame_number]
+
 
     def setup_plot(self, view):
         '''
@@ -113,7 +114,7 @@ class Pdp3Images:
         data_file_e_z = os.path.join(self.__cfg.data_path, self.data_file_e_z_pattern)
         data_file_bunch_density = os.path.join(self.__cfg.data_path, self.data_file_e_bunch_density_pattern)
 
-        data_file, data_frame = self.get_file_frame()
+        data_file, data_frame = self.__cfg.get_file_frame_by_timestamp(self.timestamp)
 
         k = data_file
 
