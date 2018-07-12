@@ -27,6 +27,8 @@ class Pdp3View:
         ## define files data file sets range
         self.start_data_set = 0
         self.end_data_set = 1000
+        self.start_frame = 0
+        self.end_frame = 0
 
         ## define public object fields
         self.data_file_e_r_pattern = 'e_r'
@@ -97,7 +99,7 @@ class Pdp3View:
 
         self.__plot_builder.figure.show()
 
-    def create_view_with_3_plots(self, view=False):
+    def create_view_with_3_plots(self):
         '''
         create movie with preset subplots and data from data files
         '''
@@ -109,11 +111,15 @@ class Pdp3View:
         data_file_e_z = os.path.join(self.__cfg.data_path, self.data_file_e_z_pattern)
         data_file_bunch_density = os.path.join(self.__cfg.data_path, self.data_file_e_bunch_density_pattern)
 
+        # print(self.start_data_set, self.end_data_set)
+        # print(self.start_frame, self.end_frame)
         # with writer.saving(self.__plot_builder.figure, movie_file, self.video_dpi):
-        for k in range(self.start_data_set, self.end_data_set):
-            tstart = k*fpf
-            tend = ((k+1)*fpf)
+        for k in range(self.start_data_set, self.end_data_set+1):
+            tstart = self.start_frame if k == self.start_data_set else k*fpf
+            tend = self.end_frame if k == self.end_data_set else ((k+1)*fpf)
             i = 1;
+
+            print(k, tstart, tend)
 
             if not os.path.isfile(data_file_e_r + str(k)) \
                or not os.path.isfile(data_file_e_z + str(k)) \
@@ -136,7 +142,7 @@ class Pdp3View:
             fidh_e_z.close()
             fidh_bunch_density.close()
 
-            for t in range(tstart, tend):
+            for t in range(tstart, tend+1):
                 local_step = t % fpf
 
                 print("Processing frame %d" % (local_step))
@@ -171,34 +177,39 @@ def main():
     parser.add_argument('properties_path', metavar='properties_path', type=str,
                         help='Full path to properties.xml')
 
-    parser.add_argument('--video_file', type=str,
+    parser.add_argument('--video-file', type=str,
                         help='Full path to output video file')
 
     default_data_set_range = [0, 10000]
 
-    parser.add_argument('--data_set_range', type=str,
-                        help='Range of data files set (e.g. 2:10 is E_r2-Er_10, E_z2-E_z10...). Default %s'
+    parser.add_argument('--data-set-range', type=str,
+                        help='Range of data files set (e.g. 2:10 is E_r2-Er_10, E_z2-E_z10...). Could be overriden by --time-range and --timestamp. Default %s'
                         % ':'.join(map(str, default_data_set_range)))
+
+    parser.add_argument('--time-range', type=str, help='Time range. Could be overriden by --timestamp')
+
+    parser.add_argument('--timestamp', type=float, help='Timestamp to generate image at')
 
     default_clim = [-1e5, 1e5]
 
-    parser.add_argument('--clim_e_r', type=str,
+    parser.add_argument('--clim-e-r', type=str,
                         help='Color limit range for Electrical field longitual component. Default %s'
                         % ':'.join(map(str, default_clim)))
-    parser.add_argument('--clim_e_z', type=str,
+    parser.add_argument('--clim-e-z', type=str,
                         help='Color limit range for Electrical field radial component. Default %s'
                         % ':'.join(map(str, default_clim)))
 
     args = parser.parse_args()
 
-    clim_e_r = list(map(float, args.clim_e_r.split(':'))) if args.clim_e_r else default_clim
-    clim_e_z = list(map(float, args.clim_e_z.split(':'))) if args.clim_e_z else default_clim
-
-    data_set_range = list(map(int, args.data_set_range.split(':'))) if args.data_set_range else default_data_set_range
+    ## required parameter
+    if not (args.data_set_range or args.time_range or args.timestamp):
+        parser.error('one of --data-set-range or --time-range or --timestamp required')
 
     # check if config file exists
     if os.path.isfile(args.properties_path):
         ## initialize config
+        clim_e_r = list(map(float, args.clim_e_r.split(':'))) if args.clim_e_r else default_clim
+        clim_e_z = list(map(float, args.clim_e_z.split(':'))) if args.clim_e_z else default_clim
         config = Parameters(args.properties_path, '/dev/null', clim_e_r, clim_e_z)
 
         view = Pdp3View(config)
@@ -206,8 +217,18 @@ def main():
         ################################################################################################
         #################### configure plot and view parameters #######################################
         ################################################################################################
-        view.start_data_set = data_set_range[0]
-        view.end_data_set = data_set_range[1]
+
+        if args.timestamp:
+            view.start_data_set, view.start_frame = config.get_file_frame_by_timestamp(args.timestamp)
+            view.end_data_set, view.end_frame = config.get_file_frame_by_timestamp(args.timestamp)
+        elif args.time_range:
+            time_range = list(map(float, args.time_range.split(':')))
+            view.start_data_set, view.start_frame = config.get_file_frame_by_timestamp(time_range[0])
+            view.end_data_set, view.end_frame = config.get_file_frame_by_timestamp(time_range[1])
+        else:
+            data_set_range = list(map(int, args.data_set_range.split(':')))
+            view.start_data_set = data_set_range[0]
+            view.end_data_set = data_set_range[1]
 
         view.data_file_e_r_pattern = 'E_r'
         view.data_file_e_z_pattern = 'E_z'
@@ -236,7 +257,7 @@ def main():
         ################################################################################################
 
         view.setup_plot()
-        view.create_view_with_3_plots(view)
+        view.create_view_with_3_plots()
         if view:
             input("Press 'Return' to exit ")
     else:

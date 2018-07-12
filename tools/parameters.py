@@ -50,6 +50,11 @@ class Parameters:
         # getData frame number per data file
         self.frames_per_file = int(file_save_parameters.getElementsByTagName('frames_per_file')[0].firstChild.data)
 
+        if is_debug:
+            self.data_dump_interval = int(file_save_parameters.getElementsByTagName('debug_data_dump_interval')[0].firstChild.data)
+        else:
+            self.data_dump_interval = int(file_save_parameters.getElementsByTagName('debug_data_dump_interval')[0].firstChild.data)
+
         # calculate data path
         if str.startswith(local_system_state_path, '/'):
             self.system_state_path = local_system_state_path
@@ -78,3 +83,10 @@ class Parameters:
         self.start_time = float(time.getElementsByTagName('start_time')[0].firstChild.data)
         self.end_time = float(time.getElementsByTagName('end_time')[0].firstChild.data)
         self.step_interval = float(time.getElementsByTagName('step_interval')[0].firstChild.data)
+
+    def get_file_frame_by_timestamp(self, timestamp):
+        number_frames = timestamp / self.step_interval / self.data_dump_interval
+        fpf = self.frames_per_file
+        file_number = int(number_frames // fpf)
+        frame_number = int(number_frames % fpf)
+        return [file_number, frame_number]
