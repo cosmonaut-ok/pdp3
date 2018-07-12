@@ -47,14 +47,6 @@ class Pdp3Images:
         self.E_z_plot_name = r'$E_z$'
         self.E_bunch_density_plot_name = r'$\rho_{beam}$'
 
-    # def get_file_frame(self):
-    #     number_frames = self.timestamp / self.__cfg.step_interval / self.__cfg.data_dump_interval
-    #     fpf = self.__cfg.frames_per_file
-    #     file_number = int(number_frames // fpf)
-    #     frame_number = int(number_frames % fpf)
-    #     return [file_number, frame_number]
-
-
     def setup_plot(self, view):
         '''
         initialize plot figure and subplots with preset object fields
