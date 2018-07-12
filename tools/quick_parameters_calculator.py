@@ -54,7 +54,8 @@ def main():
     config = Parameters(args.properties_path)
 
     for i in config.particles:
-        if i.getElementsByTagName('name')[0].firstChild.data == 'electrons':
+        p_name = i.getAttribute('name').lower()
+        if p_name == 'electrons':
             left_el_density = float(i.getElementsByTagName('left_density')[0].firstChild.data)
             right_el_density = float(i.getElementsByTagName('right_density')[0].firstChild.data)
             el_density = (left_el_density + right_el_density) / 2
@@ -64,20 +65,23 @@ def main():
     if not el_density:
         print("Incorrect parameters.xml file (no particles->particle_kind->electrons section)")
     else:
+        bunch_duration = config.bunch_length / config.beam_initial_velocity
+        beam_duration = bunch_duration * config.number_bunches + config.bunches_distance * (config.number_bunches -1)
         w_p = langmur_freq(el_density)
-        wake_len = wake_length(el_density, config.bunch_initial_velocity)
+        wake_len = wake_length(el_density, config.beam_initial_velocity)
         el_temperature = eV2kelvin(el_temperature)
         debye = debye_length(el_density, el_temperature)
-        bunch_part_number = math.pi * math.pow(config.bunch_radius, 2) * config.bunch_duration * config.bunch_initial_velocity * config.bunch_density
+        beam_part_number = math.pi * math.pow(config.bunch_radius, 2) * bunch_duration * config.beam_initial_velocity * config.bunch_density
 
         print("Expected plasma frequency is %.4g Hz"%(w_p/(2 * math.pi)))
         print("Expected wake wavelength is %.2g m"%(wake_len))
         print("Expected Debye length is %.4g m"%(debye))
-        print("Initial bunch velocity is %.4g m/s"%(config.bunch_initial_velocity))
-        print("Particles bunch length is %.4g m"%(config.bunch_duration * config.bunch_initial_velocity))
-        print("Number of particles in bunch is %.2g"%(bunch_part_number))
+        print("Initial beam velocity is %.4g m/s"%(config.beam_initial_velocity))
+        print("Single particles bunch duration is %.4g m"%bunch_duration)
+        print("Whole particles beam duration is %.4g m"%beam_duration)
+        print("Number of particles in beam is %.2g"%(beam_part_number))
         print()
-        print("Estimated bunch passage time is %.4g s"%(config.z_size / config.bunch_initial_velocity))
+        print("Estimated beam passage time is %.4g s"%(config.z_size / config.beam_initial_velocity + beam_duration / config.beam_initial_velocity))
         print("Number of calculation steps is %.0g"%((config.end_time - config.start_time) / config.step_interval))
 
 ## call main function

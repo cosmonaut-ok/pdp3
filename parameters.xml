@@ -2,14 +2,17 @@
 <!-- edited with XMLSpy v2011 rel. 2 -->
 <initial_parameters>
 
-  <!-- use debug mode with low resolution and macroparticles number and long data dump interval -->
-  <debug>false</debug>
+  <!--
+      //! use debug mode with low resolution and macroparticles number and long data dump interval
+      //! usual, tag names for debug begins from 'debug_' word. Ex. 'debug_n_grid_r'
+  -->
+  <debug>true</debug>
 
   <geometry>
-    <r_size>0.25</r_size>
-    <z_size>2.0</z_size>
-    <n_grid_r>255</n_grid_r>
-    <n_grid_z>2047</n_grid_z>
+    <r_size>0.25</r_size>       <!-- model radial size -->
+    <z_size>2.0</z_size>        <!-- model longitudal size-->
+    <n_grid_r>255</n_grid_r>    <!-- number of strips in model grid in radial direction -->
+    <n_grid_z>2047</n_grid_z>   <!-- number of strips in model grid in longitudal direction -->
     <debug_n_grid_r>31</debug_n_grid_r>
     <debug_n_grid_z>255</debug_n_grid_z>
   </geometry>
@@ -27,27 +30,27 @@
     <relaxation_time>0</relaxation_time>
     <current_time>0</current_time>
     <end_time>5e-8</end_time>
-    <step_interval>1e-13</step_interval>
+    <step_interval>1e-13</step_interval> <!-- time interval in one time-step -->
   </time>
 
   <!-- number_of_part_kinds: 2 -->
 
   <particles>
     <particle_specie name="electrons">
-      <charge>-1</charge>
-      <mass>1</mass> <!-- electron mass -->
-      <macro_count>1e6</macro_count>
-      <debug_macro_count>1e6</debug_macro_count>
-      <left_density>1e16</left_density>
+      <charge>-1</charge>       <!-- physical particle charge-->
+      <mass>1</mass>            <!-- physical particle mass -->
+      <number_macro>1e6</number_macro> <!-- number of macroparticles in whole modeling volume -->
+      <debug_number_macro>1e4</debug_number_macro>
+      <left_density>1e16</left_density> <!-- physical particles density -->
       <right_density>1.05e16</right_density>
-      <temperature>1.0</temperature>
+      <temperature>1.0</temperature> <!-- temperature of particle gas (in eV) -->
     </particle_specie>
 
     <particle_specie name="ions">
       <charge>1</charge>
       <mass>1836</mass> <!-- electron mass -->
-      <macro_count>1e6</macro_count>
-      <debug_macro_count>1e6</debug_macro_count>
+      <number_macro>1e6</number_macro>
+      <debug_number_macro>1e4</debug_number_macro>
       <left_density>1e16</left_density>
       <right_density>1.05e16</right_density>
       <temperature>0.1</temperature>
@@ -55,19 +58,18 @@
   </particles>
 
   <particle_beam name="electron_beam">
-    <charge>-1</charge>
-    <mass>1</mass>
-    <initial_velocity>2e8</initial_velocity>
-    <bunches_count>100</bunches_count> <!-- NOT IMPLEMENTED -->
-    <bunches_distance>0.02</bunches_distance> <!-- NOT IMPLEMENTED -->
+    <charge>-1</charge>         <!-- physical particles charge in particle beam -->
+    <mass>1</mass>              <!-- physical particles mass in particle beam -->
+    <initial_velocity>2e8</initial_velocity> <!-- beam bunches initial velocity -->
+    <number_bunches>2</number_bunches>       <!-- number of bunches in particle beam -->
+    <bunches_distance>0.2</bunches_distance> <!-- distance between bunches in beam -->
 
-    <bunch_macro_count>1e6</bunch_macro_count> <!-- count of macroparticles in one bunch -->
-    <debug_bunch_macro_count>1e4</debug_bunch_macro_count>
-    <!-- <duration>1e-10</duration> -->
+    <bunch_number_macro>1e6</bunch_number_macro> <!-- number of macroparticles in bunch -->
+    <debug_bunch_number_macro>1e4</debug_bunch_number_macro>
 
-    <bunch_length>0.02</bunch_length>
-    <bunch_radius>0.02</bunch_radius>
-    <bunch_density>1e15</bunch_density>
+    <bunch_length>0.02</bunch_length> <!-- length of single bunch in beam -->
+    <bunch_radius>0.02</bunch_radius> <!-- radius of bunches in beam -->
+    <bunch_density>1e15</bunch_density> <!-- physical particles density in beam bunch -->
   </particle_beam>
 
   <boundary_maxwell_conditions>
@@ -79,17 +81,13 @@
   <boundary_conditions type = "dirichlet">0</boundary_conditions>
 
   <file_save_parameters>
-    <result_path>pdp3_result/</result_path>
-    <save_state_path>pdp3_result/dump/</save_state_path>
-    <compress_result>true</compress_result><!-- not implemented -->
-    <!-- -->
-    <data_dump_interval>5</data_dump_interval>
+    <result_path>pdp3_result/</result_path>              <!-- path to modeling results data -->
+    <save_state_path>pdp3_result/dump/</save_state_path> <!-- path to system state dump -->
+    <data_dump_interval>5</data_dump_interval>           <!-- number of time steps between two result data dumps -->
     <debug_data_dump_interval>20</debug_data_dump_interval>
+    <system_state_dump_interval>0</system_state_dump_interval> <!-- number of time steps between two system state dumps. Set '0' to disable. RESTORATION STILL NOT IMPLEMENTED -->
     <frames_per_file>100</frames_per_file> <!-- how many image frames should be placed in one data file -->
-    <system_state_dump_interval>1000</system_state_dump_interval>
-    <!-- <time_step>100</time_step>-->
-    <!-- <number>100</number>-->
-    <dump_data>
+    <dump_data>                            <!-- system parameters, which should be dumped as data result -->
       <E_r>true</E_r>
       <E_phi>false</E_phi>
       <E_z>true</E_z>
