@@ -1,8 +1,44 @@
 CHANGELOG
 ---------
 
-CURRENT
+release-20180712
 =======
+
+- add possibility to inject series of bunches in one particle beam
+
+- naming convenctions refactoring
+
+- bugfixes in python tools
+
+- improve python tools interface
+
+- split python tools to images_3_component.py, movie_3_component.py and view_3_component.py to simplify CLI interface
+
+- implement Parameters class to simplify parameters.xml reading
+
+- optimize Makefile
+
+- add performance debugging options (temporary solution. Profiler-friendly options required)
+
+- add openmp threading with write locks to weighting code (experimental)
+
+- update default CFLAGS set
+
+- add more data dump parameters
+
+- fix fields, positions and velocities dump
+
+- Performance optimization
+
+- move old coordinates definition to Particles class
+
+- implement triple vectors as plain 3-component arrays as tinyvec3d library
+
+- fix particles spatial distribution calculation
+
+- fix particle relativistic calculations in pusher
+
+- improve quick_parameters calculator
 
 - rename directory python to tools
 
@@ -14,9 +50,7 @@ CURRENT
 
 - update python notebook for wake wave calculation
 
-- improve math:
-  - move math functions to separate namespace
-  - add functions for operations with 3D vectors (Triple-class based)
+- move math functions to separate namespace
 
 - move random_reverse function to lib.cpp as common for all code
 
