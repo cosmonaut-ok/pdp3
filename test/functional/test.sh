@@ -57,8 +57,8 @@ cat<<EOF>${TESTDIR}/parameters.xml
     <particle_specie name="Electrons">
       <charge>-1</charge>
       <mass>1</mass>
-      <macro_count>1e5</macro_count>
-      <debug_macro_count>1e5</debug_macro_count>
+      <number_macro>1e5</number_macro>
+      <debug_number_macro>1e5</debug_number_macro>
       <left_density>2e16</left_density>
       <right_density>2.05e16</right_density>
       <temperature>1.0</temperature>
@@ -67,8 +67,8 @@ cat<<EOF>${TESTDIR}/parameters.xml
     <particle_specie name="Ions">
       <charge>1</charge>
       <mass>1836</mass>
-      <macro_count>1e5</macro_count>
-      <debug_macro_count>1e5</debug_macro_count>
+      <number_macro>1e5</number_macro>
+      <debug_number_macro>1e5</debug_number_macro>
       <left_density>2e16</left_density>
       <right_density>2.05e16</right_density>
       <temperature>0.1</temperature>
@@ -79,11 +79,11 @@ cat<<EOF>${TESTDIR}/parameters.xml
     <charge>-1</charge>
     <mass>1</mass>
     <initial_velocity>2e8</initial_velocity>
-    <bunches_count>1</bunches_count> <!-- NOT IMPLEMENTED -->
+    <number_bunches>1</number_bunches> <!-- NOT IMPLEMENTED -->
     <bunches_distance>0.02</bunches_distance> <!-- NOT IMPLEMENTED -->
 
-    <bunch_macro_count>1e6</bunch_macro_count> <!-- count of macroparticles in one bunch -->
-    <debug_bunch_macro_count>1e4</debug_bunch_macro_count>
+    <bunch_number_macro>1e6</bunch_number_macro> <!-- number of macroparticles in one bunch -->
+    <debug_bunch_number_macro>1e4</debug_bunch_number_macro>
     <!-- <duration>1e-10</duration> -->
 
     <bunch_length>2</bunch_length>

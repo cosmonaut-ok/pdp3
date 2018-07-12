@@ -18,7 +18,7 @@ from pdp3_plot_builder import PDP3PlotBuilder
 ## color map reference: https://matplotlib.org/examples/color/colormaps_reference.html
 ## mathtext reference:  https://matplotlib.org/users/mathtext.html
 
-class Pdp3Movie:
+class Pdp3View:
     def __init__(self, cfg):
         ## define private object fields
         self.__cfg = cfg
@@ -53,7 +53,7 @@ class Pdp3Movie:
         self.E_z_plot_name = r'$E_z$'
         self.E_bunch_density_plot_name = r'$\rho_{beam}$'
 
-    def setup_plot(self, view):
+    def setup_plot(self):
         '''
         initialize plot figure and subplots with preset object fields
         '''
@@ -95,10 +95,9 @@ class Pdp3Movie:
             ticklabels=[self.__cfg.bunch_density, 0], title=self.cbar_bunch_density_axis_label
         )
 
-        if view:
-            self.__plot_builder.figure.show()
+        self.__plot_builder.figure.show()
 
-    def create_movie_with_3_plots(self, view=False, write=True):
+    def create_view_with_3_plots(self, view=False):
         '''
         create movie with preset subplots and data from data files
         '''
@@ -110,74 +109,58 @@ class Pdp3Movie:
         data_file_e_z = os.path.join(self.__cfg.data_path, self.data_file_e_z_pattern)
         data_file_bunch_density = os.path.join(self.__cfg.data_path, self.data_file_e_bunch_density_pattern)
 
-        FFMpegWriter = ani.writers['ffmpeg']
-        metadata = dict(title='Movie Test', artist='Matplotlib',
-                        comment='Movie support!')
-        writer = FFMpegWriter(fps=self.video_fps,
-                              metadata=metadata,
-                              codec=self.video_codec,
-                              bitrate=self.video_bitrate)
+        # with writer.saving(self.__plot_builder.figure, movie_file, self.video_dpi):
+        for k in range(self.start_data_set, self.end_data_set):
+            tstart = k*fpf
+            tend = (k*fpf+1)
+            i = 1;
 
-        ## dirty hack to aviod real file writing
-        if write:
-            movie_file = self.__cfg.movie_file
-        else:
-            movie_file = '/dev/null'
+            if not os.path.isfile(data_file_e_r + str(k)) \
+               or not os.path.isfile(data_file_e_z + str(k)) \
+               or not os.path.isfile(data_file_bunch_density + str(k)):
+                print('No more data files exists. Exiting')
+                return
 
-        with writer.saving(self.__plot_builder.figure, movie_file, self.video_dpi):
-            for k in range(self.start_data_set, self.end_data_set):
-                tstart = k*fpf
-                tend = (k*fpf+1)
-                i = 1;
+            print("Loading files set %d" % (k))
+            ## Open data files
+            fidh_e_r = open(data_file_e_r + str(k), 'r')
+            fidh_e_z = open(data_file_e_z + str(k), 'r')
+            fidh_bunch_density = open(data_file_bunch_density + str(k), 'r')
 
-                if not os.path.isfile(data_file_e_r + str(k)) \
-                   or not os.path.isfile(data_file_e_z + str(k)) \
-                   or not os.path.isfile(data_file_bunch_density + str(k)):
-                    print('No more data files exists. Exiting')
-                    return
+            h_field_e_r = fromfile(fidh_e_r, dtype=float, count=sr*sz*fpf, sep=' ')
+            h_field_e_z = fromfile(fidh_e_z, dtype=float, count=sr*sz*fpf, sep=' ')
+            h_field_bunch_density = fromfile(fidh_bunch_density, dtype=float, count=sr*sz*fpf, sep=' ')
 
-                print("Loading files set %d" % (k))
-                ## Open data files
-                fidh_e_r = open(data_file_e_r + str(k), 'r')
-                fidh_e_z = open(data_file_e_z + str(k), 'r')
-                fidh_bunch_density = open(data_file_bunch_density + str(k), 'r')
+            ## Close data files
+            fidh_e_r.close()
+            fidh_e_z.close()
+            fidh_bunch_density.close()
 
-                h_field_e_r = fromfile(fidh_e_r, dtype=float, count=sr*sz*fpf, sep=' ')
-                h_field_e_z = fromfile(fidh_e_z, dtype=float, count=sr*sz*fpf, sep=' ')
-                h_field_bunch_density = fromfile(fidh_bunch_density, dtype=float, count=sr*sz*fpf, sep=' ')
+            for t in range(tstart, tend):
+                local_step = t % fpf
 
-                ## Close data files
-                fidh_e_r.close()
-                fidh_e_z.close()
-                fidh_bunch_density.close()
+                print("Processing frame %d" % (local_step))
 
-                for t in range(tstart, tend):
-                    local_step = t % fpf
+                rstart = sr*sz*local_step
+                rend = sr*sz*(local_step+1)
 
-                    print("Processing frame %d" % (local_step))
+                try:
+                    self.__plot_builder.fill_image_with_data(
+                        self.E_z_plot_name,
+                        h_field_e_r[rstart:rend])
 
-                    rstart = sr*sz*local_step
-                    rend = sr*sz*(local_step+1)
-                    try:
-                        self.__plot_builder.fill_image_with_data(
-                            self.E_z_plot_name,
-                            h_field_e_r[rstart:rend])
+                    self.__plot_builder.fill_image_with_data(
+                        self.E_r_plot_name,
+                        h_field_e_z[rstart:rend])
 
-                        self.__plot_builder.fill_image_with_data(
-                            self.E_r_plot_name,
-                            h_field_e_z[rstart:rend])
+                    self.__plot_builder.fill_image_with_data(
+                        self.E_bunch_density_plot_name,
+                        h_field_bunch_density[rstart:rend])
 
-                        self.__plot_builder.fill_image_with_data(
-                            self.E_bunch_density_plot_name,
-                            h_field_bunch_density[rstart:rend])
+                except ValueError: ## skip frame, when data is inconsistent
+                    break
 
-                    except ValueError: ## skip frame, when data is inconsistent
-                        break
-
-                    if write:
-                        writer.grab_frame()
-                    if view:
-                        self.__plot_builder.redraw()
+                self.__plot_builder.redraw()
 
 def main():
     ## configure RC properties
@@ -197,11 +180,6 @@ def main():
                         help='Range of data files set (e.g. 2:10 is E_r2-Er_10, E_z2-E_z10...). Default %s'
                         % ':'.join(map(str, default_data_set_range)))
 
-    parser.add_argument('--dry-run', action='store_true', help='Do not write anything. Just for debug')
-
-    parser.add_argument('--view', action='store_true', default=False,
-                        help='View animation as well as write it to file')
-
     default_clim = [-1e5, 1e5]
 
     parser.add_argument('--clim_e_r', type=str,
@@ -213,60 +191,52 @@ def main():
 
     args = parser.parse_args()
 
-    view=False
-    write=True
-
-    if args.view:
-        view = True
-    if args.dry_run:
-        write = False
-
-    clim_e_r = list(map(int, args.clim_e_r.split(':'))) if args.clim_e_r else default_clim
-    clim_e_z = list(map(int, args.clim_e_z.split(':'))) if args.clim_e_z else default_clim
+    clim_e_r = list(map(float, args.clim_e_r.split(':'))) if args.clim_e_r else default_clim
+    clim_e_z = list(map(float, args.clim_e_z.split(':'))) if args.clim_e_z else default_clim
 
     data_set_range = list(map(int, args.data_set_range.split(':'))) if args.data_set_range else default_data_set_range
 
     # check if config file exists
     if os.path.isfile(args.properties_path):
         ## initialize config
-        config = Parameters(args.properties_path, args.video_file, clim_e_r, clim_e_z)
+        config = Parameters(args.properties_path, '/dev/null', clim_e_r, clim_e_z)
 
-        movie = Pdp3Movie(config)
+        view = Pdp3View(config)
 
         ################################################################################################
-        #################### configure plot and movie parameters #######################################
+        #################### configure plot and view parameters #######################################
         ################################################################################################
-        movie.start_data_set = data_set_range[0]
-        movie.end_data_set = data_set_range[1]
+        view.start_data_set = data_set_range[0]
+        view.end_data_set = data_set_range[1]
 
-        movie.data_file_e_r_pattern = 'E_r'
-        movie.data_file_e_z_pattern = 'E_z'
-        movie.data_file_e_bunch_density_pattern = 'rho_beam'
+        view.data_file_e_r_pattern = 'E_r'
+        view.data_file_e_z_pattern = 'E_z'
+        view.data_file_e_bunch_density_pattern = 'rho_beam'
 
-        movie.x_axis_label = r'$\mathit{Z (m)}$'
-        movie.y_axis_label = r'$\mathit{R (m)}$'
-        movie.cbar_axis_label = r'$\frac{V}{m}$'
-        movie.cbar_bunch_density_axis_label = r'$m^{-3}$'
+        view.x_axis_label = r'$\mathit{Z (m)}$'
+        view.y_axis_label = r'$\mathit{R (m)}$'
+        view.cbar_axis_label = r'$\frac{V}{m}$'
+        view.cbar_bunch_density_axis_label = r'$m^{-3}$'
 
-        movie.position_e_r = [0.1, 0.70, 0.8, 0.3]
-        movie.position_e_z = [0.1, 0.35, 0.8, 0.3]
-        movie.position_bunch_density = [0.1, 0.01, 0.8, 0.3]
+        view.position_e_r = [0.1, 0.70, 0.8, 0.3]
+        view.position_e_z = [0.1, 0.35, 0.8, 0.3]
+        view.position_bunch_density = [0.1, 0.01, 0.8, 0.3]
 
-        movie.cmap = 'gray'
-        movie.video_codec = 'mjpeg'
-        movie.video_fps = 30
-        movie.video_dpi = 100
-        movie.video_bitrate=32000
+        view.cmap = 'gray'
+        view.video_codec = 'mjpeg'
+        view.video_fps = 30
+        view.video_dpi = 100
+        view.video_bitrate=32000
 
-        movie.E_r_plot_name = r'$\mathbf{Electrical\enspace Field\enspace Radial\enspace Component}\enspace(E_r)$'
-        movie.E_z_plot_name = r'$\mathbf{Electrical\enspace Field\enspace Longitudal\enspace Component}\enspace(E_z)$'
-        movie.E_bunch_density_plot_name = r'$\mathbf{Electron\enspace Beam\enspace Density}\enspace (\rho_{beam})$'
+        view.E_r_plot_name = r'$\mathbf{Electrical\enspace Field\enspace Radial\enspace Component}\enspace(E_r)$'
+        view.E_z_plot_name = r'$\mathbf{Electrical\enspace Field\enspace Longitudal\enspace Component}\enspace(E_z)$'
+        view.E_bunch_density_plot_name = r'$\mathbf{Electron\enspace Bunch\enspace Density}\enspace (\rho_{bunch})$'
         ################################################################################################
         ################################################################################################
         ################################################################################################
 
-        movie.setup_plot(view)
-        movie.create_movie_with_3_plots(view, write)
+        view.setup_plot()
+        view.create_view_with_3_plots(view)
         if view:
             input("Press 'Return' to exit ")
     else:
