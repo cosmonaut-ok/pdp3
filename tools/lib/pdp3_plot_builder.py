@@ -6,7 +6,7 @@ import os
 current_dir = os.path.dirname(os.path.abspath('__file__'))
 sys.path.append(current_dir)
 
-from parameters import Parameters
+from lib.parameters import Parameters
 
 from numpy import *
 from pylab import *
