@@ -86,7 +86,7 @@
     <data_dump_interval>20</data_dump_interval>          <!-- number of time steps between two result data dumps -->
     <debug_data_dump_interval>50</debug_data_dump_interval>
     <system_state_dump_interval>0</system_state_dump_interval> <!-- number of time steps between two system state dumps. Set '0' to disable. RESTORATION STILL NOT IMPLEMENTED -->
-    <frames_per_file>100</frames_per_file> <!-- how many image frames should be placed in one data file -->
+    <frames_per_file>10</frames_per_file> <!-- how many image frames should be placed in one data file -->
     <dump_data>                            <!-- system parameters, which should be dumped as data result -->
       <E_r>true</E_r>
       <E_phi>false</E_phi>
@@ -102,5 +102,14 @@
       <rho_bunch>true</rho_bunch>
     </dump_data>
   </file_save_parameters>
+
+  <plot>
+    <video>
+      <codec>mjpeg</codec>
+      <fps>20</fps>
+      <dpi>100</dpi>
+      <bitrate>32000</bitrate>
+    </video>
+  </plot>
 
 </initial_parameters>
