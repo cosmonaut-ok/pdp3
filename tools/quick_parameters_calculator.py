@@ -13,8 +13,8 @@ import argparse
 # import matplotlib.pyplot as plt
 # import matplotlib.animation as ani
 
-from parameters import Parameters
-from pdp3_plot_builder import PDP3PlotBuilder
+from lib.parameters import Parameters
+from lib.pdp3_plot_builder import PDP3PlotBuilder
 
 def langmur_freq(density):
     # pi = 3.1415
@@ -45,7 +45,7 @@ def wake_length(density, beam_velocity):
     return lambda_
 
 def main():
-    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser = argparse.ArgumentParser(description='Quick calculator for some PDP3 model parameters.')
     parser.add_argument('properties_path', metavar='properties_path', type=str,
                         help='Full path to properties.xml')
 
