@@ -125,6 +125,15 @@ cat<<EOF>${TESTDIR}/parameters.xml
     </dump_data>
   </file_save_parameters>
 
+  <plot>
+    <video>
+      <codec>mjpeg</codec>
+      <fps>20</fps>
+      <dpi>100</dpi>
+      <bitrate>32000</bitrate>
+    </video>
+  </plot>
+
 </initial_parameters>
 
 EOF
