@@ -4,13 +4,13 @@ from numpy import *
 import json
 
 class Parameters:
-    def __init__(self, parameters_file, movie_file=None, clim_e_field_r=[0,1], clim_e_field_z=[0,1]):
+    def __init__(self, parameters_file): # , movie_file=None): # , clim_e_field_r=[0,1], clim_e_field_z=[0,1]):
         '''
         read parameters from properties.xml, recalculate and set parameters as object fields
         '''
 
         self.config_path = os.path.dirname(parameters_file)
-        self.movie_file = movie_file if movie_file else os.path.join(self.config_path, 'field_movie.avi')
+        # self.movie_file = movie_file if movie_file else os.path.join(self.config_path, 'field_movie.avi')
 
         ## read parameters_file
         self.dom_root = minidom.parse(parameters_file)
@@ -70,10 +70,6 @@ class Parameters:
         self.bunches_distance = float(beam.item(0).getElementsByTagName('bunches_distance')[0].firstChild.data)
         self.beam_initial_velocity = float(beam.item(0).getElementsByTagName('initial_velocity')[0].firstChild.data)
 
-        self.clim_e_field_r = clim_e_field_r # r-component of E field
-        self.clim_e_field_z = clim_e_field_z # z-component of E field
-        self.clim_e_field_beam = [-(self.bunch_density*1.6e-19), 0] # E field of electron/ion beam
-
         # get particles
         particles = self.dom_root.getElementsByTagName('particles')[0];
         self.particles = particles.getElementsByTagName('particle_specie')
@@ -83,6 +79,16 @@ class Parameters:
         self.start_time = float(time.getElementsByTagName('start_time')[0].firstChild.data)
         self.end_time = float(time.getElementsByTagName('end_time')[0].firstChild.data)
         self.step_interval = float(time.getElementsByTagName('step_interval')[0].firstChild.data)
+
+        # get plot parameters
+        plot = self.dom_root.getElementsByTagName('plot')[0]
+
+        # get video parameters
+        video = plot.getElementsByTagName('video')[0]
+        self.video_codec = str(plot.getElementsByTagName('codec')[0].firstChild.data)
+        self.video_fps = int(plot.getElementsByTagName('fps')[0].firstChild.data)
+        self.video_dpi = int(plot.getElementsByTagName('dpi')[0].firstChild.data)
+        self.video_bitrate = int(plot.getElementsByTagName('bitrate')[0].firstChild.data)
 
     def get_file_frame_by_timestamp(self, timestamp):
         number_frames = timestamp / self.step_interval / self.data_dump_interval
