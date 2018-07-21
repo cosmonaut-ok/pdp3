@@ -134,7 +134,7 @@ def main():
                         Reference: https://matplotlib.org/examples/color/colormaps_reference.html''' % 'gray',
                         default='gray')
 
-    parser.add_argument('--beam-scale-factor', type=int,
+    parser.add_argument('--beam-scale-factor', type=float,
                         help='''Beam density setting automatically, but you can set scale factor to sets,
                         where initial bunch density should be placed in color range''',
                         default=2)
