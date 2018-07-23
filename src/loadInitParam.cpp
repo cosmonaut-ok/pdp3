@@ -267,7 +267,7 @@ void LoadInitParam::run(void)
   char avg_step_exec_time[24]; // rounded and formatted average step execution time
 
   //! Main calculation cycle
-  while (params->time->current_time <= params->time->end_time)
+  while (params->time->current_time < params->time->end_time)
   {
     //! Steps:
 #ifdef PERF_DEBUG
