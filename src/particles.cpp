@@ -85,7 +85,7 @@ void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
   for(int i=0; i<number; i++)
     if (is_alive[i])
     {
-      // define vars directly in cycle, because of multithreading
+      // define vars directly in loop, because of multithreading
       double gamma, const1, const2, sq_velocity;
       // use classical calculations, if velocity lower, than minimal
       double min_relativistic_velocity = 5e7;
