@@ -258,7 +258,7 @@ void LoadInitParam::dump_data(int step_number)
 void LoadInitParam::run(void)
 {
   //! Launch calculation.
-  //! THIS IS ENTRY POINT TO MAIN PDP3 CALCULATION CYCLE
+  //! THIS IS ENTRY POINT TO MAIN PDP3 CALCULATION LOOP
   cout << endl << "Launch Simulation" << endl << endl;
 
   clock_t the_time = 0;
@@ -266,7 +266,7 @@ void LoadInitParam::run(void)
   time_t t1 = time(0);
   char avg_step_exec_time[24]; // rounded and formatted average step execution time
 
-  //! Main calculation cycle
+  //! Main calculation loop
   while (params->time->current_time < params->time->end_time)
   {
     //! Steps:
