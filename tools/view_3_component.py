@@ -8,6 +8,7 @@ import argparse
 from numpy import *
 from pylab import *
 
+import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.animation as ani
 
@@ -29,6 +30,17 @@ class Pdp3View(Pdp3EViewBuilder):
         initialize plot figure and subplots with preset object fields
         '''
         super(Pdp3View, self).setup_3e_view()
+
+        mgr = self._plot_builder.figure.canvas.manager
+        if matplotlib.get_backend() == 'Qt5Agg':  # 'Qt4' backend
+            mgr.window.showMaximized()
+        elif matplotlib.get_backend() == 'Qt4Agg':  # 'Qt4' backend
+            mgr.window.showMaximized()
+        elif matplotlib.get_backend() == 'WxAgg':  # 'WxAgg' backend
+            mgr.frame.Maximize(True)
+        elif matplotlib.get_backend() == 'TKAgg':  # 'TKAgg' backend
+            matplotlib.frame.Maximize(True)
+
         self._plot_builder.figure.show()
 
 def main():
