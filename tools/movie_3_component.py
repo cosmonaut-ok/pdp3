@@ -207,7 +207,8 @@ def main():
 
         movie.setup_3e_view(view)
         movie.create_view_with_3_plots(view, write)
-        input("Press 'Return' to exit ")
+        if view:
+            input("Press 'Return' to exit ")
     else:
         print("Configuration file `%s' does not exists. Exiting" % args.properties_path)
         exit(1)
