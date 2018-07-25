@@ -2,6 +2,7 @@ import os
 from xml.dom import minidom
 from numpy import *
 import json
+import math
 
 class Parameters:
     def __init__(self, parameters_file): # , movie_file=None): # , clim_e_field_r=[0,1], clim_e_field_z=[0,1]):
@@ -89,6 +90,8 @@ class Parameters:
         self.video_fps = int(plot.getElementsByTagName('fps')[0].firstChild.data)
         self.video_dpi = int(plot.getElementsByTagName('dpi')[0].firstChild.data)
         self.video_bitrate = int(plot.getElementsByTagName('bitrate')[0].firstChild.data)
+        # get clim estimation
+        self.get_clim_estimation()
 
     def get_file_frame_by_timestamp(self, timestamp):
         number_frames = timestamp / self.step_interval / self.data_dump_interval
@@ -96,3 +99,20 @@ class Parameters:
         file_number = int(number_frames // fpf)
         frame_number = int(number_frames % fpf)
         return [file_number, frame_number]
+
+    def get_clim_estimation(self):
+        p_factor_array = []
+        factor = 1e-5 # very empirical coefitient :)
+        counter = 0
+
+        for i in self.particles:
+            n_l = float(i.getElementsByTagName('left_density')[0].firstChild.data)
+            n_r = float(i.getElementsByTagName('right_density')[0].firstChild.data)
+            t = float(i.getElementsByTagName('temperature')[0].firstChild.data)
+
+            n = n_l if n_l > n_r else n_r
+
+            p_factor_array.append(factor * n * t * math.sqrt(self.step_interval))
+            counter = counter+1
+
+        self.clim_estimation = sum(p_factor_array)
