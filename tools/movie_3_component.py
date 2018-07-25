@@ -127,7 +127,6 @@ def main():
                         help='Full path to properties.xml')
 
     default_data_set_range = [0, 10000]
-    default_clim = [-1e5, 1e5]
 
     parser.add_argument('--video-file', type=str,
                         help='Full path to output video file. Default <path/to/parameters.xml>/field_movie.avi')
@@ -150,11 +149,9 @@ def main():
                         default=2)
 
     parser.add_argument('--clim-e-r', type=str,
-                        help='Color limit range for Electrical field longitual component. Default %s'
-                        % ':'.join(map(str, default_clim)))
+                        help='Color limit range for Electrical field longitual component')
     parser.add_argument('--clim-e-z', type=str,
-                        help='Color limit range for Electrical field radial component. Default %s'
-                        % ':'.join(map(str, default_clim)))
+                        help='Color limit range for Electrical field radial component')
 
     parser.add_argument('--dry-run', action='store_true', help='Do not write anything. Just for debug')
 
@@ -185,8 +182,8 @@ def main():
         #################### configure plot and view parameters #######################################
         ################################################################################################
         movie.video_file = os.path.join(config.config_path, 'field_movie.avi') if not args.video_file else args.video_file
-        movie.clim_e_field_r = list(map(float, args.clim_e_r.split(':'))) if args.clim_e_r else default_clim
-        movie.clim_e_field_z = list(map(float, args.clim_e_z.split(':'))) if args.clim_e_z else default_clim
+        movie.clim_e_field_r = list(map(float, args.clim_e_r.split(':'))) if args.clim_e_r else [-config.clim_estimation, config.clim_estimation]
+        movie.clim_e_field_z = list(map(float, args.clim_e_z.split(':'))) if args.clim_e_z else [-config.clim_estimation, config.clim_estimation]
         movie.cmap = args.cmap
         movie.clim_e_field_beam_scale_factor = args.beam_scale_factor
 
