@@ -29,6 +29,9 @@ class PDP3PlotBuilder:
         self.x_tick_count = 10;
         self.y_tick_count = 4;
 
+        self.x_plot_size = self.__cfg.z_grid_count
+        self.y_plot_size = self.__cfg.r_grid_count
+
     def get_subplot(self, name):
         ''' Object collects axes (subplots) and images for quick access
         this function allows to quick access to subplot by name
@@ -65,8 +68,8 @@ class PDP3PlotBuilder:
         subplot.set_aspect('equal')
         subplot.invert_yaxis()
         ## initialize image with random data, normalized to clim range
-        # initial_data = rand(self.__cfg.r_grid_count, self.__cfg.z_grid_count)*(clim[1]-clim[0])-((clim[0]+clim[1])/2)
-        initial_data = zeros([self.__cfg.r_grid_count, self.__cfg.z_grid_count])
+        # initial_data = rand(self.y_plot_size, self.x_plot_size)*(clim[1]-clim[0])-((clim[0]+clim[1])/2)
+        initial_data = zeros([self.y_plot_size, self.x_plot_size])
         image = subplot.imshow(initial_data,
                                cmap=cmap,
                                interpolation=interpolation_type)
@@ -89,8 +92,8 @@ class PDP3PlotBuilder:
         y_tick_range = around(linspace(0, self.__cfg.r_size, self.y_tick_count+1), 2)
 
         # ticks, that sets grid dimensions, required for data placement
-        x_tick_grid_size = linspace(0, self.__cfg.z_grid_count, self.x_tick_count+1)
-        y_tick_grid_size = linspace(0, self.__cfg.r_grid_count, self.y_tick_count+1)
+        x_tick_grid_size = linspace(0, self.x_plot_size, self.x_tick_count+1)
+        y_tick_grid_size = linspace(0, self.y_plot_size, self.y_tick_count+1)
 
         # set axis properties
         axes.set_title(_title)
@@ -157,8 +160,8 @@ class PDP3PlotBuilder:
         ''' fill image with 1-dimenstional data array, (usually got from model files)
         sized by grid dimensions (n_grid_r, n_grid_z in parameters.xml) multiplication
         used to fill model image with data '''
-        sr = self.__cfg.r_grid_count
-        sz = self.__cfg.z_grid_count
+        sr = self.y_plot_size
+        sz = self.x_plot_size
         data_len = len(data)
         if data_len != sr*sz:
             raise ValueError('data array length is not equal to grid dimensions multiplication: %i X %i' % (sr,sz))
