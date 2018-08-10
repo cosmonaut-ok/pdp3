@@ -18,9 +18,9 @@
   </geometry>
 
   <pml>
-    <comparative_l_1>0</comparative_l_1>
-    <comparative_l_2>0</comparative_l_2>
-    <comparative_l_3>0</comparative_l_3>
+    <comparative_l_1>0</comparative_l_1> <!-- z=0 -->
+    <comparative_l_2>0</comparative_l_2> <!-- z=WALL -->
+    <comparative_l_3>0</comparative_l_3> <!-- r=WALL -->
     <sigma_1>1e-5</sigma_1>
     <sigma_2>7e-2</sigma_2>
   </pml>
