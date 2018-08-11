@@ -32,6 +32,12 @@ class PDP3PlotBuilder:
         self.x_plot_size = self.__cfg.z_grid_count
         self.y_plot_size = self.__cfg.r_grid_count
 
+        self.x_tick_start = 0
+        self.x_tick_end = self.__cfg.z_size
+        self.y_tick_start = 0
+        self.y_tick_end = self.__cfg.r_size
+
+
     def get_subplot(self, name):
         ''' Object collects axes (subplots) and images for quick access
         this function allows to quick access to subplot by name
@@ -88,12 +94,12 @@ class PDP3PlotBuilder:
 
         # tick labels, that shows __real__ model space dimensions
         # translates from grid_size
-        x_tick_range = around(linspace(0, self.__cfg.z_size, self.x_tick_count+1), 2)
-        y_tick_range = around(linspace(0, self.__cfg.r_size, self.y_tick_count+1), 2)
+        x_tick_range = around(linspace(self.x_tick_start, self.x_tick_end, self.x_tick_count+1), 2)
+        y_tick_range = around(linspace(self.y_tick_start, self.y_tick_end, self.y_tick_count+1), 2)
 
         # ticks, that sets grid dimensions, required for data placement
         x_tick_grid_size = linspace(0, self.x_plot_size, self.x_tick_count+1)
-        y_tick_grid_size = linspace(0, self.y_plot_size, self.y_tick_count+1)
+        y_tick_grid_size = linspace(self.y_plot_size, 0, self.y_tick_count+1)
 
         # set axis properties
         axes.set_title(_title)
