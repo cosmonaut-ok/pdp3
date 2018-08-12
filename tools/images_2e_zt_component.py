@@ -193,7 +193,6 @@ def main():
 
         image.setup_2e_view(view)
         image.create_view_with_2_plots(view, write)
-        input("Press 'Return' to exit ")
     else:
         print("Configuration file `%s' does not exists. Exiting" % args.properties_path)
         exit(1)
