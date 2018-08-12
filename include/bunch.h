@@ -30,4 +30,5 @@ public:
                            EField  *E_bunch,
                            EField *E,
                            Time *time);
+  void reflection(void);
 };
