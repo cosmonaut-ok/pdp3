@@ -123,13 +123,13 @@ class PDP3PlotBuilder:
             axes.set_position(position)
 
 
-    def add_colorbar(self, name, title=None, ticks=[-1, 1], ticklabels=None):
+    def add_colorbar(self, name, title=None, ticks=[-1, 1], ticklabels=None, font_size=6, size="2%", position="right"):
         ''' add colorbar to selected image and set it's properties '''
 
         image = self.get_image(name)
         ax = self.get_subplot(name)
         divider = make_axes_locatable(ax)
-        cax = divider.append_axes("right", size="2%", pad=0.05)
+        cax = divider.append_axes(position, size=size, pad=0.05)
 
         cbar = self.figure.colorbar(image, cax=cax) # , ax = axes)
 
@@ -147,7 +147,7 @@ class PDP3PlotBuilder:
         cbar.set_label(__title, rotation=45)
         cbar.set_ticks(__ticks)
         cbar.set_ticklabels(__ticklabels)
-        cbar.ax.tick_params(labelsize=6)
+        cbar.ax.tick_params(labelsize=font_size)
 
 
 
