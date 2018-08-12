@@ -73,4 +73,39 @@ namespace lib
     return r;
   }
 
+  char* get_simulation_time()
+  // get the time, spent since simulation launched (in "d h m s" format)
+  {
+    double time_sec = (clock() - SIMULATION_START_TIME) / (double)CLOCKS_PER_SEC;
+
+    int d, hr, min;
+    double sec;
+    char* the_time = new char;
+
+    if (time_sec > 60 && time_sec < 3600)
+    {
+      min = (int)time_sec / 60;
+      sec = time_sec - min * 60;
+      sprintf(the_time, "%dm %.2fs", min, sec);
+    }
+    else if (time_sec > 3600 && time_sec < 86400)
+    {
+      hr = (int)time_sec / 60 / 60;
+      min = time_sec - hr * 60;
+      sec = time_sec - hr * 60 * 60 - min * 60;
+      sprintf(the_time, "%dh %dm %.1fs", hr, min, sec);
+    }
+    else if (time_sec > 86400)
+    {
+      d = (int)time_sec / 60 / 60 / 24;
+      hr = time_sec - d * 24;
+      min = time_sec - d * 24 - hr * 60;
+      sec = time_sec - d * 24 - hr * 60 * 60 - min * 60;
+      sprintf(the_time, "%dd %dh %dm %.0fs", d, hr, min, sec);
+    }
+    else
+      sprintf(the_time, "%.2fs", time_sec);
+
+    return the_time;
+  }
 }
