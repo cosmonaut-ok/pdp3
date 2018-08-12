@@ -1,4 +1,5 @@
 #pragma once
+#include <ctime>
 
 // WARNING!
 // This header file used only to store
@@ -17,4 +18,6 @@ namespace constant
   const double LIGHT_SPEED = 3.0E8;
   // Vacuum permeability (magnetic constant), m*kg*s(e-2)*A(e-2)
   const double MAGN_CONST = 1.26E-6;
+  // simulation start time
+  const clock_t SIMULATION_START_TIME = clock();
 }
