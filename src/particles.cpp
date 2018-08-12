@@ -192,9 +192,8 @@ void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
     }
 }
 
-void Particles::half_step_pos(Time *t)
+void Particles::reflection()
 {
-// #pragma omp parallel for shared(dr, dz, x1_wall, x3_wall, half_dr, half_dz, x1_wallX2, x3_wallX2, half_dt)
 #pragma omp parallel for
   for(int i=0; i<number; i++)
     if (is_alive[i])
@@ -207,18 +206,6 @@ void Particles::half_step_pos(Time *t)
       double half_dz = dz/2.0;
       double x1_wallX2 = x1_wall*2.0;
       double x3_wallX2 = x3_wall*2.0;
-      double half_dt = t->delta_t/2.0;
-
-      // check if x1 and x3 are correct
-      if (isnan(pos[i][0]) || isinf(pos[i][0]) != 0 || isnan(pos[i][2]) || isinf(pos[i][2]) != 0)
-      {
-        cerr << "ERROR(half_step_pos): x1[" << i << "] or x3[" << i << "] is not valid number. Can not continue." << endl;
-        exit(1);
-      }
-      //
-      pos[i][0] = pos[i][0] + vel[i][0] * half_dt;
-      pos[i][1] = pos[i][1] + vel[i][1] * half_dt;
-      pos[i][2] = pos[i][2] + vel[i][2] * half_dt;
 
       //! FIXME: fix wall reflections for r-position
       if (pos[i][0] > x1_wall)
@@ -244,6 +231,27 @@ void Particles::half_step_pos(Time *t)
         pos[i][2] = dz - pos[i][2];
         vel[i][2] = -vel[i][2];
       }
+    }
+}
+
+void Particles::half_step_pos(Time *t)
+{
+  double half_dt = t->delta_t/2.0;
+
+#pragma omp parallel for shared (half_dt)
+  for(int i=0; i<number; i++)
+    if (is_alive[i])
+    {
+      // check if x1 and x3 are correct
+      if (isnan(pos[i][0]) || isinf(pos[i][0]) != 0 || isnan(pos[i][2]) || isinf(pos[i][2]) != 0)
+      {
+        cerr << "ERROR(half_step_pos): x1[" << i << "] or x3[" << i << "] is not valid number. Can not continue." << endl;
+        exit(1);
+      }
+      //
+      pos[i][0] = pos[i][0] + vel[i][0] * half_dt;
+      pos[i][1] = pos[i][1] + vel[i][1] * half_dt;
+      pos[i][2] = pos[i][2] + vel[i][2] * half_dt;
     }
 }
 
