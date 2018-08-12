@@ -74,13 +74,15 @@ class Pdp2EZTViewBuilder:
         self._plot_builder.y_tick_start = self.__start_time * 1e9 # nano- is for 1e-9
         self._plot_builder.y_tick_end = self.__end_time * 1e9 # nano- is for 1e-9
 
+        font_size=16
+        
         ## setup plot dimensions
         self.image_t_range = (self.end_data_set - self.start_data_set) * fpf
 
         self._plot_builder.x_plot_size = self.image_z_range
         self._plot_builder.y_plot_size = self.image_t_range
 
-        self._plot_builder.setup_figure(width=19.2, height=10.8, font_size=12, dpi=100)
+        self._plot_builder.setup_figure(width=40, height=30, font_size=font_size, dpi=100)
 
         ## setup E_r plot
         self._plot_builder.add_subplot_with_image(
@@ -91,7 +93,7 @@ class Pdp2EZTViewBuilder:
             y_axe_label=self.y_axis_label #, position=self.position_e_r
         )
         self._plot_builder.add_colorbar(
-            self.E_r_plot_name, ticks=self.clim_e_field_r, title=self.cbar_axis_label
+            self.E_r_plot_name, ticks=self.clim_e_field_r, title=self.cbar_axis_label, font_size=font_size-4, size="10%"
         )
 
         ## setup E_z plot
@@ -103,7 +105,7 @@ class Pdp2EZTViewBuilder:
             y_axe_label=self.y_axis_label # , position=self.position_e_z
         )
         self._plot_builder.add_colorbar(
-            self.E_z_plot_name, ticks=self.clim_e_field_z, title=self.cbar_axis_label
+            self.E_z_plot_name, ticks=self.clim_e_field_z, title=self.cbar_axis_label, font_size=font_size-4, size="10%"
         )
 
     def create_view_with_2_plots(self):

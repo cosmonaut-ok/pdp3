@@ -53,13 +53,15 @@ class Pdp3EViewBuilder:
 
         self.E_r_plot_name = r'$\mathbf{Electrical\enspace Field\enspace Radial\enspace Component}\enspace(E_r)$'
         self.E_z_plot_name = r'$\mathbf{Electrical\enspace Field\enspace Longitudal\enspace Component}\enspace(E_z)$'
-        self.E_bunch_density_plot_name = r'$\mathbf{Electron\enspace Bunch\enspace Density}\enspace (\rho_{bunch})$'        
+        self.E_bunch_density_plot_name = r'$\mathbf{Electron\enspace Bunch\enspace Density}\enspace (\rho_{bunch})$'
 
     def setup_3e_view(self):
         '''
         initialize plot figure and subplots with preset object fields
         '''
-        self._plot_builder.setup_figure()
+        font_size=16
+        
+        self._plot_builder.setup_figure(width=19.2, height=12, font_size=font_size, dpi=100)
         ## setup E_r plot
         self._plot_builder.add_subplot_with_image(
             self.E_r_plot_name, 311, cmap=self.cmap, clim=self.clim_e_field_r
@@ -69,7 +71,7 @@ class Pdp3EViewBuilder:
             y_axe_label=self.y_axis_label, position=self.position_e_r
         )
         self._plot_builder.add_colorbar(
-            self.E_r_plot_name, ticks=self.clim_e_field_r, title=self.cbar_axis_label
+            self.E_r_plot_name, ticks=self.clim_e_field_r, title=self.cbar_axis_label, font_size=font_size-4
         )
 
         ## setup E_z plot
@@ -81,7 +83,7 @@ class Pdp3EViewBuilder:
             y_axe_label=self.y_axis_label, position=self.position_e_z
         )
         self._plot_builder.add_colorbar(
-            self.E_z_plot_name, ticks=self.clim_e_field_z, title=self.cbar_axis_label
+            self.E_z_plot_name, ticks=self.clim_e_field_z, title=self.cbar_axis_label, font_size=font_size-4
         )
 
         ## setup bunch_density plot
@@ -97,7 +99,7 @@ class Pdp3EViewBuilder:
         self._plot_builder.add_colorbar(
             self.E_bunch_density_plot_name, ticks=clim_e_field_beam,
             ticklabels=[self._cfg.bunch_density * self.clim_e_field_beam_scale_factor, 0],
-            title=self.cbar_bunch_density_axis_label
+            title=self.cbar_bunch_density_axis_label, font_size=font_size-4
         )
 
     def create_view_with_3_plots(self):
