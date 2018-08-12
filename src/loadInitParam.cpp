@@ -397,19 +397,21 @@ void LoadInitParam::run(void)
            << left << setw(8) << "Step"
            << left << setw(13) << "Saved Frame"
            << left << setw(18) << "Model Time (sec)"
-           << left << setw(32) << "Avg. Step Calculation Time (sec)"
+           << left << setw(18) << "Simulation Time"
+           << left << setw(34) << "Avg. Step Calculation Time"
            << endl;
     }
 
     //! dump data to corresponding files every `parameters.xml->file_save_parameters->data_dump_interval` steps
     if  ((int)(params->time->current_time / params->time->delta_t) % params->dump_data_interval == 0)
     {
-      sprintf(avg_step_exec_time, "%.2f", (double)(time(0) - t1) / params->dump_data_interval);
+      sprintf(avg_step_exec_time, "%.2fs", (double)(time(0) - t1) / params->dump_data_interval);
 
       cout << left << setw(8) << step_number * params->dump_data_interval
            << left << setw(13) << step_number
            << left << setw(18) << params->time->current_time
-           << left << setw(32) << avg_step_exec_time
+           << left << setw(18) << lib::get_simulation_time()
+           << left << setw(34) << avg_step_exec_time
            << endl;
 
       for (unsigned int i=0; i < params->beam_number_bunches; i++)

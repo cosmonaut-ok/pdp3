@@ -13,6 +13,7 @@
 
 #include "math/fourier.h"
 
+#include "lib.h"
 #include "boundaryMaxwellConditions.h"
 #include "bunch.h"
 #include "current.h"
