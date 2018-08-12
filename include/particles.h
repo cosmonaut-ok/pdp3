@@ -102,7 +102,8 @@ private:
 public:
   void charge_weighting(ChargeDensity *ro1);
   void step_v(EField *e_fld, HField *h_fld, Time *t);
-  virtual void half_step_pos(Time *t);
+  void half_step_pos(Time *t);
+  virtual void reflection(void);
   void set_j_0();
   void set_v_0();
   void set_x_0();
