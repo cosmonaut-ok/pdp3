@@ -83,12 +83,41 @@ void Bunch::bunch_inject(Time *time)
         break;
 #endif
     }
-
-#pragma omp for
-    for (int i = 0; i < number; i++)
-      if (pos[i][2] > (geom1->second_size - half_z_cell_size))
-      {
-        is_alive[i]=false;
-      }
   }
+}
+
+void Bunch::reflection()
+{
+#pragma omp parallel for
+  for(int i=0; i<number; i++)
+    if (is_alive[i])
+    {
+      double dr = geom1->dr;
+      double dz = geom1->dz;
+      double x1_wall = geom1->first_size - dr/2.0;
+      double x3_wall = geom1->second_size - dz/2.0;
+      double half_dr = dr/2.0;
+      double half_dz = dz/2.0;
+      double x1_wallX2 = x1_wall*2.0;
+      double x3_wallX2 = x3_wall*2.0;
+
+      //! FIXME: fix wall reflections for r-position
+      if (pos[i][0] > x1_wall)
+        is_alive[i] = false;
+
+      if (pos[i][2] > x3_wall)
+        is_alive[i] = false;
+
+      if (pos[i][0] < half_dr)
+      {
+        pos[i][0] = dr - pos[i][0];
+        vel[i][0] = -vel[i][0];
+      }
+
+      if (pos[i][2] < half_dz)
+      {
+        pos[i][2] = dz - pos[i][2];
+        vel[i][2] = -vel[i][2];
+      }
+    }
 }
