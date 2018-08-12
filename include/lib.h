@@ -2,6 +2,7 @@
 #include <iostream>
 #include <math.h>
 #include <algorithm>
+#include <ctime>
 
 #include "constant.h"
 
@@ -13,4 +14,5 @@ namespace lib
   double get_gamma (double velocity);
   double get_gamma_inv (double velocity);
   double random_reverse(double vel, int power);
+  char* get_simulation_time();
 }
