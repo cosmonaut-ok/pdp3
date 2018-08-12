@@ -29,6 +29,12 @@ void ParticlesList::half_step_pos(Time *t)
     part_list[i]->half_step_pos(t);
 }
 
+void ParticlesList::reflection(void)
+{
+  for(size_t i = 0; i < part_list.size(); i++)
+    part_list[i]->reflection();
+}
+
 void ParticlesList::j_weighting(Time *time1, Current *j1)
 {
   for(std::size_t i = 0; i < part_list.size(); i++)
