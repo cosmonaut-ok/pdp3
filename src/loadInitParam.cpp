@@ -331,6 +331,7 @@ void LoadInitParam::run(void)
 #endif
 
     p_list->half_step_pos(params->time);
+    p_list->reflection();
 #ifdef PERF_DEBUG
     cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: p_list->half_step_pos" << endl;
     the_time = clock();
@@ -348,6 +349,7 @@ void LoadInitParam::run(void)
 #endif
 
     p_list->half_step_pos(params->time);
+    p_list->reflection();
 #ifdef PERF_DEBUG
     cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: p_list->half_step_pos" << endl;
     the_time = clock();
