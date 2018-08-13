@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as ani
 
 from lib.parameters import Parameters
+from lib.tinycache import TinyCache
 from lib.pdp3_plot_builder import PDP3PlotBuilder
 
 ## README:
@@ -117,44 +118,49 @@ class Pdp2EZTViewBuilder:
         sz = self._cfg.z_grid_count
         radius_row = int(round(self.radius * self._cfg.r_grid_count / self._cfg.r_size))
 
-        image_r = []
-        image_z = []
+        tiny_cache = TinyCache(os.path.join(self._cfg.data_path, '.cache'))
 
-        data_file_e_r = os.path.join(self._cfg.data_path, self.data_file_e_r_pattern)
-        data_file_e_z = os.path.join(self._cfg.data_path, self.data_file_e_z_pattern)
-        data_file_bunch_density = os.path.join(self._cfg.data_path, self.data_file_e_bunch_density_pattern)
+        image_r = tiny_cache.get_cache('image_r')
+        image_z = tiny_cache.get_cache('image_z')
 
-        # with writer.saving(self._plot_builder.figure, movie_file, self.video_dpi):
-        for k in range(self.start_data_set, self.end_data_set+1):
-            tstart = self.start_frame if k == self.start_data_set else k*fpf
-            tend = self.end_frame if k == self.end_data_set else ((k+1)*fpf)
-            i = 1;
+        if (len(image_r) == 0 or len(image_z) == 0):
+            data_file_e_r = os.path.join(self._cfg.data_path, self.data_file_e_r_pattern)
+            data_file_e_z = os.path.join(self._cfg.data_path, self.data_file_e_z_pattern)
+            data_file_bunch_density = os.path.join(self._cfg.data_path, self.data_file_e_bunch_density_pattern)
 
-            if not os.path.isfile(data_file_e_r + str(k)) \
-               or not os.path.isfile(data_file_e_z + str(k)) \
-               or not os.path.isfile(data_file_bunch_density + str(k)):
-                print('No more data files exists. Exiting')
-                return
+            # with writer.saving(self._plot_builder.figure, movie_file, self.video_dpi):
+            for k in range(self.start_data_set, self.end_data_set+1):
+                tstart = self.start_frame if k == self.start_data_set else k*fpf
+                tend = self.end_frame if k == self.end_data_set else ((k+1)*fpf)
+                i = 1;
 
-            print("Loading files set %d" % (k))
-            ## Open data files
-            fidh_e_r = open(data_file_e_r + str(k), 'r')
-            fidh_e_z = open(data_file_e_z + str(k), 'r')
+                if not os.path.isfile(data_file_e_r + str(k)) \
+                   or not os.path.isfile(data_file_e_z + str(k)) \
+                   or not os.path.isfile(data_file_bunch_density + str(k)):
+                    print('No more data files exists. Exiting')
+                    return
 
-            h_field_e_r = fromfile(fidh_e_r, dtype=float, count=sr*sz*fpf, sep=' ')
-            h_field_e_z = fromfile(fidh_e_z, dtype=float, count=sr*sz*fpf, sep=' ')
+                print("Loading files set %d" % (k))
+                ## Open data files
+                fidh_e_r = open(data_file_e_r + str(k), 'r')
+                fidh_e_z = open(data_file_e_z + str(k), 'r')
 
-            ## Close data files
-            fidh_e_r.close()
-            fidh_e_z.close()
+                h_field_e_r = fromfile(fidh_e_r, dtype=float, count=sr*sz*fpf, sep=' ')
+                h_field_e_z = fromfile(fidh_e_z, dtype=float, count=sr*sz*fpf, sep=' ')
 
-            for t in range(tstart, tend):
-                local_step = t % fpf
+                ## Close data files
+                fidh_e_r.close()
+                fidh_e_z.close()
 
-                print("Processing frame %d" % (local_step))
+                for t in range(tstart, tend):
+                    local_step = t % fpf
 
-                image_r.extend(self._cfg.get_frame_row_from_data(h_field_e_r, local_step, radius_row))
-                image_z.extend(self._cfg.get_frame_row_from_data(h_field_e_z, local_step, radius_row))
+                    print("Processing frame %d" % (local_step))
+
+                    image_r.extend(self._cfg.get_frame_row_from_data(h_field_e_r, local_step, radius_row))
+                    image_z.extend(self._cfg.get_frame_row_from_data(h_field_e_z, local_step, radius_row))
+                tiny_cache.update_cache('image_r', image_r)
+                tiny_cache.update_cache('image_z', image_z)
 
         self._plot_builder.fill_image_with_data(
             self.E_z_plot_name, image_r)
