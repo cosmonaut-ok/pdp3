@@ -54,7 +54,7 @@ class Parameters:
         if is_debug:
             self.data_dump_interval = int(file_save_parameters.getElementsByTagName('debug_data_dump_interval')[0].firstChild.data)
         else:
-            self.data_dump_interval = int(file_save_parameters.getElementsByTagName('debug_data_dump_interval')[0].firstChild.data)
+            self.data_dump_interval = int(file_save_parameters.getElementsByTagName('data_dump_interval')[0].firstChild.data)
 
         # calculate data path
         if str.startswith(local_system_state_path, '/'):
