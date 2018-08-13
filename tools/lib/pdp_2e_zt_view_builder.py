@@ -25,7 +25,7 @@ class Pdp2EZTViewBuilder:
         ## define files data file sets range
         self.start_data_set = 0
         self.start_frame = 0
-        self.end_data_set, self.end_frame = self._cfg.get_file_frame_by_timestamp(self._cfg.end_time)
+        self.end_data_set, self.end_frame = self._cfg.get_file_frame_number_by_timestamp(self._cfg.end_time)
 
         self.clim_e_field_beam_scale_factor = 1
         self.clim_e_field_r = [0, 1]
@@ -75,7 +75,7 @@ class Pdp2EZTViewBuilder:
         self._plot_builder.y_tick_end = self.__end_time * 1e9 # nano- is for 1e-9
 
         font_size=16
-        
+
         ## setup plot dimensions
         self.image_t_range = (self.end_data_set - self.start_data_set) * fpf
 
@@ -153,11 +153,8 @@ class Pdp2EZTViewBuilder:
 
                 print("Processing frame %d" % (local_step))
 
-                rstart = sr*sz*local_step + radius_row*sz
-                rend = rstart+sz
-
-                image_r.extend(h_field_e_r[rstart:rend])
-                image_z.extend(h_field_e_z[rstart:rend])
+                image_r.extend(self._cfg.get_frame_row_from_data(h_field_e_r, local_step, radius_row))
+                image_z.extend(self._cfg.get_frame_row_from_data(h_field_e_z, local_step, radius_row))
 
         self._plot_builder.fill_image_with_data(
             self.E_z_plot_name, image_r)

@@ -168,13 +168,13 @@ def main():
         image.clim_e_field_beam_scale_factor = args.beam_scale_factor
 
         if args.timestamp:
-            image.start_data_set, image.start_frame = config.get_file_frame_by_timestamp(args.timestamp)
-            image.end_data_set, image.end_frame = config.get_file_frame_by_timestamp(args.timestamp)
+            image.start_data_set, image.start_frame = config.get_file_frame_number_by_timestamp(args.timestamp)
+            image.end_data_set, image.end_frame = config.get_file_frame_number_by_timestamp(args.timestamp)
             image.end_frame = image.end_frame + 1
         elif args.time_range:
             time_range = list(map(float, args.time_range.split(':')))
-            image.start_data_set, image.start_frame = config.get_file_frame_by_timestamp(time_range[0])
-            image.end_data_set, image.end_frame = config.get_file_frame_by_timestamp(time_range[1])
+            image.start_data_set, image.start_frame = config.get_file_frame_number_by_timestamp(time_range[0])
+            image.end_data_set, image.end_frame = config.get_file_frame_number_by_timestamp(time_range[1])
         elif args.data_set_range:
             data_set_range = list(map(int, args.data_set_range.split(':')))
             image.start_data_set = data_set_range[0]
