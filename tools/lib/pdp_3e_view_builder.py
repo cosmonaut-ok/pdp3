@@ -60,7 +60,7 @@ class Pdp3EViewBuilder:
         initialize plot figure and subplots with preset object fields
         '''
         font_size=16
-        
+
         self._plot_builder.setup_figure(width=19.2, height=12, font_size=font_size, dpi=100)
         ## setup E_r plot
         self._plot_builder.add_subplot_with_image(
@@ -152,15 +152,18 @@ class Pdp3EViewBuilder:
                 try:
                     self._plot_builder.fill_image_with_data(
                         self.E_z_plot_name,
-                        h_field_e_r[rstart:rend])
+                        self._cfg.get_frame_from_data(h_field_e_r, local_step)
+                    )
 
                     self._plot_builder.fill_image_with_data(
                         self.E_r_plot_name,
-                        h_field_e_z[rstart:rend])
+                        self._cfg.get_frame_from_data(h_field_e_z, local_step)
+                    )
 
                     self._plot_builder.fill_image_with_data(
                         self.E_bunch_density_plot_name,
-                        h_field_bunch_density[rstart:rend])
+                        self._cfg.get_frame_from_data(h_field_bunch_density, local_step)
+                    )
 
                 except ValueError: ## skip frame, when data is inconsistent
                     break

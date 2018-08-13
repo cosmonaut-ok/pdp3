@@ -174,13 +174,13 @@ def main():
 
 
         if args.timestamp:
-            images.start_data_set, images.start_frame = config.get_file_frame_by_timestamp(args.timestamp)
-            images.end_data_set, images.end_frame = config.get_file_frame_by_timestamp(args.timestamp)
+            images.start_data_set, images.start_frame = config.get_file_frame_number_by_timestamp(args.timestamp)
+            images.end_data_set, images.end_frame = config.get_file_frame_number_by_timestamp(args.timestamp)
             images.end_frame = images.end_frame + 1
         elif args.time_range:
             time_range = list(map(float, args.time_range.split(':')))
-            images.start_data_set, images.start_frame = config.get_file_frame_by_timestamp(time_range[0])
-            images.end_data_set, images.end_frame = config.get_file_frame_by_timestamp(time_range[1])
+            images.start_data_set, images.start_frame = config.get_file_frame_number_by_timestamp(time_range[0])
+            images.end_data_set, images.end_frame = config.get_file_frame_number_by_timestamp(time_range[1])
         elif args.data_set_range:
             data_set_range = list(map(int, args.data_set_range.split(':')))
             images.start_data_set = data_set_range[0]
