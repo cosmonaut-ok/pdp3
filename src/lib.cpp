@@ -76,35 +76,39 @@ namespace lib
   char* get_simulation_time()
   // get the time, spent since simulation launched (in "d h m s" format)
   {
-    double time_sec = (clock() - SIMULATION_START_TIME) / (double)CLOCKS_PER_SEC;
+    double time_sec = std::time(nullptr) - SIMULATION_START_TIME;
 
     int d, hr, min;
     double sec;
     char* the_time = new char;
 
-    if (time_sec > 60 && time_sec < 3600)
+    int sec_in_min = 60;
+    int sec_in_hr = 3600;
+    int sec_in_day = 86400;
+
+    if (time_sec > sec_in_min && time_sec < sec_in_hr)
     {
-      min = (int)time_sec / 60;
-      sec = time_sec - min * 60;
-      sprintf(the_time, "%dm %.2fs", min, sec);
+      min = (int)time_sec / sec_in_min;
+      sec = time_sec - min * sec_in_min;
+      sprintf(the_time, "%dm %.0fs", min, sec);
     }
-    else if (time_sec > 3600 && time_sec < 86400)
+    else if (time_sec > sec_in_hr && time_sec < sec_in_day)
     {
-      hr = (int)time_sec / 60 / 60;
-      min = time_sec - hr * 60;
-      sec = time_sec - hr * 60 * 60 - min * 60;
-      sprintf(the_time, "%dh %dm %.1fs", hr, min, sec);
+      hr = (int)time_sec / sec_in_hr;
+      min = (int)((time_sec - hr * sec_in_hr) / sec_in_min);
+      sec = time_sec - hr * sec_in_hr - min * sec_in_min;
+      sprintf(the_time, "%dh %dm %.0fs", hr, min, sec);
     }
-    else if (time_sec > 86400)
+    else if (time_sec > sec_in_day)
     {
-      d = (int)time_sec / 60 / 60 / 24;
-      hr = time_sec - d * 24;
-      min = time_sec - d * 24 - hr * 60;
-      sec = time_sec - d * 24 - hr * 60 * 60 - min * 60;
+      d = (int)time_sec / sec_in_day;
+      hr = (int)((time_sec - d * sec_in_day) / sec_in_hr);
+      min = (int)((time_sec - d * sec_in_day - hr * sec_in_hr) / sec_in_min);
+      sec = time_sec - d * sec_in_day - hr * sec_in_hr - min * sec_in_min;
       sprintf(the_time, "%dd %dh %dm %.0fs", d, hr, min, sec);
     }
     else
-      sprintf(the_time, "%.2fs", time_sec);
+      sprintf(the_time, "%.0fs", time_sec);
 
     return the_time;
   }
