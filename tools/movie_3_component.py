@@ -189,8 +189,8 @@ def main():
 
         if args.time_range:
             time_range = list(map(float, args.time_range.split(':')))
-            movie.start_data_set, movie.start_frame = config.get_file_frame_by_timestamp(time_range[0])
-            movie.end_data_set, movie.end_frame = config.get_file_frame_by_timestamp(time_range[1])
+            movie.start_data_set, movie.start_frame = config.get_file_frame_number_by_timestamp(time_range[0])
+            movie.end_data_set, movie.end_frame = config.get_file_frame_number_by_timestamp(time_range[1])
         elif args.data_set_range:
             data_set_range = list(map(int, args.data_set_range.split(':')))
             movie.start_data_set = data_set_range[0]
