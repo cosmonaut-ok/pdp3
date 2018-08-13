@@ -93,12 +93,69 @@ class Parameters:
         # get clim estimation
         self.get_clim_estimation()
 
-    def get_file_frame_by_timestamp(self, timestamp):
+    def get_file_frame_number_by_timestamp(self, timestamp):
         number_frames = timestamp / self.step_interval / self.data_dump_interval
         fpf = self.frames_per_file
         file_number = int(number_frames // fpf)
         frame_number = int(number_frames % fpf)
         return [file_number, frame_number]
+
+    def get_frame_from_data(self, image, frame_number):
+        fpf = self.frames_per_file
+        sr = self.r_grid_count
+        sz = self.z_grid_count
+
+        if frame_number > fpf:
+            raise ValueError('Can not process frame %i. Out of range (%i)' % (frame_number, fpf))
+        else:
+            rstart = sr*sz*frame_number
+            rend = sr*sz*(frame_number+1)
+            frame = image[rstart:rend]
+
+        return(frame)
+
+    def get_frame_row_from_data(self, image, frame_number, row_number):
+        fpf = self.frames_per_file
+        sr = self.r_grid_count
+        sz = self.z_grid_count
+
+        if frame_number > fpf:
+            raise ValueError('Can not process frame %i. Out of range (%i)' % (frame_number, fpf))
+        elif  row_number > sr:
+            raise ValueError('Can not process row $i in frame %i. Out of range (%i)' % (row_number, frame_number, sr))
+        else:
+
+            rstart = sr * sz * frame_number + row_number * sz
+            rend = rstart + sz
+            row = image[rstart:rend]
+
+        return(row)
+
+    def get_frame_point_from_data(self, image, frame_number, x, y):
+        sr = self.r_grid_count
+        sz = self.z_grid_count
+        if  y > sz:
+            raise ValueError('Can not process point x=%i y=%i in frame %i. Out of range (x=%i y=%i)' % (x, y, frame_number, sz, sr))
+        row = self.get_frame_row_from_data(image, frame_number, y)
+
+        return(row[x])
+
+
+    def get_frame_col_from_data(self, image, frame_number, col_number):
+        fpf = self.frames_per_file
+        sr = self.r_grid_count
+        sz = self.z_grid_count
+        col = []
+
+        if  col_number > sz:
+            raise ValueError('Can not process column $i in frame %i. Out of range (%i)' % (col_number, frame_number, sr))
+        else:
+            frame = get_frame_from_data(image, frame_number)
+            for i in range(0, sr):
+                col.append(self.get_frame_point_from_data(frame, 0, i, col_number))
+
+        return(col)
+
 
     def get_clim_estimation(self):
         p_factor_array = []
