@@ -35,64 +35,11 @@ class Pdp2Image(Pdp2EZTViewBuilder):
         if view:
             self._plot_builder.figure.show()
 
+
     def create_view_with_2_plots(self, view, write):
-        '''
-        create movie with preset subplots and data from data files
-        '''
-        fpf = self._cfg.frames_per_file
-        sr = self._cfg.r_grid_count
-        sz = self._cfg.z_grid_count
-        radius_row = int(round(self.radius * self._cfg.r_grid_count / self._cfg.r_size))
+        super(Pdp2Image, self).create_view_with_2_plots()
 
         image_file_name = os.path.join(self.image_path, 'image_2e_zt_' + str(self.radius) + 'm.png')
-
-        image_r = []
-        image_z = []
-
-        data_file_e_r = os.path.join(self._cfg.data_path, self.data_file_e_r_pattern)
-        data_file_e_z = os.path.join(self._cfg.data_path, self.data_file_e_z_pattern)
-        data_file_bunch_density = os.path.join(self._cfg.data_path, self.data_file_e_bunch_density_pattern)
-
-        # with writer.saving(self._plot_builder.figure, movie_file, self.video_dpi):
-        for k in range(self.start_data_set, self.end_data_set+1):
-            tstart = self.start_frame if k == self.start_data_set else k*fpf
-            tend = self.end_frame if k == self.end_data_set else ((k+1)*fpf)
-            i = 1;
-
-            if not os.path.isfile(data_file_e_r + str(k)) \
-               or not os.path.isfile(data_file_e_z + str(k)) \
-               or not os.path.isfile(data_file_bunch_density + str(k)):
-                print('No more data files exists. Exiting')
-                return
-
-            print("Loading files set %d" % (k))
-            ## Open data files
-            fidh_e_r = open(data_file_e_r + str(k), 'r')
-            fidh_e_z = open(data_file_e_z + str(k), 'r')
-
-            h_field_e_r = fromfile(fidh_e_r, dtype=float, count=sr*sz*fpf, sep=' ')
-            h_field_e_z = fromfile(fidh_e_z, dtype=float, count=sr*sz*fpf, sep=' ')
-
-            ## Close data files
-            fidh_e_r.close()
-            fidh_e_z.close()
-
-            for t in range(tstart, tend):
-                local_step = t % fpf
-
-                print("Processing frame %d" % (local_step))
-
-                rstart = sr*sz*local_step + radius_row*sz
-                rend = rstart+sz
-
-                image_r.extend(h_field_e_r[rstart:rend])
-                image_z.extend(h_field_e_z[rstart:rend])
-
-        self._plot_builder.fill_image_with_data(
-            self.E_z_plot_name, image_r)
-
-        self._plot_builder.fill_image_with_data(
-            self.E_r_plot_name, image_z)
 
         if write:
             self._plot_builder.figure.savefig(image_file_name) # save the figure to file
