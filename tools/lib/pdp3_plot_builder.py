@@ -37,6 +37,7 @@ class PDP3PlotBuilder:
         self.y_tick_start = 0
         self.y_tick_end = self.__cfg.r_size
 
+        self.aspect = 'equal'
 
     def get_subplot(self, name):
         ''' Object collects axes (subplots) and images for quick access
@@ -59,6 +60,19 @@ class PDP3PlotBuilder:
         rc('font',**{'size':font_size})
         # rc('text', usetex=True)
 
+    def add_subplot(self, name, subplot_number):
+        ''' add subplot
+        '''
+        subplot = self.figure.add_subplot(subplot_number)
+        #
+        subplot.set_aspect(self.aspect)
+        subplot.invert_yaxis()
+
+        self.__subplots[name] = subplot
+
+        return subplot
+
+
     def add_subplot_with_image(self, name, subplot_number, x_axe_label='X', y_axe_label='Y', cmap='gray', clim=[-1, 1]):
         ''' add subplot and place there image with same name and initial data (zeros)
         subplot and image parameters configures, using 'parameters' module
@@ -69,10 +83,8 @@ class PDP3PlotBuilder:
         '''
 
         interpolation_type = 'nearest'
-        subplot = self.figure.add_subplot(subplot_number)
-        #
-        subplot.set_aspect('equal')
-        subplot.invert_yaxis()
+        subplot = self.add_subplot(name, subplot_number)
+
         ## initialize image with random data, normalized to clim range
         # initial_data = rand(self.y_plot_size, self.x_plot_size)*(clim[1]-clim[0])-((clim[0]+clim[1])/2)
         initial_data = zeros([self.y_plot_size, self.x_plot_size])
