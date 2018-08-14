@@ -152,7 +152,7 @@ $(pdp3_MODULE): $(pdp3_OBJS)
 	$(CXX) $(CXXFLAGS) $(CXXEXTRA) $(DEFINCL) $(LDFLAGS) -o $@ $(pdp3_OBJS) $(pdp3_LIBRARY_PATH) $(pdp3_LIBRARIES:%=-l%)
 
 mrproper: clean
-	$(RM) -r $(TESTDIR) *.avi $(TARGETDIR) $(RELEASE) $(RELEASE).zip
+	$(RM) -r $(TESTDIR) *.avi *.png $(TARGETDIR) $(RELEASE) $(RELEASE).zip
 
 run: bootstrap
 	./pdp3
