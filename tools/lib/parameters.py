@@ -173,3 +173,11 @@ class Parameters:
             counter = counter+1
 
         self.clim_estimation = sum(p_factor_array)
+
+
+    def get_row_by_radius(self, radius):
+        return(int(round(radius * self.r_grid_count / self.r_size)))
+
+
+    def get_col_by_longitude(self, longitude):
+        return(int(round(longitude * self.z_grid_count / self.z_size)))

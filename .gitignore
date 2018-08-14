@@ -317,5 +317,6 @@ doc/vis
 doc/report
 *.zip
 doc/*.png
+*.png
 
 field_movie.avi
