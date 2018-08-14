@@ -15,7 +15,7 @@ from lib.pdp3_plot_builder import PDP3PlotBuilder
 ## color map reference: https://matplotlib.org/examples/color/colormaps_reference.html
 ## mathtext reference:  https://matplotlib.org/users/mathtext.html
 
-class Pdp2EZTViewBuilder:
+class Pdp2ETViewBuilder:
     def __init__(self, cfg):
         ## define private object fields
         self._cfg = cfg
@@ -35,19 +35,12 @@ class Pdp2EZTViewBuilder:
         ## define public object fields
         self.data_file_e_r_pattern = 'E_r'
         self.data_file_e_z_pattern = 'E_z'
-        self.data_file_e_bunch_density_pattern = 'rho_beam'
 
-        self.x_axis_label = r'$\mathit{Z (m)}$'
-        self.y_axis_label = r'$\mathit{t (ns)}$'
-        self.cbar_axis_label = r'$\frac{V}{m}$'
-        self.cbar_bunch_density_axis_label = r'$m^{-3}$'
-
-        ## define public object fields
-        self.cmap = 'gray'
-        self.video_codec = 'mjpeg'
-        self.video_fps = 30
-        self.video_dpi = 100
-        self.video_bitrate=32000
+        self.x_axis_label = r'$\mathit{t (s)}$'
+        self.y_r_axis_label = r'$\mathit{E_r (\frac{V}{m})}$'
+        self.y_z_axis_label = r'$\mathit{E_z (\frac{V}{m})}$'
+        # self.cbar_axis_label = r'$\frac{V}{m}$'
+        # self.cbar_bunch_density_axis_label = r'$m^{-3}$'
 
         self.E_r_plot_name = r'$\mathbf{Electrical\enspace Field\enspace Radial\enspace Component}\enspace(E_r)$'
         self.E_z_plot_name = r'$\mathbf{Electrical\enspace Field\enspace Longitudal\enspace Component}\enspace(E_z)$'
@@ -59,6 +52,7 @@ class Pdp2EZTViewBuilder:
         self.end_time = 0
 
         self.radius = 0
+        self.longitude = 0
 
     def setup_2e_view(self):
         '''
@@ -70,44 +64,30 @@ class Pdp2EZTViewBuilder:
         self.__start_time = (self.start_data_set * fpf + self.start_frame) * self._cfg.data_dump_interval * self._cfg.step_interval
         self.__end_time = (self.end_data_set * fpf + self.end_frame) * self._cfg.data_dump_interval * self._cfg.step_interval
 
-        self._plot_builder.x_tick_count = 4
-        self._plot_builder.y_tick_count = 10
-        self._plot_builder.y_tick_start = self.__start_time * 1e9 # nano- is for 1e-9
-        self._plot_builder.y_tick_end = self.__end_time * 1e9 # nano- is for 1e-9
-
         font_size=16
 
-        ## setup plot dimensions
-        self.image_t_range = (self.end_data_set - self.start_data_set) * fpf
-
-        self._plot_builder.x_plot_size = self.image_z_range
-        self._plot_builder.y_plot_size = self.image_t_range
-
-        self._plot_builder.setup_figure(width=40, height=30, font_size=font_size, dpi=100)
+        self._plot_builder.setup_figure(width=19.2, height=10.8, font_size=font_size, dpi=100)
 
         ## setup E_r plot
-        self._plot_builder.add_subplot_with_image(
-            self.E_r_plot_name, 121, cmap=self.cmap, clim=self.clim_e_field_r
-        )
-        self._plot_builder.setup_subplot(
-            self.E_r_plot_name, x_axe_label=self.x_axis_label,
-            y_axe_label=self.y_axis_label #, position=self.position_e_r
-        )
-        self._plot_builder.add_colorbar(
-            self.E_r_plot_name, ticks=self.clim_e_field_r, title=self.cbar_axis_label, font_size=font_size-4, size="10%"
-        )
+        subplot_er = self._plot_builder.add_subplot(self.E_r_plot_name, 121)
+        subplot_ez = self._plot_builder.add_subplot(self.E_z_plot_name, 122)
 
-        ## setup E_z plot
-        self._plot_builder.add_subplot_with_image(
-            self.E_z_plot_name, 122, cmap=self.cmap, clim=self.clim_e_field_z
-        )
-        self._plot_builder.setup_subplot(
-            self.E_z_plot_name, x_axe_label=self.x_axis_label,
-            y_axe_label=self.y_axis_label # , position=self.position_e_z
-        )
-        self._plot_builder.add_colorbar(
-            self.E_z_plot_name, ticks=self.clim_e_field_z, title=self.cbar_axis_label, font_size=font_size-4, size="10%"
-        )
+        subplot_er.set_title(self.E_r_plot_name)
+        subplot_er.set_aspect('auto')
+        subplot_er.set_xlabel(self.x_axis_label)
+        subplot_er.set_ylabel(self.y_r_axis_label, rotation=45)
+        subplot_er.spines['top'].set_visible(False)
+        subplot_er.spines['right'].set_visible(False)
+        subplot_er.ticklabel_format(style='sci', scilimits=(0,0))
+
+        subplot_ez.set_title(self.E_z_plot_name)
+        subplot_ez.set_aspect('auto')
+        subplot_ez.set_xlabel(self.x_axis_label)
+        subplot_ez.set_ylabel(self.y_z_axis_label, rotation=45)
+        subplot_ez.spines['top'].set_visible(False)
+        subplot_ez.spines['right'].set_visible(False)
+        subplot_ez.ticklabel_format(style='sci', scilimits=(0,0))
+
 
     def create_view_with_2_plots(self):
         '''
@@ -117,38 +97,38 @@ class Pdp2EZTViewBuilder:
         sr = self._cfg.r_grid_count
         sz = self._cfg.z_grid_count
         radius_row = self._cfg.get_row_by_radius(self.radius)
+        longitude_col = self._cfg.get_col_by_longitude(self.longitude)
+        cache_r_name = format('plot2d_r_%f-%f-%f_%f_%f' % (
+            self.__start_time,
+            self.__end_time,
+            self._cfg.data_dump_interval * self._cfg.step_interval,
+            self.radius, self.longitude
+        ))
+        cache_z_name = format('plot2d_z_%f-%f-%f_%f_%f' % (
+            self.__start_time,
+            self.__end_time,
+            self._cfg.data_dump_interval * self._cfg.step_interval,
+            self.radius, self.longitude
+        ))
 
         tiny_cache = TinyCache(os.path.join(self._cfg.data_path, '.cache'))
-        cache_r_name = format('image_erz_r_%f-%f-%f_%f' % (
-            self.__start_time,
-            self.__end_time,
-            self._cfg.data_dump_interval * self._cfg.step_interval,
-            self.radius
-        ))
-        cache_z_name = format('image_erz_z_%f-%f-%f_%f' % (
-            self.__start_time,
-            self.__end_time,
-            self._cfg.data_dump_interval * self._cfg.step_interval,
-            self.radius
-        ))
 
-        image_r = tiny_cache.get_cache(cache_r_name)
-        image_z = tiny_cache.get_cache(cache_z_name)
+        plot2d_timeline = linspace(self.__start_time, self.__end_time, self.image_t_range)
+        plot2d_r = tiny_cache.get_cache(cache_r_name)
+        plot2d_z = tiny_cache.get_cache(cache_z_name)
 
-        if (len(image_r) == 0 or len(image_z) == 0):
+        if (len(plot2d_r) == 0 or len(plot2d_z) == 0 or len(plot2d_timeline) == 0):
             data_file_e_r = os.path.join(self._cfg.data_path, self.data_file_e_r_pattern)
             data_file_e_z = os.path.join(self._cfg.data_path, self.data_file_e_z_pattern)
-            data_file_bunch_density = os.path.join(self._cfg.data_path, self.data_file_e_bunch_density_pattern)
 
             # with writer.saving(self._plot_builder.figure, movie_file, self.video_dpi):
-            for k in range(self.start_data_set, self.end_data_set+1):
+            for k in range(self.start_data_set, self.end_data_set):
                 tstart = self.start_frame if k == self.start_data_set else k*fpf
                 tend = self.end_frame if k == self.end_data_set else ((k+1)*fpf)
                 i = 1;
 
                 if not os.path.isfile(data_file_e_r + str(k)) \
-                   or not os.path.isfile(data_file_e_z + str(k)) \
-                   or not os.path.isfile(data_file_bunch_density + str(k)):
+                   or not os.path.isfile(data_file_e_z + str(k)):
                     print('No more data files exists. Exiting')
                     return
 
@@ -169,15 +149,16 @@ class Pdp2EZTViewBuilder:
 
                     print("Processing frame %d" % (local_step))
 
-                    image_r.extend(self._cfg.get_frame_row_from_data(h_field_e_r, local_step, radius_row))
-                    image_z.extend(self._cfg.get_frame_row_from_data(h_field_e_z, local_step, radius_row))
-                tiny_cache.update_cache(cache_r_name, image_r)
-                tiny_cache.update_cache(cache_z_name, image_z)
+                    plot2d_r = append(plot2d_r, self._cfg.get_frame_point_from_data(h_field_e_r, local_step, longitude_col, radius_row))
+                    plot2d_z = append(plot2d_z, self._cfg.get_frame_point_from_data(h_field_e_z, local_step, longitude_col, radius_row))
 
-        self._plot_builder.fill_image_with_data(
-            self.E_z_plot_name, image_r)
+        tiny_cache.update_cache(cache_r_name, plot2d_r)
+        tiny_cache.update_cache(cache_z_name, plot2d_z)
 
-        self._plot_builder.fill_image_with_data(
-            self.E_r_plot_name, image_z)
+        plot_er = self._plot_builder.get_subplot(self.E_r_plot_name)
+        plot_ez = self._plot_builder.get_subplot(self.E_z_plot_name)
+
+        plot_er.plot(plot2d_timeline, plot2d_r)
+        plot_ez.plot(plot2d_timeline, plot2d_z)
 
         # self._plot_builder.redraw()
