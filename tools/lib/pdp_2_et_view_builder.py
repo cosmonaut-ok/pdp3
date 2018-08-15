@@ -95,17 +95,19 @@ class Pdp2ETViewBuilder:
         sz = self._cfg.z_grid_count
         radius_row = self._cfg.get_row_by_radius(self.radius)
         longitude_col = self._cfg.get_col_by_longitude(self.longitude)
-        cache_r_name = format('plot2d_r_%f-%f-%f_%f_%f' % (
+        cache_r_name = format('plot2d_r_%e-%e-%e#%d_%d_%d' % (
             self.__start_time,
             self.__end_time,
-            self._cfg.data_dump_interval * self._cfg.step_interval,
-            self.radius, self.longitude
+            self._cfg.step_interval,
+            self._cfg.data_dump_interval,
+            radius_row, longitude_col
         ))
-        cache_z_name = format('plot2d_z_%f-%f-%f_%f_%f' % (
+        cache_z_name = format('plot2d_z_%e-%e-%e#%d_%d_%d' % (
             self.__start_time,
             self.__end_time,
-            self._cfg.data_dump_interval * self._cfg.step_interval,
-            self.radius, self.longitude
+            self._cfg.step_interval,
+            self._cfg.data_dump_interval,
+            radius_row, longitude_col
         ))
 
         tiny_cache = TinyCache(os.path.join(self._cfg.data_path, '.cache'))
