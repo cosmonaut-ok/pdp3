@@ -1,5 +1,8 @@
 #include <gtest/gtest.h>
+
 #include "geometry.h"
+// #include "tinyvec3d.h"
+// #include "tinyvec3d.cpp"
 #include "particles.h"
 #include "particles.cpp"
 
@@ -40,13 +43,13 @@ namespace particles {
 			prtls->is_alive[i] = 1;
 	}
 
-	TEST(Particles, load_spatial_distribution_with_variable_mass)
+	TEST(Particles, load_spatial_distribution)
 	{
-		prtls->load_spatial_distribution_with_variable_mass(left_density, right_density, 0,0);
+		prtls->load_spatial_distribution(left_density, right_density, 0, 2);
 		for (int i = 0; i<number;i++)
 		{
-			ASSERT_NE(prtls->x1[i], prtls_clean->x1[i]);
-			ASSERT_NE(prtls->x3[i], prtls_clean->x3[i]);
+			ASSERT_NE(prtls->pos[i][0], prtls_clean->pos[i][0]);
+			ASSERT_NE(prtls->pos[i][2], prtls_clean->pos[i][2]);
 		}
 	}
 

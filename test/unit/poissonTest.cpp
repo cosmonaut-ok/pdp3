@@ -1,3 +1,5 @@
 #include <gtest/gtest.h>
-#include "poisson.h"
+
+// #pragma once
+// #include "poisson.h"
 #include "poisson.cpp"
