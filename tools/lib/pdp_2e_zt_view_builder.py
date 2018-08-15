@@ -67,8 +67,10 @@ class Pdp2EZTViewBuilder:
         fpf = self._cfg.frames_per_file
 
         ## set number of ticks
-        self.__start_time = (self.start_data_set * fpf + self.start_frame) * self._cfg.data_dump_interval * self._cfg.step_interval
-        self.__end_time = (self.end_data_set * fpf + self.end_frame) * self._cfg.data_dump_interval * self._cfg.step_interval
+        start_number_frames = self.start_data_set * fpf + self.start_frame
+        end_number_frames = self.end_data_set * fpf + self.end_frame
+        self.__start_time = start_number_frames * self._cfg.data_dump_interval * self._cfg.step_interval
+        self.__end_time = end_number_frames * self._cfg.data_dump_interval * self._cfg.step_interval
 
         self._plot_builder.x_tick_count = 4
         self._plot_builder.y_tick_count = 10
@@ -78,7 +80,7 @@ class Pdp2EZTViewBuilder:
         font_size=16
 
         ## setup plot dimensions
-        self.image_t_range = (self.end_data_set - self.start_data_set) * fpf
+        self.image_t_range = end_number_frames - start_number_frames
 
         self._plot_builder.x_plot_size = self.image_z_range
         self._plot_builder.y_plot_size = self.image_t_range
@@ -145,7 +147,7 @@ class Pdp2EZTViewBuilder:
             # with writer.saving(self._plot_builder.figure, movie_file, self.video_dpi):
             for k in range(self.start_data_set, self.end_data_set+1):
                 tstart = (k*fpf+self.start_frame) if k == self.start_data_set else k*fpf
-                tend = ((k+1)*self.end_frame) if k == self.end_data_set else ((k+1)*fpf)
+                tend = (k*fpf+self.end_frame) if k == self.end_data_set else ((k+1)*fpf)
                 i = 1;
 
                 if not os.path.isfile(data_file_e_r + str(k)) \
@@ -175,7 +177,6 @@ class Pdp2EZTViewBuilder:
                     image_z.extend(self._cfg.get_frame_row_from_data(h_field_e_z, local_step, radius_row))
                 tiny_cache.update_cache(cache_r_name, image_r)
                 tiny_cache.update_cache(cache_z_name, image_z)
-
         self._plot_builder.fill_image_with_data(
             self.E_z_plot_name, image_r)
 

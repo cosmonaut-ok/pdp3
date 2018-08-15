@@ -117,7 +117,7 @@ class Pdp3EViewBuilder:
         # with writer.saving(self._plot_builder.figure, movie_file, self.video_dpi):
         for k in range(self.start_data_set, self.end_data_set+1):
             tstart = (k*fpf+self.start_frame) if k == self.start_data_set else k*fpf
-            tend = ((k+1)*self.end_frame) if k == self.end_data_set else ((k+1)*fpf)
+            tend = (k*fpf+self.end_frame) if k == self.end_data_set else ((k+1)*fpf)
             i = 1;
 
             if not os.path.isfile(data_file_e_r + str(k)) \
