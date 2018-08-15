@@ -1,8 +1,6 @@
 #include <gtest/gtest.h>
 
 #include "geometry.h"
-// #include "tinyvec3d.h"
-// #include "tinyvec3d.cpp"
 #include "particles.h"
 #include "particles.cpp"
 
