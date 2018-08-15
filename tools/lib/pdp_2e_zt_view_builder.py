@@ -119,17 +119,19 @@ class Pdp2EZTViewBuilder:
         radius_row = self._cfg.get_row_by_radius(self.radius)
 
         tiny_cache = TinyCache(os.path.join(self._cfg.data_path, '.cache'))
-        cache_r_name = format('image_erz_r_%f-%f-%f_%f' % (
+        cache_r_name = format('image_erz_r_%e-%e-%e#%d_%d' % (
             self.__start_time,
             self.__end_time,
-            self._cfg.data_dump_interval * self._cfg.step_interval,
-            self.radius
+            self._cfg.step_interval,
+            self._cfg.data_dump_interval,
+            radius_row
         ))
-        cache_z_name = format('image_erz_z_%f-%f-%f_%f' % (
+        cache_z_name = format('image_erz_z_%e-%e-%e#%d_%d' % (
             self.__start_time,
             self.__end_time,
-            self._cfg.data_dump_interval * self._cfg.step_interval,
-            self.radius
+            self._cfg.step_interval,
+            self._cfg.data_dump_interval,
+            radius_row
         ))
 
         image_r = tiny_cache.get_cache(cache_r_name)
