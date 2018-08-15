@@ -1,8 +1,6 @@
 #include <gtest/gtest.h>
-#pragma once
+
 #include "field.h"
-// #include "tinyvec3d.h"
-// #include "tinyvec3d.cpp"
 #include "eField.h"
 #include "eField.cpp"
 #include "geometry.h"
