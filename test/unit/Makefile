@@ -23,13 +23,13 @@ USER_INC_DIR = ../../include
 # Flags passed to the preprocessor.
 # Set Google Test's header directory as a system directory, such that
 # the compiler doesn't generate warnings in Google Test headers.
-CPPFLAGS += -isystem $(GTEST_DIR)/include -I$(USER_INC_DIR) -I$(USER_SRC_DIR) -I../../lib/tinyxml2 -fopenmp
+CPPFLAGS += -isystem $(GTEST_DIR)/include -I$(USER_INC_DIR) -I$(USER_SRC_DIR) -I../../lib/tinyxml2 -I../../lib/tinyvec3d -fopenmp
 
 # Flags passed to the C++ compiler.
 CXXFLAGS += -g -Wall -Wextra -pthread
 
 # Linker flags
-LDFLAGS += -L$(USER_SRC_DIR)
+LDFLAGS += -L$(USER_SRC_DIR) -L../../lib/tinyxml2 -L../../lib/tinyvec3d -ltinyxml2 -ltinyvec3d
 
 # All tests produced by this Makefile.  Remember to add new tests you
 # created to the list.
