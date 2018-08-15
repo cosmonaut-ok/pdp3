@@ -57,9 +57,11 @@ class Pdp2ETViewBuilder:
         fpf = self._cfg.frames_per_file
 
         ## set number of ticks
-        self.__start_time = (self.start_data_set * fpf + self.start_frame) * self._cfg.data_dump_interval * self._cfg.step_interval
-        self.__end_time = (self.end_data_set * fpf + self.end_frame) * self._cfg.data_dump_interval * self._cfg.step_interval
-        self.__image_t_range = (self.end_data_set - self.start_data_set) * fpf
+        start_number_frames = self.start_data_set * fpf + self.start_frame
+        end_number_frames = self.end_data_set * fpf + self.end_frame
+        self.__start_time = start_number_frames * self._cfg.data_dump_interval * self._cfg.step_interval
+        self.__end_time = end_number_frames * self._cfg.data_dump_interval * self._cfg.step_interval
+        self.__image_t_range = end_number_frames - start_number_frames
 
         font_size=16
 
@@ -123,7 +125,7 @@ class Pdp2ETViewBuilder:
             # with writer.saving(self._plot_builder.figure, movie_file, self.video_dpi):
             for k in range(self.start_data_set, self.end_data_set+1):
                 tstart = (k*fpf+self.start_frame) if k == self.start_data_set else k*fpf
-                tend = ((k+1)*self.end_frame) if k == self.end_data_set else ((k+1)*fpf)
+                tend = (k*fpf+self.end_frame) if k == self.end_data_set else ((k+1)*fpf)
                 i = 1;
 
                 if not os.path.isfile(data_file_e_r + str(k)) \
