@@ -96,8 +96,7 @@ def main():
 
         if args.timestamp:
             view.start_data_set, view.start_frame = config.get_file_frame_number_by_timestamp(args.timestamp)
-            view.end_data_set, view.end_frame = config.get_file_frame_number_by_timestamp(args.timestamp)
-            view.end_frame = view.end_frame + 1
+            view.end_data_set, view.end_frame = view.start_data_set, view.start_frame + 1
         elif args.time_range:
             time_range = list(map(float, args.time_range.split(':')))
             view.start_data_set, view.start_frame = config.get_file_frame_number_by_timestamp(time_range[0])
