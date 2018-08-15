@@ -78,7 +78,7 @@ before_install:
   - echo 'Europe/Kiev' | sudo tee /etc/timezone
   - sudo add-apt-repository -y ppa:jonathonf/ffmpeg-3
   - sudo apt-get update
-  - sudo apt-get -qq -y install python3 python3-matplotlib python3-numpy python3-scipy ffmpeg xvfb virtualenv
+  - sudo apt-get -qq -y install python3 python3-matplotlib python3-numpy python3-scipy ffmpeg xvfb python-virtualenv
   - virtualenv --python=python3.6 py3; source py3/bin/activate; pip install matplotlib numpy scipy
 
 before_script:
