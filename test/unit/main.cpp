@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
-// #pragma once
+#pragma once
+#include "tinyvec3d.cpp"
 
 int main(int ac, char* av[])
 {
