@@ -45,11 +45,7 @@ class Pdp2ETViewBuilder:
         self.E_r_plot_name = r'$\mathbf{Electrical\enspace Field\enspace Radial\enspace Component}\enspace(E_r)$'
         self.E_z_plot_name = r'$\mathbf{Electrical\enspace Field\enspace Longitudal\enspace Component}\enspace(E_z)$'
 
-        self.image_t_range = (self.end_data_set - self.start_data_set) * fpf
-        self.image_z_range = cfg.z_grid_count
-
-        self.start_time = 0
-        self.end_time = 0
+        self.__image_t_range = (self.end_data_set - self.start_data_set) * fpf
 
         self.radius = 0
         self.longitude = 0
@@ -63,6 +59,7 @@ class Pdp2ETViewBuilder:
         ## set number of ticks
         self.__start_time = (self.start_data_set * fpf + self.start_frame) * self._cfg.data_dump_interval * self._cfg.step_interval
         self.__end_time = (self.end_data_set * fpf + self.end_frame) * self._cfg.data_dump_interval * self._cfg.step_interval
+        self.__image_t_range = (self.end_data_set - self.start_data_set) * fpf
 
         font_size=16
 
@@ -113,7 +110,7 @@ class Pdp2ETViewBuilder:
 
         tiny_cache = TinyCache(os.path.join(self._cfg.data_path, '.cache'))
 
-        plot2d_timeline = linspace(self.__start_time, self.__end_time, self.image_t_range)
+        plot2d_timeline = linspace(self.__start_time, self.__end_time, self.__image_t_range)
         plot2d_r = tiny_cache.get_cache(cache_r_name)
         plot2d_z = tiny_cache.get_cache(cache_z_name)
 
