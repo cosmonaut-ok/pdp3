@@ -10,44 +10,44 @@ HField::HField(Geometry *geom1_l) : Field(geom1_l)
 
   // Hr_half_time
   field_r_half_time = new double *[geom1->n_grid_1];
-#pragma omp parallel for shared (field_r_half_time)
+#pragma omp parallel for
   for (int i=0;i<(geom1->n_grid_1);i++)
     field_r_half_time[i] = new double[geom1->n_grid_2-1];
 
   // Hf half time
   field_phi_half_time = new double *[geom1->n_grid_1-1];
-#pragma omp parallel for shared (field_phi_half_time)
+#pragma omp parallel for
   for (int i=0;i<(geom1->n_grid_1-1);i++)
     field_phi_half_time[i] = new double[geom1->n_grid_2-1];
 
   // Hz half time
   field_z_half_time = new double *[geom1->n_grid_1-1];
-#pragma omp parallel for shared (field_z_half_time)
+#pragma omp parallel for
   for (int i=0;i<(geom1->n_grid_1-1);i++)
     field_z_half_time[i] = new double[geom1->n_grid_2];
 
   // Ar
   Ar = new double *[geom1->n_grid_1];
-#pragma omp parallel for shared (Ar)
+#pragma omp parallel for
   for (int i=0;i<(geom1->n_grid_1);i++)
     Ar[i] = new double[geom1->n_grid_2];
 
   // Afi
   Afi = new double *[geom1->n_grid_1];
-#pragma omp parallel for shared (Afi)
+#pragma omp parallel for
   for (int i=0;i<(geom1->n_grid_1);i++)
     Afi[i] = new double[geom1->n_grid_2];
 
   // Az
   Az = new double *[geom1->n_grid_1];
-#pragma omp parallel for shared (Az)
+#pragma omp parallel for
   for (int i=0;i<(geom1->n_grid_1);i++)
   {
     Az[i] = new double[geom1->n_grid_2];
   }
 
   // initialisation of magnetic potential
-#pragma omp parallel shared (field_r, field_phi, field_z, field_r_half_time, field_phi_half_time, field_z_half_time)
+#pragma omp parallel
   {
 #pragma omp for
     for(int i=0;i<geom1->n_grid_1-1;i++)
