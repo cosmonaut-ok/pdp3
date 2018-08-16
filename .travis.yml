@@ -52,6 +52,7 @@ matrix:
             - libiomp5
             - libiomp-dev
             - gcc-6 # required for stdlib
+            - libc++-dev
       env:
         - REAL_CC=clang-3.9
         - REAL_CXX=clang++-3.9
@@ -70,6 +71,7 @@ matrix:
             - libiomp5
             - libiomp-dev
             - gcc-6 # required for stdlib
+            - libc++-dev
       env:
         - REAL_CC=clang-5.0
         - REAL_CXX=clang++-5.0
