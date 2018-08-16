@@ -8,23 +8,10 @@ branches:
 
 matrix:
   allow_failure:
-    env: REAL_CC=gcc-4.9 REAL_CXX=g++-4.9
+    env: REAL_CC=clang-3.9 REAL_CXX=clang++-3.9 CFLAGS_OPENMP=-fopenmp=libiomp5
   fast_finish: true
   include:
     ## GCC
-    # works on Precise and Trusty
-    - os: linux
-      compiler: gcc
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-4.9
-      env:
-        - REAL_CC=gcc-4.9
-        - REAL_CXX=g++-4.9
-
     # works on Precise and Trusty
     - os: linux
       compiler: gcc
@@ -56,25 +43,6 @@ matrix:
       env:
         - REAL_CC=clang-3.9
         - REAL_CXX=clang++-3.9
-        - CFLAGS_OPENMP=-fopenmp=libiomp5
-
-    # works on Trusty
-    - os: linux
-      compiler: clang
-      addons:
-        apt:
-          sources:
-            - llvm-toolchain-trusty-5.0
-            - ubuntu-toolchain-r-test
-          packages:
-            - clang-5.0
-            - libiomp5
-            - libiomp-dev
-            - gcc-6 # required for stdlib
-            - libc++-dev
-      env:
-        - REAL_CC=clang-5.0
-        - REAL_CXX=clang++-5.0
         - CFLAGS_OPENMP=-fopenmp=libiomp5
 
 install:
