@@ -46,10 +46,12 @@ matrix:
         apt:
           sources:
             - llvm-toolchain-trusty-3.9
+            - ubuntu-toolchain-r-test
           packages:
             - clang-3.9
             - libiomp5
             - libiomp-dev
+            - gcc-6 # required for stdlib
       env:
         - REAL_CC=clang-3.9
         - REAL_CXX=clang++-3.9
@@ -62,10 +64,12 @@ matrix:
         apt:
           sources:
             - llvm-toolchain-trusty-5.0
+            - ubuntu-toolchain-r-test
           packages:
             - clang-5.0
             - libiomp5
             - libiomp-dev
+            - gcc-6 # required for stdlib
       env:
         - REAL_CC=clang-5.0
         - REAL_CXX=clang++-5.0
