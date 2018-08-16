@@ -62,7 +62,7 @@ CXX ?= g++
 RC = wrc
 AR = ar
 
-CFLAGS_DEFAULT = -m64 -mcmodel=medium -std=c++1z
+CFLAGS_DEFAULT = -m64 -mcmodel=medium -std=c++14 # -DEXPERIMENTAL
 CFLAGS_SPEEDUP = -ffast-math -O3 -funroll-loops -Wno-write-strings -freciprocal-math -fcx-fortran-rules
 CFLAGS_NO_SPEEDUP = -O2
 CFLAGS_OPENMP ?= -fopenmp

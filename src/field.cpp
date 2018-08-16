@@ -20,7 +20,7 @@ Field::Field(Geometry *geom1_t): geom1(geom1_t)
   field_z = new double *[geom1->n_grid_1];
   field_z_1d = new double [geom1->n_grid_1*(geom1->n_grid_2)];
 
-#pragma omp parallel for shared (field_r, field_phi, field_z)
+#pragma omp parallel for
   // filling second demension
   for (int i=0; i<(geom1->n_grid_1); i++)
   {
