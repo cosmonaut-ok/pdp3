@@ -33,10 +33,10 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - g++-7
+            - g++-6
       env:
-        - REAL_CC=gcc-7
-        - REAL_CXX=g++-7
+        - REAL_CC=gcc-6
+        - REAL_CXX=g++-6
 
     ## CLANG
     # works on Trusty
