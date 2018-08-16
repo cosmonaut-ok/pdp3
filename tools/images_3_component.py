@@ -175,7 +175,7 @@ def main():
 
         if args.timestamp:
             images.start_data_set, images.start_frame = config.get_file_frame_number_by_timestamp(args.timestamp)
-            images.end_data_set, view.end_frame = view.start_data_set, view.start_frame + 1
+            images.end_data_set, images.end_frame = images.start_data_set, images.start_frame + 1
         elif args.time_range:
             time_range = list(map(float, args.time_range.split(':')))
             images.start_data_set, images.start_frame = config.get_file_frame_number_by_timestamp(time_range[0])
