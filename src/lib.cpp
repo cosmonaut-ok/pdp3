@@ -1,6 +1,5 @@
 #include "lib.h"
 
-using namespace std;
 using namespace constant;
 
 namespace lib
@@ -8,6 +7,10 @@ namespace lib
   // C^2 define c^2 to decrease number of operations
   const double LIGHT_SPEED_POW_2 = pow (LIGHT_SPEED, 2);
 
+#if __cplusplus >= 201103L
+  using std::isnan;
+#endif
+  
   bool to_bool(string str)
   {
     std::transform(str.begin(), str.end(), str.begin(), ::tolower);
