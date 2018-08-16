@@ -42,7 +42,7 @@ matrix:
         - REAL_CC=clang-3.9
         - REAL_CXX=clang++-3.9
         - CFLAGS_OPENMP=-fopenmp=libiomp5
-    allow_failure:
+  allow_failures:
     - compiler: clang
       env: REAL_CC=clang-3.9 REAL_CXX=clang++-3.9 CFLAGS_OPENMP=-fopenmp=libiomp5
 
