@@ -405,8 +405,11 @@ void LoadInitParam::run(void)
     //! dump data to corresponding files every `parameters.xml->file_save_parameters->data_dump_interval` steps
     if  ((int)(params->time->current_time / params->time->delta_t) % params->dump_data_interval == 0)
     {
+#ifdef _OPENMP
       sprintf(avg_step_exec_time, "%.2fs", (double)(time(0) - t1) / params->dump_data_interval / omp_get_num_threads());
-
+#else
+      sprintf(avg_step_exec_time, "%.2fs", (double)(time(0) - t1) / params->dump_data_interval);
+#endif
       cout << left << setw(8) << step_number * params->dump_data_interval
            << left << setw(13) << step_number
            << left << setw(18) << params->time->current_time
