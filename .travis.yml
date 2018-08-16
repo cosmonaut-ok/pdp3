@@ -90,14 +90,9 @@ script:
     set -e
     make clean all
     make test-unit CXXFLAGS="-m64 -mcmodel=medium -O2 ${CFLAGS_OPENMP}"
-    if [ $TRAVIS_BRANCH = 'master' ]; then
-      make test-ext CFLAGS_OPENMP=${CFLAGS_OPENMP};
-    else
-      make test CFLAGS_OPENMP=${CFLAGS_OPENMP};
-    fi
+    make test CFLAGS_OPENMP=${CFLAGS_OPENMP}
     source py3/bin/activate
-    xvfb-run python tools/movie_3_component.py testdir/parameters.xml --no-view
-    test -f testdir/field_movie.avi
+    make test-tools CFLAGS_OPENMP=${CFLAGS_OPENMP}
 
 after_script:
   - make mrproper

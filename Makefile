@@ -168,6 +168,9 @@ test: mrproper all
 test-ext: mrproper all
 	TESTDIR=$(TESTDIR) /bin/bash ./test/functional/test.sh extended
 
+test-tools: test
+	TESTDIR=$(TESTDIR) /bin/bash ./test/functional/tools.sh
+
 check-syntax:
 	$(CXX) $(LIBRARY_PATH) $(INCLUDE_PATH) -Wall -Wextra -pedantic -fsyntax-only $(CHK_SOURCES)
 

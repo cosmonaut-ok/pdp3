@@ -20,6 +20,7 @@ fi
 
 mkdir -p ${TESTDIR}
 cp pdp3 ${TESTDIR}
+cp -r tools ${TESTDIR}
 
 cat<<EOF>${TESTDIR}/parameters.xml
 <?xml version="1.0" encoding="UTF-8"?>
