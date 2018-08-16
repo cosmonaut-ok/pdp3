@@ -23,7 +23,7 @@ namespace tinyvec3d {
     return vector;
   }
 
-  double* copy(double* v_this)
+  double* tv_copy(double* v_this)
   {
     double* newvec = new double[3];
     for (int i=0; i < 3; i++)
@@ -32,15 +32,15 @@ namespace tinyvec3d {
     return newvec;
   }
 
-  void copy_components(double* v_this, double* v_other)
+  void tv_copy_components(double* v_this, double* v_other)
   {
     for (int i=0; i < 3; i++)
       v_other[i] = v_this[i];
   }
 
-  void cross(double* v_this, double* v_other)
+  void tv_cross(double* v_this, double* v_other)
   {
-    double* vtmp = copy(v_this);
+    double* vtmp = tv_copy(v_this);
 
     vtmp[0] = v_this[1] * v_other[2] - v_this[2] * v_other[1];
     vtmp[1] = v_this[2] * v_other[0] - v_this[0] * v_other[2];
@@ -52,7 +52,7 @@ namespace tinyvec3d {
     delete [] vtmp;
   }
 
-  double dot(double* v_this, double* v_other)
+  double tv_dot(double* v_this, double* v_other)
   {
     double res = 0;
     for (int i=0; i < 3; i++)
@@ -61,13 +61,13 @@ namespace tinyvec3d {
     return res;
   }
 
-  void add(double* v_this, double* v_other)
+  void tv_add(double* v_this, double* v_other)
   {
     for (int i=0; i < 3; i++)
       v_this[i] += v_other[i];
   }
 
-  void subst(double* v_this, double* v_other)
+  void tv_subst(double* v_this, double* v_other)
   {
     for (int i=0; i < 3; i++)
       v_this[i] -= v_other[i];
@@ -77,50 +77,50 @@ namespace tinyvec3d {
   ////////////////////////////////////////////////////////////////////////////////
 
   // vector-number
-  void plus(double* v_this, double number)
+  void tv_plus(double* v_this, double number)
   {
     for (int i=0; i < 3; i++)
       v_this[i] += number;
   }
 
-  void minus(double* v_this, double number)
+  void tv_minus(double* v_this, double number)
   {
     for (int i=0; i < 3; i++)
       v_this[i] -= number;
   }
 
-  void product(double* v_this, double number)
+  void tv_product(double* v_this, double number)
   {
     for (int i=0; i < 3; i++)
       v_this[i] *= number;
   }
 
-  void div(double* v_this, double number)
+  void tv_div(double* v_this, double number)
   {
     for (int i=0; i < 3; i++)
       v_this[i] /= number;
   }
 
-  void power(double* v_this, double number)
+  void tv_power(double* v_this, double number)
   {
     for (int i=0; i < 3; i++)
       v_this[i] = std::pow(v_this[i], number);
   }
 
-  void abs(double* v_this)
+  void tv_abs(double* v_this)
   {
     for (int i=0; i < 3; i++)
       v_this[i] = std::abs(v_this[i]);
   }
 
-  void abs2(double* v_this)
+  void tv_abs2(double* v_this)
   {
-    power(v_this, 2);
+    tv_power(v_this, 2);
   }
 
-  double squared_sum(double* v_this)
+  double tv_squared_sum(double* v_this)
   {
-    return dot(v_this, v_this);
+    return tv_dot(v_this, v_this);
   }
 
   // TODO: vector-vector: max, min,
