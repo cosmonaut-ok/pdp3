@@ -9,6 +9,7 @@ branches:
 matrix:
   allow_failure:
     - compiler: clang
+      env: REAL_CC=clang-3.9 REAL_CXX=clang++-3.9 CFLAGS_OPENMP=-fopenmp=libiomp5
   fast_finish: true
   include:
     ## GCC
