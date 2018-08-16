@@ -60,8 +60,6 @@ def main():
 
     default_data_set_range = [0, 10000]
 
-    parser.add_argument('--timestamp', type=float, help='Timestamp to generate image at')
-
     parser.add_argument('--radius', type=float, help='Radius to generate image at')
 
     parser.add_argument('--time-range', type=str, help='Time range. Can be overriden by --timestamp')
@@ -101,11 +99,7 @@ def main():
         view.cmap = args.cmap
         view.clim_e_field_beam_scale_factor = args.beam_scale_factor
 
-        if args.timestamp:
-            view.start_data_set, view.start_frame = config.get_file_frame_number_by_timestamp(args.timestamp)
-            view.end_data_set, view.end_frame = config.get_file_frame_number_by_timestamp(args.timestamp)
-            view.end_frame = view.end_frame + 1
-        elif args.time_range:
+        if args.time_range:
             time_range = list(map(float, args.time_range.split(':')))
             view.start_data_set, view.start_frame = config.get_file_frame_number_by_timestamp(time_range[0])
             view.end_data_set, view.end_frame = config.get_file_frame_number_by_timestamp(time_range[1])

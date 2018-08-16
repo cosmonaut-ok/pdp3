@@ -59,8 +59,6 @@ def main():
 
     default_data_set_range = [0, 10000]
 
-    parser.add_argument('--timestamp', type=float, help='Timestamp to generate image at')
-
     parser.add_argument('--radius', type=float, help='Radius to generate plot at')
 
     parser.add_argument('--longitude', type=float, help='Longitude to generate plot at')
@@ -70,21 +68,6 @@ def main():
     parser.add_argument('--data-set-range', type=str,
                         help='''Range of data files set (e.g. 2:10 is E_r2 to Er_10, E_z2 to E_z10 and so on).
                         Can be overriden by --time-range and --timestamp. Default is calculated''')
-
-    parser.add_argument('--cmap', type=str,
-                        help='''Use custom colormap. Default %s.
-                        Reference: https://matplotlib.org/examples/color/colormaps_reference.html''' % 'gray',
-                        default='gray')
-
-    parser.add_argument('--beam-scale-factor', type=float,
-                        help='''Beam density setting automatically, but you can set scale factor to sets,
-                        where initial bunch density should be placed in color range''',
-                        default=2)
-
-    parser.add_argument('--clim-e-r', type=str,
-                        help='Color limit range for Electrical field longitual component')
-    parser.add_argument('--clim-e-z', type=str,
-                        help='Color limit range for Electrical field radial component')
 
     args = parser.parse_args()
 
@@ -97,16 +80,7 @@ def main():
         ################################################################################################
         #################### configure plot and view parameters #######################################
         ################################################################################################
-        view.clim_e_field_r = list(map(float, args.clim_e_r.split(':'))) if args.clim_e_r else [-config.clim_estimation, config.clim_estimation]
-        view.clim_e_field_z = list(map(float, args.clim_e_z.split(':'))) if args.clim_e_z else [-config.clim_estimation, config.clim_estimation]
-        view.cmap = args.cmap
-        view.clim_e_field_beam_scale_factor = args.beam_scale_factor
-
-        if args.timestamp:
-            view.start_data_set, view.start_frame = config.get_file_frame_number_by_timestamp(args.timestamp)
-            view.end_data_set, view.end_frame = config.get_file_frame_number_by_timestamp(args.timestamp)
-            view.end_frame = view.end_frame + 1
-        elif args.time_range:
+        if args.time_range:
             time_range = list(map(float, args.time_range.split(':')))
             view.start_data_set, view.start_frame = config.get_file_frame_number_by_timestamp(time_range[0])
             view.end_data_set, view.end_frame = config.get_file_frame_number_by_timestamp(time_range[1])
@@ -114,9 +88,6 @@ def main():
             data_set_range = list(map(int, args.data_set_range.split(':')))
             view.start_data_set = data_set_range[0]
             view.end_data_set = data_set_range[1]
-        # else:
-        #     view.start_data_set = default_data_set_range[0]
-        #     view.end_data_set = default_data_set_range[1]
 
         ################################################################################################
         ################################################################################################
