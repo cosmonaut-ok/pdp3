@@ -9,19 +9,19 @@ Current::Current(Geometry *geom1_t): geom1(geom1_t)
   //// jr
   // n_grid - number of edges
   j1 = new double*[geom1->n_grid_1-1];
-#pragma omp parallel for shared (j1)
+#pragma omp parallel for
   for (int i=0; i<(geom1->n_grid_1-1);i++)
     j1[i]= new double[geom1->n_grid_2];
 
   //// jfi
   j2 = new double*[geom1->n_grid_1];
-#pragma omp parallel for shared (j2)
+#pragma omp parallel for
   for (int i=0; i<(geom1->n_grid_1);i++)
     j2[i]= new double[geom1->n_grid_2];
 
   //// jz
   j3 = new double*[geom1->n_grid_1];
-#pragma omp parallel for shared (j3)
+#pragma omp parallel for
   for (int i=0; i<(geom1->n_grid_1);i++)
     j3[i]= new double[geom1->n_grid_2-1];
 
@@ -32,7 +32,7 @@ Current::Current(Geometry *geom1_t): geom1(geom1_t)
   j3_1d = new double[geom1->n_grid_1*(geom1->n_grid_2-1)];
 
   // initialization
-#pragma omp parallel for shared (j1, j2, j3)
+#pragma omp parallel for
   for (int i=0; i<(geom1->n_grid_1-1);i++)
     for (int k=0; k<(geom1->n_grid_2-1);k++)
     {
@@ -40,19 +40,19 @@ Current::Current(Geometry *geom1_t): geom1(geom1_t)
       j2[i][k]=0;
       j3[i][k]=0;
     }
-#pragma omp parallel for shared (j1)
+#pragma omp parallel for
   for (int i=0; i<(geom1->n_grid_1-1);i++)
     j1[i][geom1->n_grid_2-1]=0;
 
-#pragma omp parallel for shared (j2)
+#pragma omp parallel for
   for(int k=0;k<(geom1->n_grid_2);k++)
     j2[geom1->n_grid_1-1][k]=0;
 
-#pragma omp parallel for shared (j2)
+#pragma omp parallel for
   for(int i=0;i<(geom1->n_grid_1);i++)
     j2[i][geom1->n_grid_2-1]=0;
 
-#pragma omp parallel for shared (j3)
+#pragma omp parallel for
   for(int k=0;k<(geom1->n_grid_2-1);k++)
     j3[geom1->n_grid_1-1][k]=0;
 }

@@ -6,6 +6,7 @@
 #include <iostream>
 #include <math.h>
 #include <algorithm>
+#include <cmath>
 
 extern "C"
 {
