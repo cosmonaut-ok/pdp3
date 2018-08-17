@@ -61,12 +61,11 @@ class PDP3PlotBuilder:
         # rc('text', usetex=True)
 
     def add_subplot(self, name, subplot_number):
-        ''' add subplot
-        '''
+        ''' add subplot '''
         subplot = self.figure.add_subplot(subplot_number)
         #
         subplot.set_aspect(self.aspect)
-        subplot.invert_yaxis()
+        # subplot.invert_yaxis()
 
         self.__subplots[name] = subplot
 
