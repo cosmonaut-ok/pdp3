@@ -80,7 +80,7 @@ def main():
         print("Expected wake wavelength:\t %.2g m"%(wake_len))
         print("Expected Debye length:\t\t %.4g m"%(debye))
         print("Estimated beam passage time:\t %.4g s"%(config.z_size / config.beam_initial_velocity + beam_duration / config.beam_initial_velocity))
-        print("Number of calculation steps is\t %.0g"%((config.end_time - config.start_time) / config.step_interval))
+        print("Number of calculation steps is\t %.4g"%((config.end_time - config.start_time) / float(config.step_interval)))
         print("Number of data frames dumped is\t %.0g"%((config.end_time - config.start_time) / config.step_interval / config.data_dump_interval))
         print()
 
