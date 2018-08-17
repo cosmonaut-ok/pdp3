@@ -26,8 +26,8 @@ class PDP3PlotBuilder:
 
         # self.figure.subplots_adjust(hspace=1.8)
 
-        self.x_tick_count = 40;
-        self.y_tick_count = 16;
+        self.x_tick_count = 20;
+        self.y_tick_count = 8;
 
         self.x_plot_size = self.__cfg.z_grid_count
         self.y_plot_size = self.__cfg.r_grid_count
@@ -129,9 +129,9 @@ class PDP3PlotBuilder:
         axes.spines['right'].set_visible(tickbox)
 
         # set label on every 4th grid
-        for label in [x for i,x in enumerate(axes.xaxis.get_ticklabels()) if i%4 != 0]:
+        for label in [x for i,x in enumerate(axes.xaxis.get_ticklabels()) if i%2 != 0]:
             label.set_visible(False)
-        for label in [x for i,x in enumerate(axes.yaxis.get_ticklabels()) if i%4 != 0]:
+        for label in [x for i,x in enumerate(axes.yaxis.get_ticklabels()) if i%2 != 0]:
             label.set_visible(False)
 
         axes.grid(grid)
