@@ -44,6 +44,8 @@ class Pdp3EViewBuilder:
         self.position_e_z = [0.1, 0.35, 0.8, 0.3]
         self.position_bunch_density = [0.1, 0.01, 0.8, 0.3]
 
+        self.use_grid = False
+
         ## define public object fields
         self.cmap = 'gray'
         self.video_codec = 'mjpeg'
@@ -68,7 +70,7 @@ class Pdp3EViewBuilder:
         )
         self._plot_builder.setup_subplot(
             self.E_r_plot_name, x_axe_label=self.x_axis_label,
-            y_axe_label=self.y_axis_label, position=self.position_e_r
+            y_axe_label=self.y_axis_label, position=self.position_e_r, grid=self.use_grid
         )
         self._plot_builder.add_colorbar(
             self.E_r_plot_name, ticks=self.clim_e_field_r, title=self.cbar_axis_label, font_size=font_size-4
@@ -80,7 +82,7 @@ class Pdp3EViewBuilder:
         )
         self._plot_builder.setup_subplot(
             self.E_z_plot_name, x_axe_label=self.x_axis_label,
-            y_axe_label=self.y_axis_label, position=self.position_e_z
+            y_axe_label=self.y_axis_label, position=self.position_e_z, grid=self.use_grid
         )
         self._plot_builder.add_colorbar(
             self.E_z_plot_name, ticks=self.clim_e_field_z, title=self.cbar_axis_label, font_size=font_size-4
@@ -94,7 +96,7 @@ class Pdp3EViewBuilder:
         )
         self._plot_builder.setup_subplot(
             self.E_bunch_density_plot_name, x_axe_label=self.x_axis_label,
-            y_axe_label=self.y_axis_label, position=self.position_bunch_density
+            y_axe_label=self.y_axis_label, position=self.position_bunch_density, grid=self.use_grid
         )
         self._plot_builder.add_colorbar(
             self.E_bunch_density_plot_name, ticks=clim_e_field_beam,

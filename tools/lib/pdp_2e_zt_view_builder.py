@@ -42,12 +42,10 @@ class Pdp2EZTViewBuilder:
         self.cbar_axis_label = r'$\frac{V}{m}$'
         self.cbar_bunch_density_axis_label = r'$m^{-3}$'
 
+        self.use_grid = False
+
         ## define public object fields
         self.cmap = 'gray'
-        self.video_codec = 'mjpeg'
-        self.video_fps = 30
-        self.video_dpi = 100
-        self.video_bitrate=32000
 
         self.E_r_plot_name = r'$\mathbf{Electrical\enspace Field\enspace Radial\enspace Component}\enspace(E_r)$'
         self.E_z_plot_name = r'$\mathbf{Electrical\enspace Field\enspace Longitudal\enspace Component}\enspace(E_z)$'
@@ -93,7 +91,7 @@ class Pdp2EZTViewBuilder:
         )
         self._plot_builder.setup_subplot(
             self.E_r_plot_name, x_axe_label=self.x_axis_label,
-            y_axe_label=self.y_axis_label #, position=self.position_e_r
+            y_axe_label=self.y_axis_label, grid=self.use_grid
         )
         self._plot_builder.add_colorbar(
             self.E_r_plot_name, ticks=self.clim_e_field_r, title=self.cbar_axis_label, font_size=font_size-4, size="10%"
@@ -105,7 +103,7 @@ class Pdp2EZTViewBuilder:
         )
         self._plot_builder.setup_subplot(
             self.E_z_plot_name, x_axe_label=self.x_axis_label,
-            y_axe_label=self.y_axis_label # , position=self.position_e_z
+            y_axe_label=self.y_axis_label, grid=self.use_grid
         )
         self._plot_builder.add_colorbar(
             self.E_z_plot_name, ticks=self.clim_e_field_z, title=self.cbar_axis_label, font_size=font_size-4, size="10%"

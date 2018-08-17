@@ -39,8 +39,8 @@ class Pdp2ETViewBuilder:
         self.x_axis_label = r'$\mathit{t (s)}$'
         self.y_r_axis_label = r'$\mathit{E_r (\frac{V}{m})}$'
         self.y_z_axis_label = r'$\mathit{E_z (\frac{V}{m})}$'
-        # self.cbar_axis_label = r'$\frac{V}{m}$'
-        # self.cbar_bunch_density_axis_label = r'$m^{-3}$'
+
+        self.use_grid = False
 
         self.E_r_plot_name = r'$\mathbf{Electrical\enspace Field\enspace Radial\enspace Component}\enspace(E_r)$'
         self.E_z_plot_name = r'$\mathbf{Electrical\enspace Field\enspace Longitudal\enspace Component}\enspace(E_z)$'
@@ -78,7 +78,8 @@ class Pdp2ETViewBuilder:
         subplot_er.spines['top'].set_visible(False)
         subplot_er.spines['right'].set_visible(False)
         subplot_er.ticklabel_format(style='sci', scilimits=(0,0))
-
+        subplot_er.grid(self.use_grid)
+        
         subplot_ez.set_title(self.E_z_plot_name)
         subplot_ez.set_aspect('auto')
         subplot_ez.set_xlabel(self.x_axis_label)
@@ -86,6 +87,7 @@ class Pdp2ETViewBuilder:
         subplot_ez.spines['top'].set_visible(False)
         subplot_ez.spines['right'].set_visible(False)
         subplot_ez.ticklabel_format(style='sci', scilimits=(0,0))
+        subplot_ez.grid(self.use_grid)
 
 
     def create_view_with_2_plots(self):
