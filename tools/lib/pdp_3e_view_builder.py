@@ -153,12 +153,12 @@ class Pdp3EViewBuilder:
 
                 try:
                     self._plot_builder.fill_image_with_data(
-                        self.E_z_plot_name,
+                        self.E_r_plot_name,
                         self._cfg.get_frame_from_data(h_field_e_r, local_step)
                     )
 
                     self._plot_builder.fill_image_with_data(
-                        self.E_r_plot_name,
+                        self.E_z_plot_name,
                         self._cfg.get_frame_from_data(h_field_e_z, local_step)
                     )
 
