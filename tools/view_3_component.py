@@ -71,7 +71,7 @@ def main():
     parser.add_argument('--beam-scale-factor', type=float,
                         help='''Beam density setting automatically, but you can set scale factor to sets,
                         where initial bunch density should be placed in color range''',
-                        default=2)
+                        default=0.1)
 
     parser.add_argument('--clim-e-r', type=str,
                         help='Color limit range for Electrical field longitual component')
