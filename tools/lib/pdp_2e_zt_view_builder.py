@@ -175,10 +175,9 @@ class Pdp2EZTViewBuilder:
                     image_z.extend(self._cfg.get_frame_row_from_data(h_field_e_z, local_step, radius_row))
                 tiny_cache.update_cache(cache_r_name, image_r)
                 tiny_cache.update_cache(cache_z_name, image_z)
-        self._plot_builder.fill_image_with_data(
-            self.E_z_plot_name, image_r)
 
         self._plot_builder.fill_image_with_data(
-            self.E_r_plot_name, image_z)
+            self.E_r_plot_name, image_r)
 
-        # self._plot_builder.redraw()
+        self._plot_builder.fill_image_with_data(
+            self.E_z_plot_name, image_z)
