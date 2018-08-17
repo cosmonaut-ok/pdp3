@@ -77,7 +77,7 @@ class Pdp2EZTViewBuilder:
         self._plot_builder.y_tick_start = self.__start_time * 1e9 # nano- is for 1e-9
         self._plot_builder.y_tick_end = self.__end_time * 1e9 # nano- is for 1e-9
 
-        font_size=16
+        font_size=14
 
         ## setup plot dimensions
         self.image_t_range = end_number_frames - start_number_frames
