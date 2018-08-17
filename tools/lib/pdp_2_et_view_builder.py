@@ -163,5 +163,3 @@ class Pdp2ETViewBuilder:
 
         plot_er.plot(plot2d_timeline, plot2d_r)
         plot_ez.plot(plot2d_timeline, plot2d_z)
-
-        # self._plot_builder.redraw()
