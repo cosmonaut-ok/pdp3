@@ -108,7 +108,7 @@ def main():
         if args.longitude:
             image.longitude = args.longitude
 
-        view.use_grid = args.with_grid
+        image.use_grid = args.with_grid
 
         image.setup_2e_view(view)
         image.create_view_with_2_plots(view, write)
