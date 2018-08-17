@@ -63,7 +63,7 @@ class Pdp2ETViewBuilder:
         self.__end_time = end_number_frames * self._cfg.data_dump_interval * self._cfg.step_interval
         self.__image_t_range = end_number_frames - start_number_frames
 
-        font_size=16
+        font_size=14
 
         self._plot_builder.setup_figure(width=19.2, height=10.8, font_size=font_size, dpi=100)
 

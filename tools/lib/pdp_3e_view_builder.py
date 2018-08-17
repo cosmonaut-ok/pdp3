@@ -59,7 +59,7 @@ class Pdp3EViewBuilder:
         '''
         initialize plot figure and subplots with preset object fields
         '''
-        font_size=16
+        font_size=14
 
         self._plot_builder.setup_figure(width=19.2, height=12, font_size=font_size, dpi=100)
         ## setup E_r plot
