@@ -128,6 +128,8 @@ def main():
 
     default_data_set_range = [0, 10000]
 
+    parser.add_argument('--with-grid', action='store_true', help='Use tick grid for plots')
+
     parser.add_argument('--video-file', type=str,
                         help='Full path to output video file. Default <path/to/parameters.xml>/field_movie.avi')
 
@@ -186,7 +188,8 @@ def main():
         movie.clim_e_field_z = list(map(float, args.clim_e_z.split(':'))) if args.clim_e_z else [-config.clim_estimation, config.clim_estimation]
         movie.cmap = args.cmap
         movie.clim_e_field_beam_scale_factor = args.beam_scale_factor
-
+        movie.use_grid = args.with_grid
+        
         if args.time_range:
             time_range = list(map(float, args.time_range.split(':')))
             movie.start_data_set, movie.start_frame = config.get_file_frame_number_by_timestamp(time_range[0])
