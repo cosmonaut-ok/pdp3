@@ -53,6 +53,8 @@ def main():
 
     default_data_set_range = [0, 10000]
 
+    parser.add_argument('--with-grid', action='store_true', help='Use tick grid for plots')
+    
     parser.add_argument('--radius', type=float, help='Radius to generate image at')
 
     parser.add_argument('--time-range', type=str, help='Time range')
@@ -107,6 +109,7 @@ def main():
         image.clim_e_field_z = list(map(float, args.clim_e_z.split(':'))) if args.clim_e_z else [-config.clim_estimation, config.clim_estimation]
         image.cmap = args.cmap
         image.clim_e_field_beam_scale_factor = args.beam_scale_factor
+        image.use_grid = args.with_grid
 
         if args.time_range:
             time_range = list(map(float, args.time_range.split(':')))
