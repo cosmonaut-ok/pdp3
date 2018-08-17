@@ -53,6 +53,8 @@ def main():
 
     default_data_set_range = [0, 10000]
 
+    parser.add_argument('--with-grid', action='store_true', help='Use tick grid for plots')
+    
     parser.add_argument('--radius', type=float, help='Radius to generate plot at')
 
     parser.add_argument('--longitude', type=float, help='Longitude to generate plot at')
@@ -105,6 +107,8 @@ def main():
 
         if args.longitude:
             image.longitude = args.longitude
+
+        view.use_grid = args.with_grid
 
         image.setup_2e_view(view)
         image.create_view_with_2_plots(view, write)

@@ -116,6 +116,8 @@ def main():
 
     default_data_set_range = [0, 10000]
 
+    parser.add_argument('--with-grid', action='store_true', help='Use tick grid for plots')
+
     parser.add_argument('--images-path', type=str,
                         help='Full path to images. Default <path/to/parameters.xml>')
 
@@ -171,7 +173,7 @@ def main():
         images.clim_e_field_z = list(map(float, args.clim_e_z.split(':'))) if args.clim_e_z else [-config.clim_estimation, config.clim_estimation]
         images.cmap = args.cmap
         images.clim_e_field_beam_scale_factor = args.beam_scale_factor
-
+        images.use_grid = args.with_grid
 
         if args.timestamp:
             images.start_data_set, images.start_frame = config.get_file_frame_number_by_timestamp(args.timestamp)
