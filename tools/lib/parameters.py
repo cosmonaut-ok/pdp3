@@ -122,7 +122,7 @@ class Parameters:
         if frame_number > fpf:
             raise ValueError('Can not process frame %i. Out of range (%i)' % (frame_number, fpf))
         elif  row_number > sr:
-            raise ValueError('Can not process row $i in frame %i. Out of range (%i)' % (row_number, frame_number, sr))
+            raise ValueError('Can not process row %i in frame %i. Out of range (%i)' % (row_number, frame_number, sr))
         else:
 
             rstart = sr * sz * frame_number + row_number * sz
@@ -134,7 +134,7 @@ class Parameters:
     def get_frame_point_from_data(self, image, frame_number, x, y):
         sr = self.r_grid_count
         sz = self.z_grid_count
-        if  y > sz:
+        if  y > sr:
             raise ValueError('Can not process point x=%i y=%i in frame %i. Out of range (x=%i y=%i)' % (x, y, frame_number, sz, sr))
         row = self.get_frame_row_from_data(image, frame_number, y)
 
@@ -150,9 +150,9 @@ class Parameters:
         if  col_number > sz:
             raise ValueError('Can not process column $i in frame %i. Out of range (%i)' % (col_number, frame_number, sr))
         else:
-            frame = get_frame_from_data(image, frame_number)
+            frame = self.get_frame_from_data(image, frame_number)
             for i in range(0, sr):
-                col.append(self.get_frame_point_from_data(frame, 0, i, col_number))
+                col.append(self.get_frame_point_from_data(frame, 0, col_number, i))
 
         return(col)
 
