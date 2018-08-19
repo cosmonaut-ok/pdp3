@@ -15,13 +15,13 @@ import matplotlib.animation as ani
 from lib.parameters import Parameters
 from lib.pdp3_plot_builder import PDP3PlotBuilder
 
-from lib.pdp_2e_zt_view_builder import Pdp2EZTViewBuilder
+from lib.pdp_2e_rt_view_builder import Pdp2ERTViewBuilder
 
 ## README:
 ## color map reference: https://matplotlib.org/examples/color/colormaps_reference.html
 ## mathtext reference:  https://matplotlib.org/users/mathtext.html
 
-class Pdp2Image(Pdp2EZTViewBuilder):
+class Pdp2Image(Pdp2ERTViewBuilder):
     def __init__(self, cfg):
         super(Pdp2Image, self).__init__(cfg)
 
@@ -39,7 +39,7 @@ class Pdp2Image(Pdp2EZTViewBuilder):
     def create_view_with_2_plots(self, view, write):
         super(Pdp2Image, self).create_view_with_2_plots()
 
-        image_file_name = os.path.join(self.image_path, 'image_2e_zt_' + str(self.radius) + 'm.png')
+        image_file_name = os.path.join(self.image_path, 'image_2e_rt_' + str(self.longitude) + 'm.png')
 
         if write:
             self._plot_builder.figure.savefig(image_file_name) # save the figure to file
@@ -54,8 +54,8 @@ def main():
     default_data_set_range = [0, 10000]
 
     parser.add_argument('--with-grid', action='store_true', help='Use tick grid for plots')
-    
-    parser.add_argument('--radius', type=float, help='Radius to generate image at')
+
+    parser.add_argument('--longitude', type=float, help='Longitude to generate image at')
 
     parser.add_argument('--time-range', type=str, help='Time range')
 
@@ -127,7 +127,7 @@ def main():
         ################################################################################################
         ################################################################################################
 
-        if args.radius: image.radius = args.radius
+        if args.longitude: image.longitude = args.longitude
 
         image.image_path = config.config_path if not args.image_path else args.image_path
 
