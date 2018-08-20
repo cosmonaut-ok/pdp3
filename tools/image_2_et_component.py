@@ -53,8 +53,14 @@ def main():
 
     default_data_set_range = [0, 10000]
 
+    parser.add_argument('--range-e-r', type=str,
+                        help='Limit range for Electrical field longitual component')
+
+    parser.add_argument('--range-e-z', type=str,
+                        help='Limit range for Electrical field radial component')
+
     parser.add_argument('--with-grid', action='store_true', help='Use tick grid for plots')
-    
+
     parser.add_argument('--radius', type=float, help='Radius to generate plot at')
 
     parser.add_argument('--longitude', type=float, help='Longitude to generate plot at')
@@ -89,6 +95,9 @@ def main():
         ################################################################################################
         #################### configure plot and image parameters #######################################
         ################################################################################################
+        if args.range_e_r: view.range_e_field_r = list(map(float, args.range_e_r.split(':')))
+        if args.range_e_z: view.range_e_field_z = list(map(float, args.range_e_z.split(':')))
+
         if args.time_range:
             time_range = list(map(float, args.time_range.split(':')))
             image.start_data_set, image.start_frame = config.get_file_frame_number_by_timestamp(time_range[0])
