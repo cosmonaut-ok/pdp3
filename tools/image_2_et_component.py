@@ -95,8 +95,8 @@ def main():
         ################################################################################################
         #################### configure plot and image parameters #######################################
         ################################################################################################
-        if args.range_e_r: view.range_e_field_r = list(map(float, args.range_e_r.split(':')))
-        if args.range_e_z: view.range_e_field_z = list(map(float, args.range_e_z.split(':')))
+        if args.range_e_r: image.range_e_field_r = list(map(float, args.range_e_r.split(':')))
+        if args.range_e_z: image.range_e_field_z = list(map(float, args.range_e_z.split(':')))
 
         if args.time_range:
             time_range = list(map(float, args.time_range.split(':')))
