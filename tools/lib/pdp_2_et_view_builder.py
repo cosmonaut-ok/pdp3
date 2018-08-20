@@ -28,9 +28,8 @@ class Pdp2ETViewBuilder:
         self.start_frame = 0
         self.end_data_set, self.end_frame = self._cfg.get_file_frame_number_by_timestamp(self._cfg.end_time)
 
-        self.clim_e_field_beam_scale_factor = 1
-        self.clim_e_field_r = [0, 1]
-        self.clim_e_field_z = [0, 1]
+        self.range_e_field_r = [0,0]
+        self.range_e_field_z = [0,0]
 
         ## define public object fields
         self.data_file_e_r_pattern = 'E_r'
@@ -79,7 +78,8 @@ class Pdp2ETViewBuilder:
         subplot_er.spines['right'].set_visible(False)
         subplot_er.ticklabel_format(style='sci', scilimits=(0,0))
         subplot_er.grid(self.use_grid)
-        
+        if self.range_e_field_r[0] != 0 or self.range_e_field_r[1] != 0: subplot_er.set_ylim(self.range_e_field_r)
+
         subplot_ez.set_title(self.E_z_plot_name)
         subplot_ez.set_aspect('auto')
         subplot_ez.set_xlabel(self.x_axis_label)
@@ -88,6 +88,7 @@ class Pdp2ETViewBuilder:
         subplot_ez.spines['right'].set_visible(False)
         subplot_ez.ticklabel_format(style='sci', scilimits=(0,0))
         subplot_ez.grid(self.use_grid)
+        if self.range_e_field_z[0] != 0 or self.range_e_field_z[1] != 0: subplot_ez.set_ylim(self.range_e_field_z)
 
 
     def create_view_with_2_plots(self):
