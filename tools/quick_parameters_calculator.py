@@ -67,8 +67,8 @@ def main():
     else:
         bunch_duration = config.bunch_length / config.beam_initial_velocity
         interval_bunches_duration = config.bunches_distance / config.beam_initial_velocity
-        beam_duration = bunch_duration * config.number_bunches + interval_bunches_duration * (config.number_bunches - 1)
         beam_length = config.bunch_length * config.number_bunches + config.bunches_distance * (config.number_bunches - 1)
+        beam_duration = beam_length / config.beam_initial_velocity
         w_p = langmur_freq(el_density)
         wake_len = wake_length(el_density, config.beam_initial_velocity)
         el_temperature = eV2kelvin(el_temperature)
@@ -79,7 +79,7 @@ def main():
         print("Expected plasma frequency:\t %.4g Hz"%(w_p/(2 * math.pi)))
         print("Expected wake wavelength:\t %.2g m"%(wake_len))
         print("Expected Debye length:\t\t %.4g m"%(debye))
-        print("Estimated beam passage time:\t %.4g s"%(config.z_size / config.beam_initial_velocity + beam_duration / config.beam_initial_velocity))
+        print("Estimated beam passage time:\t %.4g s"%(config.z_size / config.beam_initial_velocity + beam_duration))
         print("Number of calculation steps is\t %.4g"%((config.end_time - config.start_time) / float(config.step_interval)))
         print("Number of data frames dumped is\t %.0g"%((config.end_time - config.start_time) / config.step_interval / config.data_dump_interval))
         print()
