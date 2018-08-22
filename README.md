@@ -10,10 +10,12 @@ Renew PDP3 project
   - C++ compiler: gcc 4.9+ or LLVM/clang 3.9+ or Intel C++ compiler 18.0+ (experimental, tests fails, but still working) or PGI compiler (experimental) or MSVS 2013 (single thread only)
   - OpenMP spec. version 3.0+ (see compiler requirements. As usual, openMP is a part of standard compiler libraries)
   - git (to get sources)
+  - hdf5 library
 - Linux:
   - 'make' util
   - libomp5 or libgomp (for clang or gcc)
   - python+matplotlib+numpy (or anaconda - python scientific environment)
+  - libhdf5 (development files)
 - Windows:
   - MS Visual Studio 2017 or Cygwin with 'make' util (for gcc/clang/icc)
   - anaconda (python scientific environment)
@@ -32,12 +34,12 @@ Renew PDP3 project
 #### 0. INSTALL PREREQUIRED SOFTWARE
 
 ``` shell
-root@host# apt-get install build-essential git
+root@host# apt-get install build-essential git libhdf5-dev libhdf5-serial-dev
 ```
 > NOTE: if you are going to use LLVM/clang, you should install different packages
 
 ``` shell
-root@host# apt-get install clang-<your faforite version> make git libomp5
+root@host# apt-get install clang-<your faforite version> make git libomp5 libhdf5-dev libhdf5-serial-dev
 ```
 
 #### 1. **CLONE PROJECT**

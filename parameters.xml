@@ -8,6 +8,8 @@
   -->
   <debug>true</debug>
 
+  <use_hdf5>false</use_hdf5>   	<!-- experimental feature whith implements output to new data format (HDF5) -->
+
   <geometry>
     <r_size>0.25</r_size>       <!-- model radial size -->
     <z_size>2.0</z_size>        <!-- model longitudal size-->

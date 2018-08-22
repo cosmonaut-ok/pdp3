@@ -65,6 +65,7 @@ public:
 public:
 
   bool debug = false;
+  bool use_hdf5 = false;
 
   Geometry *geom;
 
