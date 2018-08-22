@@ -18,6 +18,9 @@ Parameters::Parameters(const char *xml_file_name)
   //! set debug option
   debug = lib::to_bool(try_first_child(xml_data, "debug")->GetText());
 
+  //! check if use hdf5 backend
+  use_hdf5 = lib::to_bool(try_first_child(xml_data, "use_hdf5")->GetText());
+
   //! initialize geometry, set PML
   init_geometry();
   init_pml();
