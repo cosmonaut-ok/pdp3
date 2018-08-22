@@ -40,7 +40,11 @@ LoadInitParam::LoadInitParam(char *xml_file_name)
   cout << "Initializing File Saving Paths" << endl;
   //! initialize file saving parameters, like path to computed data files,
   //! path to system state data files max frames number, placed to one file etc.
-  c_io_class = new InputOutputClass (params->dump_result_path, params->dump_save_state_path);
+  // c_io_class = new InputOutputClass (params->dump_result_path, params->dump_save_state_path);
+  if (params->use_hdf5)
+    c_io_class = new IOHDF5 (params->dump_result_path, params->dump_save_state_path);
+  else
+    c_io_class = new IOText (params->dump_result_path, params->dump_save_state_path);
 
   //! 2. creating field objects
   cout << "Initializing E/M Fields Data" << endl;
@@ -449,4 +453,6 @@ void LoadInitParam::run(void)
     params->time->current_time = params->time->current_time + params->time->delta_t;
   }
   cout << endl << "Simulation Completed" << endl << endl;
+
+  delete c_io_class;
 }
