@@ -1,21 +1,21 @@
-#include "inputOutputClass.h"
+#include "ioText.h"
 
-InputOutputClass::InputOutputClass(void)
+IOText::IOText(void)
 {
 }
 
-InputOutputClass::InputOutputClass(char *c_pathres,char *c_pathdump)
+IOText::IOText(char *c_pathres,char *c_pathdump)
 {
   strcpy(path_result, c_pathres);
   strcpy(path_dump, c_pathdump);
 }
 
 
-InputOutputClass::~InputOutputClass(void)
+IOText::~IOText(void)
 {
 }
 
-char* InputOutputClass::get_data_path(char const *comp_name, int number=-1)
+char* IOText::get_data_path(char const *comp_name, int number=-1)
 {
   char st_name[100];
   strcpy(st_name, comp_name);
@@ -34,7 +34,7 @@ char* InputOutputClass::get_data_path(char const *comp_name, int number=-1)
   return path;
 }
 
-char* InputOutputClass::get_dump_path(char const *comp_name)
+char* IOText::get_dump_path(char const *comp_name)
 {
   char st_name[100];
   strcpy(st_name, comp_name);
@@ -45,7 +45,7 @@ char* InputOutputClass::get_dump_path(char const *comp_name)
   return path;
 }
 
-void InputOutputClass::dump_data(char const *path,
+void IOText::dump_data(char const *path,
                                  double **out_value,
                                  int r_step,
                                  int z_step,
@@ -67,7 +67,7 @@ void InputOutputClass::dump_data(char const *path,
   out_val.close();
 }
 
-void InputOutputClass::dump_components(char const *path,
+void IOText::dump_components(char const *path,
                                        double **components,
                                        int size,
                                        int dimensions,
@@ -91,7 +91,7 @@ void InputOutputClass::dump_components(char const *path,
   out_val.close();
 }
 
-void InputOutputClass::out_data(char const *comp_name,
+void IOText::out_data(char const *comp_name,
                                   double **out_value,
                                   int step_number,
                                   int number,
@@ -104,7 +104,7 @@ void InputOutputClass::out_data(char const *comp_name,
   delete [] path;
 }
 
-void InputOutputClass::out_field_dump(char const *comp_name,
+void IOText::out_field_dump(char const *comp_name,
                                         double **out_value,
                                         int r_step,
                                         int z_step)
@@ -115,7 +115,7 @@ void InputOutputClass::out_field_dump(char const *comp_name,
   delete [] path;
 }
 
-void InputOutputClass::out_triple(char *comp_name,
+void IOText::out_triple(char *comp_name,
                                   double **triple,
                                   int step_number,
                                   int number,
@@ -127,7 +127,7 @@ void InputOutputClass::out_triple(char *comp_name,
   delete [] path;
 }
 
-void InputOutputClass::out_pos_dump(char *comp_name,
+void IOText::out_pos_dump(char *comp_name,
                                       double **pos,
                                       int particles_number)
 {
@@ -138,7 +138,7 @@ void InputOutputClass::out_pos_dump(char *comp_name,
   delete [] path;
 }
 
-void InputOutputClass::out_velocity_dump(char *comp_name,
+void IOText::out_velocity_dump(char *comp_name,
                                          double **vel,
                                          int particles_number)
 {
@@ -149,7 +149,7 @@ void InputOutputClass::out_velocity_dump(char *comp_name,
   delete [] path;
 }
 
-void InputOutputClass::out_current_time_dump(double current_time)
+void IOText::out_current_time_dump(double current_time)
 {
   char* path = get_dump_path("current_time");
   ofstream out_val(path, ios::trunc);
