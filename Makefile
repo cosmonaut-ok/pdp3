@@ -47,6 +47,9 @@ SUBDIRS += $(tinyvec3d_SUBDIR)
 pdp3_LIBRARIES += tinyvec3d
 LDFLAGS += -L$(tinyvec3d_SUBDIR)
 
+### link hdf5 library
+pdp3_LIBRARIES += hdf5_serial
+
 pdp3_OBJS := $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(pdp3_CXX_SRCS))
 
 LDFLAGS := $(LDFLAGS) $(pdp3_LDFLAGS)
@@ -152,7 +155,7 @@ $(pdp3_MODULE): $(pdp3_OBJS)
 	$(CXX) $(CXXFLAGS) $(CXXEXTRA) $(DEFINCL) $(LDFLAGS) -o $@ $(pdp3_OBJS) $(pdp3_LIBRARY_PATH) $(pdp3_LIBRARIES:%=-l%)
 
 mrproper: clean
-	$(RM) -r $(TESTDIR) *.avi *.png $(TARGETDIR) $(RELEASE) $(RELEASE).zip
+	$(RM) -r $(TESTDIR) $(TESTDIR)_h5 *.avi *.png $(TARGETDIR) $(RELEASE) $(RELEASE).zip
 
 run: bootstrap
 	./pdp3
@@ -165,11 +168,16 @@ test-unit: $(TESTSUBDIRS:%=%/__test__)
 test: mrproper all
 	TESTDIR=$(TESTDIR) /bin/bash ./test/functional/test.sh
 
+test-h5: mrproper all
+	TESTDIR=$(TESTDIR)_h5 /bin/bash ./test/functional/test_h5.sh
+
 test-ext: mrproper all
 	TESTDIR=$(TESTDIR) /bin/bash ./test/functional/test.sh extended
 
 test-tools: test
 	TESTDIR=$(TESTDIR) /bin/bash ./test/functional/tools.sh
+
+test-full: test-unit test-ext test-h5 test-tools
 
 check-syntax:
 	$(CXX) $(LIBRARY_PATH) $(INCLUDE_PATH) -Wall -Wextra -pedantic -fsyntax-only $(CHK_SOURCES)

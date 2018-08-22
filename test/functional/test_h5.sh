@@ -2,7 +2,7 @@
 
 set -e
 
-test -z $TESTDIR && TESTDIR=testingdir
+test -z $TESTDIR && TESTDIR=testingdir_h5
 test -z $TRUE_MD5 && TRUE_MD5=test/functional/true_md5sums
 test -z $TRUE_EXT_MD5 && TRUE_EXT_MD5=test/functional/true_ext_md5sums
 
@@ -29,7 +29,7 @@ cat<<EOF>${TESTDIR}/parameters.xml
 <initial_parameters>
 
   <debug>false</debug>
-  <use_hdf5>false</use_hdf5>
+  <use_hdf5>true</use_hdf5>
 
   <geometry>
     <r_size>0.25</r_size>
@@ -120,7 +120,7 @@ cat<<EOF>${TESTDIR}/parameters.xml
       <J_phi>false</J_phi>
       <J_z>true</J_z>
 
-      <position>true</position>
+      <position>false</position>
 
       <velocity>true</velocity>
 
@@ -145,15 +145,34 @@ cd ${TESTDIR}
 mkdir -p pdp3_result/dump
 time ./pdp3
 
+## dump data from hdf5 database
+echo -n "Dumping state data from database to plaintext for test..."
+for i in `h5ls -r pdp3_result/data.h5/pdp3/result | grep Dataset | awk '{print $1}'`; do
+    h5dump -d /pdp3/result/$i -y -r -o pdp3_result/$(basename $(dirname $i))$(basename $i)_raw pdp3_result/data.h5 > /dev/null
+done
+echo "done"
+
+echo -n "Dumping data from database to plaintext for test..."
+for i in `h5ls -r pdp3_result/data.h5/pdp3/dump | grep Dataset | awk '{print $1}'`; do
+    h5dump -d /pdp3/dump/$i -y -r -o pdp3_result/$(basename $i)_raw pdp3_result/data.h5 > /dev/null
+done
+echo "done"
+
 cd pdp3_result
+
+echo -n "Converting RAW data to format for md5sums comparation..."
+for i in `find . -name '*_raw'`; do
+    echo $(cat ${i} | tr ',' ' ') | tr ' ' '\n' > $(basename $i _raw)n
+    rm -f ${i}
+done
+echo "done"
 
 ## compare with testing data
 success="true"
-for i in `find . -type f`; do
+for i in `find . -type f -regex '^.*[0-9]n$'`; do
     bn=`basename $i`
-    cat ${i} | tr ' ' '\n' > ${i}n
-    true_md5sum="$(egrep ${bn}n$ ../../${TRUE_MD5} | cut -d';' -f1)"
-    actual_md5sum="$(md5sum ${i}n | cut -d' ' -f1)"
+    true_md5sum="$(egrep ${bn}$ ../../${TRUE_MD5} | cut -d';' -f1)"
+    actual_md5sum="$(md5sum ${i} | cut -d' ' -f1)"
     if test "${true_md5sum}" == "${actual_md5sum}"; then
 	printf "%-25b %-10b\n" "file $bn" "${GREEN}match${NC}"
     else
