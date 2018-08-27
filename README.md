@@ -7,18 +7,13 @@ Renew PDP3 project
 ### System And Software Requirements
 
 - Common:
-  - C++ compiler: gcc 4.9+ or LLVM/clang 3.9+ or Intel C++ compiler 18.0+ (experimental, tests fails, but still working) or PGI compiler (experimental) or MSVS 2013 (single thread only)
-  - OpenMP spec. version 3.0+ (see compiler requirements. As usual, openMP is a part of standard compiler libraries)
+  - C++ compiler: gcc 6.0+
   - git (to get sources)
   - hdf5 library
-- Linux:
   - 'make' util
-  - libomp5 or libgomp (for clang or gcc)
-  - python+matplotlib+numpy (or anaconda - python scientific environment)
+  - libgomp (OpenMP spec. version 3.0+).
+  - python+matplotlib+numpy (anaconda - python scientific environment is highly recommended)
   - libhdf5 (development files)
-- Windows:
-  - MS Visual Studio 2017 or Cygwin with 'make' util (for gcc/clang/icc)
-  - anaconda (python scientific environment)
 
 ### Terms and Legend
 
@@ -36,11 +31,6 @@ Renew PDP3 project
 ``` shell
 root@host# apt-get install build-essential git libhdf5-dev libhdf5-serial-dev
 ```
-> NOTE: if you are going to use LLVM/clang, you should install different packages
-
-``` shell
-root@host# apt-get install clang-<your faforite version> make git libomp5 libhdf5-dev libhdf5-serial-dev
-```
 
 #### 1. **CLONE PROJECT**
 
@@ -52,28 +42,10 @@ user@host$ git submodule update --init # require to enable external libraries
 
 #### 2. **COMPILE**
 
-* **GCC (recommended)**
-
 ```shell
 # change your current directory to project's root directory
 user@host$ cd /path/to/pdp3/root/directory
 user@host$ make [COMPILE FLAGS] # see below about COMPILE FLAGS
-```
-
-* **LLVM/Clang**
-
-```shell
-# change your current directory to project's root directory
-user@host$ cd /path/to/pdp3/root/directory
-user@host$ make CXX=clang++-<your faforite version> CFLAGS_OPENMP=-fopenmp=libiomp5 [OTHER COMPILE FLAGS] # see below about COMPILE FLAGS
-```
-
-* **PGI (Nvidia) C compiler**
-
-```shell
-# change your current directory to project's root directory
-user@host$ cd /path/to/pdp3/root/directory
-user@host$ make CXX=/path/to/binary/pgc++ CFLAGS="-mp [other pgi-specific compile flags]"
 ```
 
 #### Compile flags
@@ -89,7 +61,7 @@ user@host$ FLAG=value make [action]
 **List of built-in compile flags, accepted by PDP3 project:**
 
 - `DEBUG=yes/no`- Compile binary with debug symbols, prepared to use with GDB
-- `SPEEDUP=yes/no` - Increase speed up to 30%, by using unsafe math operations (gcc and clang only!). WARNING! it decreases calculations accuracy and can cause incorrect program working
+- `SPEEDUP=yes/no` - Increase speed up to 30%, by using unsafe math operations. WARNING! it decreases calculations accuracy and can cause incorrect program working
 - `SINGLETHREAD=yes/no` - Compile binary without multithreading support. Disables all parallelization features
 - `CXX=/foo/bar++` - Use custom c++ compiler (see supported c++ compilers list)
 - `CXXFLAGS="foo bar"` - custom C++ compile flags, used by compiler (overrides all autogeneration flags)
