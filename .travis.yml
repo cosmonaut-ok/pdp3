@@ -23,29 +23,6 @@ matrix:
         - REAL_CC=gcc-6
         - REAL_CXX=g++-6
 
-    ## CLANG
-    # works on Trusty
-    - os: linux
-      compiler: clang
-      addons:
-        apt:
-          sources:
-            - llvm-toolchain-trusty-3.9
-            - ubuntu-toolchain-r-test
-          packages:
-            - clang-3.9
-            - libiomp5
-            - libiomp-dev
-            - gcc-6 # required for stdlib
-            - libc++-dev
-      env:
-        - REAL_CC=clang-3.9
-        - REAL_CXX=clang++-3.9
-        - CFLAGS_OPENMP=-fopenmp=libiomp5
-  allow_failures:
-    - compiler: clang
-      env: REAL_CC=clang-3.9 REAL_CXX=clang++-3.9 CFLAGS_OPENMP=-fopenmp=libiomp5
-
 install:
   - git submodule update --init
 
