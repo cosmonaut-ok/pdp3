@@ -1,5 +1,7 @@
 import os
 import sys
+import re
+import fnmatch
 
 import numpy as np
 from os.path import join # to use "join" for namespaces
@@ -41,73 +43,68 @@ class PlainReader:
         return(path)
 
 
+    def __get_file_range__(self, space):
+        files = fnmatch.filter(os.listdir(self.__data_path__), '{}*'.format(space))
+        return(max(map(lambda x: int(re.sub(space, '', x)), files)))
+
+
     def __check_frame__(self, space, frame):
-        return(True)
-        # if frame < 0:
-        #     raise Exception('frame should not be less, than 0. The value was: {}'.format(frame))
-        # else:
-        #     path = self.__get_path__(space)
-        #     space_length = len(self.file[path])
-        #     if space_length < frame:
-        #         raise Exception('frame should be less, than {}. The value was: {}'.format(space_length, frame))
-        #     else:
-        #         return(True)
+        if frame < 0:
+            raise Exception('frame should not be less, than 0. The value was: {}'.format(frame))
+        else:
+            path = self.__get_path__(space)
+            space_length = self.__get_file_range__(space) * self.__fpf__
+            if space_length < frame:
+                raise Exception('frame should be less, than {}. The value was: {}'.format(space_length, frame))
+            else:
+                return(True)
 
 
     def __check_row__(self, space, row):
-        return(True)
-        # if row < 0:
-        #     raise Exception('row should not be less than 0. The value was {}'.format(row))
-        # else:
-        #     path = self.__get_path__(space, 0)
-        #     frame_length = len(self.file[path][0])
-        #     if frame_length < row:
-        #         raise Exception('Out of range: row should be less, than {}. The value was {}.'.format(row, frame_length))
-        #     else:
-        #         return(True)
+        if row < 0:
+            raise Exception('row should not be less than 0. The value was {}'.format(row))
+        else:
+            if self.__shape__[0] < row:
+                raise Exception('Out of range: row should be less, than {}. The value was {}.'.format(row, self.__shape__[0]))
+            else:
+                return(True)
 
 
     def __check_col__(self, space, col):
-        return(True)
-        # if col < 0:
-        #     raise Exception('column should not be less than 0. The value was {}'.format(col))
-        # else:
-        #     path = self.__get_path__(space, 0)
-        #     frame_height = len(self.file[path][0,0])
-        #     if frame_length < col:
-        #         raise Exception('Out of range: column should be less, than {}. The value was {}.'.format(col, frame_height))
-        #     else:
-        #         return(True)
+        if col < 0:
+            raise Exception('column should not be less than 0. The value was {}'.format(col))
+        else:
+            if self.__shape__[1] < col:
+                raise Exception('Out of range: column should be less, than {}. The value was {}.'.format(col, self.__shape__[1]))
+            else:
+                return(True)
 
 
     def __check_frame_range__(self, space, from_frame, to_frame):
-        return(True)
-        # if to_frame < from_frame:
-        #     raise Exception('from_frame should be less or equal, than to_frame. The values was: {} and {}'.format(from_frame, to_frame))
-        # elif from_frame < 0:
-        #     raise Exception('from_frame should not be less, than 0. The value was: {}'.format(from_frame))
-        # else:
-        #     return(self.__check_frame__(space, to_frame))
+        if to_frame < from_frame:
+            raise Exception('from_frame should be less or equal, than to_frame. The values was: {} and {}'.format(from_frame, to_frame))
+        elif from_frame < 0:
+            raise Exception('from_frame should not be less, than 0. The value was: {}'.format(from_frame))
+        else:
+            return(self.__check_frame__(space, to_frame))
 
 
     def __check_row_range__(self, space, from_row, to_row):
-        return(True)
-        # if from_row < 0:
-        #     raise Exception('from_row should not be less than 0. The value was {}'.format(from_row))
-        # elif to_row < from_row:
-        #     raise Exception('from_row should be less than to_row. The values were {} and {}'.format(from_row, to_row))
-        # else:
-        #     return(self.__check_row__(space, to_row))
+        if from_row < 0:
+            raise Exception('from_row should not be less than 0. The value was {}'.format(from_row))
+        elif to_row < from_row:
+            raise Exception('from_row should be less than to_row. The values were {} and {}'.format(from_row, to_row))
+        else:
+            return(self.__check_row__(space, to_row))
 
 
     def __check_col_range__(self, space, from_col, to_col):
-        return(True)
-        # if from_col < 0:
-        #     raise Exception('from_col should not be less than 0. The value was {}'.format(from_col))
-        # elif to_col < from_col:
-        #     raise Exception('from_col should be less than to_col. The values were {} and {}'.format(from_col, to_col))
-        # else:
-        #     return(self.__check_col__(space, to_col))
+        if from_col < 0:
+            raise Exception('from_col should not be less than 0. The value was {}'.format(from_col))
+        elif to_col < from_col:
+            raise Exception('from_col should be less than to_col. The values were {} and {}'.format(from_col, to_col))
+        else:
+            return(self.__check_col__(space, to_col))
 
     #################################################################################################
     #################################################################################################
@@ -118,7 +115,6 @@ class PlainReader:
         if self.__check_frame__(space, number):
 
             path = self.__get_path__(space, framefile)
-            # file = fidh_e_r = open(data_file_e_r + str(k), 'r')
             with open(path, 'r', encoding='utf-8') as datafile:
                 frames = np.fromfile(datafile, dtype=float, count=self.__shape__[0] * self.__shape__[1] * self.__fpf__, sep=' ')
 
@@ -159,22 +155,23 @@ class PlainReader:
 ###################################################################
 
     def get_frame_range(self, space, from_frame=0, to_frame=None):
-        path = self.__get_path__(space, 0)
-        frame_length = len(self.file[path][:])
-        frame_height = len(self.file[path][0])
 
-        if not to_frame:
-            path = self.__get_path__(space)
-            space_length = len(self.file[path])
-            to_frame = space_length-1
+        # path = self.__get_path__(space, 0)
+        # frame_length = len(self.file[path][:])
+        # frame_height = len(self.file[path][0])
 
-        if self.__check_frame_range__(space, from_frame, to_frame):
-            frames = np.empty([to_frame - from_frame + 1, frame_length, frame_height])
+        # if not to_frame:
+        #     path = self.__get_path__(space)
+        #     space_length = len(self.file[path])
+        #     to_frame = space_length-1
 
-            for i in range(from_frame, to_frame + 1):
-                path = self.__get_path__(space, i)
-                frames[i-from_frame] = self.file[path][:]
-            return(frames)
+        # if self.__check_frame_range__(space, from_frame, to_frame):
+        #     frames = np.empty([to_frame - from_frame + 1, frame_length, frame_height])
+
+        #     for i in range(from_frame, to_frame + 1):
+        #         path = self.__get_path__(space, i)
+        #         frames[i-from_frame] = self.file[path][:]
+        #     return(frames)
 
 
     def get_frame_range_row(self, space, from_frame=0, to_frame=None, row_number=0):
