@@ -1,6 +1,7 @@
-from lib.plot_builder import PlotBuilder
+# from lib.plot_builder import PlotBuilder
+from builder.builder import Builder
 
-class PDP3ERHOBeam(PlotBuilder):
+class PDP3ERHOBeam(Builder):
     def __init__(self,
                  parameters_file, video_file,
                  cmap='terrain', clim_e_r=[0, 1], clim_e_z=[0, 1],
