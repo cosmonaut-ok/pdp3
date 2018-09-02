@@ -19,6 +19,9 @@ class Parameters:
         # check, if debug used
         is_debug = json.loads(self.dom_root.getElementsByTagName('debug')[0].firstChild.data.lower())
 
+        # use hdf5 format
+        self.use_hdf5 = json.loads(self.dom_root.getElementsByTagName('use_hdf5')[0].firstChild.data.lower())
+
         if is_debug:
             n_grid_r_name = 'debug_n_grid_r'
             n_grid_z_name = 'debug_n_grid_z'
@@ -28,8 +31,8 @@ class Parameters:
 
         # get geometry parameters for gird and ticks
         geometry = self.dom_root.getElementsByTagName('geometry')[0]
-        self.r_grid_count = int(geometry.getElementsByTagName(n_grid_r_name)[0].firstChild.data)-1
-        self.z_grid_count = int(geometry.getElementsByTagName(n_grid_z_name)[0].firstChild.data)-1
+        self.number_r_grid = int(geometry.getElementsByTagName(n_grid_r_name)[0].firstChild.data)-1
+        self.number_z_grid = int(geometry.getElementsByTagName(n_grid_z_name)[0].firstChild.data)-1
         self.r_size = float(geometry.getElementsByTagName('r_size')[0].firstChild.data)
         self.z_size = float(geometry.getElementsByTagName('z_size')[0].firstChild.data)
 
@@ -102,8 +105,8 @@ class Parameters:
 
     def get_frame_from_data(self, image, frame_number):
         fpf = self.frames_per_file
-        sr = self.r_grid_count
-        sz = self.z_grid_count
+        sr = self.number_r_grid
+        sz = self.number_z_grid
 
         if frame_number > fpf:
             raise ValueError('Can not process frame %i. Out of range (%i)' % (frame_number, fpf))
@@ -116,8 +119,8 @@ class Parameters:
 
     def get_frame_row_from_data(self, image, frame_number, row_number):
         fpf = self.frames_per_file
-        sr = self.r_grid_count
-        sz = self.z_grid_count
+        sr = self.number_r_grid
+        sz = self.number_z_grid
 
         if frame_number > fpf:
             raise ValueError('Can not process frame %i. Out of range (%i)' % (frame_number, fpf))
@@ -132,8 +135,8 @@ class Parameters:
         return(row)
 
     def get_frame_point_from_data(self, image, frame_number, x, y):
-        sr = self.r_grid_count
-        sz = self.z_grid_count
+        sr = self.number_r_grid
+        sz = self.number_z_grid
         if  y > sr:
             raise ValueError('Can not process point x=%i y=%i in frame %i. Out of range (x=%i y=%i)' % (x, y, frame_number, sz, sr))
         row = self.get_frame_row_from_data(image, frame_number, y)
@@ -143,8 +146,8 @@ class Parameters:
 
     def get_frame_col_from_data(self, image, frame_number, col_number):
         fpf = self.frames_per_file
-        sr = self.r_grid_count
-        sz = self.z_grid_count
+        sr = self.number_r_grid
+        sz = self.number_z_grid
         col = []
 
         if  col_number > sz:
@@ -176,8 +179,8 @@ class Parameters:
 
 
     def get_row_by_radius(self, radius):
-        return(int(round(radius * self.r_grid_count / self.r_size)))
+        return(int(round(radius * self.number_r_grid / self.r_size)))
 
 
     def get_col_by_longitude(self, longitude):
-        return(int(round(longitude * self.z_grid_count / self.z_size)))
+        return(int(round(longitude * self.number_z_grid / self.z_size)))
