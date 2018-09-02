@@ -8,7 +8,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from mpl_toolkits.mplot3d.axes3d import Axes3D, get_test_data
 
 
-class PlotBuiler:
+class PlotBuilder:
     def __init__(self, parameters, fig_color=None, fig_width=10.5, fig_height=7, fig_dpi=100,
                  font_family='sans-serif', font_name='DejaVu Sans', font_size=10):
         self.__parameters__ = parameters
