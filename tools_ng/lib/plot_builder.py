@@ -12,33 +12,33 @@ class PlotBuilder:
     def __init__(self, parameters, fig_color=None, fig_width=10.5, fig_height=7, fig_dpi=100,
                  font_family='sans-serif', font_name='DejaVu Sans', font_size=10):
         self.__parameters__ = parameters
-#         self.__subplots__ = []
-#         self.__images__ = []
-#         self.__figure__ = plt.figure(figsize=[fig_width, fig_height], dpi=fig_dpi, facecolor=fig_color)
-#         #
-#         self.__font_size__ = font_size
-#         self.__font_family__ = font_family
-#         self.__font_name__ = font_name
-#         rc('font',**{'family':font_family, font_family:[font_name], 'size':font_size})
-#         rc('text', usetex=True)
+        self.__subplots__ = []
+        self.__images__ = []
+        self.__figure__ = plt.figure(figsize=[fig_width, fig_height], dpi=fig_dpi, facecolor=fig_color)
+        #
+        self.__font_size__ = font_size
+        self.__font_family__ = font_family
+        self.__font_name__ = font_name
+        rc('font',**{'family':font_family, font_family:[font_name], 'size':font_size})
+        rc('text', usetex=True)
 
-#         self.aspect = 'equal'
+        self.aspect = 'equal'
 
-#         self.number_x_ticks = 20;
-#         self.number_y_ticks = 8;
-#         self.number_y_ticks = 20;
-#         self.number_cbar_ticks = 3;
+        self.number_x_ticks = 20;
+        self.number_y_ticks = 8;
+        self.number_y_ticks = 20;
+        self.number_cbar_ticks = 3;
 
-#         self.x_plot_size = self.__parameters__.number_z_grid
-#         self.y_plot_size = self.__parameters__.number_r_grid
-#         self.z_plot_size = self.y_plot_size
+        self.x_plot_size = self.__parameters__.number_z_grid
+        self.y_plot_size = self.__parameters__.number_r_grid
+        self.z_plot_size = self.y_plot_size
 
-#         self.x_tick_start, self.y_tick_start, self.z_tick_start = 0
-#         self.x_tick_end = self.__parameters__.z_size
-#         self.y_tick_end = self.__parameters__.r_size
-#         self.z_tick_end = self.y_tick_end
+        self.x_tick_start, self.y_tick_start, self.z_tick_start = 0
+        self.x_tick_end = self.__parameters__.z_size
+        self.y_tick_end = self.__parameters__.r_size
+        self.z_tick_end = self.y_tick_end
 
-#         self.default_image_interpolation = 'nearest'
+        self.default_image_interpolation = 'nearest'
 
 #     def get_figure(self):
 #         return(self.__figure__)

@@ -16,7 +16,7 @@ class Builder:
 
         self.__cfg__ = Parameters(parameters_file)
 
-        if self.use_hdf5:
+        if self.__cfg__.use_hdf5:
             self.__reader__ = H5Reader(self.__cfg__.data_path,
                                        base_keyspace='/pdp3/result',
                                        dump_keyspace='/pdp3/dump')
@@ -26,7 +26,7 @@ class Builder:
                                           shape=[self.__cfg__.number_r_grid,
                                                  self.__cfg__.number_z_grid],
                                           fpds=self.__cfg__.frames_per_file,
-                                          use_cache=False):
+                                          use_cache=False)
 
         self.__plotter__ = PlotBuilder(self.__cfg__,
                                        fig_color=fig_color,
