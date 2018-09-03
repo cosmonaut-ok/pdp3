@@ -14,7 +14,8 @@ class PDP3ERHOBeam(Builder):
                  parameters_file, video_file,
                  cmap='terrain', clim_e_r=None, clim_e_z=None,
                  beam_scale_factor=0.1,
-                 view=True, dry_run=False):
+                 use_grid=False, time_range=None,
+                 view=False, dry_run=False):
 
         self.__fig_color__=None
         self.__fig_width__=10.5
@@ -43,3 +44,14 @@ class PDP3ERHOBeam(Builder):
         # get clims
         self.__clim_e_r__ = clim_e_r or [-self.__cfg__.clim_estimation, self.__cfg__.clim_estimation]
         self.__clim_e_z__ = clim_e_z or [-self.__cfg__.clim_estimation, self.__cfg__.clim_estimation]
+
+        self.__cmap__ = cmap or 'terrain'
+        self.__beam_scale_factor__ = beam_scale_factor or 0.1
+        self.__view__ = view
+        self.__time_range__ = time_range or [self.__cfg__.start_time, self.__cfg__.end_time]
+
+    def run(self):
+        # some code to run
+        if self.__view__:
+            input("Press 'Return' to exit ")
+        return True
