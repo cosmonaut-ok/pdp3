@@ -22,7 +22,7 @@ class Builder:
                                        dump_keyspace='/pdp3/dump')
         else:
             self.__reader__ = PlainReader(self.__cfg__.data_path,
-                                          self.__cfg__.dump_path,
+                                          self.__cfg__.system_state_path,
                                           shape=[self.__cfg__.number_r_grid,
                                                  self.__cfg__.number_z_grid],
                                           fpds=self.__cfg__.frames_per_file,
@@ -31,8 +31,11 @@ class Builder:
         self.__plotter__ = PlotBuilder(self.__cfg__,
                                        fig_color=fig_color,
                                        fig_width=fig_width,
-                                       fig_heigt=fig_height,
+                                       fig_height=fig_height,
                                        fig_dpi=fig_dpi,
                                        font_family=font_family,
                                        font_name=font_name,
-                                       font_sizse=font_size)
+                                       font_size=font_size)
+
+    def get_config(self):
+        return self.__cfg__
