@@ -33,103 +33,103 @@ class PlotBuilder:
         self.y_plot_size = self.__parameters__.number_r_grid
         self.z_plot_size = self.y_plot_size
 
-        self.x_tick_start, self.y_tick_start, self.z_tick_start = 0
+        self.x_tick_start, self.y_tick_start, self.z_tick_start = 0, 0, 0
         self.x_tick_end = self.__parameters__.z_size
         self.y_tick_end = self.__parameters__.r_size
         self.z_tick_end = self.y_tick_end
 
         self.default_image_interpolation = 'nearest'
 
-#     def get_figure(self):
-#         return(self.__figure__)
+    def get_figure(self):
+        return(self.__figure__)
 
-#     def get_subplot(self, name):
-#         ''' Object collects axes (subplots) and images for quick access
-#         this function allows to quick access to subplot by name
-#         '''
-#         return(self.__subplots__[name])
+    def get_subplot(self, name):
+        ''' Object collects axes (subplots) and images for quick access
+        this function allows to quick access to subplot by name
+        '''
+        return(self.__subplots__[name])
 
-#     def get_image(self, name):
-#         ''' Object collects axes (subplots) and images for quick access
-#         this function allows to quick access to image by name
-#         (same, as subplot, to what it bount)
-#         '''
-#         return(self.__images[name])
+    def get_image(self, name):
+        ''' Object collects axes (subplots) and images for quick access
+        this function allows to quick access to image by name
+        (same, as subplot, to what it bount)
+        '''
+        return(self.__images[name])
 
 # ##################################################################################################
 
-#     def __add_subplot_common__(self, name, number, title, x_axe_label, y_axe_label, z_axe_label,
-#                                tickbox, grid, position, is_invert_y_axe, projection=None):
-#         ''' common method to add any'''
-#         subplot = self.__figure__.add_subplot(subplot_number, projection=projection)
-#         self.__subplots__[name] = subplot
+    def __add_subplot_common__(self, name, number, title, x_axe_label, y_axe_label, z_axe_label,
+                               tickbox, grid, position, is_invert_y_axe, projection=None):
+        ''' common method to add any'''
+        subplot = self.__figure__.add_subplot(subplot_number, projection=projection)
+        self.__subplots__[name] = subplot
 
-#         subplot.set_aspect(self.aspect)
-#         if is_invert_y_axe: subplot.invert_yaxis()
+        subplot.set_aspect(self.aspect)
+        if is_invert_y_axe: subplot.invert_yaxis()
 
-#         self.__subplots[name] = subplot
+        self.__subplots[name] = subplot
 
-#         # axes = self.get_subplot(name)
+        # axes = self.get_subplot(name)
 
-#         __title = title or name
+        __title = title or name
 
-#         # tick labels, that shows __real__ model space dimensions
-#         # translates from grid_size
-#         x_tick_range = around(linspace(self.x_tick_start, self.x_tick_end, self.number_x_ticks + 1), 2)
-#         y_tick_range = around(linspace(self.y_tick_start, self.y_tick_end, self.number_y_ticks + 1), 2)
-#         z_tick_range = around(linspace(self.z_tick_start, self.z_tick_end, self.number_z_ticks + 1), 2)
+        # tick labels, that shows __real__ model space dimensions
+        # translates from grid_size
+        x_tick_range = around(linspace(self.x_tick_start, self.x_tick_end, self.number_x_ticks + 1), 2)
+        y_tick_range = around(linspace(self.y_tick_start, self.y_tick_end, self.number_y_ticks + 1), 2)
+        z_tick_range = around(linspace(self.z_tick_start, self.z_tick_end, self.number_z_ticks + 1), 2)
 
-#         # ticks, that sets grid dimensions, required for data placement
-#         x_tick_grid_size = linspace(0, self.x_plot_size, self.number_x_ticks + 1)
-#         y_tick_grid_size = linspace(0, self.y_plot_size, self.number_y_ticks + 1)
-#         z_tick_grid_size = linspace(0, self.z_plot_size, self.number_z_ticks + 1)
+        # ticks, that sets grid dimensions, required for data placement
+        x_tick_grid_size = linspace(0, self.x_plot_size, self.number_x_ticks + 1)
+        y_tick_grid_size = linspace(0, self.y_plot_size, self.number_y_ticks + 1)
+        z_tick_grid_size = linspace(0, self.z_plot_size, self.number_z_ticks + 1)
 
-#         # set axis properties
-#         axes.set_title(__title)
+        # set axis properties
+        axes.set_title(__title)
 
-#         subplot.set_xlabel(x_axe_label)
-#         subplot.set_ylabel(y_axe_label, rotation=45)
-#         if projection == '3d': subplot.set_zlabel(z_axe_label, rotation=45)
+        subplot.set_xlabel(x_axe_label)
+        subplot.set_ylabel(y_axe_label, rotation=45)
+        if projection == '3d': subplot.set_zlabel(z_axe_label, rotation=45)
 
-#         subplot.set_xticks(x_tick_grid_size)
-#         subplot.set_yticks(y_tick_grid_size)
-#         if projection == '3d': subplot.set_zticks(z_tick_grid_size)
+        subplot.set_xticks(x_tick_grid_size)
+        subplot.set_yticks(y_tick_grid_size)
+        if projection == '3d': subplot.set_zticks(z_tick_grid_size)
 
-#         subplot.set_xticklabels(x_tick_range)
-#         subplot.set_yticklabels(y_tick_range)
-#         if projection == '3d': axes.set_zticklabels(z_tick_range)
+        subplot.set_xticklabels(x_tick_range)
+        subplot.set_yticklabels(y_tick_range)
+        if projection == '3d': axes.set_zticklabels(z_tick_range)
 
-#         # subplot.xticks(rotation=90)
-#         subplot.spines['top'].set_visible(tickbox)
-#         subplot.spines['right'].set_visible(tickbox)
+        # subplot.xticks(rotation=90)
+        subplot.spines['top'].set_visible(tickbox)
+        subplot.spines['right'].set_visible(tickbox)
 
-#         # set label on every 4th grid
-#         for label in [x for i,x in enumerate(subplot.xaxis.get_ticklabels()) if i%2 != 0]:
-#             label.set_visible(False)
-#         for label in [x for i,x in enumerate(subplot.yaxis.get_ticklabels()) if i%2 != 0]:
-#             label.set_visible(False)
-#         if projection == '3d':
-#             for label in [x for i,x in enumerate(subplot.zaxis.get_ticklabels()) if i%2 != 0]:
-#                 label.set_visible(False)
+        # set label on every 4th grid
+        for label in [x for i,x in enumerate(subplot.xaxis.get_ticklabels()) if i%2 != 0]:
+            label.set_visible(False)
+        for label in [x for i,x in enumerate(subplot.yaxis.get_ticklabels()) if i%2 != 0]:
+            label.set_visible(False)
+        if projection == '3d':
+            for label in [x for i,x in enumerate(subplot.zaxis.get_ticklabels()) if i%2 != 0]:
+                label.set_visible(False)
 
-#         subplot.grid(grid)
+        subplot.grid(grid)
 
-#         if position:
-#             subplot.set_position(position)
+        if position:
+            subplot.set_position(position)
 
-#         return subplot
+        return subplot
 
 
-#     def add_subplot_cartesian_2d(self, name, number, title=None, x_axe_label='X', y_axe_label='Y',
-#                       tickbox=False, grid=False, position=None):
-#         ''' add 2D subplot, cartesian projection '''
+    def add_subplot_cartesian_2d(self, name, number, title=None, x_axe_label='X', y_axe_label='Y',
+                                 tickbox=False, grid=False, position=None):
+        ''' add 2D subplot, cartesian projection '''
 
-#         subplot = self.__add_subplot_common__(name, number, title or name,
-#                                               x_axe_label, y_axe_label, None,
-#                                               tickbox, grid, position, True,
-#                                               projection=None)
+        subplot = self.__add_subplot_common__(name, number, title or name,
+                                              x_axe_label, y_axe_label, None,
+                                              tickbox, grid, position, True,
+                                              projection=None)
 
-#         return(subplot)
+        return subplot
 
 
 #     def add_subplot_cartesian_3d(self, name, number, title=None, x_axe_label='X', y_axe_label='Y', z_axe_label='Z',

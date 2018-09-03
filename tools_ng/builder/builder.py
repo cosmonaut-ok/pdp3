@@ -39,3 +39,15 @@ class Builder:
 
     def get_config(self):
         return self.__cfg__
+
+    def get_plotter(self):
+        return self.__plotter__
+
+    def get_reader(self):
+        return self.__reader__
+
+    def setup_figure(self):
+        return None
+
+    def run(self):
+        return None
