@@ -1,10 +1,18 @@
+from os import path
+
 # from lib.plot_builder import PlotBuilder
 from builder.builder import Builder
+import matplotlib.animation as ani
+import matplotlib.pyplot as plt
+
+# README:
+# color map reference: https://matplotlib.org/examples/color/colormaps_reference.html
+# mathtext reference:  https://matplotlib.org/users/mathtext.html
 
 class PDP3ERHOBeam(Builder):
     def __init__(self,
                  parameters_file, video_file,
-                 cmap='terrain', clim_e_r=[0, 1], clim_e_z=[0, 1],
+                 cmap='terrain', clim_e_r=None, clim_e_z=None,
                  beam_scale_factor=0.1,
                  view=True, dry_run=False):
 
@@ -25,7 +33,13 @@ class PDP3ERHOBeam(Builder):
                                            self.__font_name__,
                                            self.__font_size__)
 
+        # configure animation parameters
+        plt.rcParams['animation.ffmpeg_path'] = '/usr/bin/ffmpeg'
 
-# (self, parameters_xml, video_file,
-#                  time_range=None,
-#                  cmap='terrain', clim_e_r=, clim_e_z, beam_scale_factor, view, dry_run):
+        # get video file name
+        config_file_name = 'field_movie.avi'
+        self.__video_file__ = path.join(self.__cfg__.config_path, config_file_name) if not video_file else video_file
+
+        # get clims
+        self.__clim_e_r__ = clim_e_r or [-self.__cfg__.clim_estimation, self.__cfg__.clim_estimation]
+        self.__clim_e_z__ = clim_e_z or [-self.__cfg__.clim_estimation, self.__cfg__.clim_estimation]
