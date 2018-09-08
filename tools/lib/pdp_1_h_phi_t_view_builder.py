@@ -34,7 +34,7 @@ class Pdp1HTViewBuilder:
         self.data_file_h_phi_pattern = 'H_phi'
 
         self.x_axis_label = r'$\mathit{t (s)}$'
-        self.y_axis_label = r'$\mathit{H_{\phi} (\frac{V}{m})}$'
+        self.y_axis_label = r'$\mathit{H_{\phi} (\frac{A}{m})}$'
 
         self.use_grid = False
 
