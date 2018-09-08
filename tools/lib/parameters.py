@@ -100,6 +100,16 @@ class Parameters:
         frame_number = int(number_frames % fpf)
         return [file_number, frame_number]
 
+    def get_timestamp_by_file_frame_number(self, file_number, frame_number):
+        number_frames = file_number * self.frames_per_file + frame_number
+        timestamp = number_frames * self.step_interval * self.data_dump_interval
+        # number_frames = timestamp / self.step_interval / self.data_dump_interval
+        # fpf = self.frames_per_file
+        # file_number = int(number_frames // fpf)
+        # frame_number = int(number_frames % fpf)
+        return timestamp
+
+
     def get_frame_from_data(self, image, frame_number):
         fpf = self.frames_per_file
         sr = self.r_grid_count
