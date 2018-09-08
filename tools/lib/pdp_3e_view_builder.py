@@ -40,8 +40,8 @@ class Pdp3EViewBuilder:
         self.cbar_axis_label = r'$\frac{V}{m}$'
         self.cbar_bunch_density_axis_label = r'$m^{-3}$'
 
-        self.position_e_r = [0.1, 0.70, 0.8, 0.3]
-        self.position_e_z = [0.1, 0.35, 0.8, 0.3]
+        self.position_e_r = [0.1, 0.65, 0.8, 0.3]
+        self.position_e_z = [0.1, 0.32, 0.8, 0.3]
         self.position_bunch_density = [0.1, 0.01, 0.8, 0.3]
 
         self.use_grid = False
@@ -170,4 +170,7 @@ class Pdp3EViewBuilder:
                 except ValueError: ## skip frame, when data is inconsistent
                     break
 
+                # add timestamp to each frame
+                timestamp = self._cfg.get_timestamp_by_file_frame_number(k, local_step)
+                self._plot_builder.figure.suptitle("Time: {:.2e} s".format(timestamp), fontsize=18, x=.85, y=.95)
                 self._plot_builder.redraw()
