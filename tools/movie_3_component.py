@@ -109,6 +109,11 @@ class Pdp3Movie(Pdp3EViewBuilder):
                             self.E_bunch_density_plot_name,
                             h_field_bunch_density[rstart:rend])
 
+                        # add timestamp to each frame
+                        timestamp = self._cfg.get_timestamp_by_file_frame_number(k, local_step)
+                        self._plot_builder.figure.suptitle("Time: {:.2e} s".format(timestamp), fontsize=18, x=.85, y=.95)
+                        ## self._plot_builder.redraw()
+
                     except ValueError: ## skip frame, when data is inconsistent
                         break
 
