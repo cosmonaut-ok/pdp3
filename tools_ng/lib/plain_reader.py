@@ -62,8 +62,9 @@ class PlainReader:
 
     def __get_file_range__(self, space):
         files = fnmatch.filter(os.listdir(self.__data_path__), '{}[0-9]*'.format(space))
+        files_s = len(files)
 
-        return max(map(lambda x: int(re.sub(space, '', x)), files))
+        return files_s
 
     def __get_ds_range__(self, space):
         try:
@@ -91,7 +92,7 @@ class PlainReader:
             raise IndexError('frame should not be less, than 0. The value was: {}'.format(frame))
         else:
             frame_length = self.__get_ds_range__(space) * self.__fpds__
-            if frame_length < frame:
+            if frame_length <= frame:
                 raise IndexError('frame should be less, than {}. The value was: {}'
                                 .format(frame_length - 1, frame))
             else:
