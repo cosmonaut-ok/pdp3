@@ -19,6 +19,9 @@ class Parameters:
         # check, if debug used
         is_debug = json.loads(self.dom_root.getElementsByTagName('debug')[0].firstChild.data.lower())
 
+        # use hdf5 format
+        self.use_hdf5 = json.loads(self.dom_root.getElementsByTagName('use_hdf5')[0].firstChild.data.lower())
+
         if is_debug:
             n_grid_r_name = 'debug_n_grid_r'
             n_grid_z_name = 'debug_n_grid_z'
@@ -28,8 +31,8 @@ class Parameters:
 
         # get geometry parameters for gird and ticks
         geometry = self.dom_root.getElementsByTagName('geometry')[0]
-        self.r_grid_count = int(geometry.getElementsByTagName(n_grid_r_name)[0].firstChild.data)-1
-        self.z_grid_count = int(geometry.getElementsByTagName(n_grid_z_name)[0].firstChild.data)-1
+        self.number_r_grid = int(geometry.getElementsByTagName(n_grid_r_name)[0].firstChild.data)-1
+        self.number_z_grid = int(geometry.getElementsByTagName(n_grid_z_name)[0].firstChild.data)-1
         self.r_size = float(geometry.getElementsByTagName('r_size')[0].firstChild.data)
         self.z_size = float(geometry.getElementsByTagName('z_size')[0].firstChild.data)
 
@@ -84,77 +87,33 @@ class Parameters:
         # get plot parameters
         plot = self.dom_root.getElementsByTagName('plot')[0]
 
+        # get plot figure parameters
+        figure = plot.getElementsByTagName('figure')[0]
         # get video parameters
+        self.figure_color = str(figure.getElementsByTagName('color')[0].firstChild.data)
+        self.figure_width = float(figure.getElementsByTagName('width')[0].firstChild.data)
+        self.figure_height = float(figure.getElementsByTagName('height')[0].firstChild.data)
+        self.figure_dpi = int(figure.getElementsByTagName('dpi')[0].firstChild.data)
+
+        font = figure.getElementsByTagName('font')[0]
+        self.figure_font_name = str(font.getElementsByTagName('name')[0].firstChild.data)
+        self.figure_font_family = str(font.getElementsByTagName('family')[0].firstChild.data)
+        self.figure_font_size = int(font.getElementsByTagName('size')[0].firstChild.data)
+
         video = plot.getElementsByTagName('video')[0]
-        self.video_codec = str(plot.getElementsByTagName('codec')[0].firstChild.data)
-        self.video_fps = int(plot.getElementsByTagName('fps')[0].firstChild.data)
-        self.video_dpi = int(plot.getElementsByTagName('dpi')[0].firstChild.data)
-        self.video_bitrate = int(plot.getElementsByTagName('bitrate')[0].firstChild.data)
-        # get clim estimation
-        self.get_clim_estimation()
-
-    def get_file_frame_number_by_timestamp(self, timestamp):
-        number_frames = timestamp / self.step_interval / self.data_dump_interval
-        fpf = self.frames_per_file
-        file_number = int(number_frames // fpf)
-        frame_number = int(number_frames % fpf)
-        return [file_number, frame_number]
-
-    def get_frame_from_data(self, image, frame_number):
-        fpf = self.frames_per_file
-        sr = self.r_grid_count
-        sz = self.z_grid_count
-
-        if frame_number > fpf:
-            raise ValueError('Can not process frame %i. Out of range (%i)' % (frame_number, fpf))
-        else:
-            rstart = sr*sz*frame_number
-            rend = sr*sz*(frame_number+1)
-            frame = image[rstart:rend]
-
-        return(frame)
-
-    def get_frame_row_from_data(self, image, frame_number, row_number):
-        fpf = self.frames_per_file
-        sr = self.r_grid_count
-        sz = self.z_grid_count
-
-        if frame_number > fpf:
-            raise ValueError('Can not process frame %i. Out of range (%i)' % (frame_number, fpf))
-        elif  row_number > sr:
-            raise ValueError('Can not process row %i in frame %i. Out of range (%i)' % (row_number, frame_number, sr))
-        else:
-
-            rstart = sr * sz * frame_number + row_number * sz
-            rend = rstart + sz
-            row = image[rstart:rend]
-
-        return(row)
-
-    def get_frame_point_from_data(self, image, frame_number, x, y):
-        sr = self.r_grid_count
-        sz = self.z_grid_count
-        if  y > sr:
-            raise ValueError('Can not process point x=%i y=%i in frame %i. Out of range (x=%i y=%i)' % (x, y, frame_number, sz, sr))
-        row = self.get_frame_row_from_data(image, frame_number, y)
-
-        return(row[x])
+        self.video_codec = str(video.getElementsByTagName('codec')[0].firstChild.data)
+        self.video_fps = int(video.getElementsByTagName('fps')[0].firstChild.data)
+        self.video_bitrate = int(video.getElementsByTagName('bitrate')[0].firstChild.data)
 
 
-    def get_frame_col_from_data(self, image, frame_number, col_number):
-        fpf = self.frames_per_file
-        sr = self.r_grid_count
-        sz = self.z_grid_count
-        col = []
+    def get_frame_number_by_timestamp(self, timestamp):
+        number_frames = round(timestamp / self.step_interval / self.data_dump_interval)
+        return number_frames
 
-        if  col_number > sz:
-            raise ValueError('Can not process column $i in frame %i. Out of range (%i)' % (col_number, frame_number, sr))
-        else:
-            frame = self.get_frame_from_data(image, frame_number)
-            for i in range(0, sr):
-                col.append(self.get_frame_point_from_data(frame, 0, col_number, i))
 
-        return(col)
+    def get_timestamp_by_frame_number(self, frame_number):
+        timestamp = frame_number * self.step_interval * self.data_dump_interval
+        return timestamp
 
 
     def get_clim_estimation(self):
@@ -172,12 +131,12 @@ class Parameters:
             p_factor_array.append(factor * n * t * math.sqrt(self.step_interval))
             counter = counter+1
 
-        self.clim_estimation = sum(p_factor_array)
+        return sum(p_factor_array)
 
 
     def get_row_by_radius(self, radius):
-        return(int(round(radius * self.r_grid_count / self.r_size)))
+        return(int(round(radius * self.number_r_grid / self.r_size)))
 
 
     def get_col_by_longitude(self, longitude):
-        return(int(round(longitude * self.z_grid_count / self.z_size)))
+        return(int(round(longitude * self.number_z_grid / self.z_size)))

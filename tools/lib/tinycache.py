@@ -37,7 +37,7 @@ class TinyCache:
                 self.__cache__[key] = fromfile(cache_file, dtype='float')
             return(self.__cache__[key])
         else:
-            return([])
+            return empty(0)
 
     def update_cache(self, key, value):
         cache_file = os.path.join(self.path, key)
