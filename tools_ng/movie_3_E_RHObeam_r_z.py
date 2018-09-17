@@ -127,7 +127,7 @@ def run(config_file, clim_e_r, clim_e_z, rho_beam_scale, video_file=None,
                 if view: plot.redraw()
                 if not dry_run: writer.grab_frame()
                 frame = frame + 1
-            print()
+            print('done')
 
 
 def main():
