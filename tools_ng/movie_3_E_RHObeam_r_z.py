@@ -37,6 +37,7 @@ def run(config_file, clim_e_r, clim_e_z, rho_beam_scale, video_file=None,
     if not clim_e_z: clim_e_z = [-clim_estimation, clim_estimation]
     if not rho_beam_scale: rho_beam_scale = 1
 
+    # calculate/update video file path
     video_file = os.path.join(os.path.dirname(config_file), 'field_movie.avi') if not video_file else video_file
 
     # define reader (plain reader used)
@@ -109,11 +110,15 @@ def run(config_file, clim_e_r, clim_e_z, rho_beam_scale, video_file=None,
             data_r = reader.get_all_frames_in_ds('E_r', i)
             data_z = reader.get_all_frames_in_ds('E_z', i)
             data_beam = reader.get_all_frames_in_ds('rho_beam', i)
-            
+            frame = 0
             for r, z, beam in zip(data_r, data_z, data_beam):
                 # print without newline
                 sys.stdout.write('.')
                 sys.stdout.flush()
+
+                # add timestamp to each frame
+                timestamp = cfg.get_timestamp_by_frame_number(frame + i)
+                fig.suptitle("Time: {:.2e} s".format(timestamp), x=.85, y=.95)
                 
                 plot.add_image(e_r_plot_name, r, cmap=cmap, clim=clim_e_r)
                 plot.add_image(e_z_plot_name, z, cmap=cmap, clim=clim_e_z)
@@ -122,6 +127,7 @@ def run(config_file, clim_e_r, clim_e_z, rho_beam_scale, video_file=None,
                 if view: plot.redraw()
                 print()
                 if not dry_run: writer.grab_frame()
+                frame = frame + 1
 
 
 def main():
