@@ -1,8 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.ticker as mtick
 
-from matplotlib import cm
 from matplotlib import rc
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from mpl_toolkits.mplot3d.axes3d import Axes3D, get_test_data
@@ -33,46 +31,51 @@ class PlotBuilder:
         self.y_plot_size = y_plot_size
         self.z_plot_size = z_plot_size
 
-        self.x_ticklabel_start=x_ticklabel_start
-        self.y_ticklabel_start=y_ticklabel_start
-        self.z_ticklabel_start=z_ticklabel_start
+        self.x_ticklabel_start = x_ticklabel_start
+        self.y_ticklabel_start = y_ticklabel_start
+        self.z_ticklabel_start = z_ticklabel_start
 
-        self.x_ticklabel_end=x_ticklabel_end or x_plot_size
-        self.y_ticklabel_end=y_ticklabel_end or y_plot_size
-        self.z_ticklabel_end=z_ticklabel_end or z_plot_size
+        self.x_ticklabel_end = x_ticklabel_end or x_plot_size
+        self.y_ticklabel_end = y_ticklabel_end or y_plot_size
+        self.z_ticklabel_end = z_ticklabel_end or z_plot_size
 
         # calculate accurate ticks number automatically (recommended)
-        tick_value = self.__guess_tick_size__(guess_number_ticks)
+        if x_plot_size > 0 and y_plot_size > 0:
+            tick_value = self.__guess_tick_size__(guess_number_ticks)
+            self.number_x_ticks = number_x_ticks or int(np.around((self.x_ticklabel_end - self.x_ticklabel_start) / tick_value, 0))
+            self.number_y_ticks = number_y_ticks or int(np.around((self.y_ticklabel_end - self.y_ticklabel_start) / tick_value, 0))
+            self.number_z_ticks = number_z_ticks or int(np.around((self.z_ticklabel_end - self.z_ticklabel_start) / tick_value, 0))
+        else:
+            self.number_x_ticks = guess_number_ticks
+            self.number_y_ticks = guess_number_ticks
+            self.number_z_ticks = guess_number_ticks
 
-        self.number_x_ticks=number_x_ticks or int(np.around((self.x_ticklabel_end - self.x_ticklabel_start) / tick_value, 0))
-        self.number_y_ticks=number_y_ticks or int(np.around((self.y_ticklabel_end - self.y_ticklabel_start) / tick_value, 0))
-        self.number_z_ticks=number_z_ticks or int(np.around((self.z_ticklabel_end - self.z_ticklabel_start) / tick_value, 0))
-
-        self.tickbox=tickbox
-        self.grid=grid
-        self.is_invert_y_axe=is_invert_y_axe
-        self.aspect=aspect
+        self.tickbox = tickbox
+        self.grid = grid
+        self.is_invert_y_axe = is_invert_y_axe
+        self.aspect = aspect
 
         self.number_cbar_ticks = number_cbar_ticks
         self.image_interpolation = image_interpolation
         self.image_clim = image_clim
         self.image_cmap = image_cmap
 
+
     def get_figure(self):
-        return(self.__figure__)
+        return self.__figure__
 
     def get_subplot(self, name):
         ''' Object collects axes (subplots) and images for quick access
         this function allows to quick access to subplot by name
         '''
-        return(self.__subplots__[name])
+        return self.__subplots__[name]
 
     def get_image(self, name):
         ''' Object collects axes (subplots) and images for quick access
         this function allows to quick access to image by name
         (same, as subplot, to what it bount)
         '''
-        return(self.__images__[name])
+        return self.__images__[name]
 
 ################################################################################
 
@@ -114,11 +117,14 @@ class PlotBuilder:
         # set grid
         subplot.grid(self.grid if grid is None else grid)
 
+        # make all plot numbers scientifically
+        subplot.ticklabel_format(style='sci', scilimits=(0, 0))
+
         # set position if needed
         if position: subplot.set_position(position)
 
         # set axes labels
-        yz_rotation_angle=45
+        yz_rotation_angle = 45
         subplot.set_xlabel(x_axe_label)
         subplot.set_ylabel(y_axe_label, rotation=yz_rotation_angle)
         if projection == '3d': subplot.set_zlabel(z_axe_label, rotation=yz_rotation_angle)
@@ -127,7 +133,7 @@ class PlotBuilder:
         subplot.spines['top'].set_visible(self.tickbox if tickbox is None else tickbox)
         subplot.spines['right'].set_visible(self.tickbox if tickbox is None else tickbox)
 
-        # # ticks, that sets grid dimensions, required for data placement
+        # ticks, that sets grid dimensions, required for data placement
         x_size = x_plot_size or self.x_plot_size
         y_size = y_plot_size or self.y_plot_size
         z_size = z_plot_size or self.z_plot_size
@@ -146,9 +152,9 @@ class PlotBuilder:
         y_tick_grid_size = np.linspace(0, y_size, y_ticks + 1)
         if projection == '3d': z_tick_grid_size = np.linspace(0, z_size, z_ticks + 1)
 
-        subplot.set_xticks(x_tick_grid_size)
-        subplot.set_yticks(y_tick_grid_size)
-        if projection == '3d': subplot.set_zticks(z_tick_grid_size)
+        if x_size > 0: subplot.set_xticks(x_tick_grid_size)
+        if y_size > 0: subplot.set_yticks(y_tick_grid_size)
+        if projection == '3d' and z_size > 0: subplot.set_zticks(z_tick_grid_size)
 
         # tick labels, that shows __real__ model space dimensions
         # translates from grid_size
@@ -156,17 +162,17 @@ class PlotBuilder:
         y_tlabel_range = np.around(np.linspace(y_tlabel_start, y_tlabel_end, y_ticks + 1), 5)
         if projection == '3d': z_tlabel_range = np.around(np.linspace(z_tlabel_start, z_tlabel_end, z_ticks + 1), 5)
 
-        subplot.set_xticklabels(x_tlabel_range)
-        subplot.set_yticklabels(y_tlabel_range)
-        if projection == '3d': axes.set_zticklabels(z_tlabel_range)
+        if x_size > 0: subplot.set_xticklabels(x_tlabel_range)
+        if y_size > 0: subplot.set_yticklabels(y_tlabel_range)
+        if projection == '3d' and z_size > 0: subplot.set_zticklabels(z_tlabel_range)
 
         # set label on every 2nd grid
-        for label in [x for i,x in enumerate(subplot.xaxis.get_ticklabels()) if i%2 != 0]:
+        for label in [x for i, x in enumerate(subplot.xaxis.get_ticklabels()) if i%2 != 0]:
             label.set_visible(False)
-        for label in [x for i,x in enumerate(subplot.yaxis.get_ticklabels()) if i%2 != 0]:
+        for label in [x for i, x in enumerate(subplot.yaxis.get_ticklabels()) if i%2 != 0]:
             label.set_visible(False)
         if projection == '3d':
-            for label in [x for i,x in enumerate(subplot.zaxis.get_ticklabels()) if i%2 != 0]:
+            for label in [x for i, x in enumerate(subplot.zaxis.get_ticklabels()) if i%2 != 0]:
                 label.set_visible(False)
 
         return subplot
@@ -224,9 +230,9 @@ class PlotBuilder:
             ####
             data_len = len(data[0])
             data_height = len(data)
-            if data_len != self.x_plot_size:
+            if data_len != self.x_plot_size and self.x_plot_size > 0:
                 raise ValueError('data array length is not equal to grid X-dimension {}. The value was {}.'.format(self.x_plot_size, data_len))
-            elif data_height != self.y_plot_size:
+            elif data_height != self.y_plot_size and self.y_plot_size > 0:
                 raise ValueError('data array height is not equal to grid Y-dimension {}. The value was {}.'.format(self.y_plot_size, data_height))
             else:
                 image = subplot.imshow(data,
@@ -237,9 +243,9 @@ class PlotBuilder:
                 image.set_data(data)
                 self.__images__[subplot_name] = image
 
-                return(image)
+                return image
         else:
-            raise ('There is no subplot, named {}'.format(subplot_name))
+            raise 'There is no subplot, named {}'.format(subplot_name)
 
 
     def add_colorbar(self, subplot_name, image_name=None, title=None,
