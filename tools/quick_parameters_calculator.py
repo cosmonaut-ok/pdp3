@@ -14,7 +14,6 @@ import argparse
 # import matplotlib.animation as ani
 
 from lib.parameters import Parameters
-from lib.pdp3_plot_builder import PDP3PlotBuilder
 
 def langmur_freq(density):
     # pi = 3.1415
