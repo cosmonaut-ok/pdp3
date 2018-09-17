@@ -23,7 +23,7 @@ class PlainReader:
         self.__data_set_ranges__ = {}
         self.use_cache = use_cache
         self.__tiny_cache__ = TinyCache(os.path.join(self.__data_path__, '.cache'))
-
+        self.verbose = False
 
     #### special/service functions
 
@@ -163,6 +163,9 @@ class PlainReader:
         self.__validate_ds__(space, ds_number)
 
         path = self.__get_path__(space, ds_number)
+        if self.verbose:
+            sys.stdout.write("Loading data set {}:{}...".format(space, ds_number))
+            sys.stdout.flush()
         with open(path, 'r', encoding='utf-8') as datafile:
             frames = np.fromfile(datafile, dtype=float,
                                  count=self.__shape__[0] * self.__shape__[1] * self.__fpds__,
@@ -170,7 +173,10 @@ class PlainReader:
 
         real_shape = [self.__fpds__, self.__shape__[0], self.__shape__[1]]
         frames_re = np.reshape(frames, real_shape)
-        
+        if self.verbose:
+            sys.stdout.write('done\n')
+            sys.stdout.flush()
+
         return frames_re
 
 
@@ -178,9 +184,18 @@ class PlainReader:
         ''' get frame by number. Find required dataset automatically '''
         self.__validate_frame__(space, number)
 
-        frameds, frame_in_ds = self.get_ds_frame_by_frame(number)
-        self.__validate_ds__(space, frameds)
-        frame = self.get_all_frames_in_ds(space, frameds)[frame_in_ds]
+        cache_file_name = "frame_space:{}_number:{}".format(space, number)
+
+        if self.use_cache:
+            frame = self.__tiny_cache__.get_cache(cache_file_name)
+
+        if len(frame) == 0:
+            frameds, frame_in_ds = self.get_ds_frame_by_frame(number)
+            self.__validate_ds__(space, frameds)
+            frame = self.get_all_frames_in_ds(space, frameds)[frame_in_ds]
+
+        if self.use_cache:
+            self.__tiny_cache__.update_cache(cache_file_name, frame)
 
         return frame
 
