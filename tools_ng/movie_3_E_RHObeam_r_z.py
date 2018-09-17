@@ -41,9 +41,9 @@ def main():
 
     # check if config file exists
     if os.path.isfile(args.properties_path):
-        ################################################################################################
-        #################### configure plot and view parameters #######################################
-        ################################################################################################
+        ############################################################################################
+        #################### configure plot and view parameters ####################################
+        ############################################################################################
         clim_e_r = list(map(float, args.clim_e_r.split(':'))) if args.clim_e_r else None
         clim_e_z = list(map(float, args.clim_e_z.split(':'))) if args.clim_e_z else None
         time_range = list(map(float, args.time_range.split(':'))) if args.time_range else None
@@ -63,7 +63,6 @@ def main():
     else:
         print("Configuration file `%s' does not exists. Exiting" % args.properties_path)
         exit(1)
-
 
 
 # call main function
