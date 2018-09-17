@@ -1,9 +1,10 @@
 from os import path
 
 # from lib.plot_builder import PlotBuilder
-from builder.builder import Builder
 import matplotlib.animation as ani
 import matplotlib.pyplot as plt
+
+from builder.builder import Builder
 
 # README:
 # color map reference: https://matplotlib.org/examples/color/colormaps_reference.html
@@ -12,7 +13,7 @@ import matplotlib.pyplot as plt
 class PDP3ERHOBeam(Builder):
     def __init__(self,
                  parameters_file, video_file,
-                 cmap='terrain', clim_e_r=None, clim_e_z=None,
+                 cmap=None, clim_e_r=None, clim_e_z=None,
                  beam_scale_factor=0.1,
                  use_grid=False, time_range=None,
                  view=False, dry_run=False):

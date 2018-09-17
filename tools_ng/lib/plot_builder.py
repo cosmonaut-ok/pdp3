@@ -9,36 +9,54 @@ from mpl_toolkits.mplot3d.axes3d import Axes3D, get_test_data
 
 
 class PlotBuilder:
-    def __init__(self, parameters, fig_color=None, fig_width=10.5, fig_height=7, fig_dpi=100,
-                 font_family='sans-serif', font_name='DejaVu Sans', font_size=10):
-        self.__parameters__ = parameters
-        self.__subplots__ = []
-        self.__images__ = []
+    def __init__(self, x_plot_size, y_plot_size, z_plot_size=0,
+                 fig_color=None, fig_width=10.5, fig_height=7, fig_dpi=100,
+                 font_family='sans-serif', font_name='DejaVu Sans', font_size=14,
+                 x_ticklabel_start=0, y_ticklabel_start=0, z_ticklabel_start=0,
+                 x_ticklabel_end=None, y_ticklabel_end=None, z_ticklabel_end=None,
+                 number_x_ticks=None, number_y_ticks=None, number_z_ticks=None, number_cbar_ticks=3,
+                 tickbox=False, grid=False, is_invert_y_axe=True, aspect='auto',
+                 image_interpolation='nearest', image_cmap='terrain', image_clim=[-1, 1],
+                 guess_number_ticks=40):
+
+        self.__subplots__ = {}
+        self.__images__ = {}
         self.__figure__ = plt.figure(figsize=[fig_width, fig_height], dpi=fig_dpi, facecolor=fig_color)
         #
         self.__font_size__ = font_size
         self.__font_family__ = font_family
         self.__font_name__ = font_name
-        rc('font',**{'family':font_family, font_family:[font_name], 'size':font_size})
+        rc('font', **{'family':font_family, font_family:[font_name], 'size':font_size})
         rc('text', usetex=True)
 
-        self.aspect = 'equal'
+        self.x_plot_size = x_plot_size
+        self.y_plot_size = y_plot_size
+        self.z_plot_size = z_plot_size
 
-        self.number_x_ticks = 20;
-        self.number_y_ticks = 8;
-        self.number_y_ticks = 20;
-        self.number_cbar_ticks = 3;
+        self.x_ticklabel_start=x_ticklabel_start
+        self.y_ticklabel_start=y_ticklabel_start
+        self.z_ticklabel_start=z_ticklabel_start
 
-        self.x_plot_size = self.__parameters__.number_z_grid
-        self.y_plot_size = self.__parameters__.number_r_grid
-        self.z_plot_size = self.y_plot_size
+        self.x_ticklabel_end=x_ticklabel_end or x_plot_size
+        self.y_ticklabel_end=y_ticklabel_end or y_plot_size
+        self.z_ticklabel_end=z_ticklabel_end or z_plot_size
 
-        self.x_tick_start, self.y_tick_start, self.z_tick_start = 0, 0, 0
-        self.x_tick_end = self.__parameters__.z_size
-        self.y_tick_end = self.__parameters__.r_size
-        self.z_tick_end = self.y_tick_end
+        # calculate accurate ticks number automatically (recommended)
+        tick_value = self.__guess_tick_size__(guess_number_ticks)
 
-        self.default_image_interpolation = 'nearest'
+        self.number_x_ticks=number_x_ticks or int(np.around((self.x_ticklabel_end - self.x_ticklabel_start) / tick_value, 0))
+        self.number_y_ticks=number_y_ticks or int(np.around((self.y_ticklabel_end - self.y_ticklabel_start) / tick_value, 0))
+        self.number_z_ticks=number_z_ticks or int(np.around((self.z_ticklabel_end - self.z_ticklabel_start) / tick_value, 0))
+
+        self.tickbox=tickbox
+        self.grid=grid
+        self.is_invert_y_axe=is_invert_y_axe
+        self.aspect=aspect
+
+        self.number_cbar_ticks = number_cbar_ticks
+        self.image_interpolation = image_interpolation
+        self.image_clim = image_clim
+        self.image_cmap = image_cmap
 
     def get_figure(self):
         return(self.__figure__)
@@ -54,56 +72,95 @@ class PlotBuilder:
         this function allows to quick access to image by name
         (same, as subplot, to what it bount)
         '''
-        return(self.__images[name])
+        return(self.__images__[name])
 
-# ##################################################################################################
+################################################################################
 
-    def __add_subplot_common__(self, name, number, title, x_axe_label, y_axe_label, z_axe_label,
-                               tickbox, grid, position, is_invert_y_axe, projection=None):
+    def __guess_tick_size__(self, guess_number_ticks):
+        sizes = [self.x_ticklabel_end - self.x_ticklabel_start,
+                 self.y_ticklabel_end - self.y_ticklabel_start,
+                 self.z_ticklabel_end - self.z_ticklabel_start]
+        max_size = np.max(sizes)
+        exp_number = np.floor(np.log10(max_size))
+        base_number = int(max_size / pow(10, exp_number))
+        unit = (base_number / guess_number_ticks)
+        unit = unit * pow(10, exp_number)
+
+        return unit
+
+    def __add_subplot_common__(self,
+                               name, number, projection, title=None,
+                               x_plot_size=None, y_plot_size=None, z_plot_size=None,
+                               x_axe_label='X', y_axe_label='Y', z_axe_label='Z',
+                               x_ticklabel_start=None, y_ticklabel_start=None, z_ticklabel_start=None,
+                               x_ticklabel_end=None, y_ticklabel_end=None, z_ticklabel_end=None,
+                               number_x_ticks=None, number_y_ticks=None, number_z_ticks=None,
+                               tickbox=False, grid=None, is_invert_y_axe=None,
+                               position=None, aspect=None):
         ''' common method to add any'''
-        subplot = self.__figure__.add_subplot(subplot_number, projection=projection)
+        subplot = self.__figure__.add_subplot(number, projection=projection)
         self.__subplots__[name] = subplot
 
-        subplot.set_aspect(self.aspect)
-        if is_invert_y_axe: subplot.invert_yaxis()
+        #  set aspect
+        subplot.set_aspect(aspect or self.aspect)
 
-        self.__subplots[name] = subplot
-
-        # axes = self.get_subplot(name)
-
-        __title = title or name
-
-        # tick labels, that shows __real__ model space dimensions
-        # translates from grid_size
-        x_tick_range = around(linspace(self.x_tick_start, self.x_tick_end, self.number_x_ticks + 1), 2)
-        y_tick_range = around(linspace(self.y_tick_start, self.y_tick_end, self.number_y_ticks + 1), 2)
-        z_tick_range = around(linspace(self.z_tick_start, self.z_tick_end, self.number_z_ticks + 1), 2)
-
-        # ticks, that sets grid dimensions, required for data placement
-        x_tick_grid_size = linspace(0, self.x_plot_size, self.number_x_ticks + 1)
-        y_tick_grid_size = linspace(0, self.y_plot_size, self.number_y_ticks + 1)
-        z_tick_grid_size = linspace(0, self.z_plot_size, self.number_z_ticks + 1)
+        # set position of needed
+        invert_y_axe = self.is_invert_y_axe if is_invert_y_axe is None else is_invert_y_axe
+        if invert_y_axe: subplot.invert_yaxis()
 
         # set axis properties
-        axes.set_title(__title)
+        subplot.set_title(title or name)
 
+        # set grid
+        subplot.grid(self.grid if grid is None else grid)
+
+        # set position if needed
+        if position: subplot.set_position(position)
+
+        # set axes labels
+        yz_rotation_angle=45
         subplot.set_xlabel(x_axe_label)
-        subplot.set_ylabel(y_axe_label, rotation=45)
-        if projection == '3d': subplot.set_zlabel(z_axe_label, rotation=45)
+        subplot.set_ylabel(y_axe_label, rotation=yz_rotation_angle)
+        if projection == '3d': subplot.set_zlabel(z_axe_label, rotation=yz_rotation_angle)
+
+        # set subplot tickbox
+        subplot.spines['top'].set_visible(self.tickbox if tickbox is None else tickbox)
+        subplot.spines['right'].set_visible(self.tickbox if tickbox is None else tickbox)
+
+        # # ticks, that sets grid dimensions, required for data placement
+        x_size = x_plot_size or self.x_plot_size
+        y_size = y_plot_size or self.y_plot_size
+        z_size = z_plot_size or self.z_plot_size
+        x_ticks = number_x_ticks or self.number_x_ticks
+        y_ticks = number_y_ticks or self.number_y_ticks
+        z_ticks = number_z_ticks or self.number_z_ticks
+
+        x_tlabel_start = x_ticklabel_start or self.x_ticklabel_start
+        y_tlabel_start = y_ticklabel_start or self.y_ticklabel_start
+        z_tlabel_start = z_ticklabel_start or self.z_ticklabel_start
+        x_tlabel_end = x_ticklabel_end or self.x_ticklabel_end
+        y_tlabel_end = y_ticklabel_end or self.y_ticklabel_end
+        z_tlabel_end = z_ticklabel_end or self.z_ticklabel_end
+
+        x_tick_grid_size = np.linspace(0, x_size, x_ticks + 1)
+        y_tick_grid_size = np.linspace(0, y_size, y_ticks + 1)
+        if projection == '3d': z_tick_grid_size = np.linspace(0, z_size, z_ticks + 1)
 
         subplot.set_xticks(x_tick_grid_size)
         subplot.set_yticks(y_tick_grid_size)
         if projection == '3d': subplot.set_zticks(z_tick_grid_size)
 
-        subplot.set_xticklabels(x_tick_range)
-        subplot.set_yticklabels(y_tick_range)
-        if projection == '3d': axes.set_zticklabels(z_tick_range)
+        # tick labels, that shows __real__ model space dimensions
+        # translates from grid_size
+        x_tlabel_range = np.around(np.linspace(x_tlabel_start, x_tlabel_end, x_ticks + 1), 5)
+        y_tlabel_range = np.around(np.linspace(y_tlabel_start, y_tlabel_end, y_ticks + 1), 5)
+        if projection == '3d': z_tlabel_range = np.around(np.linspace(z_tlabel_start, z_tlabel_end, z_ticks + 1), 5)
 
-        # subplot.xticks(rotation=90)
-        subplot.spines['top'].set_visible(tickbox)
-        subplot.spines['right'].set_visible(tickbox)
+        subplot.set_xticklabels(x_tlabel_range)
+        subplot.set_yticklabels(y_tlabel_range)
+        if projection == '3d': axes.set_zticklabels(z_tlabel_range)
 
-        # set label on every 4th grid
+        # set label on every 2nd grid
         for label in [x for i,x in enumerate(subplot.xaxis.get_ticklabels()) if i%2 != 0]:
             label.set_visible(False)
         for label in [x for i,x in enumerate(subplot.yaxis.get_ticklabels()) if i%2 != 0]:
@@ -112,22 +169,36 @@ class PlotBuilder:
             for label in [x for i,x in enumerate(subplot.zaxis.get_ticklabels()) if i%2 != 0]:
                 label.set_visible(False)
 
-        subplot.grid(grid)
-
-        if position:
-            subplot.set_position(position)
-
         return subplot
 
 
-    def add_subplot_cartesian_2d(self, name, number, title=None, x_axe_label='X', y_axe_label='Y',
-                                 tickbox=False, grid=False, position=None):
+    def add_subplot_cartesian_2d(self, name, number, title=None,
+                                 x_plot_size=None, y_plot_size=None,
+                                 x_axe_label='X', y_axe_label='Y',
+                                 x_ticklabel_start=None, y_ticklabel_start=None,
+                                 x_ticklabel_end=None, y_ticklabel_end=None,
+                                 number_x_ticks=None, number_y_ticks=None,
+                                 tickbox=None, grid=None, is_invert_y_axe=None,
+                                 position=None, aspect=None):
         ''' add 2D subplot, cartesian projection '''
 
-        subplot = self.__add_subplot_common__(name, number, title or name,
-                                              x_axe_label, y_axe_label, None,
-                                              tickbox, grid, position, True,
-                                              projection=None)
+        subplot = self.__add_subplot_common__(name, number, projection=None,
+                                              title=title,
+                                              x_plot_size=x_plot_size,
+                                              y_plot_size=y_plot_size,
+                                              x_axe_label=x_axe_label,
+                                              y_axe_label=y_axe_label,
+                                              x_ticklabel_start=x_ticklabel_start,
+                                              y_ticklabel_start=y_ticklabel_start,
+                                              x_ticklabel_end=x_ticklabel_end,
+                                              y_ticklabel_end=y_ticklabel_end,
+                                              number_x_ticks=number_x_ticks,
+                                              number_y_ticks=number_y_ticks,
+                                              tickbox=tickbox,
+                                              grid=grid,
+                                              is_invert_y_axe=is_invert_y_axe,
+                                              position=position,
+                                              aspect=aspect)
 
         return subplot
 
@@ -142,72 +213,66 @@ class PlotBuilder:
 
 #         return(subplot)
 
-#     def add_image(self, subplot_name, data, cmap='gray', clim=[-1, 1], interpolation=None):
-#         '''
-#         cmap reference: https://matplotlib.org/examples/color/colormaps_reference.html
-#         '''
-#         if not interpolation: interpolation = self.default_image_interpolation
-#         subplot = self.get_subplot(subplot_name)
 
-#         if subplot:
-#             ## initialize image with random data, normalized to clim range
-#             # initial_data = rand(self.y_plot_size, self.x_plot_size)*(clim[1]-clim[0])-((clim[0]+clim[1])/2)
-#             initial_data = zeros([self.y_plot_size, self.x_plot_size])
-#             image = subplot.imshow(initial_data,
-#                                    cmap=cmap,
-#                                    aspect='auto',
-#                                    origin='lower',
-#                                    interpolation=interpolation)
-#             image.set_clim(clim)
+    def add_image(self, subplot_name, data, cmap=None, clim=None, interpolation=None):
+        '''
+        cmap reference: https://matplotlib.org/examples/color/colormaps_reference.html
+        '''
+        subplot = self.get_subplot(subplot_name)
 
-#             ####
-#             sr = self.y_plot_size
-#             sz = self.x_plot_size
-#             data_len = len(data)
-#             data_high = len(data[0])
-#             if data_len != self.x_plot_size:
-#                 raise ValueError('data array length is not equal to grid X-dimension {}. The value was {}.'.format(self.x_plot_size, data_len))
-#             elif data_high != self.y_plot_size:
-#                 raise ValueError('data array height is not equal to grid Y-dimension {}. The value was {}.'.format(self.y_plot_size, data_high))
-#             else:
-#                 image.set_data(np.flipud(data))
+        if subplot:
+            ####
+            data_len = len(data[0])
+            data_height = len(data)
+            if data_len != self.x_plot_size:
+                raise ValueError('data array length is not equal to grid X-dimension {}. The value was {}.'.format(self.x_plot_size, data_len))
+            elif data_height != self.y_plot_size:
+                raise ValueError('data array height is not equal to grid Y-dimension {}. The value was {}.'.format(self.y_plot_size, data_height))
+            else:
+                image = subplot.imshow(data,
+                                       cmap=cmap or self.image_cmap,
+                                       origin='lower',
+                                       interpolation=interpolation or self.image_interpolation)
+                image.set_clim(clim or self.image_clime)
+                image.set_data(data)
+                self.__images__[subplot_name] = image
 
-#             self.__images[name] = image
-
-#             return(image)
-#         else:
-#             raise Exception('There is no subplot, named {}'.format(subplot_name))
+                return(image)
+        else:
+            raise ('There is no subplot, named {}'.format(subplot_name))
 
 
-#     def add_colorbar(self, subplot_name, image_name=None, title=None, ticks=[-1, 1], ticklabels=None,
-#                      font_size=None, size="2%", position="right"):
-#         image = self.get_image(image_name)
-#         if not font_size: font_size = self.font_size
-#         if not image_name: image_name = subplot_name
-#         if not title: title = subplot_name
-#         if image:
-#             ax = self.get_subplot(subplot_name)
-#             divider = make_axes_locatable(ax)
-#             cax = divider.append_axes(position, size=size, pad=0.05)
+    def add_colorbar(self, subplot_name, image_name=None, title=None,
+                     ticks=[-1, 1], ticklabels=None,
+                     font_size=None, size="2%", position="right"):
+        image = self.get_image(image_name or subplot_name)
+        if not font_size: font_size = self.__font_size__
 
-#             cbar = self.figure.colorbar(image, cax=cax) # , ax = axes)
+        if not title: title = subplot_name
+        if image:
+            ax = self.get_subplot(subplot_name)
+            divider = make_axes_locatable(ax)
+            cax = divider.append_axes(position, size=size, pad=0.05)
 
-#             __ticks = linspace(ticks[0], ticks[1], self.number_cbar_ticks)
-#             __ticklabels = linspace(ticklabels[0], ticklabels[1], self.number_cbar_ticks) if ticklabels else __ticks
+            cbar = self.__figure__.colorbar(image, cax=cax) # , ax = axes)
 
-#             def format_s(x):
-#                 return('%.0e' % x)
+            __ticks = np.linspace(ticks[0], ticks[1], self.number_cbar_ticks)
+            __ticklabels = np.linspace(ticklabels[0], ticklabels[1], self.number_cbar_ticks) if ticklabels else __ticks
 
-#             __ticklabels = list(map(format_s, _ticklabels))
+            # def format_s(x):
+            #     return('%.1e' % x)
 
-#             cbar.set_label(title, rotation=45)
-#             cbar.set_ticks(__ticks)
-#             cbar.set_ticklabels(__ticklabels)
-#             cbar.ax.tick_params(labelsize=font_size)
+            #  __ticklabels = list(map(format_s, __ticklabels))
 
+            cbar.set_label(title, rotation=45)
+            cbar.set_ticks(__ticks)
+            cbar.set_ticklabels(__ticklabels)
+            cbar.ax.tick_params(labelsize=font_size)
 
-#     def redraw(self):
-#         ''' Redraw figure (can be used for animation and video writing) '''
-#         self.figure.canvas.draw_idle()
-#         # self.__plot_builder.canvas.start_event_loop(1)
-#         self.__figure__.canvas.flush_events()
+    def show(self):
+        self.__figure__.show()
+
+    def redraw(self):
+        ''' Redraw figure (can be used for animation and video writing) '''
+        self.__figure__.canvas.draw_idle()
+        self.__figure__.canvas.flush_events()
