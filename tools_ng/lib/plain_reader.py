@@ -61,7 +61,7 @@ class PlainReader:
 
 
     def __get_file_range__(self, space):
-        files = fnmatch.filter(os.listdir(self.__data_path__), '{}*'.format(space))
+        files = fnmatch.filter(os.listdir(self.__data_path__), '{}[0-9]'.format(space))
 
         return max(map(lambda x: int(re.sub(space, '', x)), files))
 
