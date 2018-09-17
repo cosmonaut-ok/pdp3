@@ -233,7 +233,7 @@ class PlotBuilder:
                                        cmap=cmap or self.image_cmap,
                                        origin='lower',
                                        interpolation=interpolation or self.image_interpolation)
-                image.set_clim(clim or self.image_clime)
+                image.set_clim(clim or self.image_clim)
                 image.set_data(data)
                 self.__images__[subplot_name] = image
 
@@ -259,10 +259,10 @@ class PlotBuilder:
             __ticks = np.linspace(ticks[0], ticks[1], self.number_cbar_ticks)
             __ticklabels = np.linspace(ticklabels[0], ticklabels[1], self.number_cbar_ticks) if ticklabels else __ticks
 
-            # def format_s(x):
-            #     return('%.1e' % x)
+            def format_s(x):
+                return('%.0e' % x)
 
-            #  __ticklabels = list(map(format_s, __ticklabels))
+            __ticklabels = list(map(format_s, __ticklabels))
 
             cbar.set_label(title, rotation=45)
             cbar.set_ticks(__ticks)

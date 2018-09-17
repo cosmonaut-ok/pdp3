@@ -16,7 +16,8 @@ timestamp = 1e-9
 cmap = 'terrain'
 
 # define configuration file
-config_file = '/home/cosmonaut/pdp3_modeling/model32_single/parameters.xml'
+# config_file = '/home/cosmonaut/pdp3_modeling/model32_single/parameters.xml'
+config_file = '../testdir/parameters.xml'
 
 ## read configfile
 cfg = Parameters(config_file)
@@ -53,8 +54,18 @@ end_frame = cfg.get_frame_number_by_timestamp(cfg.end_time)
 start_data_set, _ = reader.get_ds_frame_by_frame(start_frame)
 end_data_set, _ = reader.get_ds_frame_by_frame(end_frame)
 
+initial_image = zeros([cfg.number_r_grid, cfg.number_r_grid])
+
+plot.add_image(r'$E_r$', initial_image, cmap=cmap, clim=clim_e_r)
+plot.add_colorbar(r'$E_r$', ticks=clim_e_r)
+
+plot.add_image(r'$E_z$', initial_image, cmap=cmap, clim=clim_e_z)
+plot.add_colorbar(r'$E_z$', ticks=clim_e_z)
+
+plot.add_image(r'$\rho_{beam}$', initial_image, cmap=cmap, clim=clim_rho_beam)
+plot.add_colorbar(r'$\rho_{beam}$', ticks=clim_rho_beam)
+
 for i in range(start_data_set, end_data_set):
-    # print("Loading dataset", i)
     sys.stdout.write('Loading dataset ' + str(i) + ' ')
     sys.stdout.flush()
 
@@ -68,7 +79,6 @@ for i in range(start_data_set, end_data_set):
         sys.stdout.flush()
 
         plot.add_image(r'$E_r$', r, cmap=cmap, clim=clim_e_r)
-        plot.add_colorbar(r'$E_r$', ticks=clim_e_r)
         plot.add_image(r'$E_z$', z, cmap=cmap, clim=clim_e_z)
         plot.add_image(r'$\rho_{beam}$', beam, cmap=cmap, clim=clim_rho_beam)
         plot.redraw()
