@@ -5,14 +5,24 @@ from lib.plot_builder import PlotBuilder
 
 class Builder:
     def __init__(self,
-                 parameters_file,
-                 fig_color=None,
-                 fig_width=10.5,
-                 fig_height=7,
-                 fig_dpi=100,
-                 font_family='sans-serif',
-                 font_name='DejaVu Sans',
-                 font_size=10):
+                 parameters_file
+                 # fig_color=None,
+                 # fig_width=10.5,
+                 # fig_height=7,
+                 # fig_dpi=100,
+                 # font_family='sans-serif',
+                 # font_name='DejaVu Sans',
+                 # font_size=10
+):
+
+
+        # self.__fig_color__=None
+        # self.__fig_width__=10.5
+        # self.__fig_height__=7
+        # self.__fig_dpi__=100
+        # self.__font_family__='sans-serif'
+        # self.__font_name__='DejaVu Sans'
+        # self.__font_size__=10
 
         self.__cfg__ = Parameters(parameters_file)
 
@@ -28,14 +38,8 @@ class Builder:
                                           fpds=self.__cfg__.frames_per_file,
                                           use_cache=False)
 
-        self.__plotter__ = PlotBuilder(self.__cfg__,
-                                       fig_color=fig_color,
-                                       fig_width=fig_width,
-                                       fig_height=fig_height,
-                                       fig_dpi=fig_dpi,
-                                       font_family=font_family,
-                                       font_name=font_name,
-                                       font_size=font_size)
+        self.__plotter__ = PlotBuilder(
+)
 
     def get_config(self):
         return self.__cfg__
@@ -46,8 +50,8 @@ class Builder:
     def get_reader(self):
         return self.__reader__
 
-    def setup_figure(self):
-        return None
+    # def setup_figure(self):
+    #     return None
 
     def run(self):
         return None
