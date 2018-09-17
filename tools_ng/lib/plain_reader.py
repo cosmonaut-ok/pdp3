@@ -187,7 +187,7 @@ class PlainReader:
         cache_file_name = "frame_space:{}_number:{}".format(space, number)
 
         if self.use_cache:
-            frame = self.__tiny_cache__.get_cache(cache_file_name)
+            frame = np.reshape(self.__tiny_cache__.get_cache(cache_file_name), [self.__shape__[0], self.__shape__[1]])
 
         if len(frame) == 0:
             frameds, frame_in_ds = self.get_ds_frame_by_frame(number)
