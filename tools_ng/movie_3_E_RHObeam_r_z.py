@@ -125,9 +125,9 @@ def run(config_file, clim_e_r, clim_e_z, rho_beam_scale, video_file=None,
                 plot.add_image(rho_beam_plot_name, beam, cmap=cmap, clim=clim_rho_beam)
                 
                 if view: plot.redraw()
-                print()
                 if not dry_run: writer.grab_frame()
                 frame = frame + 1
+            print()
 
 
 def main():
