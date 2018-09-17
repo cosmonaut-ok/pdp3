@@ -61,7 +61,7 @@ class PlainReader:
 
 
     def __get_file_range__(self, space):
-        files = fnmatch.filter(os.listdir(self.__data_path__), '{}[0-9]'.format(space))
+        files = fnmatch.filter(os.listdir(self.__data_path__), '{}[0-9]*'.format(space))
 
         return max(map(lambda x: int(re.sub(space, '', x)), files))
 
@@ -91,7 +91,7 @@ class PlainReader:
             raise IndexError('frame should not be less, than 0. The value was: {}'.format(frame))
         else:
             frame_length = self.__get_ds_range__(space) * self.__fpds__
-            if frame_length <= frame:
+            if frame_length < frame:
                 raise IndexError('frame should be less, than {}. The value was: {}'
                                 .format(frame_length - 1, frame))
             else:
@@ -168,8 +168,9 @@ class PlainReader:
                                  sep=' ')
 
         real_shape = [self.__fpds__, self.__shape__[0], self.__shape__[1]]
-
-        return np.reshape(frames, real_shape)
+        frames_re = np.reshape(frames, real_shape)
+        
+        return frames_re
 
 
     def get_frame(self, space, number):
@@ -332,16 +333,17 @@ class PlainReader:
             to_ds, to_frame_in_ds = self.get_ds_frame_by_frame(to_frame)
 
             # first ds
-            frames[0:self.__fpds__ - from_frame_in_ds - 1] = self.get_all_frames_in_ds(space, from_ds)[from_frame_in_ds:self.__fpds__ - 1, row_number, col_number]
-            # last ds
-            frames[frame_range - to_frame_in_ds - 1:frame_range - 1] = self.get_all_frames_in_ds(space, to_ds)[:to_frame_in_ds, row_number, col_number]
+            frames[0:self.__fpds__ - from_frame_in_ds] = self.get_all_frames_in_ds(space, from_ds)[from_frame_in_ds:self.__fpds__, row_number, col_number]
 
-            shifted_frame = self.__fpds__ - from_frame_in_ds + 1
+            # last ds
+            frames[frame_range - to_frame_in_ds:frame_range] = self.get_all_frames_in_ds(space, to_ds)[:to_frame_in_ds, row_number, col_number]
+
+            shifted_frame = self.__fpds__ - from_frame_in_ds
             for i in range(from_ds + 1, to_ds):
                 i_shifted = i - from_ds - 1
                 k = i_shifted * self.__fpds__
                 k_1 = (i_shifted + 1) * self.__fpds__
-                frames[shifted_frame + k:shifted_frame + k_1 - 1] = self.get_all_frames_in_ds(space, i)[0:self.__fpds__ - 1, row_number, col_number]
+                frames[shifted_frame + k:shifted_frame + k_1] = self.get_all_frames_in_ds(space, i)[0:self.__fpds__, row_number, col_number]
             if self.use_cache:
                 self.__tiny_cache__.update_cache(cache_file_name, frames)
 
