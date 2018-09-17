@@ -106,10 +106,27 @@
   </file_save_parameters>
 
   <plot>
+    <subplot>
+      <cmap>terrain</cmap>
+      <number_x_ticks>20</number_x_ticks>
+      <number_y_ticks>8</number_y_ticks>
+      <number_z_ticks>20</number_z_ticks>
+      <number_cbar_ticks>5</number_cbar_ticks>
+    </subplot>
+    <figure>
+      <color>None</color>
+      <width>10.5</width>
+      <height>7</height>
+      <dpi>100</dpi>
+      <font>
+        <family>sans-serif</family>
+        <size>10</size>
+        <name>DejaVu Sans</name>
+      </font>
+    </figure>
     <video>
       <codec>mjpeg</codec>
       <fps>20</fps>
-      <dpi>100</dpi>
       <bitrate>32000</bitrate>
     </video>
   </plot>
