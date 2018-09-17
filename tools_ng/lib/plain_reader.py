@@ -187,9 +187,11 @@ class PlainReader:
         cache_file_name = "frame_space:{}_number:{}".format(space, number)
 
         if self.use_cache:
-            frame = np.reshape(self.__tiny_cache__.get_cache(cache_file_name), [self.__shape__[0], self.__shape__[1]])
+            frame = self.__tiny_cache__.get_cache(cache_file_name)
 
-        if len(frame) == 0:
+        if len(frame) != 0:
+            frame = np.reshape(frame, [self.__shape__[0], self.__shape__[1]])
+        else:
             frameds, frame_in_ds = self.get_ds_frame_by_frame(number)
             self.__validate_ds__(space, frameds)
             frame = self.get_all_frames_in_ds(space, frameds)[frame_in_ds]
@@ -264,7 +266,9 @@ class PlainReader:
         if self.use_cache:
             frames = self.__tiny_cache__.get_cache(cache_file_name)
 
-        if len(frames) == 0:
+        if len(frames) != 0:
+            frames = np.reshape(frames, [to_frame - from_frame, self.__shape__[0]])
+        else:
             frame_range = to_frame - from_frame
             from_ds, from_frame_in_ds = self.get_ds_frame_by_frame(from_frame)
             to_ds, to_frame_in_ds = self.get_ds_frame_by_frame(to_frame)
@@ -272,16 +276,16 @@ class PlainReader:
             frames = np.empty([frame_range, self.__shape__[0]])
 
             # first ds
-            frames[0:self.__fpds__ - from_frame_in_ds - 1] = self.get_all_frames_in_ds(space, from_ds)[from_frame_in_ds:self.__fpds__ - 1, :, number]
+            frames[0:self.__fpds__ - from_frame_in_ds] = self.get_all_frames_in_ds(space, from_ds)[from_frame_in_ds:self.__fpds__, :, number]
             # last ds
-            frames[frame_range - to_frame_in_ds - 1:frame_range - 1] = self.get_all_frames_in_ds(space, to_ds)[:to_frame_in_ds, :, number]
+            frames[frame_range - to_frame_in_ds:frame_range] = self.get_all_frames_in_ds(space, to_ds)[:to_frame_in_ds, :, number]
 
-            shifted_frame = self.__fpds__ - from_frame_in_ds + 1
+            shifted_frame = self.__fpds__ - from_frame_in_ds
             for i in range(from_ds + 1, to_ds):
                 i_shifted = i - from_ds - 1
                 k = i_shifted * self.__fpds__
                 k_1 = (i_shifted + 1) * self.__fpds__
-                frames[shifted_frame + k:shifted_frame + k_1 - 1] = self.get_all_frames_in_ds(space, i)[0:self.__fpds__ - 1, :, number]
+                frames[shifted_frame + k:shifted_frame + k_1] = self.get_all_frames_in_ds(space, i)[0:self.__fpds__, :, number]
 
             if self.use_cache:
                     self.__tiny_cache__.update_cache(cache_file_name, frames)
@@ -302,26 +306,25 @@ class PlainReader:
         if self.use_cache:
             frames = self.__tiny_cache__.get_cache(cache_file_name)
 
-        if len(frames) == 0:
+        if len(frames) != 0:
+            frames = np.reshape(frames, [to_frame - from_frame, self.__shape__[1]])
+        else:
             frame_range = to_frame - from_frame
             frames = np.empty([frame_range, self.__shape__[1]])
             from_ds, from_frame_in_ds = self.get_ds_frame_by_frame(from_frame)
             to_ds, to_frame_in_ds = self.get_ds_frame_by_frame(to_frame)
 
-            if self.use_cache:
-                frames = self.__tiny_cache__.get_cache(cache_file_name)
-
             # first ds
-            frames[0:self.__fpds__ - from_frame_in_ds - 1] = self.get_all_frames_in_ds(space, from_ds)[from_frame_in_ds:self.__fpds__ - 1, number]
+            frames[0:self.__fpds__ - from_frame_in_ds] = self.get_all_frames_in_ds(space, from_ds)[from_frame_in_ds:self.__fpds__, number]
             # last ds
-            frames[frame_range - to_frame_in_ds - 1:frame_range - 1] = self.get_all_frames_in_ds(space, to_ds)[:to_frame_in_ds, number]
+            frames[frame_range - to_frame_in_ds:frame_range] = self.get_all_frames_in_ds(space, to_ds)[:to_frame_in_ds, number]
 
-            shifted_frame = self.__fpds__ - from_frame_in_ds + 1
+            shifted_frame = self.__fpds__ - from_frame_in_ds
             for i in range(from_ds + 1, to_ds):
                 i_shifted = i - from_ds - 1
                 k = i_shifted * self.__fpds__
                 k_1 = (i_shifted + 1) * self.__fpds__
-                frames[shifted_frame + k:shifted_frame + k_1 - 1] = self.get_all_frames_in_ds(space, i)[0:self.__fpds__ - 1, number]
+                frames[shifted_frame + k:shifted_frame + k_1] = self.get_all_frames_in_ds(space, i)[0:self.__fpds__, number]
 
             if self.use_cache:
                 self.__tiny_cache__.update_cache(cache_file_name, frames)
