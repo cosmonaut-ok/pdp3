@@ -131,7 +131,7 @@ class Parameters:
             p_factor_array.append(factor * n * t * math.sqrt(self.step_interval))
             counter = counter+1
 
-        self.clim_estimation = sum(p_factor_array)
+        return sum(p_factor_array)
 
 
     def get_row_by_radius(self, radius):
