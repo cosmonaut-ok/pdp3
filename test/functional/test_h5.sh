@@ -129,10 +129,20 @@ cat<<EOF>${TESTDIR}/parameters.xml
   </file_save_parameters>
 
   <plot>
+    <figure>
+      <color>None</color>
+      <width>10.5</width>
+      <height>7</height>
+      <dpi>100</dpi>
+      <font>
+        <name>DejaVu Sans</name>
+        <family>sans-serif</family>
+        <size>10</size>
+      </font>
+    </figure>
     <video>
       <codec>mjpeg</codec>
       <fps>20</fps>
-      <dpi>100</dpi>
       <bitrate>32000</bitrate>
     </video>
   </plot>

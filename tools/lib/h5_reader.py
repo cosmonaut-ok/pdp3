@@ -3,10 +3,12 @@ import h5py
 from os.path import join # to use "join" for namespaces
 
 class H5Reader:
-    def __init__(self, h5_path, base_keyspace='/pdp3/result', dump_keyspace='/pdp3/dump'):
+    def __init__(self, h5_path, data_keyspace='/pdp3/result', dump_keyspace='/pdp3/dump', use_cache=False):
+
         self.file = h5py.File(h5_path)
-        self.__base_keyspace = base_keyspace
-        self.__dump_keyspace = dump_keyspace
+        self.__data_keyspace__ = data_keyspace
+        self.__dump_keyspace__ = dump_keyspace
+        self.verbose = False
 
 
     def __del__(self):
@@ -29,7 +31,7 @@ class H5Reader:
 
 
     def __get_path__(self, space, ds=''):
-        path = join(self.__base_keyspace, space, str(ds))
+        path = join(self.__data_keyspace__, space, str(ds))
         return(path)
 
 
