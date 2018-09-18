@@ -274,6 +274,19 @@ Quick analytic calculator of plasma (aka Langmur) frequency, wake wavelength, De
 user@host$ ./tools/quick_calculator.py <path/to/parameters.xml>
 ```
 
+Data analysis tools made as jupyter (ipython) notebooks. You can find them in `tools` subdir. Please, run jupyter from `tools` dir also
+``` shell
+user@host$ cd tools
+user@host$ jupyter <notebook|lab> [some_notebook.ipynb] [other options]
+```
+
+To run python notebook in non-interactive mode, please, use script `tools/nbrun.sh` from project root directory
+``` shell
+user@host$ ./tools/nbrun.sh ./tools/some_notebook.ipynb
+```
+
+You can edit jupyter notebooks with jupyter browser editor (opens with `jupyter notebook` or `jupyter lab` commands), atom (plugin: https://atom.io/packages/jupyter-notebook), emacs (plugin: https://github.com/millejoh/emacs-ipython-notebook), spyder (plugin: https://github.com/spyder-ide/spyder-notebook) etc
+
 #### Bugs/Workarounds
 
 NOTE: During the bug in HDF5 library v.1.10.0, related to file locking, use `export HDF5_USE_FILE_LOCKING=FALSE` before launching pdp3, jupyter or other tools
