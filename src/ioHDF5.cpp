@@ -87,17 +87,17 @@ void IOHDF5::dump_h5_dataset(char const *group_name,
   char dataset_name[200];
   sprintf(dataset_name, "%s/%s", group_name, name);
 
-  double dv[z_step][r_step];
+  double dv[r_step][z_step];
   for (int i=0; i< r_step; i++)
     for (int j=0; j< z_step; j++)
-      dv[j][i] = out_value[i][j];
+      dv[i][j] = out_value[i][j];
 
   file_id = H5Fopen (hdf5_file, H5F_ACC_RDWR, H5P_DEFAULT);
 
   group_id = create_or_open_h5_group(file_id, group_name);
 
-  dimsf[0] = z_step;
-  dimsf[1] = r_step;
+  dimsf[0] = r_step;
+  dimsf[1] = z_step;
 
   dataspace = H5Screate_simple(2, dimsf, NULL);
   datatype = H5Tcopy(H5T_NATIVE_DOUBLE);
