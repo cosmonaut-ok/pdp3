@@ -273,3 +273,7 @@ Quick analytic calculator of plasma (aka Langmur) frequency, wake wavelength, De
 ``` shell
 user@host$ ./tools/quick_calculator.py <path/to/parameters.xml>
 ```
+
+#### Bugs/Workarounds
+
+NOTE: During the bug in HDF5 library v.1.10.0, related to file locking, use `export HDF5_USE_FILE_LOCKING=FALSE` before launching pdp3, jupyter or other tools
