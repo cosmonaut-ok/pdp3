@@ -6,9 +6,9 @@
       //! use debug mode with low resolution and macroparticles number and long data dump interval
       //! usual, tag names for debug begins from 'debug_' word. Ex. 'debug_n_grid_r'
   -->
-  <debug>true</debug>
+  <debug>@DEBUG_OPTION@</debug>
 
-  <use_hdf5>false</use_hdf5>   	<!-- experimental feature whith implements output to new data format (HDF5) -->
+  <use_hdf5>@HDF5_OPTION@</use_hdf5>   	<!-- experimental feature whith implements output to new data format (HDF5) -->
 
   <geometry>
     <r_size>0.25</r_size>       <!-- model radial size -->
@@ -83,9 +83,9 @@
   <boundary_conditions type = "dirichlet">0</boundary_conditions>
 
   <file_save_parameters>
-    <result_path>pdp3_result/</result_path>              <!-- path to modeling results data -->
-    <save_state_path>pdp3_result/dump/</save_state_path> <!-- path to system state dump -->
-    <data_dump_interval>20</data_dump_interval>          <!-- number of time steps between two result data dumps -->
+    <result_path>@RESULT_DIR@/</result_path>              <!-- path to modeling results data -->
+    <save_state_path>@RESULT_DIR@/dump/</save_state_path> <!-- path to system state dump -->
+    <data_dump_interval>20</data_dump_interval>           <!-- number of time steps between two result data dumps -->
     <debug_data_dump_interval>50</debug_data_dump_interval>
     <system_state_dump_interval>0</system_state_dump_interval> <!-- number of time steps between two system state dumps. Set '0' to disable. RESTORATION STILL NOT IMPLEMENTED -->
     <frames_per_file>10</frames_per_file> <!-- how many image frames should be placed in one data file -->
