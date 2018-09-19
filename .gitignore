@@ -321,3 +321,8 @@ doc/*.png
 *.png
 
 field_movie.avi
+Makefile
+autom4te.cache/
+config.status
+configure
+parameters.xml
