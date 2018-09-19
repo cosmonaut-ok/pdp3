@@ -1,6 +1,51 @@
 CHANGELOG
 ---------
 
+release-20180919
+=======
+
+- Add nbrun to launch jupyter/ipython notebooks from CLI
+
+- Add full HDF5 support to pdp3 and tools
+
+- Replace tools with completely new code
+
+- Add tools for FFT transform plots
+
+- Add caching to tools
+
+- Add timestamps to 3E\rho_beam view/image/movie tools graphs
+
+- Drop clang support
+
+- Improve quick calculator
+
+- Add tool to build 2.5D color map plot for E_r and E_z in r/t pane
+
+- Fix bug with E_r and E_z labels
+
+- Add with-grid option to set ticks grid
+
+- Improve calculation steps algorithm
+
+- Update tinyxml2 version
+
+- Fix incorrect singlethread behavior
+
+- Add tools to create plots for E_z(t) in fixed point (r, z)"
+
+- tools for 2.5D plots for E_z(z, t) and E_r(z, t)
+
+- Add compiler flag OPENMP_DYNAMIC_THREADS for omp dynamic threading
+
+- Add automatic color limits estimation in tools for plot building
+
+- Minor bugfixes
+
+- Minor improvements
+
+- Improve documentation
+
 release-20180712
 =======
 
