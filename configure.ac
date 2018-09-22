@@ -78,7 +78,7 @@ fi
 
 # speedup
 if test x$SPEEDUP = xyes; then
-  CFLAGS_ADDITIONAL="$CFLAGS_ADDITIONAL -ffast-math -O3 -funroll-loops -Wno-write-strings -freciprocal-math -fcx-fortran-rules -msse"
+  CFLAGS_ADDITIONAL="$CFLAGS_ADDITIONAL -ffast-math -O3 -march=native -funroll-loops -Wno-write-strings -freciprocal-math -fcx-fortran-rules -msse"
   AC_DEFINE([SPEEDUP], [true], [Directive to increase calculation speed])
 else
   CFLAGS_ADDITIONAL="$CFLAGS_ADDITIONAL -O2"
