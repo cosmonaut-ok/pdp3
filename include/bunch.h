@@ -2,7 +2,7 @@
 
 class Bunch : public Particles
 {
-public:
+ public:
   Bunch(char *p_name,
         double p_charge,
         double p_mass,
@@ -16,15 +16,15 @@ public:
         int b_number,
         double h_duration);
 
-  ~Bunch(void);
-public:
+  virtual ~Bunch(void);
+ public:
   double duration; // bunch duration
   double bunch_number; // bunch number (for series)
   double hole_duration; // duration between two bunches in series
   double density;  // bunch density (n_bunch);
   double velocity; // bunch velocity
   double radius;   // bunch radius
-public:
+ public:
   void bunch_inject(Time *time);
   void bunch_inject_calc_E(Geometry *geom,
                            EField  *E_bunch,

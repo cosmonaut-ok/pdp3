@@ -29,7 +29,7 @@ cat<<EOF>${TESTDIR}/parameters.xml
 <initial_parameters>
 
   <debug>false</debug>
-  <use_hdf5>false</use_hdf5>
+  <use_hdf5>@HDF5_OPTION@</use_hdf5>
 
   <geometry>
     <r_size>0.25</r_size>
@@ -108,7 +108,7 @@ cat<<EOF>${TESTDIR}/parameters.xml
     <debug_data_dump_interval>5</debug_data_dump_interval>
     <data_dump_interval>5</data_dump_interval>
     <frames_per_file>1</frames_per_file>
-    <system_state_dump_interval>2</system_state_dump_interval>
+    <system_state_dump_interval>0</system_state_dump_interval>
     <dump_data>
       <E_r>true</E_r>
       <E_phi>false</E_phi>
@@ -120,9 +120,9 @@ cat<<EOF>${TESTDIR}/parameters.xml
       <J_phi>false</J_phi>
       <J_z>true</J_z>
 
-      <position>true</position>
+      <position>false</position>
 
-      <velocity>true</velocity>
+      <velocity>false</velocity>
 
       <rho_bunch>true</rho_bunch>
     </dump_data>
@@ -155,20 +155,47 @@ cd ${TESTDIR}
 mkdir -p pdp3_result/dump
 time ./pdp3
 
+if [ "@HDF5_OPTION@" == "true" ]; then
+    ## dump data from hdf5 database
+    echo -n "Dumping state data from database to plaintext for test..."
+    for i in `h5ls -r pdp3_result/data.h5/pdp3/result | grep Dataset | awk '{print $1}'`; do
+        h5dump -d /pdp3/result/$i -y -r -o pdp3_result/$(basename $(dirname $i))$(basename $i)_raw pdp3_result/data.h5 > /dev/null
+    done
+    echo "done"
+
+    echo -n "Dumping data from database to plaintext for test..."
+    for i in `h5ls -r pdp3_result/data.h5/pdp3/dump | grep Dataset | awk '{print $1}'`; do
+        h5dump -d /pdp3/dump/$i -y -r -o pdp3_result/$(basename $i)_raw pdp3_result/data.h5 > /dev/null
+    done
+    echo "done"
+fi
+
+echo -n "Converting RAW data to format for md5sums comparation..."
 cd pdp3_result
+if [ "@HDF5_OPTION@" == "true" ]; then
+    for i in `find . -name '*_raw' -type f`; do
+        echo $(cat ${i} | tr ',' ' ') | tr ' ' '\n' > $(basename $i _raw)n
+        rm -f ${i}
+    done
+else
+    for i in `find .  -type f`; do
+        echo $(cat ${i} | tr ',' ' ') | tr ' ' '\n' > $(basename $i)n
+        rm -f ${i}
+    done
+fi
+echo "done"
 
 ## compare with testing data
 success="true"
-for i in `find . -type f`; do
+for i in `find . -name '*n' -type f`; do
     bn=`basename $i`
-    cat ${i} | tr ' ' '\n' > ${i}n
-    true_md5sum="$(egrep ${bn}n$ ../../${TRUE_MD5} | cut -d';' -f1)"
-    actual_md5sum="$(md5sum ${i}n | cut -d' ' -f1)"
+    true_md5sum="$(egrep ${bn}$ ../../${TRUE_MD5} | cut -d';' -f1)"
+    actual_md5sum="$(md5sum ${i} | cut -d' ' -f1)"
     if test "${true_md5sum}" == "${actual_md5sum}"; then
-	printf "%-25b %-10b\n" "file $bn" "${GREEN}match${NC}"
+        printf "%-25b %-10b\n" "file $(basename $bn n)" "${GREEN}match${NC}"
     else
-	printf "%-25b %-10b\n" "file $bn" "${RED}not match${NC}"
-	success="false"
+        printf "%-25b %-10b\n" "file $(basename $bn n)" "${RED}not match${NC}"
+        success="false"
     fi
 done
 
