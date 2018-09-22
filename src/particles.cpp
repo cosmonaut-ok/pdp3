@@ -398,6 +398,7 @@ void Particles::velocity_distribution(double tempr_ev)
 {
   double therm_vel = sqrt(tempr_ev*2.0*EL_CHARGE/
                           (this->init_const_mass*EL_MASS));
+
   // double R =0; // number from [0;1]
   // TODO: why 5e6?
   double dv = therm_vel/0.5e7; // velocity step in calculation integral
@@ -1256,17 +1257,10 @@ void Particles::back_position_to_rz()
   for (unsigned int i=0; i<number; i++)
     if (is_alive[i])
     {
-      // if (i == 12500 || i == 25000 || i == 37500)
-      // 	cout << "PRE: Particle number " << i << " has position/velocity " << pos[i][0] << "," << pos[i][2] << " " << vel[i][0] << "," << vel[i][2] << endl;
-      
       double r = sqrt(pos[i][0] * pos[i][0] + pos[i][1] * pos[i][1]);
       sin_theta_r[i] = pos[i][1]/r;
-
       pos[i][0] = r;
       pos[i][1] = 0;
-
-      // if (i == 12500 || i == 25000 || i == 37500)
-      // 	cout << "Particle number " << i << " has position/velocity " << pos[i][0] << "," << pos[i][2] << " " << vel[i][0] << "," << vel[i][2] << " " << r << endl;
     }
 }
 

@@ -10,7 +10,15 @@ namespace lib
 #if __cplusplus >= 201103L
   using std::isnan;
 #endif
-  
+
+#ifdef __SSE__
+  float sqrt_recip(float x)
+  {
+    //! 1/sqrt(x), using MMX and Newton-Raphson approximation
+    return _mm_cvtss_f32( _mm_rsqrt_ss( _mm_set_ps1(x) ) ); //same as _mm_set1_ps
+  }
+#endif
+
   bool to_bool(string str)
   {
     std::transform(str.begin(), str.end(), str.begin(), ::tolower);
@@ -36,7 +44,11 @@ namespace lib
       exit(1);
     }
 
+#ifdef __SSE__
+    gamma = sqrt_recip(1.0 - beta);
+#else
     gamma = pow(1.0 - beta, -0.5);
+#endif
 
     if (isinf(gamma) == 1) { // avoid infinity values
       cerr << "WARNING(get_gamma): gamma (Lorenz factor) girects to infinity for velocity" << sqrt(sq_velocity) << endl;
