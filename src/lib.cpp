@@ -44,7 +44,7 @@ namespace lib
       exit(1);
     }
 
-#ifdef __SSE__
+#if defined (__SSE__) && defined (SPEEDUP)
     gamma = sqrt_recip(1.0 - beta);
 #else
     gamma = pow(1.0 - beta, -0.5);
