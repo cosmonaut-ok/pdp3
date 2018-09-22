@@ -7,6 +7,14 @@ CURRENT
 
 - Improve multibunch beam support
 
+- Add profiler support
+
+- Improve messages
+
+- Fix bug with initial rotation coordinate
+
+- Improve parameters passing to application in autoconf/autoheader
+
 release-20180919
 =======
 
