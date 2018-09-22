@@ -2,6 +2,10 @@
 
 #include <string.h>
 
+#ifdef __SSE__
+#include <pmmintrin.h>
+#endif
+
 #include "tinyvec3d.h"
 
 #include "lib.h"
