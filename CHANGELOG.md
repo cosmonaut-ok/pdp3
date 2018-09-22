@@ -1,5 +1,11 @@
 CHANGELOG
 ---------
+CURRENT
+=======
+
+- Migrate to autotools from simple Makefile
+
+- Improve multibunch beam support
 
 release-20180919
 =======

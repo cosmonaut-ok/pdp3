@@ -27,7 +27,7 @@ pdp3_C_SRCS           =
 
 pdp3_CXX_SRCS := $(wildcard $(SRCDIR)/*.cpp) $(wildcard $(SRCDIR)/math/*.cpp)
 
-pdp3_LDFLAGS          =
+pdp3_LDFLAGS          = @LDFLAGS_ADDITIONAL@
 pdp3_ARFLAGS          =
 pdp3_LIBRARY_PATH     =
 pdp3_LIBRARIES        =
@@ -47,7 +47,12 @@ pdp3_LIBRARIES += tinyvec3d
 LDFLAGS += -L$(tinyvec3d_SUBDIR)
 
 ### link hdf5 library
+ifeq (@HDF5_OPTION@, true)
 pdp3_LIBRARIES += hdf5_serial
+else
+pdp3_CXX_SRCS_TMP := $(pdp3_CXX_SRCS)
+pdp3_CXX_SRCS = $(filter-out $(SRCDIR)/ioHDF5.cpp, $(pdp3_CXX_SRCS_TMP))
+endif
 
 pdp3_OBJS := $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(pdp3_CXX_SRCS))
 
@@ -74,7 +79,7 @@ CXXFLAGS = ${CFLAGS}
 all: prepare $(SUBDIRS) $(LIBS) $(EXES)
 
 ### Build rules
-.PHONY: all clean dummy check-syntax prepare doxygen
+.PHONY: all clean dummy check-syntax prepare doxygen test test-unit test-h5 test-ext
 
 $(SUBDIRS): dummy
 	cd $@ && $(MAKE)
@@ -102,7 +107,7 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 CLEAN_FILES  = y.tab.c y.tab.h lex.yy.c core *.orig *.rej \
                \\\#*\\\# *~ *% .\\\#*
 
-BUILD_DIRS = @RESULT_DIR@ @RESULT_DIR@/Dump $(OBJDIR) $(OBJDIR)/math
+BUILD_DIRS = @RESULT_DIR@ @RESULT_DIR@/Dump $(OBJDIR) $(OBJDIR)/math $(TARGETDIR)
 space :=
 space +=
 comma :=,
@@ -112,6 +117,7 @@ clean: $(SUBDIRS:%=%/__clean__) $(EXTRASUBDIRS:%=%/__clean__) $(TESTSUBDIRS:%=%/
 	$(RM) $(LIBS) $(EXES) $(EXES:%=%.so)
 	$(RM) -r $(BUILD_DIRS) $(ROOTDIR)/tools/__pycache__/
 	$(RM) -r $(DOXYGEN_DIRS)
+	$(RM) -r $(TESTDIR)
 
 $(SUBDIRS:%=%/__clean__): dummy
 	-cd `dirname $@` && $(MAKE) clean
@@ -131,7 +137,7 @@ $(pdp3_MODULE): $(pdp3_OBJS)
 	$(CXX) $(CXXFLAGS) $(CXXEXTRA) $(DEFINCL) $(LDFLAGS) -o $@ $(pdp3_OBJS) $(pdp3_LIBRARY_PATH) $(pdp3_LIBRARIES:%=-l%)
 
 mrproper: clean
-	$(RM) -r $(TESTDIR) $(TESTDIR)_h5 *.avi *.png $(TARGETDIR) $(RELEASE) $(RELEASE).zip autom4te.cache config.log config.status configure Makefile parameters.xml @RESULT_DIR@
+	$(RM) -r *.avi *.png $(RELEASE) $(RELEASE).zip autom4te.cache config.log config.status configure Makefile parameters.xml @RESULT_DIR@ test/functional/test.sh
 
 run: bootstrap
 	./pdp3
@@ -141,11 +147,8 @@ $(TESTSUBDIRS:%=%/__test__): dummy
 
 test-unit: $(TESTSUBDIRS:%=%/__test__)
 
-test: mrproper all
+test: clean all
 	TESTDIR=$(TESTDIR) /bin/bash ./test/functional/test.sh
-
-test-h5: mrproper all
-	TESTDIR=$(TESTDIR)_h5 /bin/bash ./test/functional/test_h5.sh
 
 test-ext: mrproper all
 	TESTDIR=$(TESTDIR) /bin/bash ./test/functional/test.sh extended
@@ -153,10 +156,10 @@ test-ext: mrproper all
 test-tools: test
 	TESTDIR=$(TESTDIR) /bin/bash ./test/functional/tools.sh
 
-test-full: test-unit test-ext test-h5 test-tools
+test-full: test-unit test-ext test-tools
 
 check-syntax:
-	$(CXX) $(LIBRARY_PATH) $(INCLUDE_PATH) -Wall -Wextra -pedantic -fsyntax-only $(CHK_SOURCES)
+	$(CXX) $(LIBRARY_PATH) $(INCLUDE_PATH) $(CXXFLAGS) -Wall -Wextra -pedantic -fsyntax-only $(pdp3_CXX_SRCS)
 
 prepare:
 	$(MKDIR) -p $(BUILD_DIRS)
