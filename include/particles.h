@@ -42,7 +42,7 @@ public:
   double *charge_array;
   double init_const_mass;
   // Number of particles
-  int number;
+  unsigned int number;
 
   //! Array of particle position
   //! in format:
@@ -82,7 +82,7 @@ public:
   double **vel;
 
   //indicator if particle is still alive
-  int *is_alive;
+  bool *is_alive;
 
   //current density
   //temporaty member of Particle class
@@ -143,8 +143,7 @@ public:
                                double x1_old,
                                double x3_old,
                                int p_number);
-  void azimuthal_j_weighting(Time *time1,
-                             Current *j1);
+  void azimuthal_j_weighting(Current *j1);
   void set_simple_cell(int **cell_arr_jr,
                        int **cell_arr_jz,
                        int start_number,

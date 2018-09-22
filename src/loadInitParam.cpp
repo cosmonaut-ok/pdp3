@@ -23,7 +23,7 @@ LoadInitParam::LoadInitParam(char *xml_file_name)
   omp_set_dynamic(1); // Explicitly disable dynamic teams
 #else
   int cores = omp_get_num_procs();
-  cout << "CORES: " << cores << endl;
+  cerr << "INFO! Number of calculation processors: " << cores << endl;
   omp_set_dynamic(0);         // Explicitly disable dynamic teams
   omp_set_num_threads(cores); // Use 4 threads for all consecutive parallel regions
 #endif
@@ -41,8 +41,16 @@ LoadInitParam::LoadInitParam(char *xml_file_name)
   //! initialize file saving parameters, like path to computed data files,
   //! path to system state data files max frames number, placed to one file etc.
   // c_io_class = new InputOutputClass (params->dump_result_path, params->dump_save_state_path);
+
   if (params->use_hdf5)
+  {
+#ifdef USE_HDF5
     c_io_class = new IOHDF5 (params->dump_result_path, params->dump_save_state_path);
+#else
+    cerr << "ERROR! PDP3 build without HDF5 support. Please, update your configfile to use plaintext ``<use_hdf5>false</use_hdf5>''" << endl;
+    exit(1);
+#endif
+  }
   else
     c_io_class = new IOText (params->dump_result_path, params->dump_save_state_path);
 
@@ -56,7 +64,8 @@ LoadInitParam::LoadInitParam(char *xml_file_name)
 
   //! 4. load particles beam
   cout << "Initializing Particles Beam Data" << endl;
-  init_beam();
+  current_bunch_number = 0;
+  // init_beam();
 
   //! 5. load boundary conditions
   cout << "Initializing Boundary Conditions Data" << endl;
@@ -108,30 +117,85 @@ void LoadInitParam::init_beam()
 {
   //! initialize particles bunch data
   //! particles bunch should be injected to plasma
-  Bunch *prtls;
 
-  // for (unsigned int i=0; i < params->beam_number_bunches)
-  // {
   double duration = params->bunch_lenght / params->beam_initial_velocity;
   double hole_duration = params->beam_bunches_distance / params->beam_initial_velocity;
+  double bunch_inject_time = current_bunch_number * (duration + hole_duration);
+  char *current_bunch_name =  new char[100];
 
-  for (unsigned int i=0; i < params->beam_number_bunches; i++)
-    {
-      prtls = new Bunch(params->beam_name,
-                        params->beam_particle_charge,
-                        params->beam_particle_mass,
-                        params->bunch_number_macro,
-                        params->geom, // p_list,
-                        duration,
-                        params->bunch_radius,
-                        params->bunch_density,
-                        params->beam_initial_velocity,
-                        i,
-                        hole_duration);
-      p_list->part_list.push_back(prtls); // push bunch to particles list vector
-      c_bunches.push_back(prtls); // push bunch to bunches list vector
-      // }
-    }
+  char cbn_str_int[100];
+  sprintf(cbn_str_int, "%d", current_bunch_number);
+
+  strcpy(current_bunch_name, params->beam_name);
+  strcat(current_bunch_name, "#");
+  strcat(current_bunch_name, cbn_str_int);
+
+  
+
+  double estimated_bunch_erase_number = (
+    params->time->current_time
+    - params->geom->second_size / params->beam_initial_velocity
+    - duration )
+    / (duration + hole_duration);
+
+
+  // erase gone bunches
+  if (c_bunches.size() > 1) { // strange gcc behavior: size of empty vector of instance references is not zero
+    for (auto i = c_bunches.begin(); i != c_bunches.end(); ++i)
+      {
+	Bunch *cb = *i;
+	if (cb->bunch_number < estimated_bunch_erase_number)
+	  {
+	    bool is_dead = true;
+	    for (unsigned int i; i < cb->number; ++i)
+	      if (cb->is_alive[i])
+		{
+		  is_dead = false;
+		  break;
+		}
+	    if (is_dead)
+	      {
+#ifdef DEBUG
+		cerr << "Bunch #" << cb->bunch_number << " is out of simulation. Clearing" << endl;
+#endif
+		for (auto k = p_list->part_list.begin(); k != p_list->part_list.end(); ++k)
+		  if (*i == *k)
+		    p_list->part_list.erase(k);
+		c_bunches.erase(i);
+		delete cb;
+	      }
+	  }
+      }
+  }
+  if (params->time->current_time >= bunch_inject_time // it's not equality, because of distreate simulation nature
+      && current_bunch_number < params->beam_number_bunches)
+  {
+#ifdef DEBUG
+    cerr << "Injecting Bunch #" << current_bunch_number << endl;
+#endif
+    double duration = params->bunch_lenght / params->beam_initial_velocity;
+    double hole_duration = params->beam_bunches_distance / params->beam_initial_velocity;
+    Bunch *prtls = new Bunch(current_bunch_name,
+                             params->beam_particle_charge,
+                             params->beam_particle_mass,
+                             params->bunch_number_macro,
+                             params->geom, // p_list,
+                             duration,
+                             params->bunch_radius,
+                             params->bunch_density,
+                             params->beam_initial_velocity,
+                             current_bunch_number,
+                             hole_duration);
+    p_list->part_list.push_back(prtls); // push bunch to particles list vector
+    c_bunches.push_back(prtls); // push bunch to bunches list vector
+
+    // calculate next bunch number and inject time
+    ++current_bunch_number; // increase current bunch number after creation
+  }
+
+  // inject bunch
+  for (auto i = c_bunches.begin(); i != c_bunches.end(); ++i)
+    (*i)->bunch_inject(params->time);
 }
 
 void LoadInitParam::init_boundary ()
@@ -283,13 +347,13 @@ void LoadInitParam::run(void)
     //! Steps:
 #ifdef PERF_DEBUG
     the_time = 0;
-    cerr << the_time << " loop iteration begin" << endl;
+    cerr << the_time << " sec. loop iteration begin" << endl;
     the_time = clock();
 #endif
 
     //! 1. inject beam
-    for (unsigned int i=0; i < params->beam_number_bunches; i++)
-	c_bunches[i]->bunch_inject(params->time);
+    init_beam();
+
 #ifdef PERF_DEBUG
     cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_bunches[i]->bunch_inject" << endl;
     the_time = clock();
@@ -421,8 +485,9 @@ void LoadInitParam::run(void)
            << left << setw(34) << avg_step_exec_time
            << endl;
 
-      for (unsigned int i=0; i < params->beam_number_bunches; i++)
-	c_bunches[i]->charge_weighting(c_rho_bunch);
+      for (auto i = c_bunches.begin(); i != c_bunches.end(); ++i)
+        (*i)->charge_weighting(c_rho_bunch);
+
 #ifdef PERF_DEBUG
       cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_bunches[i]->charge_weighting" << endl;
       the_time = clock();
@@ -445,8 +510,8 @@ void LoadInitParam::run(void)
         cout << "Saving system state at " << params->time->current_time << endl;
         dump_system_state();
 #ifdef PERF_DEBUG
-	cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: dump_system_state" << endl;
-	the_time = clock();
+        cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: dump_system_state" << endl;
+        the_time = clock();
 #endif
       }
     }
