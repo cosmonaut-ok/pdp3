@@ -31,15 +31,15 @@ Particles::Particles(char const *p_name,
   pos = new double*[number];
   pos_old = new double*[number];
 
-  is_alive = new int[number];
+  is_alive = new bool[number];
 
   sin_theta_r = new double[number];
   cos_theta_r = new double[number];
 
 #pragma omp parallel for
-  for (int i = 0; i < number; i++)
+  for (unsigned int i = 0; i < number; i++)
   {
-    is_alive[i] = 1;
+    is_alive[i] = true;
     vel[i] = new double[3];
     pos[i] = new double[3];
     pos_old[i] = new double[3];
@@ -49,18 +49,28 @@ Particles::Particles(char const *p_name,
 // Destructor
 Particles::~Particles()
 {
-  //delete [] x1;
-  //delete [] x3;
-  //delete [] v1;
-  //delete [] v2;
-  //delete [] v3;
-  //delete [] is_alive;
+  for (unsigned int i=0; i<number; i++)
+    {
+      delete [] pos[i];
+      delete [] pos_old[i];
+      delete [] vel[i];
+    }
+
+  delete [] pos;
+  delete [] pos_old;
+  delete [] vel;
+  delete [] is_alive;
+
+  delete [] mass_array;
+  delete [] charge_array;
+  delete [] sin_theta_r;
+  delete [] cos_theta_r;
 }
 
 void Particles::set_v_0()
 {
 #pragma omp parallel for
-  for(int i=0; i<number; i++)
+  for(unsigned int i=0; i<number; i++)
   {
     vel[i][0] = 0;
     vel[i][1] = 1e5; // TODO: WHY?
@@ -71,7 +81,7 @@ void Particles::set_v_0()
 void Particles::set_x_0()
 {
 #pragma omp parallel for
-  for(int i=0; i<number; i++)
+  for(unsigned int i=0; i<number; i++)
   {
     pos[i][0] = 0.5; // TODO: WHY?
     pos[i][2] = 0.5; // TODO: WHY?
@@ -82,7 +92,7 @@ void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
 {
 
 #pragma omp parallel for shared(e_fld, h_fld, t)
-  for(int i=0; i<number; i++)
+  for(unsigned int i=0; i<number; i++)
     if (is_alive[i])
     {
       // define vars directly in loop, because of multithreading
@@ -195,7 +205,7 @@ void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
 void Particles::reflection()
 {
 #pragma omp parallel for
-  for(int i=0; i<number; i++)
+  for(unsigned int i=0; i<number; i++)
     if (is_alive[i])
     {
       double dr = geom1->dr;
@@ -238,8 +248,8 @@ void Particles::half_step_pos(Time *t)
 {
   double half_dt = t->delta_t/2.0;
 
-#pragma omp parallel for shared (half_dt)
-  for(int i=0; i<number; i++)
+// #pragma omp parallel for shared (half_dt)
+  for(unsigned int i=0; i<number; i++)
     if (is_alive[i])
     {
       // check if x1 and x3 are correct
@@ -250,6 +260,7 @@ void Particles::half_step_pos(Time *t)
       }
       //
       pos[i][0] = pos[i][0] + vel[i][0] * half_dt;
+      //! we use "fake" rotation component to correct position from xy to rz pane
       pos[i][1] = pos[i][1] + vel[i][1] * half_dt;
       pos[i][2] = pos[i][2] + vel[i][2] * half_dt;
     }
@@ -274,7 +285,7 @@ void Particles::charge_weighting(ChargeDensity *ro1)
   double value = 0;
   // double **temp = ro1->get_rho();
 
-  for(int i=0; i<number; i++)
+  for(unsigned int i=0; i<number; i++)
     if (is_alive[i])
     {
       // check if x1 and x3 are correct
@@ -408,7 +419,7 @@ void Particles::velocity_distribution(double tempr_ev)
   }
 
 #pragma omp parallel for shared(integ_array, lenght_arr, const1, dv)
-  for(int i_n=0; i_n<number; i_n++)
+  for(unsigned int i_n=0; i_n<number; i_n++)
   {
     double Rr = lib::random_reverse(i_n,3);
     double Rfi = lib::random_reverse(i_n,5);
@@ -489,11 +500,12 @@ void Particles::load_spatial_distribution(double n1, double n2, double left_plas
     charge *= n_in_macro;
     mass *= n_in_macro;
 #pragma omp parallel for shared (dr, dz, dn, left_plasma_boundary, n1)
-    for(int n = 0; n < number; n++)
+    for(unsigned int n = 0; n < number; n++)
     {
       rand_r = lib::random_reverse(n, 13); // TODO: why 11 and 13?
       rand_z = lib::random_reverse(number - 1 - n, 11);
       pos[n][0] = sqrt(rand_r * geom1->first_size * (geom1->first_size - dr) + pow(dr, 2) / 4);
+      pos[n][1] = 0;
       //pos[n][2] = (geom1->second_size - dz)*sqrt(rand_z) + dz/2.0;
       pos[n][2] = (geom1->second_size - left_plasma_boundary - dz) / dn * (sqrt(pow(n1, 2) + rand_z * (2 * n1 * dn + pow(dn, 2))) - n1) + left_plasma_boundary + dz / 2;
       mass_array[n] = mass;
@@ -510,12 +522,12 @@ void Particles::load_spatial_distribution(double n1, double n2, double left_plas
     double R_sq = (geom1->first_size - dr / 2) * (geom1->first_size - dr / 2);
     // double tt=0;
 #pragma omp parallel for shared (sigma, R_sq, dz)
-    for (int i = 0; i<number;i++)
+    for (unsigned int i = 0; i<number;i++)
     {
       rand_r = lib::random_reverse(i,13);
       double int_rd = exp(-dr*dr/(8.0*sigma*sigma));
       pos[i][0]=sigma*sqrt(-2.0*log(int_rd - rand_r*(int_rd-exp(-R_sq/(2.0*sigma*sigma)))));
-
+      pos[i][1] = 0;
       //pos[i][0] = (geom1->first_size - dr)*(rand_r)*rand_r + dr/2.0;
       // double tt = exp(-R_sq/(2.0*sigma*sigma));
       rand_z = lib::random_reverse(number - 1 - i, 11);
@@ -532,11 +544,12 @@ void Particles::load_spatial_distribution(double n1, double n2, double left_plas
     double n_in_macro = 0;
 
 #pragma omp parallel for shared(dr, dz, dn, left_plasma_boundary, n1, n2) private(rand_r, rand_z, n_in_macro)
-    for(int n = 0; n < number; n++)
+    for(unsigned int n = 0; n < number; n++)
     {
       rand_r = lib::random_reverse(n, 13);
       rand_z = lib::random_reverse(number - 1 - n, 11);
       pos[n][0] = (geom1->first_size - dr) * rand_r + dr / 2;
+      pos[n][1] = 0;
       n_in_macro = N_real_i * pos[n][0] / N_big_for_cell;
       charge_array[n] = charge * n_in_macro;
       mass_array[n] = mass * n_in_macro;
@@ -751,7 +764,7 @@ void Particles::j_weighting(Time *time1, Current *j1)
 #ifdef EXPERIMENTAL
 #pragma omp parallel for shared(dr, dz, time1, j1) default(none)
 #endif
-  for (int i=0;i<number;i++)
+  for (unsigned int i=0;i<number;i++)
     if (is_alive[i])
     {
       // double x1_old= x1_o[i];
@@ -962,7 +975,7 @@ void Particles::j_weighting(Time *time1, Current *j1)
     }
 
 }
-void Particles::azimuthal_j_weighting(Time *time1, Current *this_j)
+void Particles::azimuthal_j_weighting(Current *this_j)
 {
   double dr = geom1->dr;
   double dz = geom1->dz;
@@ -970,7 +983,7 @@ void Particles::azimuthal_j_weighting(Time *time1, Current *this_j)
 #ifdef EXPERIMENTAL
 #pragma omp parallel for shared(dr, dz, time1, this_j) default(none)
 #endif
-  for(int i=0;i<number;i++)
+  for(unsigned int i=0;i<number;i++)
     if (is_alive[i])
     {
       int r_i=0;  // number of particle i cell
@@ -1088,7 +1101,7 @@ void Particles::strict_motion_weighting(Time *time1,
 
   if ((abs(x1_new-x1_old)<1e-15)&&(abs(x3_new-x3_old)<1e-15))
   {
-    cerr<<"WARNING! zero velocity!" << endl;
+    // cerr<<"WARNING! zero velocity!" << endl; // TODO: why it is warning?
     return;
   }
   // stirct axis motion
@@ -1240,14 +1253,20 @@ void Particles::back_position_to_rz()
   //! implementation of backing coodrinates to rz pane
   //! taken from https://www.particleincell.com/2015/rz-pic/
 #pragma omp parallel for
-  for (int i=0; i<number; i++)
+  for (unsigned int i=0; i<number; i++)
     if (is_alive[i])
     {
+      // if (i == 12500 || i == 25000 || i == 37500)
+      // 	cout << "PRE: Particle number " << i << " has position/velocity " << pos[i][0] << "," << pos[i][2] << " " << vel[i][0] << "," << vel[i][2] << endl;
+      
       double r = sqrt(pos[i][0] * pos[i][0] + pos[i][1] * pos[i][1]);
       sin_theta_r[i] = pos[i][1]/r;
 
       pos[i][0] = r;
       pos[i][1] = 0;
+
+      // if (i == 12500 || i == 25000 || i == 37500)
+      // 	cout << "Particle number " << i << " has position/velocity " << pos[i][0] << "," << pos[i][2] << " " << vel[i][0] << "," << vel[i][2] << " " << r << endl;
     }
 }
 
@@ -1256,7 +1275,7 @@ void Particles::back_velocity_to_rz()
   //! implementation of backing velocities to rz pane
   //! taken from https://www.particleincell.com/2015/rz-pic/
 #pragma omp parallel for
-  for (int i=0; i<number; i++)
+  for (unsigned int i=0; i<number; i++)
     if (is_alive[i])
     {
       // rotate velocity
@@ -1271,7 +1290,7 @@ void Particles::back_velocity_to_rz()
 void Particles::dump_position_to_old()
 {
 #pragma omp parallel for
-  for (int i=0; i < number; i++)
+  for (unsigned int i=0; i < number; i++)
   {
     pos_old[i][0] = pos[i][0];
     pos_old[i][2] = pos[i][2];

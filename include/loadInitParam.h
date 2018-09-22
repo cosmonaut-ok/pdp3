@@ -11,6 +11,8 @@
 #define omp_get_thread_num() 0
 #endif
 
+#include "config.h"
+
 #include "math/fourier.h"
 
 #include "lib.h"
@@ -20,7 +22,11 @@
 #include "geometry.h"
 #include "hField.h"
 #include "ioText.h"
+
+#ifdef USE_HDF5
 #include "ioHDF5.h"
+#endif
+
 #include "particles.h"
 #include "particlesList.h"
 #include "pdp3Time.h"
@@ -48,6 +54,7 @@ public:
   // Time *c_time;
   Particles *c_part;
   vector<Bunch*> c_bunches;
+  unsigned int current_bunch_number;
   ParticlesList *p_list;
   EField *efield;
   HField *hfield;
