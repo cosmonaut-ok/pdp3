@@ -30,9 +30,9 @@ Bunch::Bunch(char *p_name,
   mass *= n_in_macro;
 
 #pragma omp parallel for
-  for(int i=0; i<number; i++)
+  for(unsigned int i=0; i<number; i++)
   {
-    is_alive[i] = 0;
+    is_alive[i] = false;
     vel[i][0]=0;
     vel[i][1]=0;
     vel[i][2]=0;
@@ -41,7 +41,8 @@ Bunch::Bunch(char *p_name,
   }
 }
 
-Bunch::~Bunch(void)
+// Destructor
+Bunch::~Bunch()
 {
 }
 
@@ -52,7 +53,7 @@ void Bunch::bunch_inject(Time *time)
 
   double dl = velocity * time->delta_t;
   int steps_amount = ceil(duration / time->delta_t);
-  int particles_in_step = number / steps_amount;
+  unsigned int particles_in_step = number / steps_amount;
   int start_number = (time->current_time - bunch_time_begin) / time->delta_t * particles_in_step;
 
   // very local constants
@@ -64,7 +65,7 @@ void Bunch::bunch_inject(Time *time)
 #pragma omp parallel shared(start_number, dl, half_r_cell_size_pow_2, half_z_cell_size, const1)
   {
 #pragma omp for
-    for(int i = 0; i < particles_in_step; i++)
+    for(unsigned int i = 0; i < particles_in_step; i++)
     {
       double rand_i = lib::random_reverse(start_number + i, 9); // TODO: why 9 and 11?
       double rand_z = lib::random_reverse(start_number + i, 11);
@@ -72,6 +73,7 @@ void Bunch::bunch_inject(Time *time)
       if (i+start_number < number)
       {
         pos[i+start_number][0] = sqrt(half_r_cell_size_pow_2 + const1 * rand_i);
+	pos[i+start_number][1] = 0;
         pos[i+start_number][2] = dl * rand_z + half_z_cell_size;
         vel[i+start_number][2] = velocity;
         vel[i+start_number][0] = 0;
@@ -89,7 +91,7 @@ void Bunch::bunch_inject(Time *time)
 void Bunch::reflection()
 {
 #pragma omp parallel for
-  for(int i=0; i<number; i++)
+  for(unsigned int i=0; i<number; i++)
     if (is_alive[i])
     {
       double dr = geom1->dr;
@@ -98,8 +100,6 @@ void Bunch::reflection()
       double x3_wall = geom1->second_size - dz/2.0;
       double half_dr = dr/2.0;
       double half_dz = dz/2.0;
-      double x1_wallX2 = x1_wall*2.0;
-      double x3_wallX2 = x3_wall*2.0;
 
       //! FIXME: fix wall reflections for r-position
       if (pos[i][0] > x1_wall)

@@ -29,7 +29,7 @@ Renew PDP3 project
 #### 0. INSTALL PREREQUIRED SOFTWARE
 
 ``` shell
-root@host# apt-get install build-essential git libhdf5-dev libhdf5-serial-dev
+root@host# apt-get install build-essential autotools git libhdf5-dev libhdf5-serial-dev
 ```
 
 #### 1. **CLONE PROJECT**

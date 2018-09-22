@@ -326,3 +326,6 @@ autom4te.cache/
 config.status
 configure
 parameters.xml
+test/functional/test.sh
+include/config.h
+include/config.h.in
