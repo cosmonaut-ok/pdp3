@@ -1,3 +1,4 @@
+#include "config.h"
 #include "loadInitParam.h"
 
 using namespace std;
@@ -40,6 +41,25 @@ int main(int argc, char **argv)
   {
     filename = (char*)"parameters.xml";
   }
+  
+  cout << endl;
+  cout << "Wellcome to " << PACKAGE_NAME << ", version: " << PACKAGE_VERSION << endl;
+  cout << endl;
+#ifdef EXPERIMENTAL
+  cerr << "WARNING! Experimental features enabled" << endl;
+#endif
+#ifdef DEBUG
+  cerr << "INFO! Running in debug mode" << endl;
+#endif
+#ifdef SINGLETHREAD
+  cerr << "INFO! Running in single-thread mode" << endl;
+#endif
+#ifdef SPEEDUP
+  cerr << "INFO! Running with fast-math option" << endl;
+#endif  
+#ifdef PROFILER
+  cerr << "INFO! Running with profiler" << endl;
+#endif  
 
   LoadInitParam init_param(filename);
 
