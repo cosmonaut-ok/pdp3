@@ -44,7 +44,7 @@ void ParticlesList::j_weighting(Time *time1, Current *j1)
 void ParticlesList::azimuthal_j_weighting(Time *time1, Current *j1)
 {
   for(std::size_t i=0; i<part_list.size(); i++)
-    part_list[i]->azimuthal_j_weighting(time1,j1);
+    part_list[i]->azimuthal_j_weighting(j1);
 }
 
 void ParticlesList::dump_position_to_old()
