@@ -172,4 +172,13 @@ public:
   void back_velocity_to_rz();
 
   void dump_position_to_old();
+
+  void step_v_single(EField *e_fld, HField *h_fld, Time *t, unsigned int i);
+  void dump_position_to_old_single(unsigned int i);
+  void half_step_pos_single(Time *t, unsigned int i);
+  void back_position_to_rz_single(unsigned int i);
+  void boris_pusher(EField *e_fld, HField *h_fld, Time *t);
+
+  void reflection_single(unsigned int i);
+  void move_half_reflect(Time *t);
 };
