@@ -1290,3 +1290,214 @@ void Particles::dump_position_to_old()
     pos_old[i][2] = pos[i][2];
   }
 }
+
+void Particles::step_v_single(EField *e_fld, HField *h_fld,
+                              Time *t, unsigned int i)
+{
+  //!
+  //! step_v
+  //!
+  // define vars directly in loop, because of multithreading
+  double gamma, const1, const2, sq_velocity;
+  // use classical calculations, if velocity lower, than minimal
+  double min_relativistic_velocity = 5e7;
+  bool use_rel; // use relativistic calculations
+
+  double* e;
+  double* b;
+  double vtmp[3];
+  double velocity[3];
+
+  // check if x1 and x3 are correct
+  if (isnan(pos[i][0]) ||
+      isinf(pos[i][0]) != 0 ||
+      isnan(pos[i][2]) ||
+      isinf(pos[i][2]) != 0)
+  {
+    cerr << "ERROR(step_v): x1[" << i << "] or x3[" << i << "] is not valid number. Can not continue." << endl;
+    exit(1);
+  }
+  //! \f$ const1 = \frac{q t}{2 m} \f$
+  //! where \f$ q, m \f$ - particle charge and mass, \f$ t = \frac{\Delta t_{step}}{2} \f$
+  const1 = charge_array[i]*t->delta_t/(2 * mass_array[i]);
+
+  e = e_fld->get_field(pos[i][0], pos[i][2]);
+  b = h_fld->get_field(pos[i][0], pos[i][2]);
+
+  tinyvec3d::tv_product(e, const1);
+  tinyvec3d::tv_product(b, MAGN_CONST * const1);
+
+  // set velocity vector components and
+  // round very small velicities to avoid exceptions
+  velocity[0] = (abs(vel[i][0]) < 1e-15) ? 0 : vel[i][0];
+  velocity[1] = (abs(vel[i][1]) < 1e-15) ? 0 : vel[i][1];
+  velocity[2] = (abs(vel[i][2]) < 1e-15) ? 0 : vel[i][2];
+
+  //! 0. check, if we should use classical calculations.
+  //! Required to increase modeling speed
+  gamma = 1;
+  if (velocity[0] > min_relativistic_velocity ||
+      velocity[1] > min_relativistic_velocity ||
+      velocity[2] > min_relativistic_velocity)
+    use_rel = true;
+
+  //! 1. Multiplication by relativistic factor (only for relativistic case)
+  //! \f$ u_{n-\frac{1}{2}} = \gamma_{n-\frac{1}{2}}*v_{n-\frac{1}{2}} \f$
+  if (use_rel)
+  {
+    sq_velocity = tinyvec3d::tv_squared_sum(velocity);
+    gamma = lib::get_gamma(sq_velocity);
+    tinyvec3d::tv_product(velocity, gamma);
+  }
+
+  //! 2. Half acceleration in the electric field
+  //! \f$ u'_n = u_{n-\frac{1}{2}} + \frac{q dt}{2 m  E(n)} \f$
+  //! \f$ u'_n = u_{n-1/2} + \frac{q dt}{2 m E(n)} \f$
+  tinyvec3d::tv_add(velocity, e);
+
+  //! 3. Rotation in the magnetic field
+  //! \f$ u" = u' + \frac{2}{1+B'^2}   [(u' + [u' \times B'(n)] ) \times B'(n)] \f$,
+  //! \f$  B'(n) = \frac{B(n) q dt}{2 m * \gamma_n} \f$
+  if (use_rel)
+  {
+    sq_velocity = tinyvec3d::tv_squared_sum(velocity);
+    gamma = lib::get_gamma_inv(sq_velocity);
+    tinyvec3d::tv_div(b, gamma);
+  }
+  //! \f$ const2 = \frac{2}{1 + b_1^2 + b_2^2 + b_3^2} \f$
+  const2 = 2.0 / (1.0 + tinyvec3d::tv_squared_sum(b));
+
+  // set temporary velocity as old values
+  // to calculate magnetic rotation
+  tinyvec3d::tv_copy_components(velocity, vtmp);
+
+  velocity[0] = vtmp[0] + const2 * (
+    (vtmp[1] - vtmp[0] * b[2] + vtmp[2] * b[0]) * b[2]
+    - (vtmp[2] + vtmp[0] * b[1] - vtmp[1] * b[0]) * b[1]
+    );
+  velocity[1] = vtmp[1] + const2 * (
+    -(vtmp[0] + vtmp[1] * b[2] - vtmp[2] * b[1]) * b[2]
+    + (vtmp[2] + vtmp[0] * b[1] - vtmp[1] * b[0]) * b[0]
+    );
+  velocity[2] = vtmp[2] + const2 * (
+    (vtmp[0] + vtmp[1] * b[2] - vtmp[2] * b[1]) * b[1]
+    - (vtmp[1] - vtmp[0] * b[2] + vtmp[2] * b[0]) * b[0]
+    );
+
+  //! 4. Half acceleration in the electric field
+  //! \f$ u_{n+\frac{1}{2}} = u_n + \frac{q dt}{2 m E(n)} \f$
+  tinyvec3d::tv_add(velocity, e);
+
+  //! 5. Division by relativistic factor
+  if (use_rel)
+  {
+    sq_velocity = tinyvec3d::tv_squared_sum(velocity);
+    gamma = lib::get_gamma_inv(sq_velocity);
+    tinyvec3d::tv_div(velocity, gamma);
+  }
+  vel[i][0] = velocity[0];
+  vel[i][1] = velocity[1];
+  vel[i][2] = velocity[2];
+
+  delete [] e;
+  delete [] b;
+}
+
+void Particles::dump_position_to_old_single(unsigned int i)
+{
+  pos_old[i][0] = pos[i][0];
+  pos_old[i][2] = pos[i][2];
+}
+
+void Particles::half_step_pos_single(Time *t, unsigned int i)
+{
+  double half_dt = t->delta_t/2.0;
+  // check if x1 and x3 are correct
+  if (isnan(pos[i][0]) || isinf(pos[i][0]) != 0 || isnan(pos[i][2]) || isinf(pos[i][2]) != 0)
+  {
+    cerr << "ERROR(half_step_pos): x1[" << i << "] or x3[" << i << "] is not valid number. Can not continue." << endl;
+    exit(1);
+  }
+  //
+  pos[i][0] = pos[i][0] + vel[i][0] * half_dt;
+  //! we use "fake" rotation component to correct position from xy to rz pane
+  pos[i][1] = pos[i][1] + vel[i][1] * half_dt;
+  pos[i][2] = pos[i][2] + vel[i][2] * half_dt;
+}
+
+void Particles::back_position_to_rz_single(unsigned int i)
+{
+  //! implementation of backing coodrinates to rz pane
+  //! taken from https://www.particleincell.com/2015/rz-pic/
+  double r = sqrt(pos[i][0] * pos[i][0] + pos[i][1] * pos[i][1]);
+  sin_theta_r[i] = pos[i][1]/r;
+  pos[i][0] = r;
+  pos[i][1] = 0;
+}
+
+void Particles::boris_pusher(EField *e_fld, HField *h_fld, Time *t)
+{
+#pragma omp parallel for shared(e_fld, h_fld, t)
+  for(unsigned int i=0; i<number; i++)
+  {
+    if (is_alive[i])
+    {
+      step_v_single(e_fld, h_fld, t, i);
+      //! dump position to old
+      dump_position_to_old_single(i);
+      //! half step position
+      half_step_pos_single(t, i);
+      //! back position to rz
+      back_position_to_rz_single(i);
+    }
+  }
+}
+
+void Particles::reflection_single(unsigned int i)
+{
+  double dr = geom1->dr;
+  double dz = geom1->dz;
+  double x1_wall = geom1->first_size - dr/2.0;
+  double x3_wall = geom1->second_size - dz/2.0;
+  double half_dr = dr/2.0;
+  double half_dz = dz/2.0;
+  double x1_wallX2 = x1_wall*2.0;
+  double x3_wallX2 = x3_wall*2.0;
+
+  //! FIXME: fix wall reflections for r-position
+  if (pos[i][0] > x1_wall)
+  {
+    pos[i][0] = x1_wallX2 - pos[i][0];
+    vel[i][0] = -vel[i][0];
+  }
+
+  if (pos[i][2] > x3_wall)
+  {
+    pos[i][2] = x3_wallX2 - pos[i][2];
+    vel[i][2] = -vel[i][2];
+  }
+
+  if (pos[i][0] < half_dr)
+  {
+    pos[i][0] = dr - pos[i][0];
+    vel[i][0] = -vel[i][0];
+  }
+
+  if (pos[i][2] < half_dz)
+  {
+    pos[i][2] = dz - pos[i][2];
+    vel[i][2] = -vel[i][2];
+  }
+}
+
+void Particles::move_half_reflect(Time *t)
+{
+#pragma omp parallel for shared(t)
+  for (unsigned int i=0; i < number; i++)
+    if (is_alive[i])
+    {
+      half_step_pos_single(t, i);
+      reflection_single(i);
+      back_position_to_rz_single(i);
+    }
+}
