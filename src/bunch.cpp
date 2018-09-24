@@ -88,36 +88,43 @@ void Bunch::bunch_inject(Time *time)
   }
 }
 
-void Bunch::reflection()
+void Bunch::reflection_single(unsigned int i)
 {
-#pragma omp parallel for
-  for(unsigned int i=0; i<number; i++)
-    if (is_alive[i])
-    {
-      double dr = geom1->dr;
-      double dz = geom1->dz;
-      double x1_wall = geom1->first_size - dr/2.0;
-      double x3_wall = geom1->second_size - dz/2.0;
-      double half_dr = dr/2.0;
-      double half_dz = dz/2.0;
+  double dr = geom1->dr;
+  double dz = geom1->dz;
+  double x1_wall = geom1->first_size - dr/2.0;
+  double x3_wall = geom1->second_size - dz/2.0;
+  double half_dr = dr/2.0;
+  double half_dz = dz/2.0;
 
-      //! FIXME: fix wall reflections for r-position
-      if (pos[i][0] > x1_wall)
-        is_alive[i] = false;
+  //! FIXME: fix wall reflections for r-position
+  if (pos[i][0] > x1_wall)
+    is_alive[i] = false;
 
-      if (pos[i][2] > x3_wall)
-        is_alive[i] = false;
+  if (pos[i][2] > x3_wall)
+    is_alive[i] = false;
 
-      if (pos[i][0] < half_dr)
-      {
-        pos[i][0] = dr - pos[i][0];
-        vel[i][0] = -vel[i][0];
-      }
+  if (pos[i][0] < half_dr)
+  {
+    pos[i][0] = dr - pos[i][0];
+    vel[i][0] = -vel[i][0];
+  }
 
-      if (pos[i][2] < half_dz)
-      {
-        pos[i][2] = dz - pos[i][2];
-        vel[i][2] = -vel[i][2];
-      }
-    }
+  if (pos[i][2] < half_dz)
+  {
+    pos[i][2] = dz - pos[i][2];
+    vel[i][2] = -vel[i][2];
+  }
 }
+
+// void Bunch::move_half_reflect(Time *t)
+// {
+// #pragma omp parallel for shared(t)
+//   for (unsigned int i=0; i < number; i++)
+//     if (is_alive[i])
+//     {
+//       half_step_pos_single(t, i);
+//       reflection_single(i);
+//       back_position_to_rz_single(i);
+//     }
+// }

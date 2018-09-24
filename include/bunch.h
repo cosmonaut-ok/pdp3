@@ -30,5 +30,5 @@ class Bunch : public Particles
                            EField  *E_bunch,
                            EField *E,
                            Time *time);
-  void reflection(void);
+  void reflection_single(unsigned int i);
 };
