@@ -382,29 +382,45 @@ void LoadInitParam::run(void)
     cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_rho_bunch->reset_rho" << endl;
     the_time = clock();
 #endif
-    p_list->step_v(efield, hfield, params->time);
-#ifdef DEBUG
-    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: p_list->step_v" << endl;
-    the_time = clock();
-#endif
 
-    //! 4. Calculate x, calculate J
-    p_list->dump_position_to_old();
-    // cout << 4 << endl;
-    //! FIXME: for some reason charge_weighting has no effect on result
-    // p_list->charge_weighting(c_rho_old); //continuity equation
-#ifdef DEBUG
-    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: p_list->dump_position_to_old" << endl;
-    the_time = clock();
-#endif
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
 
-    p_list->half_step_pos(params->time);
-    p_list->reflection();
-#ifdef DEBUG
-    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: p_list->half_step_pos" << endl;
-    the_time = clock();
-#endif
-    p_list->back_position_to_rz();
+    p_list->boris_pusher(efield, hfield, params->time);
+
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+
+//     p_list->step_v(efield, hfield, params->time);
+// #ifdef DEBUG
+//     cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: p_list->step_v" << endl;
+//     the_time = clock();
+// #endif
+
+//     //! 4. Calculate x, calculate J
+//     p_list->dump_position_to_old();
+//     // cout << 4 << endl;
+//     //! FIXME: for some reason charge_weighting has no effect on result
+//     // p_list->charge_weighting(c_rho_old); //continuity equation
+// #ifdef DEBUG
+//     cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: p_list->dump_position_to_old" << endl;
+//     the_time = clock();
+// #endif
+
+//     p_list->half_step_pos(params->time);
+//     p_list->reflection();
+// #ifdef DEBUG
+//     cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: p_list->half_step_pos" << endl;
+//     the_time = clock();
+// #endif
+//     p_list->back_position_to_rz();
+
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+
 #ifdef DEBUG
     cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: p_list->back_position_to_rz" << endl;
     the_time = clock();
@@ -416,17 +432,19 @@ void LoadInitParam::run(void)
     the_time = clock();
 #endif
 
-    p_list->half_step_pos(params->time);
-    p_list->reflection();
-#ifdef DEBUG
-    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: p_list->half_step_pos" << endl;
-    the_time = clock();
-#endif
-    p_list->back_position_to_rz();
-#ifdef DEBUG
-    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: p_list->back_position_to_rz" << endl;
-    the_time = clock();
-#endif
+    p_list->move_half_reflect(params->time);
+
+    // p_list->half_step_pos(params->time);
+    // p_list->reflection();
+// #ifdef DEBUG
+//     cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: p_list->half_step_pos" << endl;
+//     the_time = clock();
+// #endif
+//     p_list->back_position_to_rz();
+// #ifdef DEBUG
+//     cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: p_list->back_position_to_rz" << endl;
+//     the_time = clock();
+// #endif
 
     p_list->j_weighting(params->time, c_current);
 #ifdef DEBUG
