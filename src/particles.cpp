@@ -88,120 +88,6 @@ void Particles::set_x_0()
   }
 }
 
-void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
-{
-
-#pragma omp parallel for shared(e_fld, h_fld, t)
-  for(unsigned int i=0; i<number; i++)
-    if (is_alive[i])
-    {
-      // define vars directly in loop, because of multithreading
-      double gamma, const1, const2, sq_velocity;
-      // use classical calculations, if velocity lower, than minimal
-      double min_relativistic_velocity = 5e7;
-      bool use_rel; // use relativistic calculations
-
-      double* e;
-      double* b;
-      double vtmp[3];
-      double velocity[3];
-
-      // check if x1 and x3 are correct
-      if (isnan(pos[i][0]) ||
-          isinf(pos[i][0]) != 0 ||
-          isnan(pos[i][2]) ||
-          isinf(pos[i][2]) != 0)
-      {
-        cerr << "ERROR(step_v): x1[" << i << "] or x3[" << i << "] is not valid number. Can not continue." << endl;
-        exit(1);
-      }
-      //! \f$ const1 = \frac{q t}{2 m} \f$
-      //! where \f$ q, m \f$ - particle charge and mass, \f$ t = \frac{\Delta t_{step}}{2} \f$
-      const1 = charge_array[i]*t->delta_t/(2 * mass_array[i]);
-
-      e = e_fld->get_field(pos[i][0], pos[i][2]);
-      b = h_fld->get_field(pos[i][0], pos[i][2]);
-
-      tinyvec3d::tv_product(e, const1);
-      tinyvec3d::tv_product(b, MAGN_CONST * const1);
-
-      // set velocity vector components and
-      // round very small velicities to avoid exceptions
-      velocity[0] = (abs(vel[i][0]) < 1e-15) ? 0 : vel[i][0];
-      velocity[1] = (abs(vel[i][1]) < 1e-15) ? 0 : vel[i][1];
-      velocity[2] = (abs(vel[i][2]) < 1e-15) ? 0 : vel[i][2];
-
-      //! 0. check, if we should use classical calculations.
-      //! Required to increase modeling speed
-      gamma = 1;
-      if (velocity[0] > min_relativistic_velocity ||
-          velocity[1] > min_relativistic_velocity ||
-          velocity[2] > min_relativistic_velocity)
-        use_rel = true;
-
-      //! 1. Multiplication by relativistic factor (only for relativistic case)
-      //! \f$ u_{n-\frac{1}{2}} = \gamma_{n-\frac{1}{2}}*v_{n-\frac{1}{2}} \f$
-      if (use_rel)
-      {
-        sq_velocity = tinyvec3d::tv_squared_sum(velocity);
-        gamma = lib::get_gamma(sq_velocity);
-        tinyvec3d::tv_product(velocity, gamma);
-      }
-
-      //! 2. Half acceleration in the electric field
-      //! \f$ u'_n = u_{n-\frac{1}{2}} + \frac{q dt}{2 m  E(n)} \f$
-      //! \f$ u'_n = u_{n-1/2} + \frac{q dt}{2 m E(n)} \f$
-      tinyvec3d::tv_add(velocity, e);
-
-      //! 3. Rotation in the magnetic field
-      //! \f$ u" = u' + \frac{2}{1+B'^2}   [(u' + [u' \times B'(n)] ) \times B'(n)] \f$,
-      //! \f$  B'(n) = \frac{B(n) q dt}{2 m * \gamma_n} \f$
-      if (use_rel)
-      {
-        sq_velocity = tinyvec3d::tv_squared_sum(velocity);
-        gamma = lib::get_gamma_inv(sq_velocity);
-        tinyvec3d::tv_div(b, gamma);
-      }
-      //! \f$ const2 = \frac{2}{1 + b_1^2 + b_2^2 + b_3^2} \f$
-      const2 = 2.0 / (1.0 + tinyvec3d::tv_squared_sum(b));
-
-      // set temporary velocity as old values
-      // to calculate magnetic rotation
-      tinyvec3d::tv_copy_components(velocity, vtmp);
-
-      velocity[0] = vtmp[0] + const2 * (
-        (vtmp[1] - vtmp[0] * b[2] + vtmp[2] * b[0]) * b[2]
-        - (vtmp[2] + vtmp[0] * b[1] - vtmp[1] * b[0]) * b[1]
-        );
-      velocity[1] = vtmp[1] + const2 * (
-        -(vtmp[0] + vtmp[1] * b[2] - vtmp[2] * b[1]) * b[2]
-        + (vtmp[2] + vtmp[0] * b[1] - vtmp[1] * b[0]) * b[0]
-        );
-      velocity[2] = vtmp[2] + const2 * (
-        (vtmp[0] + vtmp[1] * b[2] - vtmp[2] * b[1]) * b[1]
-        - (vtmp[1] - vtmp[0] * b[2] + vtmp[2] * b[0]) * b[0]
-        );
-
-      //! 4. Half acceleration in the electric field
-      //! \f$ u_{n+\frac{1}{2}} = u_n + \frac{q dt}{2 m E(n)} \f$
-      tinyvec3d::tv_add(velocity, e);
-
-      //! 5. Division by relativistic factor
-      if (use_rel)
-      {
-        sq_velocity = tinyvec3d::tv_squared_sum(velocity);
-        gamma = lib::get_gamma_inv(sq_velocity);
-        tinyvec3d::tv_div(velocity, gamma);
-      }
-      vel[i][0] = velocity[0];
-      vel[i][1] = velocity[1];
-      vel[i][2] = velocity[2];
-
-      delete [] e;
-      delete [] b;
-    }
-}
-
 void Particles::reflection()
 {
 #pragma omp parallel for
@@ -482,7 +368,6 @@ void Particles::velocity_distribution(double tempr_ev)
   }
   delete []integ_array;
 }
-
 
 void Particles::load_spatial_distribution(double n1, double n2, double left_plasma_boundary, int type)
 //! calculate number of charged physical particles in macroparticle
@@ -974,8 +859,8 @@ void Particles::j_weighting(Time *time1, Current *j1)
         }
       }
     }
-
 }
+
 void Particles::azimuthal_j_weighting(Current *this_j)
 {
   double dr = geom1->dr;
@@ -1264,31 +1149,24 @@ void Particles::back_position_to_rz()
     }
 }
 
-void Particles::back_velocity_to_rz()
+void Particles::back_velocity_to_rz_single(unsigned int i)
 {
   //! implementation of backing velocities to rz pane
   //! taken from https://www.particleincell.com/2015/rz-pic/
+  // rotate velocity
+  cos_theta_r[i] = sqrt( 1 - sin_theta_r[i] * sin_theta_r[i] );
+  double u_2 = cos_theta_r[i]*vel[i][0] - sin_theta_r[i]*vel[i][1];
+  double v_2 = sin_theta_r[i]*vel[i][0] + cos_theta_r[i]*vel[i][1];
+  vel[i][0] = u_2;
+  vel[i][1] = v_2;
+}
+
+void Particles::back_velocity_to_rz()
+{
 #pragma omp parallel for
   for (unsigned int i=0; i<number; i++)
     if (is_alive[i])
-    {
-      // rotate velocity
-      cos_theta_r[i] = sqrt( 1 - sin_theta_r[i] * sin_theta_r[i] );
-      double u_2 = cos_theta_r[i]*vel[i][0] - sin_theta_r[i]*vel[i][1];
-      double v_2 = sin_theta_r[i]*vel[i][0] + cos_theta_r[i]*vel[i][1];
-      vel[i][0] = u_2;
-      vel[i][1] = v_2;
-    }
-}
-
-void Particles::dump_position_to_old()
-{
-#pragma omp parallel for
-  for (unsigned int i=0; i < number; i++)
-  {
-    pos_old[i][0] = pos[i][0];
-    pos_old[i][2] = pos[i][2];
-  }
+      back_velocity_to_rz_single(i);
 }
 
 void Particles::step_v_single(EField *e_fld, HField *h_fld,
@@ -1407,6 +1285,14 @@ void Particles::dump_position_to_old_single(unsigned int i)
 {
   pos_old[i][0] = pos[i][0];
   pos_old[i][2] = pos[i][2];
+}
+
+void Particles::dump_position_to_old()
+{
+#pragma omp parallel for
+  for (unsigned int i=0; i < number; i++)
+    if (is_alive[i])
+      dump_position_to_old_single(i);
 }
 
 void Particles::half_step_pos_single(Time *t, unsigned int i)
