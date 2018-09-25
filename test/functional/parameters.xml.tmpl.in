@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2011 rel. 2 -->
+<initial_parameters>
+
+  <debug>false</debug>
+  <use_hdf5>@HDF5_OPTION@</use_hdf5>
+
+  <geometry>
+    <r_size>0.25</r_size>
+    <z_size>2.0</z_size>
+    <debug_n_grid_r>15</debug_n_grid_r>
+    <debug_n_grid_z>127</debug_n_grid_z>
+    <n_grid_r>255</n_grid_r>
+    <n_grid_z>2047</n_grid_z>
+  </geometry>
+
+  <pml>
+    <comparative_l_1>0</comparative_l_1>
+    <comparative_l_2>0</comparative_l_2>
+    <comparative_l_3>0</comparative_l_3>
+    <sigma_1>1e-5</sigma_1>
+    <sigma_2>7e-2</sigma_2>
+  </pml>
+
+  <time>
+    <start_time> 0 </start_time>
+    <relaxation_time> 0 </relaxation_time>
+    <current_time> 0 </current_time>
+    <end_time>2.2e-11</end_time>
+    <step_interval>1e-12</step_interval>
+  </time>
+
+  <particles>
+    <particle_specie name="Electrons">
+      <charge>-1</charge>
+      <mass>1</mass>
+      <number_macro>1e5</number_macro>
+      <debug_number_macro>1e5</debug_number_macro>
+      <left_density>2e16</left_density>
+      <right_density>2.05e16</right_density>
+      <temperature>1.0</temperature>
+    </particle_specie>
+
+    <particle_specie name="Ions">
+      <charge>1</charge>
+      <mass>1836</mass>
+      <number_macro>1e5</number_macro>
+      <debug_number_macro>1e5</debug_number_macro>
+      <left_density>2e16</left_density>
+      <right_density>2.05e16</right_density>
+      <temperature>0.1</temperature>
+    </particle_specie>
+  </particles>
+
+  <particle_beam name="Beam">
+    <charge>-1</charge>
+    <mass>1</mass>
+    <initial_velocity>2e8</initial_velocity>
+    <number_bunches>1</number_bunches> <!-- NOT IMPLEMENTED -->
+    <bunches_distance>0.02</bunches_distance> <!-- NOT IMPLEMENTED -->
+
+    <bunch_number_macro>1e6</bunch_number_macro> <!-- number of macroparticles in one bunch -->
+    <debug_bunch_number_macro>1e4</debug_bunch_number_macro>
+    <!-- <duration>1e-10</duration> -->
+
+    <bunch_length>2</bunch_length>
+    <bunch_radius>0.02</bunch_radius>
+    <bunch_density>1e15</bunch_density>
+  </particle_beam>
+
+  <boundary_maxwell_conditions>
+    <e_fi_upper>0</e_fi_upper>
+    <e_fi_left>0</e_fi_left>
+    <e_fi_right>0</e_fi_right>
+  </boundary_maxwell_conditions>
+
+  <boundary_conditions type = "dirichlet">0</boundary_conditions>
+
+  <file_save_parameters>
+    <result_path>pdp3_result/</result_path>
+    <save_state_path>pdp3_result/dump/</save_state_path>
+    <debug_data_dump_interval>5</debug_data_dump_interval>
+    <data_dump_interval>5</data_dump_interval>
+    <frames_per_file>1</frames_per_file>
+    <system_state_dump_interval>0</system_state_dump_interval>
+    <dump_data>
+      <E_r>true</E_r>
+      <E_phi>false</E_phi>
+      <E_z>true</E_z>
+      <H_r>false</H_r>
+      <H_phi>false</H_phi>
+      <H_z>false</H_z>
+      <J_r>true</J_r>
+      <J_phi>false</J_phi>
+      <J_z>true</J_z>
+
+      <position>false</position>
+
+      <velocity>false</velocity>
+
+      <rho_bunch>true</rho_bunch>
+    </dump_data>
+  </file_save_parameters>
+
+  <plot>
+    <figure>
+      <color>None</color>
+      <width>10.5</width>
+      <height>7</height>
+      <dpi>100</dpi>
+      <font>
+        <name>DejaVu Sans</name>
+        <family>sans-serif</family>
+        <size>10</size>
+      </font>
+    </figure>
+    <video>
+      <codec>mjpeg</codec>
+      <fps>20</fps>
+      <bitrate>32000</bitrate>
+    </video>
+  </plot>
+
+</initial_parameters>
