@@ -119,3 +119,5 @@ fi
 AC_OUTPUT(Makefile)
 AC_OUTPUT(parameters.xml)
 AC_OUTPUT(test/functional/test.sh)
+AC_OUTPUT(test/functional/parameters.xml.tmpl)
+AC_OUTPUT(test/functional/parameters_ext.xml.tmpl)
