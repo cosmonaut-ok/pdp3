@@ -116,15 +116,3 @@ void Bunch::reflection_single(unsigned int i)
     vel[i][2] = -vel[i][2];
   }
 }
-
-// void Bunch::move_half_reflect(Time *t)
-// {
-// #pragma omp parallel for shared(t)
-//   for (unsigned int i=0; i < number; i++)
-//     if (is_alive[i])
-//     {
-//       half_step_pos_single(t, i);
-//       reflection_single(i);
-//       back_position_to_rz_single(i);
-//     }
-// }

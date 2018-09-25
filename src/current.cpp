@@ -8,9 +8,9 @@ Current::Current(Geometry *geom1_t): geom1(geom1_t)
 {
   //// jr
   // n_grid - number of edges
-  j1 = new double*[geom1->n_grid_1-1];
+  j1 = new double*[geom1->n_grid_1];
 #pragma omp parallel for
-  for (int i=0; i<(geom1->n_grid_1-1);i++)
+  for (int i=0; i<(geom1->n_grid_1);i++)
     j1[i]= new double[geom1->n_grid_2];
 
   //// jfi
@@ -23,13 +23,13 @@ Current::Current(Geometry *geom1_t): geom1(geom1_t)
   j3 = new double*[geom1->n_grid_1];
 #pragma omp parallel for
   for (int i=0; i<(geom1->n_grid_1);i++)
-    j3[i]= new double[geom1->n_grid_2-1];
+    j3[i]= new double[geom1->n_grid_2];
 
   j1_1d = new double[(geom1->n_grid_1-1)*geom1->n_grid_2];
 
   j2_1d = new double[geom1->n_grid_1*geom1->n_grid_2];
 
-  j3_1d = new double[geom1->n_grid_1*(geom1->n_grid_2-1)];
+  j3_1d = new double[geom1->n_grid_1*(geom1->n_grid_2)];
 
   // initialization
 #pragma omp parallel for
@@ -177,25 +177,12 @@ void Current::set_j3(int i, int k, double value)
 
 void Current::reset_j()
 {
-#pragma omp parallel
-  {
-#pragma omp for
-    for (int i=0; i<(geom1->n_grid_1-1); i++)
-      for (int k=0; k<(geom1->n_grid_2-1); k++)
-      {
-        j1[i][k]=0;
-        j3[i][k]=0;
-      }
-#pragma omp for
-    for (int i=0; i<geom1->n_grid_1; i++)
-      for (int k=0; k<geom1->n_grid_2; k++)
-        j2[i][k] = 0.0;
-#pragma omp for
-    for (int i=0; i<(geom1->n_grid_1-1); i++)
-      j1[i][geom1->n_grid_2-1]=0;
-
-#pragma omp for
-    for(int i=0; i<(geom1->n_grid_2-1); i++)
-      j3[geom1->n_grid_1-1][i]=0;
-  }
+#pragma omp parallel for
+  for (int i=0; i<(geom1->n_grid_1); i++)
+    for (int k=0; k<(geom1->n_grid_2); k++)
+    {
+      j1[i][k] = 0;
+      j2[i][k] = 0;
+      j3[i][k] = 0;
+    }
 }
