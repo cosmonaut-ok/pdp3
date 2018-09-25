@@ -130,42 +130,39 @@ void LoadInitParam::init_beam()
   strcat(current_bunch_name, "#");
   strcat(current_bunch_name, cbn_str_int);
 
-
-
   double estimated_bunch_erase_number = (
     params->time->current_time
     - params->geom->second_size / params->beam_initial_velocity
     - duration )
     / (duration + hole_duration);
 
-
   // erase gone bunches
   if (c_bunches.size() > 1) { // strange gcc behavior: size of empty vector of instance references is not zero
     for (auto i = c_bunches.begin(); i != c_bunches.end(); ++i)
+    {
+      Bunch *cb = *i;
+      if (cb->bunch_number < estimated_bunch_erase_number)
       {
-	Bunch *cb = *i;
-	if (cb->bunch_number < estimated_bunch_erase_number)
-	  {
-	    bool is_dead = true;
-	    for (unsigned int i; i < cb->number; ++i)
-	      if (cb->is_alive[i])
-		{
-		  is_dead = false;
-		  break;
-		}
-	    if (is_dead)
+        bool is_dead = true;
+        for (unsigned int i; i < cb->number; ++i)
+          if (cb->is_alive[i])
+          {
+            is_dead = false;
+            break;
+          }
+        if (is_dead)
 	      {
 #ifdef DEBUG
-		cerr << "Bunch #" << cb->bunch_number << " is out of simulation. Clearing" << endl;
+          cerr << "Bunch #" << cb->bunch_number << " is out of simulation. Clearing" << endl;
 #endif
-		for (auto k = p_list->part_list.begin(); k != p_list->part_list.end(); ++k)
-		  if (*i == *k)
-		    p_list->part_list.erase(k);
-		c_bunches.erase(i);
-		delete cb;
+          for (auto k = p_list->part_list.begin(); k != p_list->part_list.end(); ++k)
+            if (*i == *k)
+              p_list->part_list.erase(k);
+          c_bunches.erase(i);
+          delete cb;
 	      }
-	  }
       }
+    }
   }
   if (params->time->current_time >= bunch_inject_time // it's not equality, because of distreate simulation nature
       && current_bunch_number < params->beam_number_bunches)
@@ -353,7 +350,6 @@ void LoadInitParam::run(void)
 
     //! 1. inject beam
     init_beam();
-
 #ifdef DEBUG
     cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_bunches[i]->bunch_inject" << endl;
     the_time = clock();
@@ -372,11 +368,13 @@ void LoadInitParam::run(void)
     cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_current->reset_j" << endl;
     the_time = clock();
 #endif
+
     c_rho_old->reset_rho();
 #ifdef DEBUG
     cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_rho_old->reset_rho" << endl;
     the_time = clock();
 #endif
+
     c_rho_bunch->reset_rho();
 #ifdef DEBUG
     cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_rho_bunch->reset_rho" << endl;

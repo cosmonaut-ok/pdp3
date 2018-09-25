@@ -31,4 +31,5 @@ class Bunch : public Particles
                            EField *E,
                            Time *time);
   void reflection_single(unsigned int i);
+  void move_half_reflect(Time *t);
 };
