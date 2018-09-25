@@ -132,8 +132,8 @@ void HField::calc_field(EField *e_field1, Time *time1)
     field_r[i][k] = field_r[i][k]+alpha*time1->delta_t;
   }
 
-  for(int i=0;i<(geom1->n_grid_1-1);i++)
-    for(int k=0;k<(geom1->n_grid_2-1);k++)
+  for(int i=0; i<(geom1->n_grid_1 - 1); i++)
+    for(int k=0; k<(geom1->n_grid_2 - 1); k++)
     {
       alpha=((e_field1->field_phi[i][k+1]-e_field1->field_phi[i][k])/geom1->dz)/MAGN_CONST;
 
@@ -152,7 +152,6 @@ void HField::calc_field(EField *e_field1, Time *time1)
 
     }
 }
-
 
 double* HField::get_field(double x1, double x3)
 //! function for magnetic field weighting
