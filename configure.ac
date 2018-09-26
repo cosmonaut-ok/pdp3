@@ -9,7 +9,7 @@ AC_INIT(pdp3, esyscmd(git log --pretty=%h -1 | tr -d \\n), cosmonaut.ok@zoho.com
 AC_CONFIG_HEADERS([include/config.h])
 AC_OUTPUT
 
-dnl m4_pattern_allow([^AC_])
+m4_pattern_allow([^AC_])
 
 dnl AC_CONFIG_AUX_DIR([acdir])
 dnl AC_CONFIG_MACRO_DIR([acdir])
@@ -17,7 +17,7 @@ dnl AC_CONFIG_MACRO_DIR([acdir])
 # AC_CANONICAL_SYSTEM
 
 AC_SUBST(EXPERIMENTAL_OPTION)
-AC_SUBST(SPEEDUP)
+AC_SUBST(IEEE)
 AC_SUBST(DEBUG)
 AC_SUBST(SINGLETHREAD)
 AC_SUBST(HDF5)
@@ -26,6 +26,8 @@ AC_SUBST(CFLAGS_ADDITIONAL)
 AC_SUBST(LDFLAGS_ADDITIONAL)
 AC_SUBST(DOXYGEN_FORMATS)
 AC_SUBST(HDF5_OPTION)
+AC_SUBST(PUSHER)
+AC_SUBST(OMP_DYNAMIC)
 AC_SUBST(DEBUG_OPTION)
 AC_SUBST(PROFILER)
 # AC_SUBST(PROFILER_OPTION)
@@ -44,13 +46,15 @@ RELEASE=${PACKAGE_VERSION}
 AC_ARG_ENABLE([experimental], [AC_HELP_STRING([--enable-experimental], [Enable experimental features (only for debug/development)])], [ENABLE_EXPERIMENTAL="$enableval"], [ENABLE_EXPERIMENTAL=no])
 AC_ARG_ENABLE([debug], [AC_HELP_STRING([--enable-debug], [Enable debug (optimized for GDB)])], [DEBUG="$enableval"], [DEBUG=no])
 AC_ARG_ENABLE([profiler], [AC_HELP_STRING([--enable-profiler], [Enable profiler support for performance debug])], [PROFILER="$enableval"], [PROFILER=no])
-AC_ARG_ENABLE([speedup], [AC_HELP_STRING([--enable-speedup], [Enable speedup])], [SPEEDUP="$enableval"], [SPEEDUP=no])
+AC_ARG_ENABLE([ieee], [AC_HELP_STRING([--enable-ieee], [Enable speedup])], [IEEE="$enableval"], [IEEE=no])
 AC_ARG_ENABLE([singlethread], [AC_HELP_STRING([--enable-singlethread], [Build application to run in single-thread mode (used in debug by default)])], [SINGLETHREAD="$enableval"], [SINGLETHREAD=${DEBUG}])
+AC_ARG_ENABLE([omp_dynamic], [AC_HELP_STRING([--enable-omp-dynamic], [Enable openmp dynamic thread creation])], [OMP_DYNAMIC="$enableval"], [OMP_DYNAMIC=no])
 
 AC_ARG_ENABLE([hdf5], [AC_HELP_STRING([--enable-hdf5], [Build application with hdf5_serial library support])], [HDF5="$enableval"], [HDF5=no])
 
 AC_ARG_WITH([doc-formats], [AC_HELP_STRING([--with-doc-formats], [Set list of documentation formats to be generated])], [DOXYGEN_FORMATS="$withval"], [DOXYGEN_FORMATS="latex html rtf"])
 AC_ARG_WITH([result-dir], [AC_HELP_STRING([--with-result-dir], [Set default result directory])], [RESULT_DIR="$withval"], [RESULT_DIR="pdp3_result"])
+AC_ARG_WITH([pusher], [AC_HELP_STRING([--with-pusher], [Set particles pusher (supported: boris-adaptive (default), boris, boris-relativistic, vai (n/a), hc (n/a), rrll (n/a))])], [PUSHER="$withval"], [PUSHER="boris-adaptive"])
 
 AC_PROG_CXXCPP
 AC_LANG(C++)
@@ -77,7 +81,7 @@ if test x$ENABLE_EXPERIMENTAL = xyes; then
 fi
 
 # speedup
-if test x$SPEEDUP = xyes; then
+if test x$IEEE != xyes; then
   CFLAGS_ADDITIONAL="$CFLAGS_ADDITIONAL -ffast-math -O3 -march=native -funroll-loops -Wno-write-strings -freciprocal-math -fcx-fortran-rules -msse"
   AC_DEFINE([SPEEDUP], [true], [Directive to increase calculation speed])
 else
@@ -101,7 +105,7 @@ else
   DEBUG_OPTION=false
 fi
 
-# debug
+# profiler
 if test x$PROFILER = xyes; then
   CFLAGS_ADDITIONAL="$CFLAGS_ADDITIONAL -pg -no-pie"
   LDFLAGS_ADDITIONAL="$LDFLAGS_ADDITIONAL -pg -no-pie"
@@ -113,6 +117,22 @@ if test x$HDF5 = xyes; then
    AC_DEFINE([USE_HDF5], [true], [Use HDF5])
 else
    HDF5_OPTION=false
+fi
+
+# define a pusher
+if test x$PUSHER == xboris-adaptive; then
+   AC_DEFINE_UNQUOTED([PUSHER_BORIS_ADAPTIVE], [true], [Performance debug option])
+   AC_DEFINE([REL_LIMIT], [5e7], [Relativistit calculations limit (for boris-adaptive pusher)])
+elif test x$PUSHER == xboris; then
+   AC_DEFINE_UNQUOTED([PUSHER_BORIS_CLASSIC], [true], [Performance debug option])
+elif test x$PUSHER == xboris-relativistic; then
+   AC_DEFINE_UNQUOTED([PUSHER_BORIS_RELATIVISTIC], [true], [Performance debug option])
+else
+   AC_MSG_ERROR([Pusher is not supported.])
+fi
+
+if test x$OMP_DYNAMIC == xyes; then
+   AC_DEFINE([OPENMP_DYNAMIC_THREADS], [true], [Set OpenMP threads to be created dynamically])
 fi
 
 # Checks for library functions.

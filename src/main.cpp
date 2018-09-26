@@ -59,7 +59,16 @@ int main(int argc, char **argv)
 #endif  
 #ifdef PROFILER
   cerr << "INFO! Running with profiler" << endl;
-#endif  
+#endif
+#ifdef PUSHER_BORIS_CLASSIC
+  cerr << "INFO! Using non-relativistig boris particles pusher" << endl;
+#endif
+#ifdef PUSHER_BORIS_ADAPTIVE
+  cerr << "INFO! Using adaptive boris particles pusher" << endl;
+#endif
+#ifdef PUSHER_BORIS_RELATIVISTIC
+  cerr << "INFO! Using fully-relativistic boris particles pusher" << endl;
+#endif
 
   LoadInitParam init_param(filename);
 
