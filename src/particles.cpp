@@ -4,6 +4,13 @@ using namespace std;
 using namespace constant;
 using namespace math;
 
+// use classical calculations, if velocity lower, than minimal
+#ifndef REL_LIMIT
+#define REL_LIMIT 5e7
+#endif
+// define REL_LIMIT^2 to decrease number of operations
+const double REL_LIMIT_POW_2 = pow (REL_LIMIT, 2);
+
 // C^2 define c^2 to decrease number of operations
 const double LIGHT_SPEED_POW_2 = pow (LIGHT_SPEED, 2);
 
@@ -1176,10 +1183,13 @@ void Particles::step_v_single(EField *e_fld, HField *h_fld,
   //! step_v
   //!
   // define vars directly in loop, because of multithreading
-  double gamma, const1, const2, sq_velocity;
-  // use classical calculations, if velocity lower, than minimal
-  double min_relativistic_velocity = 5e7;
+  double const1, const2, sq_velocity;
+#ifdef PUSHER_BORIS_ADAPTIVE
   bool use_rel; // use relativistic calculations
+#endif
+#ifndef PUSHER_BORIS_CLASSIC // do not use gamma in non-relativistic boris pusher
+  double gamma = 1;
+#endif
 
   double* e;
   double* b;
@@ -1213,20 +1223,23 @@ void Particles::step_v_single(EField *e_fld, HField *h_fld,
 
   //! 0. check, if we should use classical calculations.
   //! Required to increase modeling speed
-  gamma = 1;
-  if (velocity[0] > min_relativistic_velocity ||
-      velocity[1] > min_relativistic_velocity ||
-      velocity[2] > min_relativistic_velocity)
+#ifdef PUSHER_BORIS_ADAPTIVE
+  if (pow(velocity[0], 2) + pow(velocity[1], 2) + pow(velocity[2], 2) > REL_LIMIT_POW_2)
     use_rel = true;
+#endif
 
   //! 1. Multiplication by relativistic factor (only for relativistic case)
   //! \f$ u_{n-\frac{1}{2}} = \gamma_{n-\frac{1}{2}}*v_{n-\frac{1}{2}} \f$
+#ifdef PUSHER_BORIS_ADAPTIVE
   if (use_rel)
+#endif
+#if defined (PUSHER_BORIS_RELATIVISTIC) || defined (PUSHER_BORIS_ADAPTIVE)
   {
     sq_velocity = tinyvec3d::tv_squared_sum(velocity);
     gamma = lib::get_gamma(sq_velocity);
     tinyvec3d::tv_product(velocity, gamma);
   }
+#endif
 
   //! 2. Half acceleration in the electric field
   //! \f$ u'_n = u_{n-\frac{1}{2}} + \frac{q dt}{2 m  E(n)} \f$
@@ -1236,12 +1249,16 @@ void Particles::step_v_single(EField *e_fld, HField *h_fld,
   //! 3. Rotation in the magnetic field
   //! \f$ u" = u' + \frac{2}{1+B'^2}   [(u' + [u' \times B'(n)] ) \times B'(n)] \f$,
   //! \f$  B'(n) = \frac{B(n) q dt}{2 m * \gamma_n} \f$
+#ifdef PUSHER_BORIS_ADAPTIVE
   if (use_rel)
+#endif
+#if defined (PUSHER_BORIS_RELATIVISTIC) || defined (PUSHER_BORIS_ADAPTIVE)
   {
     sq_velocity = tinyvec3d::tv_squared_sum(velocity);
     gamma = lib::get_gamma_inv(sq_velocity);
     tinyvec3d::tv_div(b, gamma);
   }
+#endif
   //! \f$ const2 = \frac{2}{1 + b_1^2 + b_2^2 + b_3^2} \f$
   const2 = 2.0 / (1.0 + tinyvec3d::tv_squared_sum(b));
 
@@ -1267,12 +1284,16 @@ void Particles::step_v_single(EField *e_fld, HField *h_fld,
   tinyvec3d::tv_add(velocity, e);
 
   //! 5. Division by relativistic factor
+#ifdef PUSHER_BORIS_ADAPTIVE
   if (use_rel)
+#endif
+#if defined (PUSHER_BORIS_RELATIVISTIC) || defined (PUSHER_BORIS_ADAPTIVE)
   {
     sq_velocity = tinyvec3d::tv_squared_sum(velocity);
     gamma = lib::get_gamma_inv(sq_velocity);
     tinyvec3d::tv_div(velocity, gamma);
   }
+#endif
   vel[i][0] = velocity[0];
   vel[i][1] = velocity[1];
   vel[i][2] = velocity[2];
