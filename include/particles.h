@@ -8,6 +8,8 @@
 
 #include "tinyvec3d.h"
 
+#include "config.h"
+
 #include "lib.h"
 #include "constant.h"
 

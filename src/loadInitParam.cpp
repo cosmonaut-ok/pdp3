@@ -20,7 +20,8 @@ LoadInitParam::LoadInitParam(char *xml_file_name)
 // define openmp-related options when openmp enabled
 #ifdef _OPENMP
 #ifdef OPENMP_DYNAMIC_THREADS
-  omp_set_dynamic(1); // Explicitly disable dynamic teams
+  omp_set_dynamic(1); // Explicitly enable dynamic teams
+  cerr << "INFO! Number of calculation processors changing dynamically" << endl;
 #else
   int cores = omp_get_num_procs();
   cerr << "INFO! Number of calculation processors: " << cores << endl;
@@ -28,6 +29,7 @@ LoadInitParam::LoadInitParam(char *xml_file_name)
   omp_set_num_threads(cores); // Use 4 threads for all consecutive parallel regions
 #endif
 #endif
+  cerr << endl;
 
   //! Steps to initialize:
 
