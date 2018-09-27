@@ -1,13 +1,27 @@
-#!/bin/bash
+#!/bin/bash -xe
 
-cd $(dirname ${1})
+SCRIPT_PATH=${1}
 
-TMPFILE=`mktemp .nbrunXXXXXXXX.py`
-jupyter nbconvert $(basename ${1}) --stdout --to python | sed '/get_ipython/d' > $TMPFILE
+shift
 
-echo  >> $TMPFILE
-echo 'input("Please press RETURN to exit ")' >> $TMPFILE
+cd $(dirname ${SCRIPT_PATH})
 
-python $TMPFILE
+TMPFILE=`mktemp .nbrunXXXXXXXX.ipynb`
 
-rm -f $TMPFILE
+cp -f $(basename ${SCRIPT_PATH}) $TMPFILE
+
+for i in "$@"; do
+    VAR=$(echo $i | cut -d'=' -f1)
+    VAL=$(echo $i | cut -d'=' -f2)
+    # echo "var:" $VAR and "val:" $VAL
+    sed -i "s|\"${VAR}.*=.*\\\\n\"|\"${VAR}=${VAL}\\\\n\"|g" $TMPFILE
+done
+
+jupyter nbconvert ${TMPFILE} --stdout --to python | sed '/get_ipython/d' > ${TMPFILE}.py
+
+echo  >> ${TMPFILE}.py
+echo 'input("Please press RETURN to exit ")' >> ${TMPFILE}.py
+
+python ${TMPFILE}.py
+
+rm -f $TMPFILE ${TMPFILE}.py
