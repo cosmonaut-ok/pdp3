@@ -6,8 +6,8 @@ IOHDF5::IOHDF5(void)
 
 IOHDF5::IOHDF5(char *c_pathres, char *c_pathdump)
 {
-  hid_t file_id;
-  herr_t status;
+  // hid_t file_id;
+  // herr_t status;
   hid_t gcpl;
 
   strcpy(path_result, c_pathres);
@@ -32,11 +32,12 @@ IOHDF5::IOHDF5(char *c_pathres, char *c_pathdump)
   gcpl = H5Pcreate (H5P_LINK_CREATE);
   status = H5Pset_create_intermediate_group (gcpl, 1);
 
-  status = H5Fclose(file_id);
+  // status = H5Fclose(file_id);
 }
 
 IOHDF5::~IOHDF5(void)
 {
+  status = H5Fclose(file_id);
 }
 
 hid_t IOHDF5::create_or_open_h5_group(hid_t file_id, char const *group_name)
@@ -81,7 +82,7 @@ void IOHDF5::dump_h5_dataset(char const *group_name,
                              int z_step)
 {
   herr_t status;
-  hid_t file_id, group_id, dataset, datatype, dataspace;   /* declare identifiers */
+  hid_t group_id, dataset, datatype, dataspace;   /* declare identifiers */
   hsize_t dimsf[2];              /* dataset dimensions */
 
   char dataset_name[200];
@@ -92,7 +93,7 @@ void IOHDF5::dump_h5_dataset(char const *group_name,
     for (int j=0; j< z_step; j++)
       dv[i][j] = out_value[i][j];
 
-  file_id = H5Fopen (hdf5_file, H5F_ACC_RDWR, H5P_DEFAULT);
+  // file_id = H5Fopen (hdf5_file, H5F_ACC_RDWR, H5P_DEFAULT);
 
   group_id = create_or_open_h5_group(file_id, group_name);
 
@@ -128,7 +129,7 @@ void IOHDF5::dump_h5_dataset(char const *group_name,
   status = H5Tclose(datatype);
   status = H5Dclose(dataset);
   status = H5Gclose(group_id);
-  status = H5Fclose(file_id);
+  // status = H5Fclose(file_id);
 }
 
 void IOHDF5::dump_h5_nd_components(char const *group_name,
@@ -139,13 +140,13 @@ void IOHDF5::dump_h5_nd_components(char const *group_name,
 //! dump array from N-dimensional vectors
 {
   herr_t status;
-  hid_t file_id, group_id, dataset, datatype, dataspace;
+  hid_t group_id, dataset, datatype, dataspace;
   hsize_t dimsf[size];
 
   char dataset_name[200];
   sprintf(dataset_name, "%s/%s", group_name, name);
 
-  file_id = H5Fopen (hdf5_file, H5F_ACC_RDWR, H5P_DEFAULT);
+  // file_id = H5Fopen (hdf5_file, H5F_ACC_RDWR, H5P_DEFAULT);
 
   group_id = create_or_open_h5_group(file_id, group_name);
 
@@ -180,7 +181,7 @@ void IOHDF5::dump_h5_nd_components(char const *group_name,
   status = H5Tclose(datatype);
   status = H5Dclose(dataset);
   status = H5Gclose(group_id);
-  status = H5Fclose(file_id);
+  // status = H5Fclose(file_id);
 }
 
 void IOHDF5::out_data(char const *comp_name,
@@ -243,12 +244,12 @@ void IOHDF5::out_velocity_dump(char *comp_name,
 
 void IOHDF5::out_current_time_dump(double current_time)
 {
-  hid_t file_id, attribute_id, dataspace_id, group_id;
+  hid_t attribute_id, dataspace_id, group_id;
   hsize_t dims;
   double attr_data[1];
   herr_t status;
 
-  file_id = H5Fopen (hdf5_file, H5F_ACC_RDWR, H5P_DEFAULT);
+  // file_id = H5Fopen (hdf5_file, H5F_ACC_RDWR, H5P_DEFAULT);
 
   group_id = create_or_open_h5_group(file_id, state_group_name);
 
@@ -278,9 +279,9 @@ void IOHDF5::out_current_time_dump(double current_time)
   /* Write the attribute data. */
   status = H5Awrite(attribute_id, H5T_NATIVE_DOUBLE, attr_data);
 
-  /* Close the attribute. */
-  status = H5Aclose(attribute_id);
+  // /* Close the attribute. */
+  // status = H5Aclose(attribute_id);
 
-  /* Close the dataspace. */
-  status = H5Sclose(dataspace_id);
+  // /* Close the dataspace. */
+  // status = H5Sclose(dataspace_id);
 }
