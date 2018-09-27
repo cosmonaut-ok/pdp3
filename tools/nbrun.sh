@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 
 function usage () {
     echo "USAGE: ${0} <path/to/notebook.ipynb> [-batch] [some variables, used in notebook in format: variable1=value1 variable2=value2]"
