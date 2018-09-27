@@ -21,7 +21,8 @@ private:
   char result_group_name[100];
   char state_group_name[100];
 
-  // hid_t file_id;
+  hid_t file_id;
+  herr_t status;
   /* hid_t root_group_id; */
   /* hid_t result_group_id; */
   /* hid_t dump_group_id; */
