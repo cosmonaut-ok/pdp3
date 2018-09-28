@@ -33,7 +33,7 @@ private:
 
 public:
   IOText(void);
-  IOText(char *cpathres,char *cpathdump);
+  IOText(char *cpathres,char *cpathdump, bool c_compress);
   ~IOText(void);
 
   void out_data(char const *comp_name,
