@@ -83,6 +83,9 @@
     <data_dump_interval>5</data_dump_interval>
     <frames_per_file>1</frames_per_file>
     <system_state_dump_interval>0</system_state_dump_interval>
+    <compress>false</compress>
+    <compress_level>1</compress_level>
+
     <dump_data>
       <E_r>true</E_r>
       <E_phi>false</E_phi>
