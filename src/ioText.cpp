@@ -4,10 +4,12 @@ IOText::IOText(void)
 {
 }
 
-IOText::IOText(char *c_pathres,char *c_pathdump)
+IOText::IOText(char *c_pathres,char *c_pathdump, bool c_compress)
 {
   strcpy(path_result, c_pathres);
   strcpy(path_dump, c_pathdump);
+  if (c_compress)
+    cerr << "WARNING! compression is not supported by this backend" << endl;
 }
 
 

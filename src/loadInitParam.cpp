@@ -47,14 +47,15 @@ LoadInitParam::LoadInitParam(char *xml_file_name)
   if (params->use_hdf5)
   {
 #ifdef USE_HDF5
-    c_io_class = new IOHDF5 (params->dump_result_path, params->dump_save_state_path);
+    c_io_class = new IOHDF5 (params->dump_result_path, params->dump_save_state_path, params->dump_compress);
 #else
     cerr << "ERROR! PDP3 build without HDF5 support. Please, update your configfile to use plaintext ``<use_hdf5>false</use_hdf5>''" << endl;
     exit(1);
 #endif
   }
   else
-    c_io_class = new IOText (params->dump_result_path, params->dump_save_state_path);
+    c_io_class = new IOText (params->dump_result_path, params->dump_save_state_path, params->dump_compress);
+  c_io_class->compress_level = params->dump_compress_level;
 
   //! 2. creating field objects
   cout << "Initializing E/M Fields Data" << endl;
