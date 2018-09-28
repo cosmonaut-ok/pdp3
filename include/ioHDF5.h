@@ -44,7 +44,7 @@ private:
 
 public:
   IOHDF5(void);
-  IOHDF5(char *cpathres,char *cpathdump);
+  IOHDF5(char *cpathres,char *cpathdump, bool c_compress);
   ~IOHDF5(void);
 
   void out_data(char const *comp_name,

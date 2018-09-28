@@ -115,19 +115,13 @@ public:
   double boundary_maxwell_e_phi_right;
   int boundary_conditions;
 
-  /* <boundary_maxwell_conditions> */
-  /*   <e_fi_upper>0</e_fi_upper> */
-  /*   <e_fi_left>0</e_fi_left> */
-  /*   <e_fi_right>0</e_fi_right> */
-  /* </boundary_maxwell_conditions> */
-
-  /* <boundary_conditions type = "dirichlet">0</boundary_conditions> */
-
   char *dump_result_path;
   char *dump_save_state_path;
   unsigned int dump_data_interval;
   unsigned int dump_frames_per_file;
   unsigned int dump_system_state_interval;
+  bool dump_compress = false;
+  int dump_compress_level = 0;
 
   // dump different kinds of data
   bool dump_e_r = false;
