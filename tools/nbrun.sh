@@ -1,4 +1,4 @@
-#!/bin/bash -xe
+#!/bin/bash
 
 SCRIPT_PATH=${1}
 
