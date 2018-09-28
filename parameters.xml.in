@@ -89,6 +89,8 @@
     <debug_data_dump_interval>50</debug_data_dump_interval>
     <system_state_dump_interval>0</system_state_dump_interval> <!-- number of time steps between two system state dumps. Set '0' to disable. RESTORATION STILL NOT IMPLEMENTED -->
     <frames_per_file>10</frames_per_file> <!-- how many image frames should be placed in one data file -->
+    <compress>false</compress>
+    <compress_level>1</compress_level>
     <dump_data>                            <!-- system parameters, which should be dumped as data result -->
       <E_r>true</E_r>
       <E_phi>false</E_phi>

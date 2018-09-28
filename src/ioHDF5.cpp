@@ -4,11 +4,13 @@ IOHDF5::IOHDF5(void)
 {
 }
 
-IOHDF5::IOHDF5(char *c_pathres, char *c_pathdump)
+IOHDF5::IOHDF5(char *c_pathres, char *c_pathdump, bool c_compress)
 {
   // hid_t file_id;
   // herr_t status;
   hid_t gcpl;
+
+  compress = c_compress;
 
   strcpy(path_result, c_pathres);
   strcpy(path_dump, c_pathdump);
@@ -81,8 +83,8 @@ void IOHDF5::dump_h5_dataset(char const *group_name,
                              int r_step,
                              int z_step)
 {
-  herr_t status;
-  hid_t group_id, dataset, datatype, dataspace;   /* declare identifiers */
+  // herr_t status;
+  hid_t group_id, dataset, datatype, dataspace, plist_id;   /* declare identifiers */
   hsize_t dimsf[2];              /* dataset dimensions */
 
   char dataset_name[200];
@@ -101,6 +103,15 @@ void IOHDF5::dump_h5_dataset(char const *group_name,
   dimsf[1] = z_step;
 
   dataspace = H5Screate_simple(2, dimsf, NULL);
+
+  plist_id  = H5P_DEFAULT;
+  if (compress)
+  {
+    plist_id  = H5Pcreate (H5P_DATASET_CREATE);
+    status = H5Pset_chunk (plist_id, 2, dimsf);
+    status = H5Pset_deflate (plist_id, compress_level);
+  }
+
   datatype = H5Tcopy(H5T_NATIVE_DOUBLE);
 
   status = H5Tset_order(datatype, H5T_ORDER_LE);
@@ -116,7 +127,7 @@ void IOHDF5::dump_h5_dataset(char const *group_name,
 
   if (dataset == -1)
     dataset = H5Dcreate(file_id, name, datatype, dataspace,
-                        H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+                        H5P_DEFAULT, plist_id, H5P_DEFAULT);
 
   status = H5Eset_auto1(old_func, old_client_data);
 
@@ -139,7 +150,7 @@ void IOHDF5::dump_h5_nd_components(char const *group_name,
                                    int dimensions)
 //! dump array from N-dimensional vectors
 {
-  herr_t status;
+  // herr_t status;
   hid_t group_id, dataset, datatype, dataspace;
   hsize_t dimsf[size];
 
@@ -247,7 +258,7 @@ void IOHDF5::out_current_time_dump(double current_time)
   hid_t attribute_id, dataspace_id, group_id;
   hsize_t dims;
   double attr_data[1];
-  herr_t status;
+  // herr_t status;
 
   // file_id = H5Fopen (hdf5_file, H5F_ACC_RDWR, H5P_DEFAULT);
 
