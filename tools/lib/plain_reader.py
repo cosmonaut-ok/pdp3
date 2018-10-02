@@ -183,7 +183,7 @@ class PlainReader:
     def get_frame(self, space, number):
         ''' get frame by number. Find required dataset automatically '''
         self.__validate_frame__(space, number)
-
+        frame = []
         cache_file_name = "frame_space:{}_number:{}".format(space, number)
 
         if self.use_cache:

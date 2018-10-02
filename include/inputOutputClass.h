@@ -16,6 +16,10 @@ private:
   char path_dump[100];
 
 public:
+  bool compress = false;
+  // char *compress_algo = 'gzip';
+  int compress_level = 6;
+
   virtual ~InputOutputClass(void) {};
 
   virtual void out_data(char const *comp_name,
