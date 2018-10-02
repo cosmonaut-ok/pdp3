@@ -1,6 +1,8 @@
 import numpy as np
 import h5py
+import os
 from os.path import join # to use "join" for namespaces
+from lib.tinycache import TinyCache
 
 class H5Reader:
     def __init__(self, h5_path, data_keyspace='/pdp3/result', dump_keyspace='/pdp3/dump', use_cache=False):
@@ -9,7 +11,8 @@ class H5Reader:
         self.__data_keyspace__ = data_keyspace
         self.__dump_keyspace__ = dump_keyspace
         self.verbose = False
-
+        self.use_cache = use_cache
+        self.__tiny_cache__ = TinyCache(os.path.join(os.path.dirname(h5_path), '.cache'))
 
     def __del__(self):
         self.file.close()
@@ -103,8 +106,18 @@ class H5Reader:
 
     def get_frame(self, space, number):
         if self.__check_frame__(space, number):
-            path = self.__get_path__(space, number)
-            frame = self.file[path][:]
+            cache_file_name = "frame_space:{}_number:{}".format(space, number)
+            if self.use_cache:
+                frame = self.__tiny_cache__.get_cache(cache_file_name)
+            if len(frame) != 0:
+                frame = np.reshape(frame, [self.__shape__[0], self.__shape__[1]])
+            else:
+                path = self.__get_path__(space, number)
+                frame = self.file[path][:]
+
+            if self.use_cache:
+                self.__tiny_cache__.update_cache(cache_file_name, frame)
+
             return frame
 
 
@@ -160,10 +173,22 @@ class H5Reader:
             to_frame = space_length-1
 
         if self.__check_frame_range__(space, from_frame, to_frame) and self.__check_row__(space, row_number):
-            rows = []
-            for i in range(from_frame, to_frame+1):
-                path = self.__get_path__(space, i)
-                rows.append(self.file[path][row_number])
+            cache_file_name = "row_space:{}_from:{}_to:{}_number:{}".format(
+            space, from_frame, to_frame, number)
+            rows = np.empty(0)
+            if self.use_cache:
+                rows = self.__tiny_cache__.get_cache(cache_file_name)
+            if len(rows) != 0:
+                rows = np.reshape(rows, [to_frame - from_frame, self.__shape__[1]])
+            else:
+                rows = []
+                for i in range(from_frame, to_frame+1):
+                    path = self.__get_path__(space, i)
+                    rows.append(self.file[path][row_number])
+                    
+            if self.use_cache:
+                self.__tiny_cache__.update_cache(cache_file_name, rows)
+
             return rows
 
 
@@ -172,12 +197,26 @@ class H5Reader:
             path = self.__get_path__(space, 0)
             space_length = len(self.file[path])
             to_frame = space_length-1
-
         if self.__check_frame_range__(space, from_frame, to_frame) and self.__check_col__(space, col_number):
-            cols = []
-            for i in range(from_frame, to_frame+1):
-                path = self.__get_path__(space, i)
-                cols.append(self.file[path][:,col_number])
+            
+            cache_file_name = "col_space:{}_from:{}_to:{}_number:{}".format(
+                space, from_frame, to_frame, number)
+            cols = np.empty(0)
+
+            if self.use_cache:
+                cols = self.__tiny_cache__.get_cache(cache_file_name)
+
+            if len(cols) != 0:
+                cols = np.reshape(cols, [to_frame - from_frame, self.__shape__[0]])
+            else:
+                cols = []
+                for i in range(from_frame, to_frame+1):
+                    path = self.__get_path__(space, i)
+                    cols.append(self.file[path][:,col_number])
+
+            if self.use_cache:
+                self.__tiny_cache__.update_cache(cache_file_name, cols)
+
             return cols
 
 
@@ -188,8 +227,19 @@ class H5Reader:
             to_frame = space_length-1
 
         if self.__check_frame_range__(space, from_frame, to_frame) and self.__check_row__(space, row_number) and self.__check_col__(space, col_number):
-            dots = []
-            for i in range(from_frame, to_frame+1):
-                path = self.__get_path__(space, i)
-                dots.append(self.file[path][row_number,col_number])
+            cache_file_name = "dot_space:{}_from:{}_to:{}_row:{}_col:{}".format(
+                space, from_frame, to_frame, row_number, col_number)
+            dots = np.empty(0)
+            if self.use_cache:
+                dots = self.__tiny_cache__.get_cache(cache_file_name)
+
+            if len(dots) == 0:
+                dots = []
+                for i in range(from_frame, to_frame+1):
+                    path = self.__get_path__(space, i)
+                    dots.append(self.file[path][row_number,col_number])
+
+            if self.use_cache:
+                self.__tiny_cache__.update_cache(cache_file_name, dots)
+
             return dots
