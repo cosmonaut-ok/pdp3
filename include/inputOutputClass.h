@@ -16,7 +16,7 @@ private:
   char path_dump[100];
 
 public:
-  bool compress;
+  bool compress = false;
   // char *compress_algo = 'gzip';
   int compress_level = 6;
 
