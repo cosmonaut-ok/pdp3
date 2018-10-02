@@ -174,7 +174,7 @@ class H5Reader:
 
         if self.__check_frame_range__(space, from_frame, to_frame) and self.__check_row__(space, row_number):
             cache_file_name = "row_space:{}_from:{}_to:{}_number:{}".format(
-            space, from_frame, to_frame, number)
+                space, from_frame, to_frame, row_number)
             rows = np.empty(0)
             if self.use_cache:
                 rows = self.__tiny_cache__.get_cache(cache_file_name)
@@ -200,7 +200,7 @@ class H5Reader:
         if self.__check_frame_range__(space, from_frame, to_frame) and self.__check_col__(space, col_number):
             
             cache_file_name = "col_space:{}_from:{}_to:{}_number:{}".format(
-                space, from_frame, to_frame, number)
+                space, from_frame, to_frame, col_number)
             cols = np.empty(0)
 
             if self.use_cache:
