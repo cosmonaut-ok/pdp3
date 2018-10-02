@@ -189,6 +189,8 @@ void Parameters::init_data_dump_parameters ()
 
   dump_system_state_interval = atoi(try_first_child(sub_root, "system_state_dump_interval")->GetText());
   dump_frames_per_file = atoi(try_first_child(sub_root, "frames_per_file")->GetText());
+  dump_compress = lib::to_bool(try_first_child(sub_root, "compress")->GetText());
+  dump_compress_level = atoi(try_first_child(sub_root, "compress_level")->GetText());
 
   //! choose, which parameters should be dumped to data files
   dump_e_r = lib::to_bool(try_first_child(dump_data_root, "E_r")->GetText());
