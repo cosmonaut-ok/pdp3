@@ -1,10 +1,6 @@
 //! Class for reading configfile and calculate parameters,
 //! requires for modeling
 
-/* #include <fstream> */
-/* #include <iostream> */
-/* #include <iomanip> */
-/* #include <ctime> */
 #include <vector>
 
 #include "tinyxml2.h"
@@ -15,29 +11,6 @@
 
 using namespace std;
 using namespace tinyxml2;
-
-/* // enable openmp optional */
-/* #ifdef _OPENMP */
-/* #include <omp.h> */
-/* #else */
-/* #define omp_get_thread_num() 0 */
-/* #endif */
-
-/* #include "math/fourier.h" */
-
-/* #include "boundaryMaxwellConditions.h" */
-/* #include "bunch.h" */
-/* #include "current.h" */
-/* #include "geometry.h" */
-/* #include "hField.h" */
-/* #include "inputOutputClass.h" */
-/* #include "particles.h" */
-/* #include "particlesList.h" */
-/* #include "pdp3Time.h" */
-/* #include "poissonDirichlet.h" */
-
-/* using namespace std; */
-/* using namespace tinyxml2; */
 
 struct particle_specie {
   char *name;
@@ -115,19 +88,13 @@ public:
   double boundary_maxwell_e_phi_right;
   int boundary_conditions;
 
-  /* <boundary_maxwell_conditions> */
-  /*   <e_fi_upper>0</e_fi_upper> */
-  /*   <e_fi_left>0</e_fi_left> */
-  /*   <e_fi_right>0</e_fi_right> */
-  /* </boundary_maxwell_conditions> */
-
-  /* <boundary_conditions type = "dirichlet">0</boundary_conditions> */
-
   char *dump_result_path;
   char *dump_save_state_path;
   unsigned int dump_data_interval;
   unsigned int dump_frames_per_file;
   unsigned int dump_system_state_interval;
+  bool dump_compress = false;
+  int dump_compress_level = 0;
 
   // dump different kinds of data
   bool dump_e_r = false;
