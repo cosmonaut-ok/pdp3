@@ -23,10 +23,6 @@ private:
 
   hid_t file_id;
   herr_t status;
-  /* hid_t root_group_id; */
-  /* hid_t result_group_id; */
-  /* hid_t dump_group_id; */
-  // hid_t gcpl;
 
   void dump_h5_dataset(char const *group_name,
                        char const *name,
