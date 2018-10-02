@@ -1,10 +1,6 @@
 //! Class for reading configfile and calculate parameters,
 //! requires for modeling
 
-/* #include <fstream> */
-/* #include <iostream> */
-/* #include <iomanip> */
-/* #include <ctime> */
 #include <vector>
 
 #include "tinyxml2.h"
@@ -15,29 +11,6 @@
 
 using namespace std;
 using namespace tinyxml2;
-
-/* // enable openmp optional */
-/* #ifdef _OPENMP */
-/* #include <omp.h> */
-/* #else */
-/* #define omp_get_thread_num() 0 */
-/* #endif */
-
-/* #include "math/fourier.h" */
-
-/* #include "boundaryMaxwellConditions.h" */
-/* #include "bunch.h" */
-/* #include "current.h" */
-/* #include "geometry.h" */
-/* #include "hField.h" */
-/* #include "inputOutputClass.h" */
-/* #include "particles.h" */
-/* #include "particlesList.h" */
-/* #include "pdp3Time.h" */
-/* #include "poissonDirichlet.h" */
-
-/* using namespace std; */
-/* using namespace tinyxml2; */
 
 struct particle_specie {
   char *name;
