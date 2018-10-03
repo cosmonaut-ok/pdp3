@@ -157,19 +157,19 @@ void Current::j3_add_1d(double *j3_1d)
 //
 // functions for changing values of j
 //
-void Current::set_j1(int i, int k, double value)
+void Current::inc_j1(int i, int k, double value)
 {
 #pragma omp critical
   j1[i][k] += value;
 }
 
-void Current::set_j2(int i, int k, double value)
+void Current::inc_j2(int i, int k, double value)
 {
 #pragma omp critical
   j2[i][k] += value;
 }
 
-void Current::set_j3(int i, int k, double value)
+void Current::inc_j3(int i, int k, double value)
 {
 #pragma omp critical
   j3[i][k] += value;
