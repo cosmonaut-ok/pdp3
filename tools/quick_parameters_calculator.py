@@ -92,7 +92,7 @@ def main():
 
         print("Beam dimensions:\t\t\t length: %.4g m radius: %.4g m"%(beam_length, config.bunch_radius))
         if config.number_bunches > 1: print("Distance between bunch beginings:\t %.4g m"%(config.bunches_distance + config.bunch_length))
-        if config.number_bunches > 1: print("Number of bunches in beam:\t\t %.0g"%config.number_bunches)
+        if config.number_bunches > 1: print("Number of bunches in beam:\t\t %.4g"%config.number_bunches)
         if config.number_bunches > 1: print("Number of particles in single bunch:\t %.2g"%(bunch_part_number))
         print("Number of particles in beam:\t\t %.2g"%(bunch_part_number * config.number_bunches))
         print()
