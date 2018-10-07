@@ -3,6 +3,24 @@ CHANGELOG
 CURRENT
 =======
 
+- Improve autoconf options passing
+
+- Add pdp3 general diagram
+
+- Add caching to h5_reader
+
+- Add plain to HDF5 converter
+
+- Add optional compression to HDF5 format output
+
+- Update tools/nbrun.sh to accept redefinition of any variables, defined in jupyter notebook
+
+- Decrease number of thread synchronization points
+
+- Improve speedup with some SSE support for intel/amd CPUs
+
+- Improve multibunch support
+
 - Migrate to autotools from simple Makefile
 
 - Improve multibunch beam support
