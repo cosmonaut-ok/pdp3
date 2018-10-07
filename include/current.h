@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string.h>
 #include "geometry.h"
 
 class Current
@@ -21,9 +22,9 @@ public:
   void j2_add_1d(double *input);
   void j3_add_1d(double *input);
 
-  void set_j1(int i, int k, double value);
-  void set_j2(int i, int k, double value);
-  void set_j3(int i, int k, double value);
+  void inc_j1(int i, int k, double value);
+  void inc_j2(int i, int k, double value);
+  void inc_j3(int i, int k, double value);
   void reset_j();
 protected:
   double **j1;
