@@ -5,12 +5,13 @@ from os.path import join # to use "join" for namespaces
 from lib.tinycache import TinyCache
 
 class H5Reader:
-    def __init__(self, h5_path, data_keyspace='/pdp3/result', dump_keyspace='/pdp3/dump', use_cache=False):
+    def __init__(self, h5_path, data_keyspace='/pdp3/result', dump_keyspace='/pdp3/dump', shape=[0, 0], use_cache=False):
 
         self.file = h5py.File(h5_path, 'r')
         self.__data_keyspace__ = data_keyspace
         self.__dump_keyspace__ = dump_keyspace
         self.verbose = False
+        self.__shape__ = [shape[0], shape[1]]
         self.use_cache = use_cache
         self.__tiny_cache__ = TinyCache(os.path.join(os.path.dirname(h5_path), '.cache'))
 
