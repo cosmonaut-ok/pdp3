@@ -21,12 +21,18 @@ build:
 
 deploy:
   script:
+    - ./autogen.sh
+    - ./configure --enable-hdf5 --enable-ieee
     - make dist RELEASE=/tmp/pdp3
 
 test:
   script:
+    - ./autogen.sh
+    - ./configure --enable-hdf5 --enable-ieee
     - make test
 
 test-ext:
   script:
+    - ./autogen.sh
+    - ./configure --enable-hdf5 --enable-ieee
     - make test-ext
