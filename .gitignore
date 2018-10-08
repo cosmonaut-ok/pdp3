@@ -332,3 +332,5 @@ include/config.h.in
 test/functional/parameters.xml.tmpl
 test/functional/parameters_ext.xml.tmpl
 tools/.nbrun*
+#*
+*#
