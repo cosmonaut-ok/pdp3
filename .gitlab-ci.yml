@@ -2,7 +2,7 @@ image: debian:stretch
 
 before_script:
   - apt-get update -y -qq
-  - apt-get -y -qq install build-essential git libhdf5-100 libhdf5-dev autoconf hdf5-tools imagemagick doxygen
+  - apt-get -y -qq install build-essential git libhdf5-100 libhdf5-dev autoconf hdf5-tools imagemagick doxygen pandoc pandoc-citeproc
   - git submodule update --init
 
 stages:
@@ -36,3 +36,9 @@ test-ext:
     - ./autogen.sh
     - ./configure --enable-hdf5 --enable-ieee
     - make test-ext
+
+doc:
+  script:
+    - ./autogen.sh
+    - ./configure --enable-hdf5 --enable-ieee --with-doc-formats='html rtf'
+    - make doc
