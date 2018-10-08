@@ -180,7 +180,7 @@ class H5Reader:
             if self.use_cache:
                 rows = self.__tiny_cache__.get_cache(cache_file_name)
             if len(rows) != 0:
-                rows = np.reshape(rows, [to_frame - from_frame, self.__shape__[1]])
+                rows = np.reshape(rows, [to_frame - from_frame + 1, self.__shape__[1]])
             else:
                 rows = []
                 for i in range(from_frame, to_frame+1):
@@ -208,7 +208,7 @@ class H5Reader:
                 cols = self.__tiny_cache__.get_cache(cache_file_name)
 
             if len(cols) != 0:
-                cols = np.reshape(cols, [to_frame - from_frame, self.__shape__[0]])
+                cols = np.reshape(cols, [to_frame - from_frame + 1, self.__shape__[0]])
             else:
                 cols = []
                 for i in range(from_frame, to_frame+1):
