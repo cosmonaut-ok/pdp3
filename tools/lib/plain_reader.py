@@ -267,7 +267,7 @@ class PlainReader:
             frames = self.__tiny_cache__.get_cache(cache_file_name)
 
         if len(frames) != 0:
-            frames = np.reshape(frames, [to_frame - from_frame, self.__shape__[0]])
+            frames = np.reshape(frames, [to_frame - from_frame + 1, self.__shape__[0]])
         else:
             frame_range = to_frame - from_frame
             from_ds, from_frame_in_ds = self.get_ds_frame_by_frame(from_frame)
@@ -307,7 +307,7 @@ class PlainReader:
             frames = self.__tiny_cache__.get_cache(cache_file_name)
 
         if len(frames) != 0:
-            frames = np.reshape(frames, [to_frame - from_frame, self.__shape__[1]])
+            frames = np.reshape(frames, [to_frame - from_frame + 1, self.__shape__[1]])
         else:
             frame_range = to_frame - from_frame
             frames = np.empty([frame_range, self.__shape__[1]])
