@@ -1,0 +1,31 @@
+image: debian:stretch
+
+before_script:
+  - apt-get update -y -qq
+  - apt-get -y -qq install build-essential git libhdf5-100 libhdf5-dev autoconf
+
+stages:
+  - build
+  - deploy
+  - test
+  - test-ext
+
+
+# Stage "build"
+build:
+  script:
+    - ./autogen.sh
+    - ./configure --enable-hdf5 --enable-ieee
+    - make
+
+deploy:
+  script:
+    - make dist RELEASE=/tmp/pdp3
+
+test:
+  script:
+    - make test
+
+test-ext:
+  script:
+    - make test-ext
