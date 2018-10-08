@@ -158,8 +158,9 @@ class PlotBuilder:
 
         # tick labels, that shows __real__ model space dimensions
         # translates from grid_size
-        x_tlabel_range = np.linspace(x_tlabel_start, x_tlabel_end, x_ticks + 1)
-        y_tlabel_range = np.linspace(y_tlabel_start, y_tlabel_end, y_ticks + 1)
+        x_tlabel_range = list(map(lambda a: float("{:.2e}".format(a)), np.linspace(x_tlabel_start, x_tlabel_end, x_ticks + 1)))
+        y_tlabel_range = list(map(lambda a: float("{:.2e}".format(a)), np.linspace(y_tlabel_start, y_tlabel_end, y_ticks + 1)))
+
         if projection == '3d': z_tlabel_range = np.around(np.linspace(z_tlabel_start, z_tlabel_end, z_ticks + 1), 5)
 
         if x_size > 0: subplot.set_xticklabels(x_tlabel_range)
