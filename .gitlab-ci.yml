@@ -19,12 +19,6 @@ build:
     - ./configure --enable-hdf5 --enable-ieee
     - make
 
-deploy:
-  script:
-    - ./autogen.sh
-    - ./configure --enable-hdf5 --enable-ieee
-    - make dist RELEASE=/tmp/pdp3
-
 test:
   script:
     - ./autogen.sh
