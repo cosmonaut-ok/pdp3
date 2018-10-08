@@ -3,6 +3,7 @@ image: debian:stretch
 before_script:
   - apt-get update -y -qq
   - apt-get -y -qq install build-essential git libhdf5-100 libhdf5-dev autoconf
+  - git submodule update --init
 
 stages:
   - build
