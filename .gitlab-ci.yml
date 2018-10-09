@@ -8,7 +8,9 @@ before_script:
 
 stages:
   - build
+  - postbuild
   - test
+  - clean
 
 # Stage "build"
 build:
@@ -33,8 +35,13 @@ test-ext:
     - make test-ext
 
 doc:
-  stage: build
+  stage: postbuild
   script:
     - ./autogen.sh
     - ./configure --enable-hdf5 --enable-ieee --with-doc-formats='html rtf'
     - make doc
+
+clean:
+  stage: clean
+  script: make mrproper
+  when: always
