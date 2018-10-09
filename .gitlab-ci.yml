@@ -53,16 +53,6 @@ doc:
     - make doc
   allow_failure: true
 
-clean:
-  stage: clean
-  dependencies: 
-    - test
-    - test-ext
-  tags:
-    - plasma
-  script: make mrproper
-  when: always
-
 hdf5-build:
   stage: build
   tags:
