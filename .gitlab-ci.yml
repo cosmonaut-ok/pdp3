@@ -45,3 +45,10 @@ clean:
   stage: clean
   script: make mrproper
   when: always
+
+hdf5-build:
+  stage: build
+  script:
+    - ./autogen.sh
+    - ./configure --enable-hdf5 --enable-ieee
+    - make hdf5-prereq
