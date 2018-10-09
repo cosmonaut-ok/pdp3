@@ -8,31 +8,32 @@ before_script:
 
 stages:
   - build
-  - deploy
   - test
-  - test-ext
-
 
 # Stage "build"
 build:
+  stage: build
   script:
     - ./autogen.sh
     - ./configure --enable-hdf5 --enable-ieee
     - make
 
 test:
+  stage: test
   script:
     - ./autogen.sh
     - ./configure --enable-hdf5 --enable-ieee
     - make test
 
 test-ext:
+  stage: test
   script:
     - ./autogen.sh
     - ./configure --enable-hdf5 --enable-ieee
     - make test-ext
 
 doc:
+  stage: build
   script:
     - ./autogen.sh
     - ./configure --enable-hdf5 --enable-ieee --with-doc-formats='html rtf'
