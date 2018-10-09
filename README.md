@@ -1,4 +1,4 @@
-#PDP3
+# PDP3
 
 Renew [PDP3](https://github.com/knuniv/pdp3) project
 
