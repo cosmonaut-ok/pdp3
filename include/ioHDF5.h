@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <math.h> /* floor */
 #include "inputOutputClass.h"
-#include <hdf5/serial/hdf5.h> // TODO: is it true only for debian-based distros?
+#include <hdf5.h> // TODO: is it true only for debian-based distros?
 
 using namespace std;
 class IOHDF5 : public InputOutputClass
