@@ -55,8 +55,6 @@ clean:
 
 hdf5-build:
   stage: build
-  dependencies:
-    - build
   script:
     - ./autogen.sh
     - ./configure --enable-hdf5 --enable-ieee
