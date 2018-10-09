@@ -17,6 +17,8 @@ build:
   stage: build
   artifacts:
     untracked: true
+  tags:
+    - plasma
   script:
     - ./autogen.sh
     - ./configure --enable-hdf5 --enable-ieee
@@ -26,6 +28,8 @@ test:
   stage: test
   dependencies: 
     - build
+  tags:
+    - plasma
   script:
     - make test
 
@@ -33,6 +37,8 @@ test-ext:
   stage: test
   dependencies: 
     - build
+  tags:
+    - plasma
   script:
     - make test-ext
   allow_failure: true
@@ -41,6 +47,8 @@ doc:
   stage: postbuild
   dependencies: 
     - build
+  tags:
+    - plasma
   script:
     - make doc
   allow_failure: true
@@ -50,13 +58,17 @@ clean:
   dependencies: 
     - test
     - test-ext
+  tags:
+    - plasma
   script: make mrproper
   when: always
 
 hdf5-build:
   stage: build
+  tags:
+    - plasma
   script:
     - ./autogen.sh
     - ./configure --enable-hdf5 --enable-ieee
-    - make hdf5-prereq
+    - make hdf5-install
   allow_failure: true
