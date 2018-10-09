@@ -37,33 +37,20 @@ root@host# apt-get install build-essential autotools git
 
 If you going to use HDF5 format, you should build HDF5 library as prerequirement. As libhdf5 v.1.10.0 ships with debian, we need to download and compile fresh version (1.10.3) manually
 
-* 0.a. install HDF5 globally (perform 0.a, 0.b, 0.c or install in some other way, at your option):
+* 0.a. install HDF5 manually (perform 0.a, 0.b or install in some other way, at your option):
 ``` shell
 user@host$ cd /tmp
 user@host$ wget -qO- "https://www.hdfgroup.org/package/source-bzip/?wpdmdl=12594&refresh=5bbc7778635b21539078008" | tar xjf -
 user@host$ cd /tmp/hdf5-1.10.3
 user@host$ ./autogen.sh
-user@host$ ./configure --enable-cxx --enable-build-mode=production --prefix=/usr
+user@host$ ./configure --enable-cxx --enable-build-mode=production --prefix=/usr/local
 user@host$ sudo make install
 user@host$ cd /tmp
 user@host$ sudo rm -rf /tmp/hdf5-1.10.3
 ```
 
-* 0.b. install HDF5 locally (need to add /tmp/hdf5-1.10.3/hdf5/include and /tmp/hdf5-1.10.3/hdf5/lib to compilation include and ld flags):
-``` shell
-user@host$ cd /tmp
-user@host$ wget -qO- "https://www.hdfgroup.org/package/source-bzip/?wpdmdl=12594&refresh=5bbc7778635b21539078008" | tar xjf -
-user@host$ cd /tmp/hdf5-1.10.3
-user@host$ ./autogen.sh
-user@host$ ./configure --enable-cxx --enable-build-mode=production
-user@host$ sudo make install
-user@host$ cd /tmp
-user@host$ sudo rm -rf /tmp/hdf5-1.10.3
-```
-
-* 0.c. install HDF5 locally with make helper and include:\
-also, you can install it with `make hdf5-prereq` after application configuration, but before project compilation (see **COMPILE PROJECT** step)
-
+* 0.b. install HDF5 globally with make helper and include:\
+You can install it with PDP3 build system's helper after application configuration, but before project compilation (see **COMPILE PROJECT** step)
 
 #### 1. **GIT CLONE PROJECT**
 
@@ -80,7 +67,10 @@ user@host$ git submodule update --init # require to enable external libraries
 user@host$ cd /path/to/pdp3/
 user@host$ ./autogen.sh
 user@host$ ./configure [--help|show help] [--some-options] # use ./configure --help to view full options list
-user@host$ make hdf5-prereq # perform 0.c. optional step to work with HDF5 format
+# 0.b.: optional step to install HDF5 library with built-in helper
+user@host$ make hdf5
+user@host$ sudo make hdf5-install
+# end of 0.b.
 user@host$ make [COMPILE FLAGS] # see below about COMPILE FLAGS
 ```
 
