@@ -50,7 +50,7 @@ AC_ARG_ENABLE([ieee], [AC_HELP_STRING([--enable-ieee], [Enable speedup])], [IEEE
 AC_ARG_ENABLE([singlethread], [AC_HELP_STRING([--enable-singlethread], [Build application to run in single-thread mode (used in debug by default)])], [SINGLETHREAD="$enableval"], [SINGLETHREAD=${DEBUG}])
 AC_ARG_ENABLE([omp_dynamic], [AC_HELP_STRING([--enable-omp-dynamic], [Enable openmp dynamic thread creation])], [OMP_DYNAMIC="$enableval"], [OMP_DYNAMIC=no])
 
-AC_ARG_ENABLE([hdf5], [AC_HELP_STRING([--enable-hdf5], [Build application with hdf5_serial library support])], [HDF5="$enableval"], [HDF5=no])
+AC_ARG_ENABLE([hdf5], [AC_HELP_STRING([--enable-hdf5], [Build application with hdf5 library support])], [HDF5="$enableval"], [HDF5=no])
 
 AC_ARG_WITH([doc-formats], [AC_HELP_STRING([--with-doc-formats], [Set list of documentation formats to be generated])], [DOXYGEN_FORMATS="$withval"], [DOXYGEN_FORMATS="latex html rtf"])
 AC_ARG_WITH([result-dir], [AC_HELP_STRING([--with-result-dir], [Set default result directory])], [RESULT_DIR="$withval"], [RESULT_DIR="pdp3_result"])
@@ -65,7 +65,7 @@ if test x$SINGLETHREAD = xno; then
 fi
 
 if test x$HDF5 = xyes; then
-   AC_HAVE_LIBRARY(hdf5_serial, , AC_MSG_ERROR([No such library hdf5_serial.]))
+   AC_HAVE_LIBRARY(hdf5, , AC_MSG_ERROR([No such library hdf5.]))
 fi
 
 dnl # Checks for header files.
