@@ -49,6 +49,8 @@ LDFLAGS += -L$(tinyvec3d_SUBDIR)
 ### link hdf5 library
 ifeq (@HDF5_OPTION@, true)
 pdp3_LIBRARIES += hdf5
+LDFLAGS += -L$(TARGETDIR)/@HDF5_VERSION@/hdf5/lib
+INCLUDE_PATH += -I$(TARGETDIR)/@HDF5_VERSION@/hdf5/include
 else
 pdp3_CXX_SRCS_TMP := $(pdp3_CXX_SRCS)
 pdp3_CXX_SRCS = $(filter-out $(SRCDIR)/ioHDF5.cpp, $(pdp3_CXX_SRCS_TMP))
@@ -115,7 +117,7 @@ comma :=,
 clean: $(SUBDIRS:%=%/__clean__) $(EXTRASUBDIRS:%=%/__clean__) $(TESTSUBDIRS:%=%/__clean__) $(DOXYGEN_FORMATS:%=%/__clean__)
 	$(RM) $(pdp3_OBJS) $(CLEAN_FILES)
 	$(RM) $(LIBS) $(EXES) $(EXES:%=%.so)
-	$(RM) -r $(BUILD_DIRS) $(ROOTDIR)/tools/__pycache__/
+	$(RM) -r $(ROOTDIR)/tools/__pycache__/
 	$(RM) -r $(DOXYGEN_DIRS)
 	$(RM) -r $(TESTDIR)
 
@@ -137,7 +139,7 @@ $(pdp3_MODULE): $(pdp3_OBJS)
 	$(CXX) $(CXXFLAGS) $(CXXEXTRA) $(DEFINCL) $(LDFLAGS) -o $@ $(pdp3_OBJS) $(pdp3_LIBRARY_PATH) $(pdp3_LIBRARIES:%=-l%)
 
 mrproper: clean
-	$(RM) -r *.avi *.png $(RELEASE) $(RELEASE).zip autom4te.cache config.log config.status configure Makefile parameters.xml @RESULT_DIR@ test/functional/test.sh test/functional/parameters*tmpl
+	$(RM) -r *.avi *.png $(BUILD_DIRS) $(RELEASE) $(RELEASE).zip autom4te.cache config.log config.status configure Makefile parameters.xml @RESULT_DIR@ test/functional/test.sh test/functional/parameters*tmpl
 
 run: bootstrap
 	./pdp3
@@ -180,3 +182,12 @@ dist: all doc
 	cp doc/app/latex/refman.pdf $(RELEASE)/doc/pdp3.pdf
 	cp doc/vis/latex/refman.pdf $(RELEASE)/doc/visualization.pdf
 	zip -r `basename $(RELEASE)`.zip $(RELEASE)
+
+hdf5-prereq: prepare
+	cd $(TARGETDIR); \
+	wget -qO- "@HDF5_URL@" | tar xjf -; \
+	cd @HDF5_VERSION@; \
+	./autogen.sh; \
+	./configure --enable-cxx --enable-build-mode=production; \
+	make; \
+	make install

@@ -1,109 +1,120 @@
-# PDP3
+#PDP3
 
-Renew PDP3 project
+Renew [PDP3](https://github.com/knuniv/pdp3) project
 
-[![Travis Build Status](https://api.travis-ci.org/cosmonaut-ok/pdp3.svg?branch=master)](https://travis-ci.org/cosmonaut-ok/pdp3)
+[![Gitlab Pipeline Status](https://gitlab.com/my-funny-plasma/PIC/pdp3/badges/master/pipeline.svg)](https://gitlab.com/my-funny-plasma/PIC/pdp3/commits/master)
 
 ### System And Software Requirements
 
-- Common:
-  - C++ compiler: gcc 6.0+
-  - git (to get sources)
-  - hdf5 library
-  - 'make' util
-  - libgomp (OpenMP spec. version 3.0+).
-  - python+matplotlib+numpy (anaconda - python scientific environment is highly recommended)
-  - libhdf5 (development files)
+- C++ compiler: gcc 6.X (or later, but not tested with 7.X and 8.X)
+- git (to get sources)
+- hdf5 library (1.10.1+ recommmended. 1.10.0 is buggy)
+- 'autoconf' and 'make' utils
+- libgomp (OpenMP spec. version 3.0+).
+- python+jupyter+matplotlib+numpy for visualization (anaconda - python scientific environment is highly recommended)
+- doxygen, latex (texlive-full), imagemagick, pandoc, pandoc-citeproc _**(optional, for documentation only)**_
 
-### Terms and Legend
+<!-- ### Terms and Legend -->
 
-* `<REQUIRED_VALUE>` - required CLI value (ex. application's parameter, required to launch with)
-* `[OPTIONAL_VALUE]` - optionsl CLI value (ex. application's optional launch parameter)
-* `VAR=val` - set unix shell environment variable
-* `user@host$` - shell terminal prompt for user <user>
-* `root@host#` - shell terminal prompt for superuser (root). It can be reached by commands `su`, or `sudo -i`, or `sudo <command with all arguments>` from your user
-* `# phrase` - comment in code (in shell-like syntax)
+<!-- * `<REQUIRED_VALUE>` - required CLI value (ex. application's parameter, required to launch with) -->
+<!-- * `[OPTIONAL_VALUE]` - optionsl CLI value (ex. application's optional launch parameter) -->
+<!-- * `VAR=val` - set unix shell environment variable -->
+<!-- * `user@host$` - shell terminal prompt for user <user> -->
+<!-- * `root@host#` - shell terminal prompt for superuser (root). It can be reached by commands `su`, or `sudo -i`, or `sudo <command with all arguments>` from your user -->
+<!-- * `# phrase` - comment in code (in shell-like syntax) -->
 
 ### HOWTO (linux, debian/ubuntu example)
 
 #### 0. INSTALL PREREQUIRED SOFTWARE
 
+**Install prerequired software with standars package management system**:
+
 ``` shell
-root@host# apt-get install build-essential autotools git libhdf5-dev libhdf5-serial-dev
+root@host# apt-get install build-essential autotools git
 ```
 
-#### 1. **CLONE PROJECT**
+**HDF5 library installation (optional)**:
 
-```shell
+If you going to use HDF5 format, you should build HDF5 library as prerequirement. As libhdf5 v.1.10.0 ships with debian, we need to download and compile fresh version (1.10.3) manually
+
+* 0.a. install HDF5 globally (perform 0.a, 0.b, 0.c or install in some other way, at your option):
+``` shell
+user@host$ cd /tmp
+user@host$ wget -qO- "https://www.hdfgroup.org/package/source-bzip/?wpdmdl=12594&refresh=5bbc7778635b21539078008" | tar xjf -
+user@host$ cd /tmp/hdf5-1.10.3
+user@host$ ./autogen.sh
+user@host$ ./configure --enable-cxx --enable-build-mode=production --prefix=/usr
+user@host$ sudo make install
+user@host$ cd /tmp
+user@host$ sudo rm -rf /tmp/hdf5-1.10.3
+```
+
+* 0.b. install HDF5 locally (need to add /tmp/hdf5-1.10.3/hdf5/include and /tmp/hdf5-1.10.3/hdf5/lib to compilation include and ld flags):
+``` shell
+user@host$ cd /tmp
+user@host$ wget -qO- "https://www.hdfgroup.org/package/source-bzip/?wpdmdl=12594&refresh=5bbc7778635b21539078008" | tar xjf -
+user@host$ cd /tmp/hdf5-1.10.3
+user@host$ ./autogen.sh
+user@host$ ./configure --enable-cxx --enable-build-mode=production
+user@host$ sudo make install
+user@host$ cd /tmp
+user@host$ sudo rm -rf /tmp/hdf5-1.10.3
+```
+
+* 0.c. install HDF5 locally with make helper and include:\
+also, you can install it with `make hdf5-prereq` after application configuration, but before project compilation (see **COMPILE PROJECT** step)
+
+
+#### 1. **GIT CLONE PROJECT**
+
+``` shell
 user@host$ git clone https://github.com/cosmonaut-ok/pdp3.git
 user@host$ cd pdp3
 user@host$ git submodule update --init # require to enable external libraries
 ```
 
-#### 2. **COMPILE**
+#### 2. **CONFIGURE AND BUILD PROJECT**
 
-```shell
+``` shell
 # change your current directory to project's root directory
-user@host$ cd /path/to/pdp3/root/directory
+user@host$ cd /path/to/pdp3/
+user@host$ ./autogen.sh
+user@host$ ./configure [--help|show help] [--some-options] # use ./configure --help to view full options list
+user@host$ make hdf5-prereq # perform 0.c. optional step to work with HDF5 format
 user@host$ make [COMPILE FLAGS] # see below about COMPILE FLAGS
 ```
 
-#### Compile flags
-
-**Usage:**
-
-```shell
-user@host$ make [action] FLAG_1=value1 FLAG_2=value2
-# or
-user@host$ FLAG=value make [action]
-```
-
-**List of built-in compile flags, accepted by PDP3 project:**
-
-- `DEBUG=yes/no`- Compile binary with debug symbols, prepared to use with GDB
-- `SPEEDUP=yes/no` - Increase speed up to 30%, by using unsafe math operations. WARNING! it decreases calculations accuracy and can cause incorrect program working
-- `SINGLETHREAD=yes/no` - Compile binary without multithreading support. Disables all parallelization features
-- `CXX=/foo/bar++` - Use custom c++ compiler (see supported c++ compilers list)
-- `CXXFLAGS="foo bar"` - custom C++ compile flags, used by compiler (overrides all autogeneration flags)
-- `CFLAGS="foo bar"` - same as CXXFLAGS
-  - `CFLAGS_NO_OPENMP` - used to customize flags, when openmp disabled (used for CXXFLAGS autogeneration)
-  - `CFLAGS_OPENMP` -  - used to customize flags, when openmp enabled (used for CXXFLAGS autogeneration)
-  - `CFLAGS_DEBUG` - used to customize flags, used when debug enabled (used for CXXFLAGS autogeneration)
-  - `CFLAGS_SPEEDUP` - used to customize flags, used when fast-math and other speedup options enabled (used for CXXFLAGS autogeneration)
-- `LDFLAGS` -  custom C++ linker flags
-- `TARGETDIR` - used with `make dist`, which prepares all, required to start modeling in separate directory
-
 #### 3. **TEST (optional)**
 
-**Functional (end-to-end) testing:**
-
+* Functional (end-to-end) testing:
 ```shell
 user@host$ make test # or test-ext for extended testing (require more time)
 ```
 
-**Unit testing:**
-
+* Unit testing:
 ```shell
 user@host$ make test-unit
 ```
 
 #### 4. **INSTALLATION (optional)**
 
-You can install already compiled pdp3 with it's configfile (aka properties.xml) and required subdirs to separate directory. Just run
+You can install already compiled pdp3 with it's configfile (aka properties.xml) and required subdirs to separate directory. Just run:
 
 ``` shell
-user@host$ make dist [TARGETDIR=/path/to/some/target/directory]
+user@host$ make dist [RELEASE=/path/to/some/target/directory]
 ```
 
 Than, you can go to this directory and run pdp3
 
 #### 5. **RUN**
 
-After compilation finished, you just need binary file `pdp3` and `parameters.xml`. You can copy this files to somewhere, edit `parameters.xml` and run pdp3
+After compilation finished, you just need binary file `pdp3` and `parameters.xml`. You can copy this files to somewhere (if you skipped installation), edit `parameters.xml` and run `./pdp3`.
 
-```shell
+_**WARNING! pdp3 does not create data directory automatically. You need to create it before run (see `result_path` in parameters.xml)**_
+
+``` shell
 user@host$ mkdir pdp_result # or where you defined in parameters.xml. PDP3 does not use smth. like BOOST::filesystem to operate with directories
-# NOTE: if you preformed `make dist`, you just need `cd /path/to/target/dir`, edit `parameters.xml` (optional) and run `./pdp3`
+# NOTE: if you performed `make dist`, you just need `cd /path/to/target/dir`, edit `parameters.xml` (optional) and run `./pdp3`
 user@host$ /path/to/pdp3 [ -h ] | [ -f /path/to/parameters.xml ] # used parameters.xml from current directory, if calling without any options
 # or (much better), launch it as high-priority process
 user@host$ nice -20 /path/to/pdp3 [ -h ] | [ -f /path/to/parameters.xml ] # give some power to pdp3!
@@ -134,14 +145,20 @@ user@host$ /path/to/repository/with/pdp3/tools/movie_3_component.py /path/to/par
 ```
 > NOTE: you may use smth. like `python3 /path/to/repository/with/pdp3/tools/movie_3_component.py /path/to/parameters.xml`, if you don't use anaconda.
 
-**Images generation:**
+**Interactive data analysis:**
 
 ``` shell
-user@host$ /path/to/repository/with/pdp3/tools/images_3_component.py /path/to/parameters.xml --data_set_range=1:2 --frame_range=3:4
-# USE: /path/to/repository/with/pdp3/tools/images_3_component.py -h to see list of all available options
+user@host$ cd /path/to/pdp3/tools
+user@host$ jupyter <notebook|lab>
 ```
 
-WAT is *data_set_range* and *frame_range* ? PDP3 saves every modeling frame (step) to file. Number of such frames in one file can be defined in in parameters.xml. So, you getting output as set of files with set of frames in each file. When you generate images, you can define range of files from which you going to generate images and range of frames in each file, from which that images will be generated.
+than you can choose jupyter notebook, corresponding to your needs and work with it.
+
+**Non-interactive notebook launch:**
+
+``` shell
+user@host$ /path/to/pdp3/tools/nbrun.sh /path/to/pdp3/tools/some.ipynb [config_path=\'/path/to/parameters.xml\'] [other_notebook_variable=other_notebook_value]
+```
 
 #### 7. **DOCUMENTATION GENERATION** (optional)
 

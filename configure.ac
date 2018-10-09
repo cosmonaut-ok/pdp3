@@ -30,10 +30,8 @@ AC_SUBST(PUSHER)
 AC_SUBST(OMP_DYNAMIC)
 AC_SUBST(DEBUG_OPTION)
 AC_SUBST(PROFILER)
-# AC_SUBST(PROFILER_OPTION)
-
-AC_SUBST(VERSION)
-VERSION=CURRENT
+AC_SUBST(HDF5_URL)
+AC_SUBST(HDF5_VERSION)
 
 AC_SUBST(MKDIR)
 MKDIR=mkdir
@@ -42,6 +40,9 @@ AC_SUBST(RESULT_DIR)
 
 AC_SUBST(RELEASE)
 RELEASE=${PACKAGE_VERSION}
+
+HDF5_URL="https://www.hdfgroup.org/package/source-bzip/?wpdmdl=12594&refresh=5bbc7778635b21539078008"
+HDF5_VERSION="hdf5-1.10.3"
 
 AC_ARG_ENABLE([experimental], [AC_HELP_STRING([--enable-experimental], [Enable experimental features (only for debug/development)])], [ENABLE_EXPERIMENTAL="$enableval"], [ENABLE_EXPERIMENTAL=no])
 AC_ARG_ENABLE([debug], [AC_HELP_STRING([--enable-debug], [Enable debug (optimized for GDB)])], [DEBUG="$enableval"], [DEBUG=no])
@@ -65,7 +66,7 @@ if test x$SINGLETHREAD = xno; then
 fi
 
 if test x$HDF5 = xyes; then
-   AC_HAVE_LIBRARY(hdf5, , AC_MSG_ERROR([No such library hdf5.]))
+   AC_HAVE_LIBRARY(hdf5, , AC_MSG_WARN([No such library hdf5. You can build it locally after configuration with `make hdf5-prereq` before build and it includes to build paths automatically]))
 fi
 
 dnl # Checks for header files.
