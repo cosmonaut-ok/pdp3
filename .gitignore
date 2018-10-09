@@ -334,3 +334,4 @@ test/functional/parameters_ext.xml.tmpl
 tools/.nbrun*
 #*
 *#
+target/
