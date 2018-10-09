@@ -49,8 +49,6 @@ LDFLAGS += -L$(tinyvec3d_SUBDIR)
 ### link hdf5 library
 ifeq (@HDF5_OPTION@, true)
 pdp3_LIBRARIES += hdf5
-LDFLAGS += -L$(TARGETDIR)/@HDF5_VERSION@/hdf5/lib
-INCLUDE_PATH += -I$(TARGETDIR)/@HDF5_VERSION@/hdf5/include
 else
 pdp3_CXX_SRCS_TMP := $(pdp3_CXX_SRCS)
 pdp3_CXX_SRCS = $(filter-out $(SRCDIR)/ioHDF5.cpp, $(pdp3_CXX_SRCS_TMP))
@@ -184,12 +182,13 @@ dist: all doc
 	zip -r `basename $(RELEASE)`.zip $(RELEASE)
 
 hdf5: prepare
-	cd $(TARGETDIR); \
+	test -d $(TARGETDIR)/@HDF5_VERSION@ || \
+	(cd $(TARGETDIR); \
 	wget -qO- "@HDF5_URL@" | tar xjf -; \
 	cd @HDF5_VERSION@; \
 	./autogen.sh; \
 	./configure --enable-cxx --enable-build-mode=production --prefix=@prefix@; \
-	make
+	make)
 
 hdf5-install: hdf5
 	cd $(TARGETDIR)/@HDF5_VERSION@; \
