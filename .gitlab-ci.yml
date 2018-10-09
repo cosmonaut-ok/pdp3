@@ -1,8 +1,7 @@
 image: cosmonaut/hdf5-builder:latest
 
 before_script:
-  - apt-get update -y -qq
-  - apt-get -y -qq install build-essential git libhdf5-100 libhdf5-dev autoconf hdf5-tools imagemagick doxygen pandoc pandoc-citeproc
+  - apt-get -y -qq install build-essential git autoconf imagemagick doxygen pandoc pandoc-citeproc || true
   - git submodule update --init
 
 stages:
