@@ -40,6 +40,7 @@ doc:
     - ./autogen.sh
     - ./configure --enable-hdf5 --enable-ieee --with-doc-formats='html rtf'
     - make doc
+  allow_failure: true
 
 clean:
   stage: clean
@@ -52,3 +53,4 @@ hdf5-build:
     - ./autogen.sh
     - ./configure --enable-hdf5 --enable-ieee
     - make hdf5-prereq
+  allow_failure: true
