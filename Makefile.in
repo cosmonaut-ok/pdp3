@@ -48,7 +48,7 @@ LDFLAGS += -L$(tinyvec3d_SUBDIR)
 
 ### link hdf5 library
 ifeq (@HDF5_OPTION@, true)
-pdp3_LIBRARIES += hdf5_serial
+pdp3_LIBRARIES += hdf5
 else
 pdp3_CXX_SRCS_TMP := $(pdp3_CXX_SRCS)
 pdp3_CXX_SRCS = $(filter-out $(SRCDIR)/ioHDF5.cpp, $(pdp3_CXX_SRCS_TMP))
