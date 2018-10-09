@@ -183,11 +183,14 @@ dist: all doc
 	cp doc/vis/latex/refman.pdf $(RELEASE)/doc/visualization.pdf
 	zip -r `basename $(RELEASE)`.zip $(RELEASE)
 
-hdf5-prereq: prepare
+hdf5: prepare
 	cd $(TARGETDIR); \
 	wget -qO- "@HDF5_URL@" | tar xjf -; \
 	cd @HDF5_VERSION@; \
 	./autogen.sh; \
-	./configure --enable-cxx --enable-build-mode=production; \
-	make; \
+	./configure --enable-cxx --enable-build-mode=production --prefix=@prefix@; \
+	make
+
+hdf5-install: hdf5
+	cd $(TARGETDIR)/@HDF5_VERSION@; \
 	make install
