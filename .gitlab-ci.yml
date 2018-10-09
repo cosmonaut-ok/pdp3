@@ -15,6 +15,8 @@ stages:
 # Stage "build"
 build:
   stage: build
+  artifacts:
+    untracked: true
   script:
     - ./autogen.sh
     - ./configure --enable-hdf5 --enable-ieee
@@ -22,33 +24,39 @@ build:
 
 test:
   stage: test
+  dependencies: 
+    - build
   script:
-    - ./autogen.sh
-    - ./configure --enable-hdf5 --enable-ieee
     - make test
 
 test-ext:
   stage: test
+  dependencies: 
+    - build
   script:
-    - ./autogen.sh
-    - ./configure --enable-hdf5 --enable-ieee
     - make test-ext
+  allow_failure: true
 
 doc:
   stage: postbuild
+  dependencies: 
+    - build
   script:
-    - ./autogen.sh
-    - ./configure --enable-hdf5 --enable-ieee --with-doc-formats='html rtf'
     - make doc
   allow_failure: true
 
 clean:
   stage: clean
+  dependencies: 
+    - test
+    - test-ext
   script: make mrproper
   when: always
 
 hdf5-build:
   stage: build
+  dependencies:
+    - build
   script:
     - ./autogen.sh
     - ./configure --enable-hdf5 --enable-ieee
