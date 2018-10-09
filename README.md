@@ -121,7 +121,7 @@ user@host$ nice -20 /path/to/pdp3 [ -h ] | [ -f /path/to/parameters.xml ] # give
 ```
 > NOTE: it can take several days or weeks, and several hundred gigabytes of diskspace (yep, it is science, my deer friend).
 
-#### 6. **VISUALIZATION (generate images or animation)**
+#### 6. **VISUALIZATION (generate plots or animation)**
 
 After your application finished modeling, you can build some visual model from generated data. Use python with matplotlib and numpy. [Anaconda](https://www.anaconda.com/download/#linux) as python distribution is recommended.
 
@@ -147,6 +147,8 @@ user@host$ /path/to/repository/with/pdp3/tools/movie_3_component.py /path/to/par
 
 **Interactive data analysis:**
 
+Data analysis tools made as jupyter (ipython) notebooks. You can find them in `tools` subdir. Please, run jupyter from `tools` dir also
+
 ``` shell
 user@host$ cd /path/to/pdp3/tools
 user@host$ jupyter <notebook|lab>
@@ -156,6 +158,7 @@ than you can choose jupyter notebook, corresponding to your needs and work with 
 
 **Non-interactive notebook launch:**
 
+To run python notebook in non-interactive mode, please, use script `tools/nbrun.sh` from project root directory
 ``` shell
 user@host$ /path/to/pdp3/tools/nbrun.sh /path/to/pdp3/tools/some.ipynb [config_path=\'/path/to/parameters.xml\'] [other_notebook_variable=other_notebook_value]
 ```
@@ -210,7 +213,7 @@ Find documentation in:
 user@host$ git status
 ```
 > NOTE: If you have such files, you commit, remove or move out of your working directory (with pdp3), than reset repository
-> Also, you can just reset repository
+> Also, you can just reset repository, or remove your local changes in other way
 ``` shell
 user@host$ git reset --hard
 ```
@@ -218,7 +221,7 @@ user@host$ git reset --hard
 2. Sync with upstream
 
 ``` shell
-user@host$ git fetch origin --tags
+user@host$ git fetch origin
 ```
 
 ##### Working
@@ -257,10 +260,10 @@ When you finish some logical step of your work, you should merge your changes to
 
 1. build project with DEBUG option
 ``` shell
-user@host$ make DEBUG=yes
+user@host$ ./autogen.sh && ./configure --enable-debug && make
 ```
 
-2. Set options `debug` to `true`,
+2. Set `debug` option to `true`,
 
 3. Check out options
    - `particles->particles_kind->debug_number` (at least `1e4` is recommended)
@@ -281,29 +284,19 @@ user@host$ gdb ./pdp3
 If you want to experiment and use unsafe features, disabled by default, use "-DEXPERIMENTAL" key in CFLAGS. For example:
 
 ``` shell
-user@host$ make CFLAGS="-m64 -mcmodel=medium -DEXPERIMENTAL"
+user@host$ ./confugure --enable-experimental && make
 ```
 
 #### Tools
 
 Quick analytic calculator of plasma (aka Langmur) frequency, wake wavelength, Debye length etc. from parameters.xml file
 ``` shell
-user@host$ ./tools/quick_calculator.py <path/to/parameters.xml>
+user@host$ ./tools/quick_parameters_calculator.py <path/to/parameters.xml>
 ```
-
-Data analysis tools made as jupyter (ipython) notebooks. You can find them in `tools` subdir. Please, run jupyter from `tools` dir also
-``` shell
-user@host$ cd tools
-user@host$ jupyter <notebook|lab> [some_notebook.ipynb] [other options]
-```
-
-To run python notebook in non-interactive mode, please, use script `tools/nbrun.sh` from project root directory
-``` shell
-user@host$ ./tools/nbrun.sh ./tools/some_notebook.ipynb
-```
+See **VISUALIZATION** section also
 
 You can edit jupyter notebooks with jupyter browser editor (opens with `jupyter notebook` or `jupyter lab` commands), atom (plugin: https://atom.io/packages/jupyter-notebook), emacs (plugin: https://github.com/millejoh/emacs-ipython-notebook), spyder (plugin: https://github.com/spyder-ide/spyder-notebook) etc
 
 #### Bugs/Workarounds
 
-NOTE: During the bug in HDF5 library v.1.10.0, related to file locking, use `export HDF5_USE_FILE_LOCKING=FALSE` before launching pdp3, jupyter or other tools
+> NOTE: It's recommended to disable HDF data file locking to avoid unreadable files, during incorrect application exit or other emergency stuff. Use `export HDF5_USE_FILE_LOCKING=FALSE` before launching pdp3, jupyter or other tools to disable locking.
