@@ -11,7 +11,7 @@ RUN apt-get -y -qq install apt-utils build-essential git imagemagick pandoc pand
 
 # because mainstream openjdk does not want to be installed w/o some (pseudo)graphics
 RUN apt-get -y -qq install default-jdk-headless || true
-RUN apt-get -qq -y build-dep hdf5
+RUN apt-get -qq -y build-dep hdf5 || true
 
 RUN wget -qO- "https://www.hdfgroup.org/package/source-bzip/?wpdmdl=12594&refresh=5bbc7778635b21539078008" | tar xjf -
 
