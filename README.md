@@ -14,15 +14,6 @@ Renew [PDP3](https://github.com/knuniv/pdp3) project
 - python+jupyter+matplotlib+numpy for visualization (anaconda - python scientific environment is highly recommended)
 - doxygen, latex (texlive-full), imagemagick, pandoc, pandoc-citeproc _**(optional, for documentation only)**_
 
-<!-- ### Terms and Legend -->
-
-<!-- * `<REQUIRED_VALUE>` - required CLI value (ex. application's parameter, required to launch with) -->
-<!-- * `[OPTIONAL_VALUE]` - optionsl CLI value (ex. application's optional launch parameter) -->
-<!-- * `VAR=val` - set unix shell environment variable -->
-<!-- * `user@host$` - shell terminal prompt for user <user> -->
-<!-- * `root@host#` - shell terminal prompt for superuser (root). It can be reached by commands `su`, or `sudo -i`, or `sudo <command with all arguments>` from your user -->
-<!-- * `# phrase` - comment in code (in shell-like syntax) -->
-
 ### HOWTO (linux, debian/ubuntu example)
 
 #### 0. INSTALL PREREQUIRED SOFTWARE
