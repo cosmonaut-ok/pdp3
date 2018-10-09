@@ -7,7 +7,7 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 RUN echo 'deb-src http://deb.debian.org/debian stretch main' >> /etc/apt/sources.list
 RUN apt-get update -y -qq
 
-RUN apt-get -y -qq install apt-utils build-essential git imagemagick pandoc pandoc-citeproc libtool libtool-bin
+RUN apt-get -y -qq install apt-utils build-essential git imagemagick pandoc pandoc-citeproc libtool libtool-bin wget
 
 # because mainstream openjdk does not want to be installed w/o some (pseudo)graphics
 RUN apt-get -y -qq install default-jdk-headless || true
