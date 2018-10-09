@@ -1,8 +1,10 @@
 image: cosmonaut/hdf5-builder:latest
 
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
 before_script:
   - apt-get -y -qq install build-essential git autoconf imagemagick doxygen pandoc pandoc-citeproc || true
-  - git submodule update --init
 
 stages:
   - build
