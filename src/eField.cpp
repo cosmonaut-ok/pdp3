@@ -119,50 +119,53 @@ void EField::calc_field(HField *h_field1,
   double dz = geom1->dz;
 
   //// Er first[i] value
-#pragma omp parallel for
-  for(int k=1; k<(geom1->n_grid_2-1); k++)
+#pragma omp parallel
   {
-    int i=0;
-    koef_e = (2.0*geom1->epsilon[i][k]*EPSILON0 - geom1->sigma[i][k]*time1->delta_t) /
-      (2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
-
-    koef_h =  2*time1->delta_t/(2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
-
-    field_r[i][k]=field_r[i][k] * koef_e  - (j1[i][k]+(h_phi[i][k] - h_phi[i][k-1])/dz)*koef_h;
-  }
-
-  //// Ez=on axis// // ???????????
-#pragma omp parallel for
-  for(int k=0; k<(geom1->n_grid_2-1); k++)
-  {
-    int i=0;
-    koef_e = (2.0*geom1->epsilon[i][k]*EPSILON0 - geom1->sigma[i][k]*time1->delta_t) /
-      (2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
-    koef_h =  2*time1->delta_t/(2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
-
-    field_z[i][k]=field_z[i][k]*koef_e - (j3[i][k]-4.0/dr*h_phi[i][k])*koef_h;
-  }
-
-#pragma omp parallel for
-  for(int i=1; i<(geom1->n_grid_1-1); i++)
+#pragma omp for
     for(int k=1; k<(geom1->n_grid_2-1); k++)
     {
+      int i=0;
+      koef_e = (2.0*geom1->epsilon[i][k]*EPSILON0 - geom1->sigma[i][k]*time1->delta_t) /
+        (2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
+
+      koef_h =  2*time1->delta_t/(2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
+
+      field_r[i][k]=field_r[i][k] * koef_e  - (j1[i][k]+(h_phi[i][k] - h_phi[i][k-1])/dz)*koef_h;
+    }
+
+    //// Ez=on axis// // ???????????
+#pragma omp for
+    for(int k=0; k<(geom1->n_grid_2-1); k++)
+    {
+      int i=0;
       koef_e = (2.0*geom1->epsilon[i][k]*EPSILON0 - geom1->sigma[i][k]*time1->delta_t) /
         (2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
       koef_h =  2*time1->delta_t/(2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
-      field_r[i][k]=field_r[i][k]*koef_e - (j1[i][k]+(h_phi[i][k]-h_phi[i][k-1])/dz)*koef_h;
-      field_phi[i][k]=field_phi[i][k]*koef_e - (j2[i][k]-(h_r[i][k]-h_r[i][k-1])/dz + (h_z[i][k]-h_z[i-1][k])/dr)*koef_h;
-      field_z[i][k]=field_z[i][k]*koef_e -(j3[i][k]-(h_phi[i][k]-h_phi[i-1][k])/dr - (h_phi[i][k]+h_phi[i-1][k])/(2.0*dr*i))*koef_h;
+
+      field_z[i][k]=field_z[i][k]*koef_e - (j3[i][k]-4.0/dr*h_phi[i][k])*koef_h;
     }
 
-#pragma omp parallel for
-  for(int i=1; i<(geom1->n_grid_1-1); i++)
-  {
-    int k=0;
-    koef_e = (2.0*geom1->epsilon[i][k]*EPSILON0 - geom1->sigma[i][k]*time1->delta_t) /
-      (2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
-    koef_h =  2*time1->delta_t/(2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
-    field_z[i][k]=field_z[i][k]*koef_e - (j3[i][k] - (h_phi[i][k]-h_phi[i-1][k])/dr - (h_phi[i][k]+h_phi[i-1][k])/(2.0*dr*i))*koef_h;
+#pragma omp for
+    for(int i=1; i<(geom1->n_grid_1-1); i++)
+      for(int k=1; k<(geom1->n_grid_2-1); k++)
+      {
+        koef_e = (2.0*geom1->epsilon[i][k]*EPSILON0 - geom1->sigma[i][k]*time1->delta_t) /
+          (2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
+        koef_h =  2*time1->delta_t/(2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
+        field_r[i][k]=field_r[i][k]*koef_e - (j1[i][k]+(h_phi[i][k]-h_phi[i][k-1])/dz)*koef_h;
+        field_phi[i][k]=field_phi[i][k]*koef_e - (j2[i][k]-(h_r[i][k]-h_r[i][k-1])/dz + (h_z[i][k]-h_z[i-1][k])/dr)*koef_h;
+        field_z[i][k]=field_z[i][k]*koef_e -(j3[i][k]-(h_phi[i][k]-h_phi[i-1][k])/dr - (h_phi[i][k]+h_phi[i-1][k])/(2.0*dr*i))*koef_h;
+      }
+
+#pragma omp for
+    for(int i=1; i<(geom1->n_grid_1-1); i++)
+    {
+      int k=0;
+      koef_e = (2.0*geom1->epsilon[i][k]*EPSILON0 - geom1->sigma[i][k]*time1->delta_t) /
+        (2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
+      koef_h =  2*time1->delta_t/(2.0*geom1->epsilon[i][k]*EPSILON0 + geom1->sigma[i][k]*time1->delta_t);
+      field_z[i][k]=field_z[i][k]*koef_e - (j3[i][k] - (h_phi[i][k]-h_phi[i-1][k])/dr - (h_phi[i][k]+h_phi[i-1][k])/(2.0*dr*i))*koef_h;
+    }
   }
 }
 
