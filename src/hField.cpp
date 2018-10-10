@@ -119,38 +119,67 @@ void HField::set_homogeneous_h(double E_r, double E_phi, double E_z)
 // Field calculation
 void HField::calc_field(EField *e_field1, Time *time1)
 {
-  double alpha;
+  double **e_r = e_field1->field_r;
+  double **e_phi = e_field1->field_phi;
+  double **e_z = e_field1->field_z;
+
+  double dr = geom1->dr;
+  double dz = geom1->dz;
+
+  // double alpha;
 
   // Hr - last i value
-#pragma omp parallel for
-  for(int k=0; k<(geom1->n_grid_2-1); k++)
+#pragma omp parallel
   {
-    int i=geom1->n_grid_1-1;
-    alpha=(e_field1->field_phi[i][k+1]-e_field1->field_phi[i][k])/(geom1->dz*MAGN_CONST);
-
-    field_r_half_time[i][k]=field_r[i][k]+alpha*time1->delta_t/2;
-    field_r[i][k] = field_r[i][k]+alpha*time1->delta_t;
-  }
-
-  for(int i=0; i<(geom1->n_grid_1 - 1); i++)
-    for(int k=0; k<(geom1->n_grid_2 - 1); k++)
+#pragma omp for
+    for(int k=0; k<(geom1->n_grid_2-1); k++)
     {
-      alpha=((e_field1->field_phi[i][k+1]-e_field1->field_phi[i][k])/geom1->dz)/MAGN_CONST;
+      int i=geom1->n_grid_1-1;
+      // alpha constant and delta_t production (to optimize calculations)
+      double alpha_t = time1->delta_t
+        * (e_phi[i][k+1]-e_phi[i][k]) / (dz * MAGN_CONST);
 
-      field_r_half_time[i][k]=field_r[i][k]+alpha*time1->delta_t/2;
-      field_r[i][k] = field_r[i][k]+alpha*time1->delta_t;
-
-      alpha=((e_field1->field_z[i+1][k]-e_field1->field_z[i][k])/geom1->dr -
-             (e_field1->field_r[i][k+1]-e_field1->field_r[i][k])/geom1->dz)/MAGN_CONST;
-      field_phi_half_time[i][k] = field_phi[i][k]+alpha*time1->delta_t/2;
-      field_phi[i][k] = field_phi[i][k]+alpha*time1->delta_t;
-
-      alpha= ((e_field1->field_phi[i+1][k]+e_field1->field_phi[i][k])/(2.0*geom1->dr*(i+0.5)) +
-              (e_field1->field_phi[i+1][k]-e_field1->field_phi[i][k])/geom1->dr)/MAGN_CONST;
-      field_z_half_time[i][k] = field_z[i][k]-alpha*time1->delta_t/2;
-      field_z[i][k] = field_z[i][k]-alpha*time1->delta_t;
-
+      field_r_half_time[i][k] = field_r[i][k] + alpha_t / 2;
+      field_r[i][k] = field_r[i][k] + alpha_t;
     }
+
+#pragma omp for
+    for(int i=0; i<(geom1->n_grid_1 - 1); i++)
+      for(int k=0; k<(geom1->n_grid_2 - 1); k++)
+      {
+        double alpha_t = time1->delta_t
+          * (e_phi[i][k+1]-e_phi[i][k]) / (dz * MAGN_CONST);
+
+        field_r_half_time[i][k] = field_r[i][k] + alpha_t / 2;
+        field_r[i][k] = field_r[i][k] + alpha_t;
+      }
+
+#pragma omp for
+    for(int i=0; i<(geom1->n_grid_1 - 1); i++)
+      for(int k=0; k<(geom1->n_grid_2 - 1); k++)
+      {
+        double alpha_t = time1->delta_t
+          * ((e_z[i+1][k] - e_z[i][k]) / dr
+             - (e_r[i][k+1] - e_r[i][k]) / dz)
+          / MAGN_CONST;
+
+        field_phi_half_time[i][k] = field_phi[i][k] + alpha_t / 2;
+        field_phi[i][k] = field_phi[i][k] + alpha_t;
+      }
+
+#pragma omp for
+    for(int i=0; i<(geom1->n_grid_1 - 1); i++)
+      for(int k=0; k<(geom1->n_grid_2 - 1); k++)
+      {
+        double alpha_t = time1->delta_t
+          * ((e_phi[i+1][k] + e_phi[i][k]) / (2.0 * dr * (i + 0.5))
+             + (e_phi[i+1][k] - e_phi[i][k]) / dr)
+          / MAGN_CONST;
+
+        field_z_half_time[i][k] = field_z[i][k] - alpha_t / 2;
+        field_z[i][k] = field_z[i][k] - alpha_t;
+      }
+  }
 }
 
 double* HField::get_field(double x1, double x3)
