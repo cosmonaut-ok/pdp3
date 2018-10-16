@@ -108,6 +108,7 @@ class H5Reader:
     def get_frame(self, space, number):
         if self.__check_frame__(space, number):
             cache_file_name = "frame_space:{}_number:{}".format(space, number)
+            frame = []
             if self.use_cache:
                 frame = self.__tiny_cache__.get_cache(cache_file_name)
             if len(frame) != 0:
