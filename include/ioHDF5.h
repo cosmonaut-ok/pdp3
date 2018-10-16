@@ -21,7 +21,6 @@ private:
   char result_group_name[100];
   char state_group_name[100];
 
-  hid_t file_id;
   herr_t status;
 
   void dump_h5_dataset(char const *group_name,
