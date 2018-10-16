@@ -88,7 +88,7 @@
   <file_save_parameters>
     <result_path>pdp3_result/</result_path>              <!-- path to modeling results data -->
     <save_state_path>pdp3_result/dump/</save_state_path> <!-- path to system state dump -->
-    <data_dump_interval>500</data_dump_interval>          <!-- number of time steps between two result data dumps -->
+    <data_dump_interval>50</data_dump_interval>          <!-- number of time steps between two result data dumps -->
     <debug_data_dump_interval>50</debug_data_dump_interval>
     <system_state_dump_interval>0</system_state_dump_interval> <!-- number of time steps between two system state dumps. Set '0' to disable. RESTORATION STILL NOT IMPLEMENTED -->
     <frames_per_file>10</frames_per_file> <!-- how many image frames should be placed in one data file -->
