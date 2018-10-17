@@ -44,7 +44,7 @@ Field::~Field()
   delete[]field_z;
 }
 
-//// Return one dimensional field components
+// Return one dimensional field components
 double *Field::get_1d_field_r()
 {
   // copy 2d field array into 1d array rowwise

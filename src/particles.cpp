@@ -477,7 +477,7 @@ void Particles::simple_j_weighting(Time *time1,
   double delta_r = x1_new - x1_old;
   double delta_z = x3_new - x3_old;
 
-  if ((abs(delta_r)<1e-15)||(abs(delta_z)<1e-15))
+  if ((abs(delta_r) < MNZL) || (abs(delta_z) < MNZL)) // MNZL see constant.h
     return;
   // if i cell is not equal 0
   if (i_n>=1)
@@ -660,17 +660,11 @@ void Particles::j_weighting(Time *time1, Current *j1)
   for (unsigned int i=0;i<number;i++)
     if (is_alive[i])
     {
-      // double x1_old= x1_o[i];
-      // double x3_old = x3_o[i];
-
-      double x1_old = pos_old[i][0];
-      double x3_old = pos_old[i][2];
-
       //finding number new and old cells
-      int i_n = (int)ceil((pos[i][0])/dr)-1;
-      int k_n =(int)ceil((pos[i][2])/dz)-1;
-      int i_o = (int)ceil((x1_old)/dr)-1;
-      int k_o =(int)ceil((x3_old)/dz)-1;
+      int i_n = (int)ceil((pos[i][0]) / dr) - 1;
+      int k_n = (int)ceil((pos[i][2]) / dz) - 1;
+      int i_o = (int)ceil((pos_old[i][0]) / dr) - 1;
+      int k_o = (int)ceil((pos_old[i][2]) / dz) - 1;
       // TODO: workaround: sometimes it gives -1.
       // Just get 0 cell if it happence
       if (i_n < 0) { i_n = 0; }
@@ -678,105 +672,107 @@ void Particles::j_weighting(Time *time1, Current *j1)
       if (i_o < 0) { i_o = 0; }
       if (k_o < 0) { k_o = 0; }
 
-      if (x1_old==(i_o+1)*dr)
-        i_o=i_n;
-      if(x3_old==(k_o+1)*dz)
-        k_o=k_n;
-      if (pos[i][0]==(i_n+1)*dr)
-        i_n=i_o;
-      if(pos[i][2]==(k_n+1)*dz)
-        k_n=k_o;
-      int res_cell = abs(i_n-i_o) + abs(k_n-k_o);
-      if ((abs(pos[i][0]-x1_old)<1e-15)||(abs(pos[i][2]-x3_old)<1e-15))
-      {
-        strict_motion_weighting(time1, j1,pos[i][0],pos[i][2],x1_old,x3_old,i);
-      }
+      if (pos_old[i][0] == (i_o + 1) * dr) i_o = i_n;
+      if (pos_old[i][2] == (k_o + 1) * dz) k_o = k_n;
+      if (pos[i][0] == (i_n + 1) * dr) i_n = i_o;
+      if (pos[i][2] == (k_n + 1) * dz) k_n = k_o;
+
+      int res_cell = abs(i_n - i_o) + abs(k_n - k_o);
+
+      if ((abs(pos[i][0] - pos_old[i][0]) < MNZL)
+          || (abs(pos[i][2] - pos_old[i][2]) < MNZL))
+        strict_motion_weighting(time1, j1, pos[i][0], pos[i][2],
+                                pos_old[i][0], pos_old[i][2], i);
       else
       {
         switch (res_cell)
         {
-          /// 1) charge in four cells
-        case 0: simple_j_weighting(time1, j1, pos[i][0],pos[i][2] ,x1_old,x3_old, i_n, k_n,i);
+          // 1) charge in four nodes
+        case 0: simple_j_weighting(time1, j1, pos[i][0], pos[i][2],
+                                   pos_old[i][0], pos_old[i][2], i_n, k_n, i);
           break;
-
-          /// 2) charge in seven cells
+          // 2) charge in 7 nodes
         case 1:
         {
-          /// charge in seven cells (i_new != i_old)
-          if ((i_n!=i_o)&&(k_n==k_o))
+          // charge in 7 nodes. Moving on r-axis (i_new != i_old)
+          if ((i_n != i_o) && (k_n == k_o))
           {
-            if (x1_old >(i_n+1)*dr)
+            // moving to center from outer to innter cell
+            if (pos_old[i][0] > (i_n + 1) * dr)
             {
-              double a = (x1_old - pos[i][0])/(x3_old - pos[i][2]);
-              double r_boundary = (i_n+1)*dr;
+              double a = (pos_old[i][0] - pos[i][0]) / (pos_old[i][2] - pos[i][2]);
+              double r_boundary = (i_n+1) * dr;
               double delta_r = r_boundary - pos[i][0];
-              double z_boundary = pos[i][2] + delta_r/a;
+              double z_boundary = pos[i][2] + delta_r / a;
 
-              simple_j_weighting(time1,j1, r_boundary,z_boundary ,x1_old,x3_old, i_n+1,k_n,i);
-              simple_j_weighting(time1,j1, pos[i][0],pos[i][2], r_boundary,z_boundary, i_n, k_n,i);
+              simple_j_weighting(time1, j1, r_boundary, z_boundary,
+                                 pos_old[i][0], pos_old[i][2], i_n+1, k_n, i);
+              simple_j_weighting(time1,j1, pos[i][0], pos[i][2],
+                                 r_boundary, z_boundary, i_n, k_n, i);
             }
+            // moving to wall
             else
             {
-              double a = (pos[i][0] - x1_old)/(pos[i][2] - x3_old);
+              double a = (pos[i][0] - pos_old[i][0]) / (pos[i][2] - pos_old[i][2]);
               double r_boundary = (i_n)*dr;
-              double delta_r = r_boundary - x1_old;
-              double z_boundary = x3_old + delta_r/a;
+              double delta_r = r_boundary - pos_old[i][0];
+              double z_boundary = pos_old[i][2] + delta_r / a;
 
-              simple_j_weighting(time1,j1, r_boundary,z_boundary ,x1_old,x3_old, i_n-1, k_n,i);
-              simple_j_weighting(time1,j1, pos[i][0],pos[i][2], r_boundary,z_boundary, i_n, k_n,i);
+              simple_j_weighting(time1, j1, r_boundary, z_boundary, pos_old[i][0], pos_old[i][2], i_n-1, k_n, i);
+              simple_j_weighting(time1, j1, pos[i][0], pos[i][2], r_boundary, z_boundary, i_n, k_n, i);
             }
-
           }
-          //  charge in seven cells (k_new != k_old)
-          else if ((i_n==i_o)&&(k_n!=k_o))
+          // charge in seven cells. Moving on z-axis (k_new != k_old)
+          else if ((i_n == i_o) && (k_n != k_o))
           {
-            if (x3_old<k_n*dz)
+            // moving forward from N to N+1 cell
+            if (pos_old[i][2] < k_n * dz)
             {
-              double z_boundary = k_n*dz;
-              double delta_z  = z_boundary - x3_old;
-              double a = (pos[i][0] - x1_old)/(pos[i][2] - x3_old);
-              double r_boundary = x1_old + a*delta_z;
-              simple_j_weighting(time1,j1, r_boundary,z_boundary ,x1_old,x3_old, i_n, k_n-1,i);
-              simple_j_weighting(time1,j1, pos[i][0],pos[i][2], r_boundary,z_boundary, i_n, k_n,i);
+              double z_boundary = k_n * dz;
+              double delta_z  = z_boundary - pos_old[i][2];
+              double a = (pos[i][0] - pos_old[i][0]) / (pos[i][2] - pos_old[i][2]);
+              double r_boundary = pos_old[i][0] + a * delta_z;
+              simple_j_weighting(time1, j1, r_boundary, z_boundary ,pos_old[i][0], pos_old[i][2], i_n, k_n-1, i);
+              simple_j_weighting(time1, j1, pos[i][0], pos[i][2], r_boundary, z_boundary, i_n, k_n, i);
             }
+            // moving backward
             else
             {
-              double z_boundary = (k_n+1)*dz;
-              double delta_z  = z_boundary - pos[i][2];
-              double a = (x1_old - pos[i][0])/(x3_old - pos[i][2]);
-              double r_boundary = pos[i][0] + a*delta_z;
-              simple_j_weighting(time1,j1, r_boundary,z_boundary ,x1_old,x3_old, i_n, k_n+1,i);
-              simple_j_weighting(time1,j1, pos[i][0],pos[i][2], r_boundary,z_boundary,i_n, k_n,i);
+              double z_boundary = (k_n + 1) * dz;
+              double delta_z = z_boundary - pos[i][2];
+              double a = (pos_old[i][0] - pos[i][0]) / (pos_old[i][2] - pos[i][2]);
+              double r_boundary = pos[i][0] + a * delta_z;
+              simple_j_weighting(time1,j1, r_boundary, z_boundary, pos_old[i][0], pos_old[i][2], i_n, k_n+1, i);
+              simple_j_weighting(time1,j1, pos[i][0], pos[i][2], r_boundary, z_boundary, i_n, k_n, i);
             }
           }
         }
         break;
-
-        ///////// 3) charge in 10 cells /////////
+        // 3) charge in 10 nodes
         case 2:
         {
-          // case, when particle move from [i-1] cell to [i] cell
-          if (i_o<i_n)
+          // moving forward
+          if (i_o < i_n)
           {
             // case, when particle move from [i-1][k-1] -> [i][k] cell
-            if(k_o<k_n)
+            if(k_o < k_n)
             {
-              double a = (pos[i][0] - x1_old)/(pos[i][2] - x3_old);
-              double r1 = i_n*dr;
-              double delta_z1 = (r1 - x1_old)/a;
-              double z1 = x3_old + delta_z1;
-              double z2 = k_n*dz;
-              double delta_r2 = (z2-x3_old)*a;
-              double r2 = x1_old+ delta_r2;
-              if (z1<k_n*dz)
+              double a = (pos[i][0] - pos_old[i][0]) / (pos[i][2] - pos_old[i][2]);
+              double r1 = i_n * dr;
+              double delta_z1 = (r1 - pos_old[i][0]) / a;
+              double z1 = pos_old[i][2] + delta_z1;
+              double z2 = k_n * dz;
+              double delta_r2 = (z2 - pos_old[i][2]) * a;
+              double r2 = pos_old[i][0] + delta_r2;
+              if (z1 < k_n * dz)
               {
-                simple_j_weighting(time1, j1, r1, z1 ,x1_old, x3_old, i_n-1, k_n-1,i);
+                simple_j_weighting(time1, j1, r1, z1 ,pos_old[i][0], pos_old[i][2], i_n-1, k_n-1,i);
                 simple_j_weighting(time1, j1, r2, z2, r1, z1, i_n, k_n-1,i);
                 simple_j_weighting(time1, j1, pos[i][0], pos[i][2], r2, z2, i_n, k_n,i);
               }
               else if (z1>k_n*dz)
               {
-                simple_j_weighting(time1, j1, r2, z2 ,x1_old, x3_old, i_n-1, k_n-1,i);
+                simple_j_weighting(time1, j1, r2, z2 ,pos_old[i][0], pos_old[i][2], i_n-1, k_n-1,i);
                 simple_j_weighting(time1, j1, r1, z1, r2, z2,i_n-1, k_n,i);
                 simple_j_weighting(time1, j1, pos[i][0], pos[i][2], r1, z1, i_n, k_n,i);
               }
@@ -784,52 +780,52 @@ void Particles::j_weighting(Time *time1, Current *j1)
             // case, when particle move from [i-1][k+1] -> [i][k] cell
             else
             {
-              double a = (pos[i][0] - x1_old)/(pos[i][2] - x3_old);
+              double a = (pos[i][0] - pos_old[i][0])/(pos[i][2] - pos_old[i][2]);
               double r1 = i_n*dr;
-              double delta_z1 = (r1 - x1_old)/a;
-              double z1 = x3_old + delta_z1;
+              double delta_z1 = (r1 - pos_old[i][0])/a;
+              double z1 = pos_old[i][2] + delta_z1;
 
               double z2 = (k_n+1)*dz;
-              double delta_r2 = -(x3_old-z2)*a;
-              double r2 = x1_old+ delta_r2;
+              double delta_r2 = -(pos_old[i][2]-z2)*a;
+              double r2 = pos_old[i][0]+ delta_r2;
               if (z1>(k_n+1)*dz)
               {
-                simple_j_weighting(time1, j1, r1, z1 ,x1_old, x3_old, i_n-1, k_n+1,i);
+                simple_j_weighting(time1, j1, r1, z1 ,pos_old[i][0], pos_old[i][2], i_n-1, k_n+1,i);
                 simple_j_weighting(time1, j1, r2, z2, r1, z1, i_n, k_n+1,i);
                 simple_j_weighting(time1, j1, pos[i][0], pos[i][2], r2, z2, i_n, k_n,i);
               }
               else if (z1<(k_n+1)*dz)
               {
-                simple_j_weighting(time1, j1, r2, z2 ,x1_old, x3_old, i_n-1, k_n+1,i);
+                simple_j_weighting(time1, j1, r2, z2 ,pos_old[i][0], pos_old[i][2], i_n-1, k_n+1,i);
                 simple_j_weighting(time1, j1, r1, z1, r2, z2,i_n-1, k_n,i);
                 simple_j_weighting(time1, j1, pos[i][0], pos[i][2], r1, z1, i_n, k_n,i);
               }
             }
           }
           // case, when particle move from [i+1] cell to [i] cell
-          else if (i_o>i_n)
+          else if (i_o > i_n)
           {
             // case, when particle move from [i+1][k-1] -> [i][k] cell
             if(k_o<k_n)
             {
-              double a = (pos[i][0] - x1_old)/(pos[i][2] - x3_old);
+              double a = (pos[i][0] - pos_old[i][0])/(pos[i][2] - pos_old[i][2]);
               double r1 = (i_n+1)*dr;
-              double delta_z1 = -(x1_old-r1)/a;
-              double z1 = x3_old + delta_z1;
+              double delta_z1 = -(pos_old[i][0]-r1)/a;
+              double z1 = pos_old[i][2] + delta_z1;
 
               double z2 = k_n*dz;
-              double delta_r2 = -(z2-x3_old)*a;
-              double r2 = x1_old- delta_r2;
+              double delta_r2 = -(z2-pos_old[i][2])*a;
+              double r2 = pos_old[i][0]- delta_r2;
 
               if (z1<(k_n)*dz)
               {
-                simple_j_weighting(time1, j1, r1, z1 ,x1_old, x3_old, i_n+1, k_n-1,i);
+                simple_j_weighting(time1, j1, r1, z1 ,pos_old[i][0], pos_old[i][2], i_n+1, k_n-1,i);
                 simple_j_weighting(time1,j1, r2, z2, r1, z1, i_n, k_n-1,i);
                 simple_j_weighting(time1,j1, pos[i][0], pos[i][2], r2, z2, i_n, k_n,i);
               }
               else if (z1>(k_n)*dz)
               {
-                simple_j_weighting(time1, j1, r2, z2 ,x1_old, x3_old, i_n+1, k_n-1,i);
+                simple_j_weighting(time1, j1, r2, z2 ,pos_old[i][0], pos_old[i][2], i_n+1, k_n-1,i);
                 simple_j_weighting(time1, j1, r1, z1, r2, z2,i_n+1, k_n,i);
                 simple_j_weighting(time1, j1, pos[i][0], pos[i][2], r1, z1, i_n, k_n,i);
               }
@@ -838,7 +834,7 @@ void Particles::j_weighting(Time *time1, Current *j1)
             // case, when particle move from [i+1][k+1] -> [i][k] cell
             else if (k_o>k_n)
             {
-              double a = (x1_old-pos[i][0])/(x3_old-pos[i][2]);
+              double a = (pos_old[i][0]-pos[i][0])/(pos_old[i][2]-pos[i][2]);
               double r1 = (i_n+1)*dr;
               double delta_z1 = (r1-pos[i][0])/a;
               double z1 = pos[i][2] + delta_z1;
@@ -849,13 +845,13 @@ void Particles::j_weighting(Time *time1, Current *j1)
 
               if (z1>(k_n+1)*dz)
               {
-                simple_j_weighting(time1, j1, r1, z1 ,x1_old,x3_old, i_n+1, k_n+1,i);
+                simple_j_weighting(time1, j1, r1, z1, pos_old[i][0],pos_old[i][2], i_n+1, k_n+1,i);
                 simple_j_weighting(time1, j1, r2, z2, r1, z1, i_n, k_n+1,i);
                 simple_j_weighting(time1, j1, pos[i][0], pos[i][2], r2, z2, i_n, k_n,i);
               }
               else if (z1<(k_n+1)*dz)
               {
-                simple_j_weighting(time1, j1, r2, z2 ,x1_old, x3_old, i_n+1, k_n+1,i);
+                simple_j_weighting(time1, j1, r2, z2, pos_old[i][0], pos_old[i][2], i_n+1, k_n+1,i);
                 simple_j_weighting(time1, j1, r1, z1, r2, z2,i_n+1, k_n,i);
                 simple_j_weighting(time1, j1, pos[i][0], pos[i][2], r1, z1, i_n, k_n,i);
               }
@@ -992,13 +988,13 @@ void Particles::strict_motion_weighting(Time *time1,
   if (i_o < 0) { i_o = 0; }
   if (k_o < 0) { k_o = 0; }
 
-  if ((abs(x1_new-x1_old)<1e-15)&&(abs(x3_new-x3_old)<1e-15))
+  if ((abs(x1_new-x1_old)<MNZL)&&(abs(x3_new-x3_old)<MNZL))
   {
     // cerr<<"WARNING! zero velocity!" << endl; // TODO: why it is warning?
     return;
   }
   // stirct axis motion
-  if (abs(x1_new-x1_old)<1e-15)
+  if (abs(x1_new-x1_old)<MNZL)
   {
     double r1=0, r2=0,r3=0;
     double delta_z = 0.0;
@@ -1063,7 +1059,7 @@ void Particles::strict_motion_weighting(Time *time1,
   }
 
   // stirct radial motion
-  else if (abs(x3_new-x3_old)<1e-15)
+  else if (abs(x3_new-x3_old)<MNZL)
   {
     double r0    =(i_n+0.5)*dr;
     double wj= 0;
@@ -1217,9 +1213,9 @@ void Particles::step_v_single(EField *e_fld, HField *h_fld,
 
   // set velocity vector components and
   // round very small velicities to avoid exceptions
-  velocity[0] = (abs(vel[i][0]) < 1e-15) ? 0 : vel[i][0];
-  velocity[1] = (abs(vel[i][1]) < 1e-15) ? 0 : vel[i][1];
-  velocity[2] = (abs(vel[i][2]) < 1e-15) ? 0 : vel[i][2];
+  velocity[0] = (abs(vel[i][0]) < MNZL) ? 0 : vel[i][0];
+  velocity[1] = (abs(vel[i][1]) < MNZL) ? 0 : vel[i][1];
+  velocity[2] = (abs(vel[i][2]) < MNZL) ? 0 : vel[i][2];
 
   //! 0. check, if we should use classical calculations.
   //! Required to increase modeling speed
