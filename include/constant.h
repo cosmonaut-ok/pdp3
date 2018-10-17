@@ -20,4 +20,7 @@ namespace constant
   const double MAGN_CONST = 1.26E-6;
   // simulation start time
   const clock_t SIMULATION_START_TIME = std::time(nullptr);
+  // minimal possible distance or velocity.
+  // Smaller values should be rounded to zero
+  const double MNZL = 1e-15; // Minimal Non-Zeroing Limit
 }
