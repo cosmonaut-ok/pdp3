@@ -870,7 +870,7 @@ void Particles::azimuthal_j_weighting(Current *this_j)
   double dz = geom1->dz;
 
 #ifdef EXPERIMENTAL
-#pragma omp parallel for shared(dr, dz, time1, this_j) default(none)
+#pragma omp parallel for shared(dr, dz, this_j) default(none)
 #endif
   for(unsigned int i=0;i<number;i++)
     if (is_alive[i])
