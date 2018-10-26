@@ -40,17 +40,23 @@ def run(config_file, data_file=None, components=['E_r', 'E_z', 'H_phi', 'rho_bea
         start_frame = cfg.get_frame_number_by_timestamp(time_range[0])
         end_frame = cfg.get_frame_number_by_timestamp(time_range[1])
 
-    for frame in range(start_frame, end_frame):
-        for compon in components:
-            name = os.path.join(main_group_name, compon, str(frame))
-            ds = reader.get_frame(compon, frame)
-            if enable_compression:
-                f.create_dataset(name, data=ds, compression='gzip', compression_opts=compression_level)
-            else:
-                f.create_dataset(name, data=ds)
-            print("Imported {}/{}".format(compon, frame))
+    start_data_set, _ = reader.get_ds_frame_by_frame(start_frame)
+    end_data_set, _ = reader.get_ds_frame_by_frame(end_frame)
 
+    for i in range(start_data_set, end_data_set):
+        for compon in components:
+            data_compon = reader.get_all_frames_in_ds(compon, i)
+            for frame in range(0, cfg.frames_per_file):
+                abs_frame_number = i * cfg.frames_per_file + frame
+                name = os.path.join(main_group_name, compon, str(abs_frame_number))
+                ds = data_compon[frame]
+                if enable_compression:
+                    f.create_dataset(name, data=ds, compression='gzip', compression_opts=compression_level)
+                else:
+                    f.create_dataset(name, data=ds)
+                print("Imported {}/{}".format(compon,  abs_frame_number))
     f.close()
+    print('done')
 
 
 def main():
