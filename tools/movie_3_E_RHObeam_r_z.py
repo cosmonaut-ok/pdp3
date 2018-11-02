@@ -13,14 +13,14 @@ from lib.h5_reader import H5Reader
 from lib.plain_reader import PlainReader
 
 def run(config_file, clim_e_r, clim_e_z, rho_beam_scale, video_file=None,
-        time_range=None, cmap=None, dry_run=False, view=False, use_grid=False):
+        time_range=None, cmap=None, frame_step=1, dry_run=False, view=False, use_grid=False):
 
     ##  configuration options
     x_axis_label = r'$\mathit{Z (m)}$'
     y_axis_label = r'$\mathit{R (m)}$'
     cbar_axis_label = r'$\frac{V}{m}$'
     cbar_bunch_density_axis_label = r'$m^{-3}$'
-    
+
     e_r_plot_name = r'$\mathbf{Electrical\enspace Field\enspace Radial\enspace Component}\enspace(E_r)$'
     e_z_plot_name = r'$\mathbf{Electrical\enspace Field\enspace Longitudal\enspace Component}\enspace(E_z)$'
     rho_beam_plot_name = r'$\mathbf{Electron\enspace Bunch\enspace Density}\enspace (\rho_{bunch})$'
@@ -56,11 +56,11 @@ def run(config_file, clim_e_r, clim_e_z, rho_beam_scale, video_file=None,
                        font_family=cfg.figure_font_family,
                        font_name=cfg.figure_font_name,
                        font_size=cfg.figure_font_size,
-                       
+
                        x_ticklabel_end=cfg.z_size, y_ticklabel_end=cfg.r_size,
                        tickbox=True, grid=use_grid, is_invert_y_axe=False,
                        aspect='equal', image_interpolation='nearest')
-    
+
     # add subplots
     plot.add_subplot_cartesian_2d(e_r_plot_name, 311, x_axe_label=x_axis_label, y_axe_label=y_axis_label)
     plot.add_subplot_cartesian_2d(e_z_plot_name, 312, x_axe_label=x_axis_label, y_axe_label=y_axis_label)
@@ -118,37 +118,38 @@ def run(config_file, clim_e_r, clim_e_z, rho_beam_scale, video_file=None,
                 # add timestamp to each frame
                 timestamp = cfg.get_timestamp_by_frame_number(i)
                 fig.suptitle("Time: {:.2e} s".format(timestamp), x=.85, y=.95)
-                    
-                plot.add_image(e_r_plot_name, data_r, cmap=cmap, clim=clim_e_r)
-                plot.add_image(e_z_plot_name, data_z, cmap=cmap, clim=clim_e_z)
-                plot.add_image(rho_beam_plot_name, data_beam, cmap=cmap, clim=clim_rho_beam)
-                    
-                if view: plot.redraw()
-                if not dry_run: writer.grab_frame()
+                if i % frame_step == 0:
+                    plot.add_image(e_r_plot_name, data_r, cmap=cmap, clim=clim_e_r)
+                    plot.add_image(e_z_plot_name, data_z, cmap=cmap, clim=clim_e_z)
+                    plot.add_image(rho_beam_plot_name, data_beam, cmap=cmap, clim=clim_rho_beam)
 
-                print('done')
-
+                    if view: plot.redraw()
+                    if not dry_run: writer.grab_frame()
+                    print('done')
+                else:
+                    print('skip')
             else:
                 data_r = reader.get_all_frames_in_ds('E_r', i)
                 data_z = reader.get_all_frames_in_ds('E_z', i)
                 data_beam = reader.get_all_frames_in_ds('rho_beam', i)
-                
+
                 frame = 0
                 for r, z, beam in zip(data_r, data_z, data_beam):
-                    # print without newline
-                    sys.stdout.write('.')
-                    sys.stdout.flush()
-                    
-                    # add timestamp to each frame
-                    timestamp = cfg.get_timestamp_by_frame_number(frame + i)
-                    fig.suptitle("Time: {:.2e} s".format(timestamp), x=.85, y=.95)
-                    
-                    plot.add_image(e_r_plot_name, r, cmap=cmap, clim=clim_e_r)
-                    plot.add_image(e_z_plot_name, z, cmap=cmap, clim=clim_e_z)
-                    plot.add_image(rho_beam_plot_name, beam, cmap=cmap, clim=clim_rho_beam)
-                    
-                    if view: plot.redraw()
-                    if not dry_run: writer.grab_frame()
+                    if (frame + i * cfg.frames_per_file) % frame_step == 0:
+                        # print without newline
+                        sys.stdout.write('.')
+                        sys.stdout.flush()
+
+                        # add timestamp to each frame
+                        timestamp = cfg.get_timestamp_by_frame_number(frame + i * cfg.frames_per_file)
+                        fig.suptitle("Time: {:.2e} s".format(timestamp), x=.85, y=.95)
+
+                        plot.add_image(e_r_plot_name, r, cmap=cmap, clim=clim_e_r)
+                        plot.add_image(e_z_plot_name, z, cmap=cmap, clim=clim_e_z)
+                        plot.add_image(rho_beam_plot_name, beam, cmap=cmap, clim=clim_rho_beam)
+
+                        if view: plot.redraw()
+                        if not dry_run: writer.grab_frame()
                     frame = frame + 1
                 print('done')
 
@@ -178,6 +179,10 @@ def main():
                         where initial bunch density should be placed in color range''',
                         default=1)
 
+    parser.add_argument('--frame-step', type=int,
+                        help='Use only every Nth frame for movie creation. Default: 1',
+                        default=1)
+
     parser.add_argument('--clim-e-r', type=str,
                         help='Color limit range for Electrical field longitual component', default=None)
 
@@ -188,7 +193,7 @@ def main():
 
     parser.add_argument('--view', action='store_true', default=False,
                         help='View animation as well as write it to file')
-    
+
     parser.add_argument('--with-grid', action='store_true', help='Use tick grid for plots', default=False)
 
     args = parser.parse_args()
@@ -208,6 +213,7 @@ def main():
             rho_beam_scale=args.beam_scale_factor,
             video_file=args.video_file,
             time_range=time_range,
+            frame_step=args.frame_step,
             cmap=args.cmap,
             dry_run=args.dry_run,
             view=args.view,
@@ -223,5 +229,5 @@ if __name__ == "__main__":
     main()
 
 # run(config_file, clim_e_r, clim_e_z, clim_rho_beam, video_file='field_movie.avi',
-#     time_range=None, cmap=None, dry-run=False, view=False, use_grid=False):    
+#     time_range=None, cmap=None, dry-run=False, view=False, use_grid=False):
 # input("Press 'Return' to exit ")
