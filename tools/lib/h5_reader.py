@@ -58,7 +58,7 @@ class H5Reader:
             path = self.__get_path__(space, 0)
             frame_length = len(self.file[path])
             if frame_length < row:
-                raise Exception('Out of range: row should be less, than {}. The value was {}.'.format(row, frame_length))
+                raise Exception('Out of range: row should be less, than {}. The value was {}.'.format(frame_length, row))
             else:
                 return True
 
@@ -70,7 +70,7 @@ class H5Reader:
             path = self.__get_path__(space, 0)
             frame_height = len(self.file[path][0])
             if frame_height < col:
-                raise Exception('Out of range: column should be less, than {}. The value was {}.'.format(col, frame_height))
+                raise Exception('Out of range: column should be less, than {}. The value was {}.'.format(frame_height, col))
             else:
                 return True
 
