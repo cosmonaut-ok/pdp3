@@ -1,7 +1,32 @@
 CHANGELOG
 ---------
-CURRENT
+
+release-20181107
 =======
+
+- Add stft jupyter notebook
+
+- add frame-step option to skip some frames in tools/movie_3_E_RHObeam_r_z.py
+
+- Add weiting schemes to documentation
+
+- Add imagemagick and doxygen as package dependency
+
+- Add cache to h5_reader
+
+- Add plain to hdf5 converter
+
+- Add compression support to tools
+
+- add batch mode to nbrun.sh
+
+- improve nbrun.sh to accept notebook variable names as arguments
+
+- update test tools
+
+- Decrease number of thread synchronization points, optimize openmp parallelization (speedup)
+
+- Add SSE sqrt to speedup calculations
 
 - Improve autoconf options passing
 
