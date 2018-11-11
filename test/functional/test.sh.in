@@ -28,7 +28,7 @@ cp -r tools ${TESTDIR}
 cp $(dirname $0)/${PARAMETERS_XML} ${TESTDIR}/parameters.xml
 
 cd ${TESTDIR}
-mkdir -p pdp3_result/dump
+
 time ./pdp3
 
 if [ "@HDF5_OPTION@" == "true" ]; then
