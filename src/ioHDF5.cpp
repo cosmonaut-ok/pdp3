@@ -1,3 +1,4 @@
+#include "lib.h"
 #include "ioHDF5.h"
 
 IOHDF5::IOHDF5(void)
@@ -14,6 +15,11 @@ IOHDF5::IOHDF5(char *c_pathres, char *c_pathdump, bool c_compress)
   strcpy(path_dump, c_pathdump);
 
   strcpy(path_data, c_pathres);
+
+#ifdef DEBUG
+  cerr << "Creating directory " << path_data << endl;
+#endif
+  lib::makeDirectory(path_data);
 
   strcpy(hdf5_file, path_data);
   strcat(hdf5_file, "data.h5");

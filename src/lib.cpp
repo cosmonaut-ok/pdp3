@@ -127,4 +127,66 @@ namespace lib
 
     return the_time;
   }
+
+// Make directory and check if it exists
+  bool directoryExists(const std::string& path)
+  {
+#ifdef _WIN32
+    struct _stat info;
+    if (_stat(path.c_str(), &info) != 0)
+      return false;
+    return (info.st_mode & _S_IFDIR) != 0;
+#else
+    struct stat info;
+    if (stat(path.c_str(), &info) != 0)
+      return false;
+    return (info.st_mode & S_IFDIR) != 0;
+#endif
+  }
+
+  bool makeDirectory(const std::string& path)
+  {
+#ifdef DEBUG
+    cerr << "Creating directory " << path << endl;
+#endif
+
+#ifdef _WIN32
+    int ret = _mkdir(path.c_str());
+#else
+    mode_t mode = 0755;
+    int ret = mkdir(path.c_str(), mode);
+#endif
+    if (ret == 0)
+      return true;
+
+    switch (errno)
+    {
+    case ENOENT:
+      // parent didn't exist, try to create it
+    {
+      int pos = path.find_last_of('/');
+      if (pos == std::string::npos)
+#ifdef _WIN32
+        pos = path.find_last_of('\\');
+      if (pos == std::string::npos)
+#endif
+        return false;
+      if (!makeDirectory(path.substr(0, pos)))
+        return false;
+    }
+    // now, try to create again
+#ifdef _WIN32
+    return 0 == _mkdir(path.c_str());
+#else
+    return 0 == mkdir(path.c_str(), mode);
+#endif
+
+    case EEXIST:
+      // done!
+      return directoryExists(path);
+
+    default:
+      return false;
+    }
+  }
 }
