@@ -1,5 +1,8 @@
 #include "loadInitParam.h"
 
+#include <typeinfo>  //for 'typeid' to work
+
+
 using namespace std;
 using namespace math::fourier;
 
@@ -47,15 +50,66 @@ LoadInitParam::LoadInitParam(char *xml_file_name)
   if (params->use_hdf5)
   {
 #ifdef USE_HDF5
+#ifdef EXPERIMENTAL
+    cerr << "ERROR! HDF5 still not supported by expedimental data mode" << endl;
+    exit(1);
+#else
     c_io_class = new IOHDF5 (params->dump_result_path, params->dump_save_state_path, params->dump_compress);
+#endif
 #else
     cerr << "ERROR! PDP3 build without HDF5 support. Please, update your configfile to use plaintext ``<use_hdf5>false</use_hdf5>''" << endl;
     exit(1);
 #endif
   }
   else
-    c_io_class = new IOText (params->dump_result_path, params->dump_save_state_path, params->dump_compress);
+    {
+#ifdef EXPERIMENTAL
+      c_writer_e_r = new WriterPlain(params->dump_result_path, "E_r", 0,
+                                     0, 0, params->geom->n_grid_1-1, params->geom->n_grid_2-1,
+                                     params->dump_compress, params->dump_compress_level);
+
+      c_writer_e_phi = new WriterPlain(params->dump_result_path, "E_phi", 0,
+                                       0, 0, params->geom->n_grid_1-1, params->geom->n_grid_2-1,
+                                       params->dump_compress, params->dump_compress_level);
+
+      c_writer_e_z = new WriterPlain(params->dump_result_path, "E_z", 0,
+                                     0, 0, params->geom->n_grid_1-1, params->geom->n_grid_2-1,
+                                     params->dump_compress, params->dump_compress_level);
+
+      c_writer_h_r = new WriterPlain(params->dump_result_path, "H_r", 0,
+                                     0, 0, params->geom->n_grid_1-1, params->geom->n_grid_2-1,
+                                     params->dump_compress, params->dump_compress_level);
+
+      c_writer_h_phi = new WriterPlain(params->dump_result_path, "H_phi", 0,
+                                       0, 0, params->geom->n_grid_1-1, params->geom->n_grid_2-1,
+                                       params->dump_compress, params->dump_compress_level);
+
+      c_writer_h_z = new WriterPlain(params->dump_result_path, "H_z", 0,
+                                     0, 0, params->geom->n_grid_1-1, params->geom->n_grid_2-1,
+                                     params->dump_compress, params->dump_compress_level);
+
+      c_writer_j_r = new WriterPlain(params->dump_result_path, "J_r", 0,
+                                     0, 0, params->geom->n_grid_1-1, params->geom->n_grid_2-1,
+                                     params->dump_compress, params->dump_compress_level);
+
+      c_writer_j_phi = new WriterPlain(params->dump_result_path, "J_phi", 0,
+                                       0, 0, params->geom->n_grid_1-1, params->geom->n_grid_2-1,
+                                       params->dump_compress, params->dump_compress_level);
+
+      c_writer_j_z = new WriterPlain(params->dump_result_path, "J_z", 0,
+                                     0, 0, params->geom->n_grid_1-1, params->geom->n_grid_2-1,
+                                     params->dump_compress, params->dump_compress_level);
+
+      c_writer_rho_beam = new WriterPlain(params->dump_result_path, "rho_beam", 0,
+                                          0, 0, params->geom->n_grid_1-1, params->geom->n_grid_2-1,
+                                          params->dump_compress, params->dump_compress_level);
+#else
+      c_io_class = new IOText (params->dump_result_path, params->dump_save_state_path, params->dump_compress);
+#endif
+    }
+#ifndef EXPERIMENTAL
   c_io_class->compress_level = params->dump_compress_level;
+#endif
 
   //! 2. creating field objects
   cout << "Initializing E/M Fields Data" << endl;
@@ -230,33 +284,49 @@ void LoadInitParam::init_fields ()
   efield->set_fi_on_z();
 }
 
-void LoadInitParam::dump_system_state()
-{
-  //! dump system state to file set
-  c_io_class->out_field_dump("E_r", efield->field_r, params->geom->n_grid_1 - 1, params->geom->n_grid_2 - 1);
-  c_io_class->out_field_dump("E_phi", efield->field_phi, params->geom->n_grid_1 - 1, params->geom->n_grid_2 - 1);
-  c_io_class->out_field_dump("E_z", efield->field_z, params->geom->n_grid_1 - 1, params->geom->n_grid_2 - 1);
-  c_io_class->out_field_dump("H_r", hfield->field_r, params->geom->n_grid_1 - 1, params->geom->n_grid_2 - 1);
-  c_io_class->out_field_dump("H_phi", hfield->field_phi, params->geom->n_grid_1 - 1, params->geom->n_grid_2 - 1);
-  c_io_class->out_field_dump("H_z", hfield->field_z, params->geom->n_grid_1 - 1, params->geom->n_grid_2 - 1);
-  for(unsigned int i=0; i<p_list->part_list.size(); i++)
-  {
-    c_io_class->out_pos_dump(p_list->part_list[i]->name,
-                               p_list->part_list[i]->pos,
-                               p_list->part_list[i]->number);
-
-    c_io_class->out_velocity_dump(p_list->part_list[i]->name,
-                                  p_list->part_list[i]->vel,
-                                  p_list->part_list[i]->number);
-    c_io_class->out_current_time_dump(params->time->current_time);
-  }
-}
-
 void LoadInitParam::dump_data(int step_number)
 {
   //! dump claculated data frames (for fields etc.) to files set
 
   // electrical fields
+#ifdef EXPERIMENTAL
+  int file_number = floor(step_number / params->dump_frames_per_file);
+  char file_name[100];
+  sprintf(file_name, "%d", file_number);
+
+  if (params->dump_e_r)
+    c_writer_e_r->write(file_name, efield->field_r);
+
+  if (params->dump_e_phi)
+    c_writer_e_phi->write(file_name, efield->field_phi);
+
+  if (params->dump_e_z)
+    c_writer_e_z->write(file_name, efield->field_z);
+
+  // magnetic fields
+  if (params->dump_h_r)
+    c_writer_h_r->write(file_name, hfield->field_r);
+
+  if (params->dump_h_phi)
+    c_writer_h_phi->write(file_name, hfield->field_phi);
+
+  if (params->dump_h_z)
+    c_writer_h_z->write(file_name, hfield->field_z);
+
+  // currents
+  if (params->dump_current_r)
+    c_writer_j_r->write(file_name, c_current->get_j1());
+
+  if (params->dump_current_phi)
+    c_writer_j_phi->write(file_name, c_current->get_j2());
+
+  if (params->dump_current_z)
+    c_writer_j_z->write(file_name, c_current->get_j3());
+
+  // beam density
+  if (params->dump_rho_beam)
+    c_writer_rho_beam->write(file_name, c_rho_bunch->get_rho());
+#else
   if (params->dump_e_r)
     c_io_class->out_data("E_r", efield->field_r, step_number,
                          params->dump_frames_per_file, params->geom->n_grid_1 - 1, params->geom->n_grid_2 - 1);
@@ -300,34 +370,7 @@ void LoadInitParam::dump_data(int step_number)
     c_io_class->out_data("rho_beam", c_rho_bunch->get_rho(), step_number,
                          params->dump_frames_per_file, params->geom->n_grid_1 - 1, params->geom->n_grid_2 - 1);
 
-  // particle positions and velocities
-  if (params->dump_position)
-    for(unsigned int i=0; i<p_list->part_list.size(); i++)
-    {
-      char full_name[256];
-      strcpy(full_name, p_list->part_list[i]->name);
-      strcat(full_name, "_pos");
-
-      c_io_class->out_triple(full_name,
-                             p_list->part_list[i]->pos,
-                             step_number,
-                             params->dump_frames_per_file,
-                             p_list->part_list[i]->number);
-    }
-
-  if (params->dump_position)
-    for(unsigned int i=0; i<p_list->part_list.size(); i++)
-    {
-      char full_name[256];
-      strcpy(full_name, p_list->part_list[i]->name);
-      strcat(full_name, "_vel");
-
-      c_io_class->out_triple(full_name,
-                             p_list->part_list[i]->vel,
-                             step_number,
-                             params->dump_frames_per_file,
-                             p_list->part_list[i]->number);
-    }
+#endif
 }
 
 void LoadInitParam::run(void)
@@ -343,155 +386,142 @@ void LoadInitParam::run(void)
 
   //! Main calculation loop
   while (params->time->current_time < params->time->end_time)
-  {
-    //! Steps:
-#ifdef DEBUG
-    the_time = 0;
-    cerr << the_time << " sec. loop iteration begin" << endl;
-    the_time = clock();
-#endif
-
-    //! 1. inject beam
-    init_beam();
-#ifdef DEBUG
-    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_bunches[i]->bunch_inject" << endl;
-    the_time = clock();
-#endif
-
-    //! 2. Calculate H field
-    hfield->calc_field(efield, params->time);
-#ifdef DEBUG
-    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: hfield->calc_field" << endl;
-    the_time = clock();
-#endif
-
-    //! 3. Calculate v
-    c_current->reset_j();
-#ifdef DEBUG
-    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_current->reset_j" << endl;
-    the_time = clock();
-#endif
-
-    c_rho_old->reset_rho();
-#ifdef DEBUG
-    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_rho_old->reset_rho" << endl;
-    the_time = clock();
-#endif
-
-    c_rho_bunch->reset_rho();
-#ifdef DEBUG
-    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_rho_bunch->reset_rho" << endl;
-    the_time = clock();
-#endif
-
-    p_list->boris_pusher(efield, hfield, params->time);
-#ifdef DEBUG
-    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: p_list->boris_pusher" << endl;
-    the_time = clock();
-#endif
-
-    p_list->azimuthal_j_weighting(params->time, c_current);
-#ifdef DEBUG
-    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: p_list->azimuthal_j_weighting" << endl;
-    the_time = clock();
-#endif
-
-    p_list->move_half_reflect(params->time);
-#ifdef DEBUG
-    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: p_list->move_half_reflect" << endl;
-    the_time = clock();
-#endif
-
-    p_list->j_weighting(params->time, c_current);
-#ifdef DEBUG
-    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: j_weighting" << endl;
-    the_time = clock();
-#endif
-
-    p_list->back_velocity_to_rz();
-#ifdef DEBUG
-    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: back_velocity_to_rz" << endl;
-    the_time = clock();
-#endif
-
-    //! 5. Calculate E
-    // maxwell_rad.probe_mode_exitation(&geom1,&current1, 1,7e8, time1.current_time);
-    efield->calc_field(hfield, params->time, c_current);
-#ifdef DEBUG
-    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: efield->calc_field" << endl;
-    the_time = clock();
-#endif
-
-    //! 6. Continuity equation
-    c_rho_new->reset_rho(); // TODO: is it 4?
-#ifdef DEBUG
-    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_rho_new->reset_rho" << endl;
-    the_time = clock();
-#endif
-
-    //! FIXME: for some reason charge_weighting has no effect on result
-    // p_list->charge_weighting(c_rho_new); // continuity equation
-
-    //! print header on every 20 logging steps
-    if  ((int)(params->time->current_time / params->time->delta_t) % (params->dump_data_interval * 20) == 0)
     {
-      cout << endl
-           << left << setw(8) << "Step"
-           << left << setw(13) << "Saved Frame"
-           << left << setw(18) << "Model Time (sec)"
-           << left << setw(18) << "Simulation Time"
-           << left << setw(34) << "Avg. Step Calculation Time"
-           << endl;
-    }
+      //! Steps:
+#ifdef DEBUG
+      the_time = 0;
+      cerr << the_time << " sec. loop iteration begin" << endl;
+      the_time = clock();
+#endif
 
-    //! dump data to corresponding files every `parameters.xml->file_save_parameters->data_dump_interval` steps
-    if  ((int)(params->time->current_time / params->time->delta_t) % params->dump_data_interval == 0)
-    {
+      //! 1. inject beam
+      init_beam();
+#ifdef DEBUG
+      cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_bunches[i]->bunch_inject" << endl;
+      the_time = clock();
+#endif
+
+      //! 2. Calculate H field
+      hfield->calc_field(efield, params->time);
+#ifdef DEBUG
+      cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: hfield->calc_field" << endl;
+      the_time = clock();
+#endif
+
+      //! 3. Calculate v
+      c_current->reset_j();
+#ifdef DEBUG
+      cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_current->reset_j" << endl;
+      the_time = clock();
+#endif
+
+      c_rho_old->reset_rho();
+#ifdef DEBUG
+      cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_rho_old->reset_rho" << endl;
+      the_time = clock();
+#endif
+
+      c_rho_bunch->reset_rho();
+#ifdef DEBUG
+      cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_rho_bunch->reset_rho" << endl;
+      the_time = clock();
+#endif
+
+      p_list->boris_pusher(efield, hfield, params->time);
+#ifdef DEBUG
+      cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: p_list->boris_pusher" << endl;
+      the_time = clock();
+#endif
+
+      p_list->azimuthal_j_weighting(params->time, c_current);
+#ifdef DEBUG
+      cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: p_list->azimuthal_j_weighting" << endl;
+      the_time = clock();
+#endif
+
+      p_list->move_half_reflect(params->time);
+#ifdef DEBUG
+      cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: p_list->move_half_reflect" << endl;
+      the_time = clock();
+#endif
+
+      p_list->j_weighting(params->time, c_current);
+#ifdef DEBUG
+      cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: j_weighting" << endl;
+      the_time = clock();
+#endif
+
+      p_list->back_velocity_to_rz();
+#ifdef DEBUG
+      cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: back_velocity_to_rz" << endl;
+      the_time = clock();
+#endif
+
+      //! 5. Calculate E
+      // maxwell_rad.probe_mode_exitation(&geom1,&current1, 1,7e8, time1.current_time);
+      efield->calc_field(hfield, params->time, c_current);
+#ifdef DEBUG
+      cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: efield->calc_field" << endl;
+      the_time = clock();
+#endif
+
+      //! 6. Continuity equation
+      c_rho_new->reset_rho(); // TODO: is it 4?
+#ifdef DEBUG
+      cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_rho_new->reset_rho" << endl;
+      the_time = clock();
+#endif
+
+      //! FIXME: for some reason charge_weighting has no effect on result
+      // p_list->charge_weighting(c_rho_new); // continuity equation
+
+      //! print header on every 20 logging steps
+      if  ((int)(params->time->current_time / params->time->delta_t) % (params->dump_data_interval * 20) == 0)
+        {
+          cout << endl
+               << left << setw(8) << "Step"
+               << left << setw(13) << "Saved Frame"
+               << left << setw(18) << "Model Time (sec)"
+               << left << setw(18) << "Simulation Time"
+               << left << setw(34) << "Avg. Step Calculation Time"
+               << endl;
+        }
+
+      //! dump data to corresponding files every `parameters.xml->file_save_parameters->data_dump_interval` steps
+      if  ((int)(params->time->current_time / params->time->delta_t) % params->dump_data_interval == 0)
+        {
 #ifdef _OPENMP
-      sprintf(avg_step_exec_time, "%.2fs", (double)(time(0) - t1) / params->dump_data_interval / omp_get_num_threads());
+          sprintf(avg_step_exec_time, "%.2fs", (double)(time(0) - t1) / params->dump_data_interval / omp_get_num_threads());
 #else
-      sprintf(avg_step_exec_time, "%.2fs", (double)(time(0) - t1) / params->dump_data_interval);
+          sprintf(avg_step_exec_time, "%.2fs", (double)(time(0) - t1) / params->dump_data_interval);
 #endif
-      cout << left << setw(8) << step_number * params->dump_data_interval
-           << left << setw(13) << step_number
-           << left << setw(18) << params->time->current_time
-           << left << setw(18) << lib::get_simulation_time()
-           << left << setw(34) << avg_step_exec_time
-           << endl;
+          cout << left << setw(8) << step_number * params->dump_data_interval
+               << left << setw(13) << step_number
+               << left << setw(18) << params->time->current_time
+               << left << setw(18) << lib::get_simulation_time()
+               << left << setw(34) << avg_step_exec_time
+               << endl;
 
-      for (auto i = c_bunches.begin(); i != c_bunches.end(); ++i)
-        (*i)->charge_weighting(c_rho_bunch);
+          for (auto i = c_bunches.begin(); i != c_bunches.end(); ++i)
+            (*i)->charge_weighting(c_rho_bunch);
 
 #ifdef DEBUG
-      cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_bunches[i]->charge_weighting" << endl;
-      the_time = clock();
+          cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_bunches[i]->charge_weighting" << endl;
+          the_time = clock();
 #endif
-      // c_rho_old->reset_rho();
-      // p_list[0].charge_weighting(c_rho_old);
+          // c_rho_old->reset_rho();
+          // p_list[0].charge_weighting(c_rho_old);
 
-      dump_data(step_number);
+          dump_data(step_number);
 #ifdef DEBUG
-      cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: dump_data" << endl;
-      the_time = clock();
+          cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: dump_data" << endl;
+          the_time = clock();
 #endif
 
-      step_number += 1;
-      t1 = time(0);
-      if  ((params->dump_system_state_interval != 0)
-           && (((int)(params->time->current_time/params->time->delta_t)) % params->dump_system_state_interval == 0)
-           && (step_number != 1))
-      {
-        cout << "Saving system state at " << params->time->current_time << endl;
-        dump_system_state();
-#ifdef DEBUG
-        cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: dump_system_state" << endl;
-        the_time = clock();
-#endif
-      }
+          step_number += 1;
+          t1 = time(0);
+        }
+      params->time->current_time = params->time->current_time + params->time->delta_t;
     }
-    params->time->current_time = params->time->current_time + params->time->delta_t;
-  }
   cout << endl << "Simulation Completed" << endl << endl;
-
-  delete c_io_class;
 }
