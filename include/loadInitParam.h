@@ -23,6 +23,9 @@
 #include "hField.h"
 #include "ioText.h"
 
+#include "writer.h"
+#include "writerPlain.h"
+
 #ifdef USE_HDF5
 #include "ioHDF5.h"
 #endif
@@ -45,7 +48,6 @@ public:
 
 public:
   double *read_double_params(const char *p_name);
-  void dump_system_state();
   void dump_data(int step_number);
   void run(void);
 
@@ -58,7 +60,21 @@ public:
   ParticlesList *p_list;
   EField *efield;
   HField *hfield;
+
+#ifdef EXPERIMENTAL
+  Writer *c_writer_e_r;
+  Writer *c_writer_e_phi;
+  Writer *c_writer_e_z;
+  Writer *c_writer_h_r;
+  Writer *c_writer_h_phi;
+  Writer *c_writer_h_z;
+  Writer *c_writer_j_r;
+  Writer *c_writer_j_phi;
+  Writer *c_writer_j_z;
+  Writer *c_writer_rho_beam;
+#else
   InputOutputClass *c_io_class;
+#endif
   ChargeDensity *c_rho_new;
   ChargeDensity *c_rho_old;
   ChargeDensity *c_rho_bunch;
