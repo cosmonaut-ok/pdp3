@@ -30,7 +30,7 @@ class WriterPlain : public virtual Writer
 
   WriterPlain(char *c_path, char *c_component, int c_type,
               int c_start_r, int c_start_z, int c_end_r, int c_end_z,
-              bool c_compress, int c_compress_level);
+              bool c_compress, int c_compress_level, int schedule);
   ~WriterPlain(void);
 
   void write(char *name, double **out_value);
