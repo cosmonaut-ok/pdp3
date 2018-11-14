@@ -56,6 +56,11 @@ public:
   // Time *c_time;
   Particles *c_part;
   vector<Bunch*> c_bunches;
+
+#ifdef EXPERIMENTAL
+  vector<Writer*> c_writers;
+#endif
+
   unsigned int current_bunch_number;
   ParticlesList *p_list;
   EField *efield;
