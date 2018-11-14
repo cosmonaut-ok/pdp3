@@ -6,8 +6,6 @@
 #include <stdlib.h>
 #include <math.h> /* floor */
 #include "writer.h"
-/* #include <iterator> */
-/* #include <vector> */
 
 using namespace std;
 class WriterPlain : public virtual Writer
@@ -23,10 +21,7 @@ class WriterPlain : public virtual Writer
   void write_dot(char *name, double **data, bool is_rewrite);
 
  public:
-  int upf = 1; // how units (frames/cols/rows/dots) per file
   WriterPlain(void);
-  // WriterPlain(char *cpathres,char *cpathdump, bool c_compress);
-
 
   WriterPlain(char *c_path, char *c_component, int c_type,
               int c_start_r, int c_start_z, int c_end_r, int c_end_z,
