@@ -12,6 +12,18 @@
 using namespace std;
 using namespace tinyxml2;
 
+/* <writer type="frame" r_start="0" z_start="0" r_end="10" z_end="200" schedule="5" component="E_r" /> */
+
+struct probe {
+  char *component;
+  unsigned int type;
+  unsigned int r_start;
+  unsigned int r_end;
+  unsigned int z_start;
+  unsigned int z_end;
+  unsigned int schedule;
+};
+
 struct particle_specie {
   char *name;
   unsigned int mass;
@@ -112,11 +124,16 @@ public:
   bool dump_current_phi = false;
   bool dump_current_z = false;
 
+  // probes
+  vector<probe> probes;
+
 private:
   XMLElement* xml_data;
   XMLElement* try_first_child(XMLElement* element, const char* name);
+  const char* try_atribute(XMLElement* element, const char* name);
 
   void init_particles();
+  void init_probes();
   void init_beam();
   void init_geometry();
   void init_pml();
