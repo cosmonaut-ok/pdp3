@@ -111,10 +111,10 @@
     </dump_data>
 
     <probes>
-      <probe type="col" z="100" schedule="50" component="E_r" /> <!-- types: frame, col, row, dot -->
-      <probe type="row" r="10" schedule="50" component="E_r" />
-      <probe type="dot" r="10" z="50" schedule="5" component="rho_beam" />
-      <probe type="frame" r_start="0" z_start="0" r_end="10" z_end="200" schedule="5" component="E_r" />
+      <probe type="frame" r_start="0" z_start="0" r_end="254" z_end="254" schedule="50" component="E_r" />
+      <probe type="frame" r_start="0" z_start="0" r_end="254" z_end="254" schedule="50" component="E_z" />
+      <probe type="frame" r_start="0" z_start="0" r_end="254" z_end="254" schedule="50" component="H_phi" />
+      <probe type="frame" r_start="0" z_start="0" r_end="254" z_end="254" schedule="50" component="rho_beam" />
     </probes>
 
   </file_save_parameters>

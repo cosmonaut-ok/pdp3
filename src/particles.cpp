@@ -654,9 +654,6 @@ void Particles::j_weighting(Time *time1, Current *j1)
   double dr = geom1->dr;
   double dz = geom1->dz;
 
-#ifdef EXPERIMENTAL
-#pragma omp parallel for shared(dr, dz, time1, j1) default(none)
-#endif
   for (unsigned int i=0;i<number;i++)
     if (is_alive[i])
     {
@@ -869,9 +866,6 @@ void Particles::azimuthal_j_weighting(Current *this_j)
   double dr = geom1->dr;
   double dz = geom1->dz;
 
-#ifdef EXPERIMENTAL
-#pragma omp parallel for shared(dr, dz, this_j) default(none)
-#endif
   for(unsigned int i=0;i<number;i++)
     if (is_alive[i])
     {
