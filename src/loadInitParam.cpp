@@ -265,12 +265,12 @@ void LoadInitParam::dump_data(int step_number)
   {
     Writer *w = *i;
 
-    int file_number = floor(step_number / (w->schedule * params->dump_frames_per_file));
-    char file_name[100];
-    sprintf(file_name, "%d", file_number);
-
     if ((int)(params->time->current_time / params->time->delta_t) % w->schedule == 0)
     {
+      int file_number = floor(w->step_number / params->dump_frames_per_file);
+      char file_name[100];
+      sprintf(file_name, "%d", file_number);
+
       if (strcmp(w->component, "E_r") == 0)
         w->write(file_name, efield->field_r);
       else if (strcmp(w->component, "E_phi") == 0)
@@ -296,6 +296,8 @@ void LoadInitParam::dump_data(int step_number)
         w->write(file_name, c_rho_bunch->get_rho());
       else
         cerr << "WARNING! writer for component ``" << w->component << "'' does not exist. Skipping" << endl;
+
+      ++w->step_number;
     }
   }
 #else

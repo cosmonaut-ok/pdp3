@@ -29,6 +29,8 @@ class Writer
   int type; // 0 - frame, 1 - col, 2 - row, 3 - dot
   int schedule = 1;
 
+  int step_number = 0;
+
   bool compress = false;
   // char *compress_algo = 'gzip';
   int compress_level = 6;
