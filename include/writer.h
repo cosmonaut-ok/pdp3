@@ -27,6 +27,7 @@ class Writer
   char path[256];
   char component[10];
   int type; // 0 - frame, 1 - col, 2 - row, 3 - dot
+  int schedule = 1;
 
   bool compress = false;
   // char *compress_algo = 'gzip';
