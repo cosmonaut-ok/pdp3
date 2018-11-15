@@ -55,7 +55,7 @@ if [ "@HDF5_OPTION@" == "true" ]; then
     done
 else
     for i in `find .  -type f`; do
-        echo $(cat ${i} | tr ',' ' ') | tr ' ' '\n' > $(basename $i)n
+        echo $(cat ${i} | tr ',' ' ') | tr ' ' '\n' > ${i}n
         rm -f ${i}
     done
 fi
@@ -65,12 +65,12 @@ echo "done"
 success="true"
 for i in `find . -name '*n' -type f`; do
     bn=`basename $i`
-    true_md5sum="$(egrep ${bn}$ ../../${TRUE_MD5} | cut -d';' -f1)"
+    true_md5sum="$(egrep ${i}$ ../../${TRUE_MD5} | cut -d';' -f1)"
     actual_md5sum="$(md5sum ${i} | cut -d' ' -f1)"
     if test "${true_md5sum}" == "${actual_md5sum}"; then
-        printf "%-25b %-10b\n" "file $(basename $bn n)" "${GREEN}match${NC}"
+        printf "%-25b %-10b\n" "file $(dirname $i)/$(basename $bn n)" "${GREEN}match${NC}"
     else
-        printf "%-25b %-10b\n" "file $(basename $bn n)" "${RED}not match${NC}"
+        printf "%-25b %-10b\n" "file $(dirname $i)/$(basename $bn n)" "${RED}not match${NC}"
         success="false"
     fi
 done
