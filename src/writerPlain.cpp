@@ -46,9 +46,6 @@ WriterPlain::WriterPlain(char *c_path, char *c_component, int c_type,
       break;
     }
 
-  cout << "type " << type << endl;
-  cout << "path " << path_result << endl;
-
   lib::makeDirectory(path_result);
 }
 
