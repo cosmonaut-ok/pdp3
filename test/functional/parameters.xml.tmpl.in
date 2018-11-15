@@ -105,11 +105,11 @@
     </dump_data>
 
     <probes>
-      <probe type="frame" r_start="0" z_start="0" r_end="14" z_end="126" schedule="5" component="E_r" />
-      <probe type="frame" r_start="0" z_start="0" r_end="14" z_end="126" schedule="5" component="E_z" />
-      <probe type="frame" r_start="0" z_start="0" r_end="14" z_end="126" schedule="5" component="J_r" />
-      <probe type="frame" r_start="0" z_start="0" r_end="14" z_end="126" schedule="5" component="J_z" />
-      <probe type="frame" r_start="0" z_start="0" r_end="14" z_end="126" schedule="5" component="rho_beam" />
+      <probe type="frame" r_start="0" z_start="0" r_end="254" z_end="2046" schedule="5" component="E_r" />
+      <probe type="frame" r_start="0" z_start="0" r_end="254" z_end="2046" schedule="5" component="E_z" />
+      <probe type="frame" r_start="0" z_start="0" r_end="254" z_end="2046" schedule="5" component="J_r" />
+      <probe type="frame" r_start="0" z_start="0" r_end="254" z_end="2046" schedule="5" component="J_z" />
+      <probe type="frame" r_start="0" z_start="0" r_end="254" z_end="2046" schedule="5" component="rho_beam" />
     </probes>
 
   </file_save_parameters>
