@@ -4,6 +4,32 @@ from numpy import *
 import json
 import math
 
+class Probe:
+    def __init__(self, probe_type, component, schedule, r_start=-1, z_start=-1, r_end=-1, z_end=-1):
+        if (probe_type == 'frame' or probe_type == 'col' or probe_type == 'row' or probe_type == 'dot'):
+            self.type = probe_type
+
+        self.component = component
+        self.schedule = schedule
+        self.r_start = r_start
+        self.z_start = z_start
+        self.r_end = r_end
+        self.z_end = z_end
+
+
+class ParticlesSpecie:
+    def __init__(self, name, number_macro,
+                 left_density, right_density, temperature,
+                 charge=1, mass=1):
+        self.name = name
+        self.charge = charge
+        self.mass = mass
+        self.number_macro = number_macro
+        self.left_density = left_density
+        self.right_density = right_density
+        self.temperature = temperature
+
+
 class Parameters:
     def __init__(self, parameters_file): # , movie_file=None): # , clim_e_field_r=[0,1], clim_e_field_z=[0,1]):
         '''
@@ -38,6 +64,51 @@ class Parameters:
 
         # get file to save parameters
         file_save_parameters = self.dom_root.getElementsByTagName('file_save_parameters')[0]
+
+        probes = file_save_parameters.getElementsByTagName('probes')[0].getElementsByTagName('probe')
+        self.probes = []
+
+        for i in probes:
+            p_type = i.getAttribute('type')
+            p_compon = i.getAttribute('component')
+            p_schedule = int(i.getAttribute('schedule'))
+
+            r_start = -1
+            r_end = -1
+            z_start = -1
+            z_end = -1
+
+            if p_type == 'frame':
+                r_start = int(i.getAttribute('r_start'))
+                r_end = int(i.getAttribute('r_end'))
+                z_start = int(i.getAttribute('z_start'))
+                z_end = int(i.getAttribute('z_end'))
+                p = Probe(p_type, p_compon, p_schedule,
+                          r_start, z_start,
+                          r_end, z_end)
+
+            elif p_type == 'col':
+                z_start = int(i.getAttribute('z'))
+                p = Probe(p_type, p_compon, p_schedule,
+                          r_start, z_start,
+                          r_end, z_end)
+
+            elif p_type == 'row':
+                r_start = int(i.getAttribute('r'))
+                p = Probe(p_type, p_compon, p_schedule,
+                          r_start, z_start,
+                          r_end, z_end)
+
+            elif p_type == 'dot':
+                r_start = int(i.getAttribute('r'))
+                z_start = int(i.getAttribute('z'))
+                p = Probe(p_type, p_compon, p_schedule,
+                          r_start, z_start,
+                          r_end, z_end)
+            else:
+                raise NameError('probe type can not be {}'.format(p_type))
+
+            self.probes.append(p)
 
         # get data_path
         local_data_path = file_save_parameters.getElementsByTagName('result_path')[0].firstChild.data
@@ -75,8 +146,24 @@ class Parameters:
         self.beam_initial_velocity = float(beam.item(0).getElementsByTagName('initial_velocity')[0].firstChild.data)
 
         # get particles
-        particles = self.dom_root.getElementsByTagName('particles')[0];
-        self.particles = particles.getElementsByTagName('particle_specie')
+        particles = self.dom_root.getElementsByTagName('particles')[0].getElementsByTagName('particle_specie')
+        self.particles = [] #  particles.getElementsByTagName('particle_specie')
+
+        for i in particles:
+            p_name = i.getAttribute('name')
+            p_charge = int(i.getElementsByTagName('charge')[0].firstChild.data)
+            p_mass = int(i.getElementsByTagName('mass')[0].firstChild.data)
+            p_temperature = float(i.getElementsByTagName('temperature')[0].firstChild.data)
+            p_number_macro = float(i.getElementsByTagName('number_macro')[0].firstChild.data)
+            p_left_density = float(i.getElementsByTagName('left_density')[0].firstChild.data)
+            p_right_density = float(i.getElementsByTagName('right_density')[0].firstChild.data)
+
+            p = ParticlesSpecie(p_name, p_number_macro,
+                                p_left_density, p_right_density, p_temperature,
+                                p_charge, p_mass)
+
+            self.particles.append(p)
+
 
         # get time
         time = self.dom_root.getElementsByTagName('time')[0];
