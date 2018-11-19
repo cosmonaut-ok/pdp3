@@ -53,13 +53,9 @@ def main():
     config = Parameters(args.properties_path)
 
     for i in config.particles:
-        p_name = i.getAttribute('name').lower()
-        if p_name == 'electrons':
-            left_el_density = float(i.getElementsByTagName('left_density')[0].firstChild.data)
-            right_el_density = float(i.getElementsByTagName('right_density')[0].firstChild.data)
-            el_density = (left_el_density + right_el_density) / 2
-
-            el_temperature = float(i.getElementsByTagName('temperature')[0].firstChild.data)
+        if i.name.lower() == 'electrons':
+            el_density = (i.left_density + i.right_density) / 2
+            el_temperature = i.temperature
 
     if not el_density:
         print("Incorrect parameters.xml file (no particles->particle_kind->electrons section)")
