@@ -132,8 +132,8 @@ void Parameters::init_probes ()
       else if ( strcmp(p_type, "col") == 0 )
         {
           p_probe.type = 1;
-          p_probe.r_start = -1;
-          p_probe.r_end = -1;
+          p_probe.r_start = 0;
+          p_probe.r_end = geom->n_grid_1;
           p_probe.z_start = atoi(try_atribute(probe_xml, "z"));
           p_probe.z_end = -1;
         }
@@ -142,8 +142,8 @@ void Parameters::init_probes ()
           p_probe.type = 2;
           p_probe.r_start = atoi(try_atribute(probe_xml, "r"));
           p_probe.r_end = -1;
-          p_probe.z_start = -1;
-          p_probe.z_end = -1;
+          p_probe.z_start = 0;
+          p_probe.z_end = geom->n_grid_2;
         }
       else if ( strcmp(p_type, "dot") == 0 )
           {
