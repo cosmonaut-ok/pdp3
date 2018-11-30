@@ -86,8 +86,9 @@
   <boundary_conditions type = "dirichlet">0</boundary_conditions>
 
   <file_save_parameters>
-    <result_path>pdp3_result/</result_path>              <!-- path to modeling results data -->
-    <save_state_path>pdp3_result/dump/</save_state_path> <!-- path to system state dump -->
+    <result_path>.</result_path>              <!-- path to modeling results data -->
+    <data_root>pdp3_result</data_root>              <!-- path to modeling results data -->
+    <debug_data_root>pdp3_result_debug</debug_data_root>              <!-- path to modeling results data -->
     <data_dump_interval>50</data_dump_interval>          <!-- number of time steps between two result data dumps -->
     <debug_data_dump_interval>50</debug_data_dump_interval>
     <system_state_dump_interval>0</system_state_dump_interval> <!-- number of time steps between two system state dumps. Set '0' to disable. RESTORATION STILL NOT IMPLEMENTED -->
