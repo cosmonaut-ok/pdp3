@@ -1,6 +1,21 @@
 CHANGELOG
 ---------
 
+CURRENT
+=========
+
+- Add enable-legacy option
+
+- Implement frame processing in tools
+
+- Add classes to process probes and particles
+
+- Implement data structure for reading and creating probes (writers)
+
+- Add classes for new data format
+
+- Add directoryExists and makeDirectory functions
+
 release-20181107
 =======
 
@@ -18,11 +33,11 @@ release-20181107
 
 - Add compression support to tools
 
-- add batch mode to nbrun.sh
+- Add batch mode to nbrun.sh
 
-- improve nbrun.sh to accept notebook variable names as arguments
+- Improve nbrun.sh to accept notebook variable names as arguments
 
-- update test tools
+- Update test tools
 
 - Decrease number of thread synchronization points, optimize openmp parallelization (speedup)
 
