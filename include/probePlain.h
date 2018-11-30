@@ -5,10 +5,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h> /* floor */
-#include "writer.h"
+#include "probe.h"
 
 using namespace std;
-class WriterPlain : public virtual Writer
+class ProbePlain : public virtual Probe
 {
  private:
   void write_data(char *out_value, bool is_rewrite);
@@ -21,12 +21,12 @@ class WriterPlain : public virtual Writer
   void write_dot(char *name, double **data, bool is_rewrite);
 
  public:
-  WriterPlain(void);
+  ProbePlain(void);
 
-  WriterPlain(char *c_path, char *c_component, int c_type,
+  ProbePlain(char *c_path, char *c_component, int c_type,
               int c_start_r, int c_start_z, int c_end_r, int c_end_z,
               bool c_compress, int c_compress_level, int schedule);
-  ~WriterPlain(void);
+  ~ProbePlain(void);
 
   void write(char *name, double **out_value);
 };
