@@ -9,40 +9,38 @@
 #include <math.h> /* floor */
 
 using namespace std;
+
 class Probe
 {
- private:
+ protected:
   char path_result[100];
   char path_dump[100];
 
+ protected:
+  void write_frame(double **data);
+  void write_col(double **data);
+  void write_row(double **data);
+  void write_dot(double **data);
+
  public:
-  bool compress = false;
-  int compress_level = 6;
   char name[100];
-  vector<char*> components;
-  unsigned int interval = 1;
+  char path[256];
+  char component[10];
+  int type; // 0 - frame, 1 - col, 2 - row, 3 - dot
+  int schedule = 1;
+
+  int step_number = 0;
+
+  bool compress = false;
+  // char *compress_algo = 'gzip';
+  int compress_level = 6;
+
+  int start_r = 0;
+  int start_z = 0;
+  int end_r = 0;
+  int end_z = 0;
 
   virtual ~Probe(void) {};
-
-  virtual void dump(char const *component,
-
-  /* virtual void out_data(char const *comp_name, */
-  /*                       double **out_value, */
-  /*                       int step_number, */
-  /*                       int number, */
-  /*                       int r_step, */
-  /*                       int z_step) = 0; */
-  /* virtual void out_field_dump(char const *comp_name, double **out_value, int r_step, int z_step) = 0; */
-  /* virtual void out_triple(char *comp_name, */
-  /*                         double **pos, */
-  /*                         int step_number, */
-  /*                         int number, */
-  /*                         int particles_number) = 0; */
-  /* virtual void out_pos_dump(char *comp_name, */
-  /*                           double **pos, */
-  /*                           int particles_number) = 0; */
-  /* virtual void out_velocity_dump(char *comp_name, */
-  /*                                double **vel, */
-  /*                                int particles_number) = 0; */
-  /* virtual void out_current_time_dump(double current_time) = 0; */
+  virtual void write(char *name, double **out_value) = 0;
+  // void write(char *name, double **data);
 };

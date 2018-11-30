@@ -12,7 +12,7 @@
 using namespace std;
 using namespace tinyxml2;
 
-/* <writer type="frame" r_start="0" z_start="0" r_end="10" z_end="200" schedule="5" component="E_r" /> */
+/* <probe type="frame" r_start="0" z_start="0" r_end="10" z_end="200" schedule="5" component="E_r" /> */
 
 struct probe {
   char *component;
