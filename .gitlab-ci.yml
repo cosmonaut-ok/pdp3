@@ -21,7 +21,7 @@ build:
     - plasma
   script:
     - ./autogen.sh
-    - ./configure --enable-hdf5 --enable-ieee
+    - ./configure --enable-experimental --enable-ieee
     - make
 
 test:
@@ -53,12 +53,12 @@ doc:
     - make doc
   allow_failure: true
 
-hdf5-build:
-  stage: build
-  tags:
-    - plasma
-  script:
-    - ./autogen.sh
-    - ./configure --enable-hdf5 --enable-ieee
-    - make hdf5-install
-  allow_failure: true
+# hdf5-build:
+#   stage: build
+#   tags:
+#     - plasma
+#   script:
+#     - ./autogen.sh
+#     - ./configure --enable-experimental --enable-ieee
+#     - make hdf5-install
+#   allow_failure: true
