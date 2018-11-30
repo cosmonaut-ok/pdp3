@@ -23,8 +23,8 @@
 #include "hField.h"
 #include "ioText.h"
 
-#include "writer.h"
-#include "writerPlain.h"
+#include "probe.h"
+#include "probePlain.h"
 
 #ifdef USE_HDF5
 #include "ioHDF5.h"
@@ -49,7 +49,7 @@ public:
 public:
   double *read_double_params(const char *p_name);
   void dump_data(int step_number);
-  void print_data(int writer_type, char* component, int step_number, int dump_interval, int* shape);
+  void print_data(int probe_type, char* component, int step_number, int dump_interval, int* shape);
   void run(void);
 
 public:
@@ -59,7 +59,7 @@ public:
   vector<Bunch*> c_bunches;
 
 #ifndef LEGACY
-  vector<Writer*> c_writers;
+  vector<Probe*> c_probes;
 #endif
 
   unsigned int current_bunch_number;
@@ -68,16 +68,16 @@ public:
   HField *hfield;
 
 #ifndef LEGACY
-  Writer *c_writer_e_r;
-  Writer *c_writer_e_phi;
-  Writer *c_writer_e_z;
-  Writer *c_writer_h_r;
-  Writer *c_writer_h_phi;
-  Writer *c_writer_h_z;
-  Writer *c_writer_j_r;
-  Writer *c_writer_j_phi;
-  Writer *c_writer_j_z;
-  Writer *c_writer_rho_beam;
+  Probe *c_probe_e_r;
+  Probe *c_probe_e_phi;
+  Probe *c_probe_e_z;
+  Probe *c_probe_h_r;
+  Probe *c_probe_h_phi;
+  Probe *c_probe_h_z;
+  Probe *c_probe_j_r;
+  Probe *c_probe_j_phi;
+  Probe *c_probe_j_z;
+  Probe *c_probe_rho_beam;
 #else
   InputOutputClass *c_io_class;
 #endif
