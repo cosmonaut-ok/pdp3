@@ -49,6 +49,7 @@ public:
 public:
   double *read_double_params(const char *p_name);
   void dump_data(int step_number);
+  void print_data(int writer_type, char* component, int step_number, int dump_interval, int* shape);
   void run(void);
 
 public:
@@ -90,6 +91,8 @@ public:
   int data_dump_interval;
   int system_state_dump_interval;
   int frames_per_file;
+
+  int printed_step = 0;
   // dump data
   bool is_dump_e_r;
   bool is_dump_e_phi;
