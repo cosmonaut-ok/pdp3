@@ -69,13 +69,13 @@ LoadInitParam::LoadInitParam(char *xml_file_name)
 	char* dump_data_root = new char[100];
 	sprintf(dump_data_root, "%s/%s", params->dump_result_path, params->dump_data_root);
 
-        WriterPlain *wp = new WriterPlain(
+        ProbePlain *wp = new ProbePlain(
           dump_data_root, (char*)i->component,
           i->type, i->r_start, i->z_start, i->r_end, i->z_end,
           params->dump_compress, params->dump_compress_level,
           i->schedule);
 
-        c_writers.push_back(wp);
+        c_probes.push_back(wp);
       }
 #else
       c_io_class = new IOText (params->dump_result_path, params->dump_result_path, params->dump_compress);
@@ -258,7 +258,7 @@ void LoadInitParam::init_fields ()
   efield->set_fi_on_z();
 }
 
-void LoadInitParam::print_data(int writer_type, char* component, int step_number, int dump_interval, int* shape)
+void LoadInitParam::print_data(int probe_type, char* component, int step_number, int dump_interval, int* shape)
 {
   if (printed_step % 20 == 0)
     {
@@ -274,32 +274,32 @@ void LoadInitParam::print_data(int writer_type, char* component, int step_number
     }
 
   char type_comp[100];
-  char writer_shape[100];
+  char probe_shape[100];
 
-  switch (writer_type)
+  switch (probe_type)
     {
     case 0:
       sprintf(type_comp, "frame/%s", component);
-      sprintf(writer_shape, "[%i,%i,%i,%i]", shape[0], shape[1], shape[2], shape[3]);
+      sprintf(probe_shape, "[%i,%i,%i,%i]", shape[0], shape[1], shape[2], shape[3]);
       break;
     case 1:
       sprintf(type_comp, "column/%s", component);
-      sprintf(writer_shape, "[%i]", shape[1]);
+      sprintf(probe_shape, "[%i]", shape[1]);
       break;
     case 2:
       sprintf(type_comp, "row/%s", component);
-      sprintf(writer_shape, "[%i]", shape[0]);
+      sprintf(probe_shape, "[%i]", shape[0]);
       break;
     case 3:
       sprintf(type_comp, "dot/%s", component);
-      sprintf(writer_shape, "[%i,%i]", shape[0], shape[1]);
+      sprintf(probe_shape, "[%i,%i]", shape[0], shape[1]);
       break;
     }
 
   cout << left << setw(8) << step_number * dump_interval
        << left << setw(13) << step_number
        << left << setw(20) << type_comp
-       << left << setw(21) << writer_shape
+       << left << setw(21) << probe_shape
        << left << setw(18) << params->time->current_time
        << left << setw(18) << lib::get_simulation_time()
        << endl;
@@ -312,9 +312,9 @@ void LoadInitParam::dump_data(int step_number)
 
   // electrical fields
 #ifndef LEGACY
-  for (auto i = c_writers.begin(); i != c_writers.end(); ++i)
+  for (auto i = c_probes.begin(); i != c_probes.end(); ++i)
   {
-    Writer *w = *i;
+    Probe *w = *i;
 
     if ((int)(params->time->current_time / params->time->delta_t) % w->schedule == 0)
     {
@@ -349,7 +349,7 @@ void LoadInitParam::dump_data(int step_number)
       else if (strcmp(w->component, "rho_beam") == 0)
         w->write(file_name, c_rho_bunch->get_rho());
       else
-        cerr << "WARNING! writer for component ``" << w->component << "'' does not exist. Skipping" << endl;
+        cerr << "WARNING! probe for component ``" << w->component << "'' does not exist. Skipping" << endl;
 
       ++w->step_number;
     }
