@@ -1,13 +1,13 @@
 #include "lib.h"
-#include "writerPlain.h"
+#include "probePlain.h"
 
 using namespace std;
 
-WriterPlain::WriterPlain(void)
+ProbePlain::ProbePlain(void)
 {
 }
 
-WriterPlain::WriterPlain(char *c_path, char *c_component, int c_type,
+ProbePlain::ProbePlain(char *c_path, char *c_component, int c_type,
                          int c_start_r, int c_start_z, int c_end_r, int c_end_z,
                          bool c_compress, int c_compress_level, int c_schedule)
 {
@@ -49,11 +49,11 @@ WriterPlain::WriterPlain(char *c_path, char *c_component, int c_type,
   lib::makeDirectory(path_result);
 }
 
-WriterPlain::~WriterPlain(void)
+ProbePlain::~ProbePlain(void)
 {
 }
 
-char* WriterPlain::get_data_path(char *name)
+char* ProbePlain::get_data_path(char *name)
 {
   char* path = new char[100];
   strcpy(path, path_result);
@@ -64,7 +64,7 @@ char* WriterPlain::get_data_path(char *name)
   return path;
 }
 
-void WriterPlain::write_frame(char *name, double **out_value, bool is_rewrite = false)
+void ProbePlain::write_frame(char *name, double **out_value, bool is_rewrite = false)
 {
   char *path = get_data_path(name);
 
@@ -83,7 +83,7 @@ void WriterPlain::write_frame(char *name, double **out_value, bool is_rewrite = 
   out_file.close();
 }
 
-void WriterPlain::write_col(char *name, double **out_value, bool is_rewrite = false)
+void ProbePlain::write_col(char *name, double **out_value, bool is_rewrite = false)
 {
   char *path = get_data_path(name);
 
@@ -101,7 +101,7 @@ void WriterPlain::write_col(char *name, double **out_value, bool is_rewrite = fa
   out_file.close();
 }
 
-void WriterPlain::write_row(char *name, double **out_value, bool is_rewrite = false)
+void ProbePlain::write_row(char *name, double **out_value, bool is_rewrite = false)
 {
   char *path = get_data_path(name);
 
@@ -120,7 +120,7 @@ void WriterPlain::write_row(char *name, double **out_value, bool is_rewrite = fa
   out_file.close();
 }
 
-void WriterPlain::write_dot(char *name, double **out_value, bool is_rewrite = false)
+void ProbePlain::write_dot(char *name, double **out_value, bool is_rewrite = false)
 {
   char *path = get_data_path(name);
 
@@ -138,7 +138,7 @@ void WriterPlain::write_dot(char *name, double **out_value, bool is_rewrite = fa
   out_file.close();
 }
 
-void WriterPlain::write(char *name, double **out_value)
+void ProbePlain::write(char *name, double **out_value)
 {
   switch (type)
     {
