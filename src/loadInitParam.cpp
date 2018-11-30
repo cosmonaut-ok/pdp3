@@ -50,7 +50,7 @@ LoadInitParam::LoadInitParam(char *xml_file_name)
   if (params->use_hdf5)
   {
 #ifdef USE_HDF5
-#ifdef EXPERIMENTAL
+#ifndef LEGACY
     cerr << "ERROR! HDF5 still not supported by expedimental data mode" << endl;
     exit(1);
 #else
@@ -63,7 +63,7 @@ LoadInitParam::LoadInitParam(char *xml_file_name)
   }
   else
     {
-#ifdef EXPERIMENTAL
+#ifndef LEGACY
       for (auto i = params->probes.begin(); i != params->probes.end(); ++i)
       {
 	char* dump_data_root = new char[100];
@@ -81,7 +81,7 @@ LoadInitParam::LoadInitParam(char *xml_file_name)
       c_io_class = new IOText (params->dump_result_path, params->dump_result_path, params->dump_compress);
 #endif
     }
-#ifndef EXPERIMENTAL
+#ifdef LEGACY
   c_io_class->compress_level = params->dump_compress_level;
 #endif
 
@@ -311,7 +311,7 @@ void LoadInitParam::dump_data(int step_number)
   //! dump claculated data frames (for fields etc.) to files set
 
   // electrical fields
-#ifdef EXPERIMENTAL
+#ifndef LEGACY
   for (auto i = c_writers.begin(); i != c_writers.end(); ++i)
   {
     Writer *w = *i;
@@ -503,7 +503,7 @@ void LoadInitParam::run(void)
       //! FIXME: for some reason charge_weighting has no effect on result
       // p_list->charge_weighting(c_rho_new); // continuity equation
 
-#ifndef EXPERIMENTAL
+#ifdef LEGACY
       //! print header on every 20 logging steps
       if  ((int)(params->time->current_time / params->time->delta_t) % (params->dump_data_interval * 20) == 0)
       {
@@ -526,7 +526,7 @@ void LoadInitParam::run(void)
         sprintf(avg_step_exec_time, "%.2fs", (double)(time(0) - t1) / params->dump_data_interval);
 #endif
 
-#ifndef EXPERIMENTAL
+#ifdef LEGACY
         cout << left << setw(8) << step_number * params->dump_data_interval
              << left << setw(13) << step_number
              << left << setw(18) << params->time->current_time
@@ -545,7 +545,7 @@ void LoadInitParam::run(void)
         // c_rho_old->reset_rho();
         // p_list[0].charge_weighting(c_rho_old);
 
-#ifndef EXPERIMENTAL
+#ifdef LEGACY
         dump_data(step_number);
 #endif
 
@@ -557,7 +557,7 @@ void LoadInitParam::run(void)
         ++step_number;
         t1 = time(0);
       }
-#ifdef EXPERIMENTAL
+#ifndef LEGACY
       dump_data(step_number);
 #endif
       params->time->current_time = params->time->current_time + params->time->delta_t;
