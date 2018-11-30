@@ -5,11 +5,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h> /* floor */
-#include "writer.h"
+#include "probe.h"
 #include <hdf5.h> // TODO: is it true only for debian-based distros?
 
 using namespace std;
-class WriterHDF5 : public Writer
+class ProbeHDF5 : public Probe
 {
 private:
   char path_data[100];
@@ -38,9 +38,9 @@ private:
   hid_t create_or_open_h5_group(hid_t file_id, char const *group_name);
 
 public:
-  WriterHDF5(void);
-  WriterHDF5(char *cpathres,char *cpathdump, bool c_compress);
-  ~WriterHDF5(void);
+  ProbeHDF5(void);
+  ProbeHDF5(char *cpathres,char *cpathdump, bool c_compress);
+  ~ProbeHDF5(void);
 
   void out_data(char const *comp_name,
                 double **out_value,
