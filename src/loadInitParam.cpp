@@ -260,18 +260,27 @@ void LoadInitParam::init_fields ()
 
 void LoadInitParam::print_data(int probe_type, char* component, int step_number, int dump_interval, int* shape)
 {
-  if (printed_step % 20 == 0)
-    {
-      cout << endl
-           << left << setw(8) << "Step"
-           << left << setw(13) << "Saved Frame"
-           << left << setw(20) << "Dumping Probe Name"
-           << left << setw(21) << "Shape"
-           << left << setw(18) << "Model Time (sec)"
-           << left << setw(18) << "Simulation Duration"
-           << endl;
-      ++printed_step;
-    }
+  int print_header_step = 20;
+  if (printed_step % print_header_step == 0)
+  {
+    char avg_step_exec_time[24];
+#ifdef _OPENMP
+    sprintf(avg_step_exec_time, "%.2fs", (double)(time(0) - time_counter) / print_header_step / omp_get_num_threads());
+#else
+    sprintf(avg_step_exec_time, "%.2fs", (double)(time(0) - time_counter) / print_header_step);
+#endif
+    time_counter = time(0);
+
+    cout << endl
+         << left << setw(8) << "Step"
+         << left << setw(13) << "Saved Frame"
+         << left << setw(20) << "Dumping Probe Name"
+         << left << setw(21) << "Shape"
+         << left << setw(18) << "Model Time (sec)"
+         << left << setw(21) << "Simulation Duration"
+         << left << setw(26) << "Avg. step execution time: " << avg_step_exec_time
+         << endl;
+  }
 
   char type_comp[100];
   char probe_shape[100];
