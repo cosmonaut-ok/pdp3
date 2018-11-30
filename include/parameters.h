@@ -101,7 +101,7 @@ public:
   int boundary_conditions;
 
   char *dump_result_path;
-  char *dump_save_state_path;
+  char *dump_data_root;
   unsigned int dump_data_interval;
   unsigned int dump_frames_per_file;
   unsigned int dump_system_state_interval;

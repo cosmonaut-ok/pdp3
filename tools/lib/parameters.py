@@ -3,6 +3,8 @@ from xml.dom import minidom
 from numpy import *
 import json
 import math
+from os.path import normpath
+
 
 class Probe:
     def __init__(self, probe_type, component, schedule, r_start=-1, z_start=-1, r_end=-1, z_end=-1):
@@ -36,7 +38,7 @@ class Parameters:
         read parameters from properties.xml, recalculate and set parameters as object fields
         '''
 
-        self.config_path = os.path.dirname(parameters_file)
+        self.config_path = normpath(os.path.dirname(parameters_file))
         # self.movie_file = movie_file if movie_file else os.path.join(self.config_path, 'field_movie.avi')
 
         ## read parameters_file
@@ -57,8 +59,8 @@ class Parameters:
 
         # get geometry parameters for gird and ticks
         geometry = self.dom_root.getElementsByTagName('geometry')[0]
-        self.number_r_grid = int(geometry.getElementsByTagName(n_grid_r_name)[0].firstChild.data)-1
-        self.number_z_grid = int(geometry.getElementsByTagName(n_grid_z_name)[0].firstChild.data)-1
+        self.number_r_grid = int(geometry.getElementsByTagName(n_grid_r_name)[0].firstChild.data)
+        self.number_z_grid = int(geometry.getElementsByTagName(n_grid_z_name)[0].firstChild.data)
         self.r_size = float(geometry.getElementsByTagName('r_size')[0].firstChild.data)
         self.z_size = float(geometry.getElementsByTagName('z_size')[0].firstChild.data)
 
@@ -110,6 +112,12 @@ class Parameters:
 
             self.probes.append(p)
 
+        # set data root path
+        if is_debug:
+            self.data_root = file_save_parameters.getElementsByTagName('debug_data_root')[0].firstChild.data
+        else:
+            self.data_root = file_save_parameters.getElementsByTagName('data_root')[0].firstChild.data
+
         # get data_path
         local_data_path = file_save_parameters.getElementsByTagName('result_path')[0].firstChild.data
 
@@ -117,24 +125,10 @@ class Parameters:
         if str.startswith(local_data_path, '/'):
             self.data_path = local_data_path
         else:
-            self.data_path = os.path.join(self.config_path, local_data_path)
-
-        # get system state path
-        local_system_state_path = file_save_parameters.getElementsByTagName('save_state_path')[0].firstChild.data
+            self.data_path = normpath(os.path.join(self.config_path, local_data_path))
 
         # getData frame number per data file
         self.frames_per_file = int(file_save_parameters.getElementsByTagName('frames_per_file')[0].firstChild.data)
-
-        if is_debug:
-            self.data_dump_interval = int(file_save_parameters.getElementsByTagName('debug_data_dump_interval')[0].firstChild.data)
-        else:
-            self.data_dump_interval = int(file_save_parameters.getElementsByTagName('data_dump_interval')[0].firstChild.data)
-
-        # calculate data path
-        if str.startswith(local_system_state_path, '/'):
-            self.system_state_path = local_system_state_path
-        else:
-            self.system_state_path = os.path.join(self.config_path, local_system_state_path)
 
         ## get normalization parameters
         beam = self.dom_root.getElementsByTagName('particle_beam');
@@ -193,13 +187,13 @@ class Parameters:
         self.video_bitrate = int(video.getElementsByTagName('bitrate')[0].firstChild.data)
 
 
-    def get_frame_number_by_timestamp(self, timestamp):
-        number_frames = round(timestamp / self.step_interval / self.data_dump_interval)
+    def get_frame_number_by_timestamp(self, timestamp, dump_interval):
+        number_frames = round(timestamp / self.step_interval / dump_interval)
         return number_frames
 
 
-    def get_timestamp_by_frame_number(self, frame_number):
-        timestamp = frame_number * self.step_interval * self.data_dump_interval
+    def get_timestamp_by_frame_number(self, frame_number, dump_interval):
+        timestamp = frame_number * self.step_interval * dump_interval
         return timestamp
 
 
@@ -209,9 +203,9 @@ class Parameters:
         counter = 0
 
         for i in self.particles:
-            n_l = float(i.getElementsByTagName('left_density')[0].firstChild.data)
-            n_r = float(i.getElementsByTagName('right_density')[0].firstChild.data)
-            t = float(i.getElementsByTagName('temperature')[0].firstChild.data)
+            n_l = i.left_density
+            n_r = i.right_density
+            t = i.temperature
 
             n = n_l if n_l > n_r else n_r
 

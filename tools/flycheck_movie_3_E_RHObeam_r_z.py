@@ -49,7 +49,7 @@ def run(config_file, clim_e_r, clim_e_z, rho_beam_scale, video_file=None,
                              fullframe_size=[cfg.number_r_grid, cfg.number_z_grid],
                              fpds=cfg.frames_per_file,
                              use_cache=use_cache,
-                             verbose=False)
+                             verbose=True)
     else:
         reader = H5Reader(str(os.path.join(cfg.data_path, 'data.h5')), use_cache=False)
         reader.verbose = True
@@ -85,21 +85,14 @@ def run(config_file, clim_e_r, clim_e_z, rho_beam_scale, video_file=None,
 
     if view: plot.show()
 
-    # dirty hack
-    for p in cfg.probes:
-        if p.component == 'E_r' or p.component == 'E_z' or p.component == 'rho_beam':
-            dump_interval = p.schedule
-            break
-
     if not time_range:
-        start_frame = cfg.get_frame_number_by_timestamp(cfg.start_time, dump_interval)
-        end_frame = cfg.get_frame_number_by_timestamp(cfg.end_time, dump_interval)
+        start_frame = cfg.get_frame_number_by_timestamp(cfg.start_time)
+        end_frame = cfg.get_frame_number_by_timestamp(cfg.end_time)
     else:
         if time_range[0] > time_range[1]: raise ValueError("End time should not be less, than start time. The values were: {}, {}".format(time_range[0], time_range[1]))
         if time_range[1] > cfg.end_time: raise IndexError("End time is out of simulation range {}. The value was {}".format(cfg.end_time, time_range[1]))
-
-        start_frame = cfg.get_frame_number_by_timestamp(time_range[0], dump_interval)
-        end_frame = cfg.get_frame_number_by_timestamp(time_range[1], dump_interval)
+        start_frame = cfg.get_frame_number_by_timestamp(time_range[0])
+        end_frame = cfg.get_frame_number_by_timestamp(time_range[1])
     if cfg.use_hdf5:
         start_data_set = start_frame
         end_data_set = end_frame
@@ -128,7 +121,7 @@ def run(config_file, clim_e_r, clim_e_z, rho_beam_scale, video_file=None,
                 data_beam = reader.get_frame('rho_beam', i)
 
                 # add timestamp to each frame
-                timestamp = cfg.get_timestamp_by_frame_number(i, dump_interval)
+                timestamp = cfg.get_timestamp_by_frame_number(i)
                 fig.suptitle("Time: {:.2e} s".format(timestamp), x=.85, y=.95)
                 if i % frame_step == 0:
                     plot.add_image(e_r_plot_name, data_r, cmap=cmap, clim=clim_e_r)
@@ -141,10 +134,9 @@ def run(config_file, clim_e_r, clim_e_z, rho_beam_scale, video_file=None,
                 else:
                     print('skip')
             else:
-                shape = [0, 0, cfg.number_r_grid, cfg.number_z_grid]
-                data_r = reader.get_all_frames_in_ds('E_r', shape, i)
-                data_z = reader.get_all_frames_in_ds('E_z', shape, i)
-                data_beam = reader.get_all_frames_in_ds('rho_beam', shape, i)
+                data_r = reader.get_all_frames_in_ds('E_r', [], i)
+                data_z = reader.get_all_frames_in_ds('E_z', i)
+                data_beam = reader.get_all_frames_in_ds('rho_beam', i)
 
                 frame = 0
                 for r, z, beam in zip(data_r, data_z, data_beam):
@@ -154,16 +146,15 @@ def run(config_file, clim_e_r, clim_e_z, rho_beam_scale, video_file=None,
                         sys.stdout.flush()
 
                         # add timestamp to each frame
-                        timestamp = cfg.get_timestamp_by_frame_number(frame + i * cfg.frames_per_file, dump_interval)
+                        timestamp = cfg.get_timestamp_by_frame_number(frame + i * cfg.frames_per_file)
                         fig.suptitle("Time: {:.2e} s".format(timestamp), x=.85, y=.95)
 
-                        if i % frame_step == 0:
-                            plot.add_image(e_r_plot_name, r, cmap=cmap, clim=clim_e_r)
-                            plot.add_image(e_z_plot_name, z, cmap=cmap, clim=clim_e_z)
-                            plot.add_image(rho_beam_plot_name, beam, cmap=cmap, clim=clim_rho_beam)
+                        plot.add_image(e_r_plot_name, r, cmap=cmap, clim=clim_e_r)
+                        plot.add_image(e_z_plot_name, z, cmap=cmap, clim=clim_e_z)
+                        plot.add_image(rho_beam_plot_name, beam, cmap=cmap, clim=clim_rho_beam)
 
-                            if view: plot.redraw()
-                            if not dry_run: writer.grab_frame()
+                        if view: plot.redraw()
+                        if not dry_run: writer.grab_frame()
                     frame = frame + 1
                 print('done')
 

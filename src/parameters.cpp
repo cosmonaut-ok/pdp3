@@ -263,10 +263,12 @@ void Parameters::init_data_dump_parameters ()
   //! initialize file saving parameters, like path to computed data files,
   //! path to system state data files max frames number, placed to one file etc.
   XMLElement *sub_root = try_first_child(xml_data, "file_save_parameters");
-  XMLElement *dump_data_root = try_first_child(sub_root, "dump_data");
+  XMLElement *dump_data_root_xml = try_first_child(sub_root, "dump_data");
 
   dump_result_path = (char*)try_first_child(sub_root, "result_path")->GetText();
-  dump_save_state_path = (char*)try_first_child(sub_root, "save_state_path")->GetText();
+  dump_data_root = debug ?
+    (char*)try_first_child(sub_root, "debug_data_root")->GetText() :
+    (char*)try_first_child(sub_root, "data_root")->GetText();
 
   dump_data_interval = debug ?
     atoi(try_first_child(sub_root, "debug_data_dump_interval")->GetText()) :
@@ -278,20 +280,20 @@ void Parameters::init_data_dump_parameters ()
   dump_compress_level = atoi(try_first_child(sub_root, "compress_level")->GetText());
 
   //! choose, which parameters should be dumped to data files
-  dump_e_r = lib::to_bool(try_first_child(dump_data_root, "E_r")->GetText());
-  dump_e_phi = lib::to_bool(try_first_child(dump_data_root, "E_phi")->GetText());
-  dump_e_z = lib::to_bool(try_first_child(dump_data_root, "E_z")->GetText());
+  dump_e_r = lib::to_bool(try_first_child(dump_data_root_xml, "E_r")->GetText());
+  dump_e_phi = lib::to_bool(try_first_child(dump_data_root_xml, "E_phi")->GetText());
+  dump_e_z = lib::to_bool(try_first_child(dump_data_root_xml, "E_z")->GetText());
 
-  dump_h_r = lib::to_bool(try_first_child(dump_data_root, "H_r")->GetText());
-  dump_h_phi = lib::to_bool(try_first_child(dump_data_root, "H_phi")->GetText());
-  dump_h_z = lib::to_bool(try_first_child(dump_data_root, "H_z")->GetText());
+  dump_h_r = lib::to_bool(try_first_child(dump_data_root_xml, "H_r")->GetText());
+  dump_h_phi = lib::to_bool(try_first_child(dump_data_root_xml, "H_phi")->GetText());
+  dump_h_z = lib::to_bool(try_first_child(dump_data_root_xml, "H_z")->GetText());
 
-  dump_current_r = lib::to_bool(try_first_child(dump_data_root, "J_r")->GetText());
-  dump_current_phi = lib::to_bool(try_first_child(dump_data_root, "J_phi")->GetText());
-  dump_current_z = lib::to_bool(try_first_child(dump_data_root, "J_z")->GetText());
+  dump_current_r = lib::to_bool(try_first_child(dump_data_root_xml, "J_r")->GetText());
+  dump_current_phi = lib::to_bool(try_first_child(dump_data_root_xml, "J_phi")->GetText());
+  dump_current_z = lib::to_bool(try_first_child(dump_data_root_xml, "J_z")->GetText());
 
-  dump_position = lib::to_bool(try_first_child(dump_data_root, "position")->GetText());
-  dump_velocity = lib::to_bool(try_first_child(dump_data_root, "velocity")->GetText());
+  dump_position = lib::to_bool(try_first_child(dump_data_root_xml, "position")->GetText());
+  dump_velocity = lib::to_bool(try_first_child(dump_data_root_xml, "velocity")->GetText());
 
-  dump_rho_beam = lib::to_bool(try_first_child(dump_data_root, "rho_bunch")->GetText());
+  dump_rho_beam = lib::to_bool(try_first_child(dump_data_root_xml, "rho_bunch")->GetText());
 }
