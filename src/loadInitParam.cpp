@@ -54,7 +54,7 @@ LoadInitParam::LoadInitParam(char *xml_file_name)
     cerr << "ERROR! HDF5 still not supported by expedimental data mode" << endl;
     exit(1);
 #else
-    c_io_class = new IOHDF5 (params->dump_result_path, params->dump_save_state_path, params->dump_compress);
+    c_io_class = new IOHDF5 (params->dump_result_path, params->dump_result_path, params->dump_compress);
 #endif
 #else
     cerr << "ERROR! PDP3 build without HDF5 support. Please, update your configfile to use plaintext ``<use_hdf5>false</use_hdf5>''" << endl;
@@ -66,8 +66,11 @@ LoadInitParam::LoadInitParam(char *xml_file_name)
 #ifdef EXPERIMENTAL
       for (auto i = params->probes.begin(); i != params->probes.end(); ++i)
       {
+	char* dump_data_root = new char[100];
+	sprintf(dump_data_root, "%s/%s", params->dump_result_path, params->dump_data_root);
+
         WriterPlain *wp = new WriterPlain(
-          params->dump_result_path, (char*)i->component,
+          dump_data_root, (char*)i->component,
           i->type, i->r_start, i->z_start, i->r_end, i->z_end,
           params->dump_compress, params->dump_compress_level,
           i->schedule);
@@ -75,7 +78,7 @@ LoadInitParam::LoadInitParam(char *xml_file_name)
         c_writers.push_back(wp);
       }
 #else
-      c_io_class = new IOText (params->dump_result_path, params->dump_save_state_path, params->dump_compress);
+      c_io_class = new IOText (params->dump_result_path, params->dump_result_path, params->dump_compress);
 #endif
     }
 #ifndef EXPERIMENTAL
@@ -255,6 +258,54 @@ void LoadInitParam::init_fields ()
   efield->set_fi_on_z();
 }
 
+void LoadInitParam::print_data(int writer_type, char* component, int step_number, int dump_interval, int* shape)
+{
+  if (printed_step % 20 == 0)
+    {
+      cout << endl
+           << left << setw(8) << "Step"
+           << left << setw(13) << "Saved Frame"
+           << left << setw(20) << "Dumping Probe Name"
+           << left << setw(21) << "Shape"
+           << left << setw(18) << "Model Time (sec)"
+           << left << setw(18) << "Simulation Duration"
+           << endl;
+      ++printed_step;
+    }
+
+  char type_comp[100];
+  char writer_shape[100];
+
+  switch (writer_type)
+    {
+    case 0:
+      sprintf(type_comp, "frame/%s", component);
+      sprintf(writer_shape, "[%i,%i,%i,%i]", shape[0], shape[1], shape[2], shape[3]);
+      break;
+    case 1:
+      sprintf(type_comp, "column/%s", component);
+      sprintf(writer_shape, "[%i]", shape[1]);
+      break;
+    case 2:
+      sprintf(type_comp, "row/%s", component);
+      sprintf(writer_shape, "[%i]", shape[0]);
+      break;
+    case 3:
+      sprintf(type_comp, "dot/%s", component);
+      sprintf(writer_shape, "[%i,%i]", shape[0], shape[1]);
+      break;
+    }
+
+  cout << left << setw(8) << step_number * dump_interval
+       << left << setw(13) << step_number
+       << left << setw(20) << type_comp
+       << left << setw(21) << writer_shape
+       << left << setw(18) << params->time->current_time
+       << left << setw(18) << lib::get_simulation_time()
+       << endl;
+  ++printed_step;
+}
+
 void LoadInitParam::dump_data(int step_number)
 {
   //! dump claculated data frames (for fields etc.) to files set
@@ -270,6 +321,9 @@ void LoadInitParam::dump_data(int step_number)
       int file_number = floor(w->step_number / params->dump_frames_per_file);
       char file_name[100];
       sprintf(file_name, "%d", file_number);
+      int shape[4] = {w->start_r, w->start_z, w->end_r, w->end_z};
+
+      print_data(w->type, w->component, w->step_number, w->schedule, shape);
 
       if (strcmp(w->component, "E_r") == 0)
         w->write(file_name, efield->field_r);
@@ -449,17 +503,19 @@ void LoadInitParam::run(void)
       //! FIXME: for some reason charge_weighting has no effect on result
       // p_list->charge_weighting(c_rho_new); // continuity equation
 
+#ifndef EXPERIMENTAL
       //! print header on every 20 logging steps
       if  ((int)(params->time->current_time / params->time->delta_t) % (params->dump_data_interval * 20) == 0)
-        {
-          cout << endl
-               << left << setw(8) << "Step"
-               << left << setw(13) << "Saved Frame"
-               << left << setw(18) << "Model Time (sec)"
-               << left << setw(18) << "Simulation Time"
-               << left << setw(34) << "Avg. Step Calculation Time"
-               << endl;
-        }
+      {
+        cout << endl
+             << left << setw(8) << "Step"
+             << left << setw(13) << "Saved Frame"
+             << left << setw(18) << "Model Time (sec)"
+             << left << setw(18) << "Simulation Time"
+             << left << setw(34) << "Avg. Step Calculation Time"
+             << endl;
+      }
+#endif
 
       //! dump data to corresponding files every `parameters.xml->file_save_parameters->data_dump_interval` steps
       if  ((int)(params->time->current_time / params->time->delta_t) % params->dump_data_interval == 0)
@@ -469,12 +525,15 @@ void LoadInitParam::run(void)
 #else
         sprintf(avg_step_exec_time, "%.2fs", (double)(time(0) - t1) / params->dump_data_interval);
 #endif
+
+#ifndef EXPERIMENTAL
         cout << left << setw(8) << step_number * params->dump_data_interval
              << left << setw(13) << step_number
              << left << setw(18) << params->time->current_time
              << left << setw(18) << lib::get_simulation_time()
              << left << setw(34) << avg_step_exec_time
              << endl;
+#endif
 
         for (auto i = c_bunches.begin(); i != c_bunches.end(); ++i)
           (*i)->charge_weighting(c_rho_bunch);
@@ -495,7 +554,7 @@ void LoadInitParam::run(void)
         the_time = clock();
 #endif
 
-        step_number += 1;
+        ++step_number;
         t1 = time(0);
       }
 #ifdef EXPERIMENTAL
