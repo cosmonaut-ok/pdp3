@@ -58,7 +58,7 @@ public:
   Particles *c_part;
   vector<Bunch*> c_bunches;
 
-#ifdef EXPERIMENTAL
+#ifndef LEGACY
   vector<Writer*> c_writers;
 #endif
 
@@ -67,7 +67,7 @@ public:
   EField *efield;
   HField *hfield;
 
-#ifdef EXPERIMENTAL
+#ifndef LEGACY
   Writer *c_writer_e_r;
   Writer *c_writer_e_phi;
   Writer *c_writer_e_z;

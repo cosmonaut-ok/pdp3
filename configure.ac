@@ -17,6 +17,7 @@ dnl AC_CONFIG_MACRO_DIR([acdir])
 # AC_CANONICAL_SYSTEM
 
 AC_SUBST(EXPERIMENTAL_OPTION)
+AC_SUBST(LEGACY_OPTION)
 AC_SUBST(IEEE)
 AC_SUBST(DEBUG)
 AC_SUBST(SINGLETHREAD)
@@ -45,6 +46,7 @@ HDF5_URL="https://www.hdfgroup.org/package/source-bzip/?wpdmdl=12594&refresh=5bb
 HDF5_VERSION="hdf5-1.10.3"
 
 AC_ARG_ENABLE([experimental], [AC_HELP_STRING([--enable-experimental], [Enable experimental features (only for debug/development)])], [ENABLE_EXPERIMENTAL="$enableval"], [ENABLE_EXPERIMENTAL=no])
+AC_ARG_ENABLE([legacy], [AC_HELP_STRING([--enable-legacy], [Use legacy instead of current features])], [ENABLE_LEGACY="$enableval"], [ENABLE_LEGACY=no])
 AC_ARG_ENABLE([debug], [AC_HELP_STRING([--enable-debug], [Enable debug (optimized for GDB)])], [DEBUG="$enableval"], [DEBUG=no])
 AC_ARG_ENABLE([profiler], [AC_HELP_STRING([--enable-profiler], [Enable profiler support for performance debug])], [PROFILER="$enableval"], [PROFILER=no])
 AC_ARG_ENABLE([ieee], [AC_HELP_STRING([--enable-ieee], [Keep IEEE compliant rounding and disable hardware acceleration. Decrease calculation speed])], [IEEE="$enableval"], [IEEE=no])
@@ -79,6 +81,11 @@ CFLAGS_DEFAULT="-m64 -mcmodel=medium -std=c++14"
 # experimental option
 if test x$ENABLE_EXPERIMENTAL = xyes; then
    AC_DEFINE([EXPERIMENTAL], [true], [Use some experimental features])
+fi
+
+# legacy option
+if test x$ENABLE_LEGACY = xyes; then
+   AC_DEFINE([LEGACY], [true], [Use legacy features instead of current recommended])
 fi
 
 # speedup
