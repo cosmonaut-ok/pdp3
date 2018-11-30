@@ -78,6 +78,7 @@ public:
   Probe *c_probe_j_phi;
   Probe *c_probe_j_z;
   Probe *c_probe_rho_beam;
+  time_t time_counter = time(0);
 #else
   InputOutputClass *c_io_class;
 #endif
