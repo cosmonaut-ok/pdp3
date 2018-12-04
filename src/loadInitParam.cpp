@@ -524,7 +524,6 @@ void LoadInitParam::run(void)
              << left << setw(34) << "Avg. Step Calculation Time"
              << endl;
       }
-#endif
 
       //! dump data to corresponding files every `parameters.xml->file_save_parameters->data_dump_interval` steps
       if  ((int)(params->time->current_time / params->time->delta_t) % params->dump_data_interval == 0)
@@ -535,14 +534,12 @@ void LoadInitParam::run(void)
         sprintf(avg_step_exec_time, "%.2fs", (double)(time(0) - t1) / params->dump_data_interval);
 #endif
 
-#ifdef LEGACY
         cout << left << setw(8) << step_number * params->dump_data_interval
              << left << setw(13) << step_number
              << left << setw(18) << params->time->current_time
              << left << setw(18) << lib::get_simulation_time()
              << left << setw(34) << avg_step_exec_time
              << endl;
-#endif
 
         for (auto i = c_bunches.begin(); i != c_bunches.end(); ++i)
           (*i)->charge_weighting(c_rho_bunch);
@@ -551,12 +548,8 @@ void LoadInitParam::run(void)
         cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_bunches[i]->charge_weighting" << endl;
         the_time = clock();
 #endif
-        // c_rho_old->reset_rho();
-        // p_list[0].charge_weighting(c_rho_old);
 
-#ifdef LEGACY
         dump_data(step_number);
-#endif
 
 #ifdef DEBUG
         cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: dump_data" << endl;
@@ -566,7 +559,11 @@ void LoadInitParam::run(void)
         ++step_number;
         t1 = time(0);
       }
+#endif
+
 #ifndef LEGACY
+      for (auto i = c_bunches.begin(); i != c_bunches.end(); ++i)
+        (*i)->charge_weighting(c_rho_bunch);
       dump_data(step_number);
 #endif
       params->time->current_time = params->time->current_time + params->time->delta_t;

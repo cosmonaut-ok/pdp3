@@ -263,22 +263,31 @@ void Parameters::init_data_dump_parameters ()
   //! initialize file saving parameters, like path to computed data files,
   //! path to system state data files max frames number, placed to one file etc.
   XMLElement *sub_root = try_first_child(xml_data, "file_save_parameters");
+
+#ifdef LEGACY
   XMLElement *dump_data_root_xml = try_first_child(sub_root, "dump_data");
+#endif
 
   dump_result_path = (char*)try_first_child(sub_root, "result_path")->GetText();
+
+#ifndef LEGACY
   dump_data_root = debug ?
     (char*)try_first_child(sub_root, "debug_data_root")->GetText() :
     (char*)try_first_child(sub_root, "data_root")->GetText();
+#endif
 
+#ifdef LEGACY
   dump_data_interval = debug ?
     atoi(try_first_child(sub_root, "debug_data_dump_interval")->GetText()) :
     atoi(try_first_child(sub_root, "data_dump_interval")->GetText());
-
   dump_system_state_interval = atoi(try_first_child(sub_root, "system_state_dump_interval")->GetText());
+#endif
+
   dump_frames_per_file = atoi(try_first_child(sub_root, "frames_per_file")->GetText());
   dump_compress = lib::to_bool(try_first_child(sub_root, "compress")->GetText());
   dump_compress_level = atoi(try_first_child(sub_root, "compress_level")->GetText());
 
+#ifdef LEGACY
   //! choose, which parameters should be dumped to data files
   dump_e_r = lib::to_bool(try_first_child(dump_data_root_xml, "E_r")->GetText());
   dump_e_phi = lib::to_bool(try_first_child(dump_data_root_xml, "E_phi")->GetText());
@@ -296,4 +305,5 @@ void Parameters::init_data_dump_parameters ()
   dump_velocity = lib::to_bool(try_first_child(dump_data_root_xml, "velocity")->GetText());
 
   dump_rho_beam = lib::to_bool(try_first_child(dump_data_root_xml, "rho_bunch")->GetText());
+#endif
 }
