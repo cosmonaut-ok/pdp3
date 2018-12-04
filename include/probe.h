@@ -8,6 +8,8 @@
 #include <stdlib.h>
 #include <math.h> /* floor */
 
+#include "lib.h"
+
 using namespace std;
 
 class Probe
