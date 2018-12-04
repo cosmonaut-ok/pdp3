@@ -80,30 +80,9 @@
     <result_path>.</result_path>              <!-- path to modeling results data -->
     <data_root>pdp3_result</data_root>              <!-- path to modeling results data -->
     <debug_data_root>pdp3_result_debug</debug_data_root>              <!-- path to modeling results data -->
-    <debug_data_dump_interval>5</debug_data_dump_interval>
-    <data_dump_interval>5</data_dump_interval>
     <frames_per_file>1</frames_per_file>
-    <system_state_dump_interval>0</system_state_dump_interval>
     <compress>false</compress>
     <compress_level>1</compress_level>
-
-    <dump_data>
-      <E_r>true</E_r>
-      <E_phi>false</E_phi>
-      <E_z>true</E_z>
-      <H_r>false</H_r>
-      <H_phi>false</H_phi>
-      <H_z>false</H_z>
-      <J_r>true</J_r>
-      <J_phi>false</J_phi>
-      <J_z>true</J_z>
-
-      <position>false</position>
-
-      <velocity>false</velocity>
-
-      <rho_bunch>true</rho_bunch>
-    </dump_data>
 
     <probes>
       <probe type="frame" r_start="0" z_start="0" r_end="254" z_end="2046" schedule="5" component="E_r" />
