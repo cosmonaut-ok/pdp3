@@ -44,7 +44,7 @@ namespace lib
       exit(1);
     }
 
-#if defined (__SSE__) && defined (SPEEDUP)
+#if defined (__SSE__) && defined (EXPERIMENTAL)
     gamma = sqrt_recip(1.0 - beta);
 #else
     gamma = pow(1.0 - beta, -0.5);
