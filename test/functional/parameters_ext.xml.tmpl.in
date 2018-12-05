@@ -39,7 +39,7 @@
   <!-- number_of_part_kinds: 2 -->
 
   <particles>
-    <particle_specie name="electrons">
+    <particle_specie name="Electrons">
       <charge>-1</charge>       <!-- physical particle charge-->
       <mass>1</mass>            <!-- physical particle mass -->
       <number_macro>5e4</number_macro> <!-- number of macroparticles in whole modeling volume -->
@@ -49,7 +49,7 @@
       <temperature>1.0</temperature> <!-- temperature of particle gas (in eV) -->
     </particle_specie>
 
-    <particle_specie name="ions">
+    <particle_specie name="Ions">
       <charge>1</charge>
       <mass>1836</mass> <!-- electron mass -->
       <number_macro>5e4</number_macro>
@@ -98,6 +98,8 @@
       <probe type="frame" r_start="0" z_start="0" r_end="254" z_end="254" schedule="50" component="E_z" />
       <probe type="frame" r_start="0" z_start="0" r_end="254" z_end="254" schedule="50" component="H_phi" />
       <probe type="frame" r_start="0" z_start="0" r_end="254" z_end="254" schedule="50" component="rho_beam" />
+      <probe type="mpframe" r_start="100" z_start="100" r_end="150" z_end="150" schedule="50" component="Electrons" />
+      <probe type="mpframe" r_start="100" z_start="100" r_end="150" z_end="150" schedule="50" component="Ions" />
     </probes>
 
   </file_save_parameters>
