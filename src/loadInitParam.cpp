@@ -303,6 +303,10 @@ void LoadInitParam::print_data(int probe_type, char* component, int step_number,
       sprintf(type_comp, "dot/%s", component);
       sprintf(probe_shape, "[%i,%i]", shape[0], shape[1]);
       break;
+    case 4:
+      sprintf(type_comp, "mpframe/%s", component);
+      sprintf(probe_shape, "[%i,%i,%i,%i]", shape[0], shape[1], shape[2], shape[3]);
+      break;
     }
 
   cout << left << setw(8) << step_number * dump_interval
@@ -357,6 +361,13 @@ void LoadInitParam::dump_data(int step_number)
       //
       else if (strcmp(w->component, "rho_beam") == 0)
         w->write(file_name, c_rho_bunch->get_rho());
+      // separate logic for velocity frames
+      else if (w->type == 4)
+        for (auto i = p_list->part_list.begin(); i != p_list->part_list.end(); ++i)
+        {
+          if (strcmp((*i)->name, w->component) == 0)
+            w->mpwrite(file_name, *i);
+        }
       else
         cerr << "WARNING! probe for component ``" << w->component << "'' does not exist. Skipping" << endl;
 
