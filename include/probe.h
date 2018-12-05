@@ -9,6 +9,7 @@
 #include <math.h> /* floor */
 
 #include "lib.h"
+#include "particles.h"
 
 using namespace std;
 
@@ -44,5 +45,10 @@ class Probe
 
   virtual ~Probe(void) {};
   virtual void write(char *name, double **out_value) = 0;
-  // void write(char *name, double **data);
+
+  //! mpwrite is a function for MacroParticles frame write output
+  //! writes two sets of files:
+  //! 3-velocity components and 2-position components
+  //! writes to files <name>_vel_[r,phi,z].dat and <name>_pos_[r,z].dat
+  virtual void mpwrite(char *name, Particles *p_specie) = 0;
 };
