@@ -109,62 +109,70 @@ void Parameters::init_probes ()
   const char *probe_section_name = "probe";
   XMLElement *probe_xml =
     try_first_child(
-                    try_first_child(
-                                    try_first_child(xml_data, "file_save_parameters"),
-                                    "probes"),
-                    probe_section_name);
+      try_first_child(
+        try_first_child(xml_data, "file_save_parameters"),
+        "probes"),
+      probe_section_name);
 
   while(probe_xml)
+  {
+    probe p_probe;
+
+    p_probe.component = (char*)try_atribute(probe_xml, "component");
+    char *p_type = (char*)try_atribute(probe_xml, "type");
+
+    if ( strcmp(p_type, "frame") == 0 )
     {
-      probe p_probe;
-
-      p_probe.component = (char*)try_atribute(probe_xml, "component");
-      char *p_type = (char*)try_atribute(probe_xml, "type");
-
-      if ( strcmp(p_type, "frame") == 0 )
-        {
-          p_probe.type = 0;
-          p_probe.r_start = atoi(try_atribute(probe_xml, "r_start"));
-          p_probe.r_end = atoi(try_atribute(probe_xml, "r_end"));
-          p_probe.z_start = atoi(try_atribute(probe_xml, "z_start"));
-          p_probe.z_end = atoi(try_atribute(probe_xml, "z_end"));
-        }
-      else if ( strcmp(p_type, "col") == 0 )
-        {
-          p_probe.type = 1;
-          p_probe.r_start = 0;
-          p_probe.r_end = geom->n_grid_1;
-          p_probe.z_start = atoi(try_atribute(probe_xml, "z"));
-          p_probe.z_end = -1;
-        }
-      else if ( strcmp(p_type, "row") == 0 )
-         {
-          p_probe.type = 2;
-          p_probe.r_start = atoi(try_atribute(probe_xml, "r"));
-          p_probe.r_end = -1;
-          p_probe.z_start = 0;
-          p_probe.z_end = geom->n_grid_2;
-        }
-      else if ( strcmp(p_type, "dot") == 0 )
-          {
-          p_probe.type = 3;
-          p_probe.r_start = atoi(try_atribute(probe_xml, "r"));
-          p_probe.r_end = -1;
-          p_probe.z_start = atoi(try_atribute(probe_xml, "z"));
-          p_probe.z_end = -1;
-        }
-      else
-        {
-          cerr << "ERROR! probe type ``" << p_type << "'' is not supported" << endl;
-          exit(1);
-        }
-
-      p_probe.schedule = atoi(try_atribute(probe_xml, "schedule"));
-
-      probes.push_back(p_probe);
-
-      probe_xml = probe_xml->NextSiblingElement(probe_section_name);
+      p_probe.type = 0;
+      p_probe.r_start = atoi(try_atribute(probe_xml, "r_start"));
+      p_probe.r_end = atoi(try_atribute(probe_xml, "r_end"));
+      p_probe.z_start = atoi(try_atribute(probe_xml, "z_start"));
+      p_probe.z_end = atoi(try_atribute(probe_xml, "z_end"));
     }
+    else if ( strcmp(p_type, "col") == 0 )
+    {
+      p_probe.type = 1;
+      p_probe.r_start = 0;
+      p_probe.r_end = geom->n_grid_1;
+      p_probe.z_start = atoi(try_atribute(probe_xml, "z"));
+      p_probe.z_end = -1;
+    }
+    else if ( strcmp(p_type, "row") == 0 )
+    {
+      p_probe.type = 2;
+      p_probe.r_start = atoi(try_atribute(probe_xml, "r"));
+      p_probe.r_end = -1;
+      p_probe.z_start = 0;
+      p_probe.z_end = geom->n_grid_2;
+    }
+    else if ( strcmp(p_type, "dot") == 0 )
+    {
+      p_probe.type = 3;
+      p_probe.r_start = atoi(try_atribute(probe_xml, "r"));
+      p_probe.r_end = -1;
+      p_probe.z_start = atoi(try_atribute(probe_xml, "z"));
+      p_probe.z_end = -1;
+    }
+    else if ( strcmp(p_type, "mpframe") == 0 )
+    {
+      p_probe.type = 4;
+      p_probe.r_start = atoi(try_atribute(probe_xml, "r_start"));
+      p_probe.r_end = atoi(try_atribute(probe_xml, "r_end"));
+      p_probe.z_start = atoi(try_atribute(probe_xml, "z_start"));
+      p_probe.z_end = atoi(try_atribute(probe_xml, "z_end"));
+    }
+    else
+    {
+      cerr << "ERROR! probe type ``" << p_type << "'' is not supported" << endl;
+      exit(1);
+    }
+
+    p_probe.schedule = atoi(try_atribute(probe_xml, "schedule"));
+
+    probes.push_back(p_probe);
+
+    probe_xml = probe_xml->NextSiblingElement(probe_section_name);
+  }
 }
 
 void Parameters::init_beam()

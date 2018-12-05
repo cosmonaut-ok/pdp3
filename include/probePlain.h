@@ -29,4 +29,5 @@ class ProbePlain : public virtual Probe
   ~ProbePlain(void);
 
   void write(char *name, double **out_value);
+  void mpwrite(char *name, Particles *p_specie);
 };
