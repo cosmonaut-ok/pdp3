@@ -13,9 +13,13 @@ class ProbeHDF5 : public virtual Probe
 {
  private:
   char hdf5_file[100];
+  char probe_path[200];
+  char probe_data_set_name[200];
 
   void write_data(char *out_value, bool is_rewrite);
   char* get_data_path(char *name);
+
+  hid_t create_or_open_h5_group(hid_t file_id, char const *group_name);
 
  protected:
   void write_frame(char *name, double **data, bool is_rewrite);

@@ -22,7 +22,6 @@ private:
   char state_group_name[100];
 
   herr_t status;
-  herr_t my_hdf5_error_handler(void *unused);
 
   void dump_h5_dataset(char const *group_name,
                        char const *name,
