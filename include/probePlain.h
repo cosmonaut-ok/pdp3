@@ -23,7 +23,7 @@ class ProbePlain : public virtual Probe
  public:
   ProbePlain(void);
 
-  ProbePlain(char *c_path, char *c_component, int c_type,
+  ProbePlain(char *c_path, char* c_data_root, char *c_component, int c_type,
               int c_start_r, int c_start_z, int c_end_r, int c_end_z,
               bool c_compress, int c_compress_level, int schedule);
   ~ProbePlain(void);

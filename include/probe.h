@@ -17,7 +17,7 @@ class Probe
 {
  protected:
   char path_result[100];
-  char path_dump[100];
+  char data_root[100];
 
  protected:
   void write_frame(double **data);

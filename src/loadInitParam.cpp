@@ -70,7 +70,8 @@ LoadInitParam::LoadInitParam(char *xml_file_name)
 	sprintf(dump_data_root, "%s/%s", params->dump_result_path, params->dump_data_root);
 
         ProbePlain *wp = new ProbePlain(
-          dump_data_root, (char*)i->component,
+          params->dump_result_path, params->dump_data_root,
+          (char*)i->component,
           i->type, i->r_start, i->z_start, i->r_end, i->z_end,
           params->dump_compress, params->dump_compress_level,
           i->schedule);
