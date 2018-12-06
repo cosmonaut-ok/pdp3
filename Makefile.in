@@ -136,7 +136,7 @@ $(TESTSUBDIRS:%=%/__clean__): dummy
 $(pdp3_MODULE): $(pdp3_OBJS)
 	$(CXX) $(CXXFLAGS) $(CXXEXTRA) $(DEFINCL) $(LDFLAGS) -o $@ $(pdp3_OBJS) $(pdp3_LIBRARY_PATH) $(pdp3_LIBRARIES:%=-l%)
 
-mrproper: clean
+distclean: clean
 	$(RM) -r *.avi *.png $(BUILD_DIRS) $(RELEASE) $(RELEASE).zip autom4te.cache config.log config.status configure Makefile parameters.xml @RESULT_DIR@ test/functional/test.sh test/functional/parameters*tmpl
 
 run: bootstrap
