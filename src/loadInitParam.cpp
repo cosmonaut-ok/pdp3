@@ -51,8 +51,20 @@ LoadInitParam::LoadInitParam(char *xml_file_name)
   {
 #ifdef USE_HDF5
 #ifndef LEGACY
-    cerr << "ERROR! HDF5 still not supported by expedimental data mode" << endl;
-    exit(1);
+    for (auto i = params->probes.begin(); i != params->probes.end(); ++i)
+    {
+      char* dump_data_root = new char[100];
+      sprintf(dump_data_root, "%s/%s", params->dump_result_path, params->dump_data_root);
+
+      ProbeHDF5 *wp = new ProbeHDF5(
+        params->dump_result_path, params->dump_data_root,
+        (char*)i->component,
+        i->type, i->r_start, i->z_start, i->r_end, i->z_end,
+        params->dump_compress, params->dump_compress_level,
+        i->schedule);
+
+      c_probes.push_back(wp);
+    }
 #else
     c_io_class = new IOHDF5 (params->dump_result_path, params->dump_result_path, params->dump_compress);
 #endif
@@ -62,26 +74,26 @@ LoadInitParam::LoadInitParam(char *xml_file_name)
 #endif
   }
   else
-    {
+  {
 #ifndef LEGACY
-      for (auto i = params->probes.begin(); i != params->probes.end(); ++i)
-      {
-	char* dump_data_root = new char[100];
-	sprintf(dump_data_root, "%s/%s", params->dump_result_path, params->dump_data_root);
+    for (auto i = params->probes.begin(); i != params->probes.end(); ++i)
+    {
+      char* dump_data_root = new char[100];
+      sprintf(dump_data_root, "%s/%s", params->dump_result_path, params->dump_data_root);
 
-        ProbePlain *wp = new ProbePlain(
-          params->dump_result_path, params->dump_data_root,
-          (char*)i->component,
-          i->type, i->r_start, i->z_start, i->r_end, i->z_end,
-          params->dump_compress, params->dump_compress_level,
-          i->schedule);
+      ProbePlain *wp = new ProbePlain(
+        params->dump_result_path, params->dump_data_root,
+        (char*)i->component,
+        i->type, i->r_start, i->z_start, i->r_end, i->z_end,
+        params->dump_compress, params->dump_compress_level,
+        i->schedule);
 
-        c_probes.push_back(wp);
-      }
-#else
-      c_io_class = new IOText (params->dump_result_path, params->dump_result_path, params->dump_compress);
-#endif
+      c_probes.push_back(wp);
     }
+#else
+    c_io_class = new IOText (params->dump_result_path, params->dump_result_path, params->dump_compress);
+#endif
+  }
 #ifdef LEGACY
   c_io_class->compress_level = params->dump_compress_level;
 #endif

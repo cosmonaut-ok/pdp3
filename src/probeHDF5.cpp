@@ -11,6 +11,7 @@ ProbeHDF5::ProbeHDF5(char *c_path, char *c_data_root, char *c_component, int c_t
                          bool c_compress, int c_compress_level, int c_schedule)
 {
   hid_t file_id, gcpl;
+  herr_t status;
 
   strcpy(path_result, c_path);
   strcpy(data_root, c_data_root);
@@ -27,13 +28,46 @@ ProbeHDF5::ProbeHDF5(char *c_path, char *c_data_root, char *c_component, int c_t
   // not implemented
   compress = c_compress;
   compress_level = c_compress_level;
-  // if (compress)
-  //   cerr << "WARNING! compression is not supported by plaintext backend" << endl;
 
-#ifdef DEBUG
-  cerr << "Creating directory " << path << endl;
+  // make hdf5 file path
+  strcpy(hdf5_file, path_result);
+  strcat(hdf5_file, "/data.h5"); // yes, baby, it's hardcode
+
+  #ifdef DEBUG
+  cerr << "Creating directory " << path_result << endl;
 #endif
-  lib::makeDirectory(path);
+  lib::makeDirectory(path_result);
+
+  //////////////////////////////////////////////////////////////////////////////
+  /* Save old error handler */
+  herr_t (*old_func)(void*);
+  void *old_client_data;
+
+  H5Eget_auto1(&old_func, &old_client_data);
+
+  /* Turn off error handling */
+  H5Eset_auto1(NULL, NULL);
+
+  /* Probe. Likely to fail, but that’s okay */
+  // status = H5Fopen (hdf5_file, H5F_ACC_RDWR, H5P_DEFAULT);
+  // file_id = H5Fopen (hdf5_file, H5F_ACC_RDWR, H5P_DEFAULT);
+
+
+  file_id = H5Fcreate (hdf5_file, H5F_ACC_EXCL, H5P_DEFAULT, H5P_DEFAULT);
+  // file_id = H5Fcreate (hdf5_file, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+
+  //////////////////////////////////////////////////////////////////////////////
+
+  // Create group creation property list and set it to allow creation
+  // of intermediate groups.
+  gcpl = H5Pcreate (H5P_LINK_CREATE);
+  status = H5Pset_create_intermediate_group (gcpl, 1);
+
+  // close
+  status = H5Fclose(file_id);
+
+  /* Restore previous error handler */
+  H5Eset_auto1(old_func, old_client_data);
 
   // switch (type)
   //   {
@@ -56,11 +90,6 @@ ProbeHDF5::ProbeHDF5(char *c_path, char *c_data_root, char *c_component, int c_t
   //             c_start_r, c_start_z, c_end_r, c_end_z);
   //     break;
   //   }
-
-#ifdef DEBUG
-  cerr << "Creating directory " << path_result << endl;
-#endif
-  lib::makeDirectory(path_result);
 }
 
 ProbeHDF5::~ProbeHDF5(void)

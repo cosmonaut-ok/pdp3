@@ -25,6 +25,7 @@
 
 #include "probe.h"
 #include "probePlain.h"
+#include "probeHDF5.h"
 
 #ifdef USE_HDF5
 #include "ioHDF5.h"

@@ -12,6 +12,8 @@ using namespace std;
 class ProbeHDF5 : public virtual Probe
 {
  private:
+  char hdf5_file[100];
+
   void write_data(char *out_value, bool is_rewrite);
   char* get_data_path(char *name);
 
