@@ -154,6 +154,27 @@ hid_t ProbeHDF5::create_or_open_h5_dataset(
   prop = H5Pcreate (H5P_DATASET_CREATE);
   status = H5Pset_chunk (prop, rank, chunk_dims);
 
+  //
+  // create or open dataset
+  //
+  // // Save old error handler
+  // herr_t (*old_func)(void*);
+  // void *old_client_data;
+  // H5Eget_auto1 (&old_func, &old_client_data);
+
+  // status = H5Eset_auto1(NULL, NULL);
+
+  // dataset = H5Dopen(file_id, name, H5P_DEFAULT);
+
+  // if (dataset == -1)
+  //   dataset = H5Dcreate(file_id, name, datatype, dataspace,
+  //                       H5P_DEFAULT, plist_id, H5P_DEFAULT);
+
+  // status = H5Eset_auto1(old_func, old_client_data);
+
+  // status = H5Dwrite(dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
+  //                   H5P_DEFAULT, dv);
+
 ////////////////////////////////////////////////////////////////////////////////
 
   // hsize_t dims[2]  = {3, 3};           /* dataset dimensions at creation time */
