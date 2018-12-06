@@ -1,3 +1,4 @@
+// follow this: https://support.hdfgroup.org/ftp/HDF5/current/src/unpacked/examples/h5_extend.c
 #include "probeHDF5.h"
 
 using namespace std;
@@ -148,12 +149,16 @@ hid_t ProbeHDF5::create_or_open_h5_dataset(
   int rank = 2;
   dataspace = H5Screate_simple (rank, dims, maxdims);
 
+  // Modify dataset creation properties, i.e. enable chunking
+  hsize_t chunk_dims[2] = {2, 5}; // TODO: WTF
+  prop = H5Pcreate (H5P_DATASET_CREATE);
+  status = H5Pset_chunk (prop, rank, chunk_dims);
+
 ////////////////////////////////////////////////////////////////////////////////
 
   // hsize_t dims[2]  = {3, 3};           /* dataset dimensions at creation time */
   // hsize_t maxdims[2] = {H5S_UNLIMITED, H5S_UNLIMITED};
 
-  // hsize_t chunk_dims[2] = {2, 5};
   // int data[3][3] = { {1, 1, 1},    /* data to write */
   //                    {1, 1, 1},
   //                    {1, 1, 1} };
@@ -178,16 +183,7 @@ hid_t ProbeHDF5::create_or_open_h5_dataset(
   // herr_t status_n;
   // int rank, rank_chunk;
 
-  // /* Create the data space with unlimited dimensions. */
-  // dataspace = H5Screate_simple (RANK, dims, maxdims);
-
-  // /* Create a new file. If file exists its contents will be overwritten. */
-  // file = H5Fcreate (FILENAME, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-
-  // /* Modify dataset creation properties, i.e. enable chunking  */
-  // prop = H5Pcreate (H5P_DATASET_CREATE);
-  // status = H5Pset_chunk (prop, RANK, chunk_dims);
-
+////
   // /* Create a new dataset within the file using chunk
   //    creation properties.  */
   // dataset = H5Dcreate2 (file, DATASETNAME, H5T_NATIVE_INT, dataspace,
