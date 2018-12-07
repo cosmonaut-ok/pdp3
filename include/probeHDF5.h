@@ -20,6 +20,7 @@ class ProbeHDF5 : public virtual Probe
   char* get_data_path(char *name);
 
   hid_t create_or_open_h5_group(hid_t file_id, char const *group_name);
+  hid_t create_or_open_h5_dataset(hid_t file_id, hid_t group_id, char const *ds_name);
 
  protected:
   void write_frame(char *name, double **data, bool is_rewrite);

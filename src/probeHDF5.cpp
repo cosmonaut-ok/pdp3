@@ -133,20 +133,17 @@ hid_t ProbeHDF5::create_or_open_h5_group(hid_t file_id, char const *group_name)
 }
 
 hid_t ProbeHDF5::create_or_open_h5_dataset(
-  hid_t file_id, char const *group_name char const *ds_name)
+  hid_t file_id, hid_t group_id, char const *ds_name)
 {
-  hid_t group_id;
-  hid_t dataspace, dataset;
+  hid_t datatype, dataspace, dataset;
   hid_t filespace, memspace;
   hid_t prop;
-  hid_t datatype, plist_id;
   herr_t status;
-
-  ////
-  group_id = create_or_open_h5_group(file_id, group_name);
 
   // Create the data space with unlimited dimensions
   int rank = 2;
+  hsize_t dims[rank]  = {3, 3}; /* dataset dimensions at creation time */
+  hsize_t maxdims[rank] = {H5S_UNLIMITED, H5S_UNLIMITED};
   dataspace = H5Screate_simple (rank, dims, maxdims);
 
   // Modify dataset creation properties, i.e. enable chunking
@@ -157,28 +154,27 @@ hid_t ProbeHDF5::create_or_open_h5_dataset(
   //
   // create or open dataset
   //
-  // // Save old error handler
-  // herr_t (*old_func)(void*);
-  // void *old_client_data;
-  // H5Eget_auto1 (&old_func, &old_client_data);
+  // Save old error handler
+  herr_t (*old_func)(void*);
+  void *old_client_data;
+  H5Eget_auto1 (&old_func, &old_client_data);
 
-  // status = H5Eset_auto1(NULL, NULL);
+  status = H5Eset_auto1(NULL, NULL);
 
-  // dataset = H5Dopen(file_id, name, H5P_DEFAULT);
+  dataset = H5Dopen2 (file_id, name, H5P_DEFAULT);
 
-  // if (dataset == -1)
-  //   dataset = H5Dcreate(file_id, name, datatype, dataspace,
-  //                       H5P_DEFAULT, plist_id, H5P_DEFAULT);
+  if (dataset == -1)
+    dataset = H5Dcreate2 (file_id, name, datatype, dataspace,
+                          H5P_DEFAULT, prop, H5P_DEFAULT);
 
-  // status = H5Eset_auto1(old_func, old_client_data);
+  status = H5Eset_auto1(old_func, old_client_data);
 
-  // status = H5Dwrite(dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
-  //                   H5P_DEFAULT, dv);
+  return(dataset);
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  // hsize_t dims[2]  = {3, 3};           /* dataset dimensions at creation time */
-  // hsize_t maxdims[2] = {H5S_UNLIMITED, H5S_UNLIMITED};
+
 
   // int data[3][3] = { {1, 1, 1},    /* data to write */
   //                    {1, 1, 1},
@@ -276,7 +272,7 @@ hid_t ProbeHDF5::create_or_open_h5_dataset(
   // status = H5Sclose (memspace);
   // status = H5Fclose (file);
 
-}
+// }
 
 // void ProbeHDF5::write_frame(char *name, double **out_value, bool is_rewrite = false)
 // {
