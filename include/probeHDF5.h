@@ -20,7 +20,7 @@ class ProbeHDF5 : public virtual Probe
   char* get_data_path(char *name);
 
   hid_t create_or_open_h5_group(hid_t file_id, char const *group_name);
-  hid_t create_or_open_h5_dataset(hid_t file_id, char const *path);
+  hid_t create_or_open_h5_dataset(hid_t file_id, char const *path, int rank, hsize_t *dims);
 
  protected:
   void write_frame(char *name, double **data, bool is_rewrite);
@@ -32,8 +32,9 @@ class ProbeHDF5 : public virtual Probe
   ProbeHDF5(void);
 
   ProbeHDF5(char *c_path, char *c_data_root, char *c_component, int c_type,
-              int c_start_r, int c_start_z, int c_end_r, int c_end_z,
-              bool c_compress, int c_compress_level, int schedule);
+            int c_start_r, int c_start_z, int c_end_r, int c_end_z,
+            bool c_compress, int c_compress_level, int schedule,
+            unsigned int c_r_size, unsigned int c_z_size);
   ~ProbeHDF5(void);
 
   void write(char *name, double **out_value);

@@ -61,7 +61,7 @@ LoadInitParam::LoadInitParam(char *xml_file_name)
         (char*)i->component,
         i->type, i->r_start, i->z_start, i->r_end, i->z_end,
         params->dump_compress, params->dump_compress_level,
-        i->schedule);
+        i->schedule, params->geom->n_grid_1, params->geom->n_grid_2);
 
       c_probes.push_back(wp);
     }

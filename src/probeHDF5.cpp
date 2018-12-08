@@ -8,11 +8,10 @@ ProbeHDF5::ProbeHDF5(void)
 }
 
 ProbeHDF5::ProbeHDF5(char *c_path, char *c_data_root, char *c_component, int c_type,
-                         int c_start_r, int c_start_z, int c_end_r, int c_end_z,
-                         bool c_compress, int c_compress_level, int c_schedule)
+                     int c_start_r, int c_start_z, int c_end_r, int c_end_z,
+                     bool c_compress, int c_compress_level, int c_schedule,
+                     unsigned int c_r_size, unsigned int c_z_size)
 {
-  hid_t file_id, gcpl;
-  herr_t status;
 
   strcpy(path_result, c_path);
   strcpy(data_root, c_data_root);
@@ -31,66 +30,148 @@ ProbeHDF5::ProbeHDF5(char *c_path, char *c_data_root, char *c_component, int c_t
   strcpy(hdf5_file, path_result);
   strcat(hdf5_file, "/data.h5"); // yes, baby, it's hardcode
 
+  unsigned int r_rank;
+
   // set probe path and data set name
   switch (type)
   {
-  case 0:
+  case 0: // frame
     sprintf(probe_path, "%s/%s/frame", data_root, component);
     sprintf(probe_data_set_name, "%d:%d_%d:%d", start_r, start_z, end_r, end_z);
+    // set dataset rank
+    r_rank = 3;
     break;
-  case 1:
+  case 1: // column
     sprintf(probe_path, "%s/%s/col", data_root, component);
     sprintf(probe_data_set_name, "%d", start_z);
+    // set dataset rank
+    r_rank = 2;
     break;
-  case 2:
+  case 2: // row
     sprintf(probe_path, "%s/%s/row", data_root, component);
     sprintf(probe_data_set_name, "%d", start_r);
+    // set dataset rank
+    r_rank = 2;
     break;
-  case 3:
+  case 3: // dot
     sprintf(probe_path, "%s/%s/dot", data_root, component);
     sprintf(probe_data_set_name, "%d_%d", start_r, start_z);
+    // set dataset rank
+    r_rank = 1;
     break;
-  case 4:
+  case 4: // macroparticles frame
     sprintf(probe_path, "%s/%s/mpframe", data_root, component);
     sprintf(probe_data_set_name, "%d:%d_%d:%d", start_r, start_z, end_r, end_z);
+    // set dataset rank
+    r_rank = 3;
     break;
   }
 
-  #ifdef DEBUG
-  cerr << "Creating directory " << path_result << endl;
-#endif
-  lib::makeDirectory(path_result);
+  char dataset_path[200]; // will contain full dataset path
+  sprintf(dataset_path, "%s/%s", probe_path, probe_data_set_name);
 
-  //////////////////////////////////////////////////////////////////////////////
-  /* Save old error handler */
+////////////////////////////////////////////////////////////////////////////////
+  hid_t file;
+  hid_t dataspace, dataset;
+  hid_t filespace, memspace;
+  hid_t prop;
+  hid_t group;
+
+  hsize_t dims[r_rank]; // = {3, 3, 3}; /* dataset dimensions at creation time */
+  hsize_t maxdims[r_rank]; // = {H5S_UNLIMITED, H5S_UNLIMITED, H5S_UNLIMITED};
+  herr_t status;
+  hsize_t chunk_dims[r_rank]; //  = {2, 2, 5};
+
+  switch (type)
+  {
+  case 0: // frame
+    dims[0] = end_r - start_r;
+    dims[1] = end_z - start_z;
+    dims[2] = 1;
+    maxdims[0] = H5S_UNLIMITED;
+    maxdims[1] = H5S_UNLIMITED;
+    maxdims[2] = H5S_UNLIMITED;
+    chunk_dims[0] = 2;
+    chunk_dims[1] = 2;
+    chunk_dims[2] = 2;
+    break;
+  case 1: // col
+    dims[0] = c_z_size;
+    dims[1] = 1;
+    maxdims[0] = H5S_UNLIMITED;
+    maxdims[1] = H5S_UNLIMITED;
+    chunk_dims[0] = 2;
+    chunk_dims[1] = 2;
+    break;
+  case 2: // row
+    dims[0] = c_r_size;
+    dims[1] = 1;
+    maxdims[0] = H5S_UNLIMITED;
+    maxdims[1] = H5S_UNLIMITED;
+    chunk_dims[0] = 2;
+    chunk_dims[1] = 2;
+    break;
+  case 3: // dot
+    dims[0] = 1;
+    maxdims[0] = H5S_UNLIMITED;
+    chunk_dims[0] = 1;
+    break;
+  case 4: // mpframe
+    dims[0] = end_r - start_r;
+    dims[1] = end_z - start_z;
+    dims[2] = 1;
+    maxdims[0] = H5S_UNLIMITED;
+    maxdims[1] = H5S_UNLIMITED;
+    maxdims[2] = H5S_UNLIMITED;
+    chunk_dims[0] = 1;
+    chunk_dims[1] = 1;
+    chunk_dims[2] = 1;
+    break;
+  }
+
+  /* Create the data space with unlimited dimensions. */
+  dataspace = H5Screate_simple (r_rank, dims, maxdims);
+
+  //// disable error printing
+  // Save old error handler
   herr_t (*old_func)(void*);
   void *old_client_data;
+  H5Eget_auto1 (&old_func, &old_client_data);
 
-  H5Eget_auto1(&old_func, &old_client_data);
+  status = H5Eset_auto1(NULL, NULL);
+  /* Create a new file. If file exists its contents will be overwritten. */
+  file = H5Fcreate (hdf5_file, H5F_ACC_EXCL, H5P_DEFAULT, H5P_DEFAULT);
+  //// enable error printing
+  status = H5Eset_auto1(old_func, old_client_data);
 
-  /* Turn off error handling */
-  // H5Eset_auto1(NULL, NULL);
-
-  // try to create hdf5 file
-  file_id = H5Fcreate (hdf5_file, H5F_ACC_EXCL, H5P_DEFAULT, H5P_DEFAULT);
-
-  /* Restore previous error handler */
-  // H5Eset_auto1(old_func, old_client_data);
-
-  if (file_id < 0)
-    file_id = H5Fopen (hdf5_file, H5F_ACC_RDWR, H5P_DEFAULT);
+  if (file < 0)
+    file = H5Fopen (hdf5_file, H5F_ACC_RDWR, H5P_DEFAULT);
   else
   {
     // Create group creation property list and set it to allow creation
     // of intermediate groups.
-    gcpl = H5Pcreate (H5P_LINK_CREATE);
+    hid_t gcpl = H5Pcreate (H5P_LINK_CREATE);
     status = H5Pset_create_intermediate_group (gcpl, 1);
   }
 
-  create_or_open_h5_group(file_id, probe_path);
+  group = create_or_open_h5_group(file, probe_path);
 
-  // close
-  status = H5Fclose(file_id);
+  /* Modify dataset creation properties, i.e. enable chunking  */
+  prop = H5Pcreate (H5P_DATASET_CREATE);
+  status = H5Pset_chunk (prop, r_rank, chunk_dims);
+
+  /* Create a new dataset within the file using chunk
+     creation properties.  */
+  dataset = H5Dcreate2 (file, dataset_path, H5T_NATIVE_INT, dataspace,
+                        H5P_DEFAULT, prop, H5P_DEFAULT);
+
+
+  status = H5Pclose (prop);
+  status = H5Dclose (dataset);
+  status = H5Gclose (group);
+  // status = H5Sclose (filespace);
+  // status = H5Sclose (memspace);
+  status = H5Fclose (file);
 }
 
 ProbeHDF5::~ProbeHDF5(void)
@@ -109,7 +190,7 @@ hid_t ProbeHDF5::create_or_open_h5_group(hid_t file_id, char const *group_name)
 
   gcpl = H5Pcreate (H5P_LINK_CREATE);
   status = H5Pset_create_intermediate_group (gcpl, 1);
-  // status = H5Eset_auto1(NULL, NULL);
+  status = H5Eset_auto1(NULL, NULL);
   status = H5Gget_objinfo (file_id, group_name, 0, NULL);
 
   if (status != 0)
@@ -127,53 +208,55 @@ hid_t ProbeHDF5::create_or_open_h5_group(hid_t file_id, char const *group_name)
     group_id = H5Gopen (file_id, group_name, H5P_DEFAULT);
   }
 
-  // status = H5Eset_auto1(old_func, old_client_data);
+  status = H5Eset_auto1(old_func, old_client_data);
 
   return(group_id);
 }
 
 hid_t ProbeHDF5::create_or_open_h5_dataset(
-  hid_t file_id, char const *path)
+  hid_t file_id, char const *path,
+  int rank, hsize_t *dims)
 {
-  hid_t datatype, dataspace, dataset;
-  hid_t filespace, memspace;
-  hid_t prop;
-  herr_t status;
+  // hid_t datatype, dataspace, dataset;
+  // hid_t filespace, memspace;
+  // hid_t prop;
+  // herr_t status;
 
-  // Create the data space with unlimited dimensions
-  int rank = 2;
-  hsize_t dims[rank]  = {3, 3}; /* dataset dimensions at creation time */
-  hsize_t maxdims[rank] = {H5S_UNLIMITED, H5S_UNLIMITED};
-  dataspace = H5Screate_simple (rank, dims, maxdims);
+  // // Create the data space with unlimited dimensions
+  // // int rank = rank;
+  // // hsize_t h_dims[rank] = dims;
+  // // h_dims = dims; /* dataset dimensions at creation time */
+  // hsize_t maxdims[rank] = {H5S_UNLIMITED, H5S_UNLIMITED};
+  // dataspace = H5Screate_simple (rank, dims, maxdims);
 
-  datatype = H5Tcopy(H5T_NATIVE_DOUBLE);
-  status = H5Tset_order(datatype, H5T_ORDER_LE);
+  // datatype = H5Tcopy(H5T_NATIVE_DOUBLE);
+  // status = H5Tset_order(datatype, H5T_ORDER_LE);
 
-  // Modify dataset creation properties, i.e. enable chunking
-  hsize_t chunk_dims[2] = {2, 5}; // TODO: WTF
-  prop = H5Pcreate (H5P_DATASET_CREATE);
-  status = H5Pset_chunk (prop, rank, chunk_dims);
+  // // Modify dataset creation properties, i.e. enable chunking
+  // hsize_t chunk_dims[2] = {2, 5}; // TODO: WTF
+  // prop = H5Pcreate (H5P_DATASET_CREATE);
+  // status = H5Pset_chunk (prop, rank, chunk_dims);
 
-  //
-  // create or open dataset
-  //
-  // Save old error handler
-  herr_t (*old_func)(void*);
-  void *old_client_data;
-  H5Eget_auto1 (&old_func, &old_client_data);
+  // //
+  // // create or open dataset
+  // //
+  // // Save old error handler
+  // herr_t (*old_func)(void*);
+  // void *old_client_data;
+  // H5Eget_auto1 (&old_func, &old_client_data);
 
   // status = H5Eset_auto1(NULL, NULL);
 
-  dataset = H5Dopen2 (file_id, path, H5P_DEFAULT);
+  // dataset = H5Dopen2 (file_id, path, H5P_DEFAULT);
 
-  if (dataset == -1)
-    dataset = H5Dcreate2 (file_id, path, datatype, dataspace,
-                          H5P_DEFAULT, prop, H5P_DEFAULT);
+  // if (dataset == -1)
+  //   dataset = H5Dcreate2 (file_id, path, datatype, dataspace,
+  //                         H5P_DEFAULT, prop, H5P_DEFAULT);
 
-  cout << "create_or_open_h5_dataset " << dataset << endl;
+  // // cout << "create_or_open_h5_dataset " << dataset << endl;
   // status = H5Eset_auto1(old_func, old_client_data);
 
-  return(dataset);
+  // return(dataset);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -278,8 +361,41 @@ hid_t ProbeHDF5::create_or_open_h5_dataset(
 
 // }
 
-// void ProbeHDF5::write_frame(char *name, double **out_value, bool is_rewrite = false)
-// {
+void ProbeHDF5::write_frame(char *name, double **out_value, bool is_rewrite = false)
+{
+  cout << "write" << endl;
+  herr_t status;
+  hid_t file_id, group_id, ds_id;
+
+  char dataset_name[200];
+  sprintf(dataset_name, "%s/%s", probe_path, probe_data_set_name);
+
+  file_id = H5Fopen (hdf5_file, H5F_ACC_RDWR, H5P_DEFAULT);
+
+  int rank = 2;
+  hsize_t dims[rank] = {254, 2046};
+
+  group_id = create_or_open_h5_group(file_id, probe_path);
+  ds_id = create_or_open_h5_dataset(file_id, dataset_name, rank, dims);
+
+  double data[3][3] = { {1, 1, 1},    /* data to write */
+                        {1, 1, 1},
+                        {1, 1, 1} };
+
+
+
+  cout << "AAAAA :" << ds_id << endl;
+  status = H5Dwrite(ds_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
+                    H5P_DEFAULT, out_value);
+
+  cout << "BBBBB :" << status << endl;
+  status = H5Dclose(ds_id);
+  cout << "CCCCC :" << status << endl;
+  status = H5Gclose(group_id);
+  cout << "DDDDD :" << status << endl;
+  status = H5Fclose(file_id);
+  cout << "EEEEE :" << status << endl;
+
 //   char *path = get_data_path(name);
 
 //   std::ofstream::openmode omode;
@@ -295,7 +411,7 @@ hid_t ProbeHDF5::create_or_open_h5_dataset(
 //     for(int k = start_z; k < end_z; k++)
 //       out_file<<out_value[i][k]<<" ";
 //   out_file.close();
-// }
+}
 
 // void ProbeHDF5::write_col(char *name, double **out_value, bool is_rewrite = false)
 // {
@@ -354,40 +470,12 @@ hid_t ProbeHDF5::create_or_open_h5_dataset(
 
 void ProbeHDF5::write(char *name, double **out_value)
 {
-  cout << "write" << endl;
-  herr_t status;
-  hid_t file_id, group_id, ds_id;
-
-  char dataset_name[200];
-  sprintf(dataset_name, "%s/%s", probe_path, probe_data_set_name);
-
-  file_id = H5Fopen (hdf5_file, H5F_ACC_RDWR, H5P_DEFAULT);
-
-  group_id = create_or_open_h5_group(file_id, probe_path);
-  ds_id = create_or_open_h5_dataset(file_id, dataset_name);
-
-  double data[3][3] = { {1, 1, 1},    /* data to write */
-                        {1, 1, 1},
-                        {1, 1, 1} };
-
-  cout << "AAAAA :" << ds_id << endl;
-  // status = H5Dwrite (ds_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
-  //                    H5P_DEFAULT, data);
-  status = H5Dwrite(ds_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
-                    H5P_DEFAULT, data);
-  cout << status << endl;
-  cout << "BBBBB :" << ds_id << endl;
-  status = H5Dclose(ds_id);
-  cout << "CCCCC :" << endl;
-  status = H5Gclose(group_id);
-  cout << "DDDDD :" << endl;
-  status = H5Fclose(file_id);
-  cout << "EEEEE :" << endl;
-//   switch (type)
-//     {
-//     case 0:
-//       write_frame(name, out_value, false);
-//       break;
+  cout << "/me dummy" << endl;
+  // switch (type)
+  // {
+  // case 0:
+  //   write_frame(name, out_value, false);
+  //   break;
 //     case 1:
 //       write_col(name, out_value, false);
 //       break;
@@ -397,7 +485,7 @@ void ProbeHDF5::write(char *name, double **out_value)
 //     case 3:
 //       write_dot(name, out_value, false);
 //       break;
-//     }
+// }
 }
 
 void ProbeHDF5::mpwrite(char *name, Particles *p_specie)
