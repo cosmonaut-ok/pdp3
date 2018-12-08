@@ -69,13 +69,13 @@ ProbeHDF5::ProbeHDF5(char *c_path, char *c_data_root, char *c_component, int c_t
   H5Eget_auto1(&old_func, &old_client_data);
 
   /* Turn off error handling */
-  H5Eset_auto1(NULL, NULL);
+  // H5Eset_auto1(NULL, NULL);
 
   // try to create hdf5 file
   file_id = H5Fcreate (hdf5_file, H5F_ACC_EXCL, H5P_DEFAULT, H5P_DEFAULT);
 
   /* Restore previous error handler */
-  H5Eset_auto1(old_func, old_client_data);
+  // H5Eset_auto1(old_func, old_client_data);
 
   if (file_id < 0)
     file_id = H5Fopen (hdf5_file, H5F_ACC_RDWR, H5P_DEFAULT);
@@ -109,7 +109,7 @@ hid_t ProbeHDF5::create_or_open_h5_group(hid_t file_id, char const *group_name)
 
   gcpl = H5Pcreate (H5P_LINK_CREATE);
   status = H5Pset_create_intermediate_group (gcpl, 1);
-  status = H5Eset_auto1(NULL, NULL);
+  // status = H5Eset_auto1(NULL, NULL);
   status = H5Gget_objinfo (file_id, group_name, 0, NULL);
 
   if (status != 0)
@@ -127,13 +127,13 @@ hid_t ProbeHDF5::create_or_open_h5_group(hid_t file_id, char const *group_name)
     group_id = H5Gopen (file_id, group_name, H5P_DEFAULT);
   }
 
-  status = H5Eset_auto1(old_func, old_client_data);
+  // status = H5Eset_auto1(old_func, old_client_data);
 
   return(group_id);
 }
 
 hid_t ProbeHDF5::create_or_open_h5_dataset(
-  hid_t file_id, hid_t group_id, char const *ds_name)
+  hid_t file_id, char const *path)
 {
   hid_t datatype, dataspace, dataset;
   hid_t filespace, memspace;
@@ -145,6 +145,9 @@ hid_t ProbeHDF5::create_or_open_h5_dataset(
   hsize_t dims[rank]  = {3, 3}; /* dataset dimensions at creation time */
   hsize_t maxdims[rank] = {H5S_UNLIMITED, H5S_UNLIMITED};
   dataspace = H5Screate_simple (rank, dims, maxdims);
+
+  datatype = H5Tcopy(H5T_NATIVE_DOUBLE);
+  status = H5Tset_order(datatype, H5T_ORDER_LE);
 
   // Modify dataset creation properties, i.e. enable chunking
   hsize_t chunk_dims[2] = {2, 5}; // TODO: WTF
@@ -159,15 +162,16 @@ hid_t ProbeHDF5::create_or_open_h5_dataset(
   void *old_client_data;
   H5Eget_auto1 (&old_func, &old_client_data);
 
-  status = H5Eset_auto1(NULL, NULL);
+  // status = H5Eset_auto1(NULL, NULL);
 
-  dataset = H5Dopen2 (file_id, name, H5P_DEFAULT);
+  dataset = H5Dopen2 (file_id, path, H5P_DEFAULT);
 
   if (dataset == -1)
-    dataset = H5Dcreate2 (file_id, name, datatype, dataspace,
+    dataset = H5Dcreate2 (file_id, path, datatype, dataspace,
                           H5P_DEFAULT, prop, H5P_DEFAULT);
 
-  status = H5Eset_auto1(old_func, old_client_data);
+  cout << "create_or_open_h5_dataset " << dataset << endl;
+  // status = H5Eset_auto1(old_func, old_client_data);
 
   return(dataset);
 }
@@ -351,6 +355,34 @@ hid_t ProbeHDF5::create_or_open_h5_dataset(
 void ProbeHDF5::write(char *name, double **out_value)
 {
   cout << "write" << endl;
+  herr_t status;
+  hid_t file_id, group_id, ds_id;
+
+  char dataset_name[200];
+  sprintf(dataset_name, "%s/%s", probe_path, probe_data_set_name);
+
+  file_id = H5Fopen (hdf5_file, H5F_ACC_RDWR, H5P_DEFAULT);
+
+  group_id = create_or_open_h5_group(file_id, probe_path);
+  ds_id = create_or_open_h5_dataset(file_id, dataset_name);
+
+  double data[3][3] = { {1, 1, 1},    /* data to write */
+                        {1, 1, 1},
+                        {1, 1, 1} };
+
+  cout << "AAAAA :" << ds_id << endl;
+  // status = H5Dwrite (ds_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
+  //                    H5P_DEFAULT, data);
+  status = H5Dwrite(ds_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
+                    H5P_DEFAULT, data);
+  cout << status << endl;
+  cout << "BBBBB :" << ds_id << endl;
+  status = H5Dclose(ds_id);
+  cout << "CCCCC :" << endl;
+  status = H5Gclose(group_id);
+  cout << "DDDDD :" << endl;
+  status = H5Fclose(file_id);
+  cout << "EEEEE :" << endl;
 //   switch (type)
 //     {
 //     case 0:
