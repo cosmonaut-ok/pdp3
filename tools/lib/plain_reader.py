@@ -68,7 +68,7 @@ class PlainReader:
         elif p_type == 'col' or p_type == 'row':
             path = join(self.__data_path__, "{}/{}_{}".format(p_component, p_type, shape[0]))
         elif p_type == 'dot':
-            path = join(self.__data_path__, "{}/{}_{}_{}".format(p_component, p_type, shape[0], shape[1]))
+            path = join(self.__data_path__, "{}/{}_{}_{}".format(p_component, p_type, shape[1], shape[0])) # use shape[1] then [0] because xy translates to zr :)
         else:
             raise TypeError("Incorrect data type {}. Must be frame/col/row/dot".format(p_type))
 
