@@ -154,6 +154,13 @@ ProbeHDF5::ProbeHDF5(char *c_path, char *c_data_root, char *c_component, int c_t
     status = H5Pset_create_intermediate_group (gcpl, 1);
   }
 
+  // catch HDF file creating/opening error
+  if (file < 0)
+  {
+    cerr << "ERROR: can not create/open HDF5 data file ``" << hdf5_file << "''. Exiting." << endl;
+    exit(1);
+  }
+
   group = create_or_open_h5_group(file, probe_path);
 
   /* Modify dataset creation properties, i.e. enable chunking  */
