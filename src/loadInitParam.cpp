@@ -331,7 +331,11 @@ void LoadInitParam::dump_data(int step_number)
 
     if ((int)(params->time->current_time / params->time->delta_t) % w->schedule == 0)
     {
-      int file_number = floor(w->step_number / params->dump_frames_per_file);
+      int file_number;
+      if (w->type == 4)
+	file_number = w->step_number;
+      else
+	file_number = floor(w->step_number / params->dump_frames_per_file);
       char file_name[100];
       sprintf(file_name, "%d", file_number);
       int shape[4] = {w->start_r, w->start_z, w->end_r, w->end_z};
