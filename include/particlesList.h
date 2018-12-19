@@ -19,6 +19,7 @@ public:
 
   void charge_weighting(ChargeDensity *rho);
   void boris_pusher(EField *e_fld, HField *h_fld, Time *t);
+  void full_j_weighting(Current *current, Time *t);
   void move_half_reflect(Time *t);
   void azimuthal_j_weighting(Time *time1, Current *j1);
   void j_weighting(Time *time1, Current *j1);
