@@ -485,29 +485,11 @@ void LoadInitParam::run(void)
       the_time = clock();
 #endif
 
-      p_list->azimuthal_j_weighting(params->time, c_current);
 #ifdef DEBUG
-      cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: p_list->azimuthal_j_weighting" << endl;
+      cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: full_j_weighting" << endl;
       the_time = clock();
 #endif
-
-      p_list->move_half_reflect(params->time);
-#ifdef DEBUG
-      cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: p_list->move_half_reflect" << endl;
-      the_time = clock();
-#endif
-
-      p_list->j_weighting(params->time, c_current);
-#ifdef DEBUG
-      cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: j_weighting" << endl;
-      the_time = clock();
-#endif
-
-      p_list->back_velocity_to_rz();
-#ifdef DEBUG
-      cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: back_velocity_to_rz" << endl;
-      the_time = clock();
-#endif
+      p_list->full_j_weighting(c_current, params->time);
 
       //! 5. Calculate E
       // maxwell_rad.probe_mode_exitation(&geom1,&current1, 1,7e8, time1.current_time);

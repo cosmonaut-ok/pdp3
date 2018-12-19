@@ -1398,3 +1398,11 @@ void Particles::move_half_reflect(Time *t)
       back_position_to_rz_single(i);
     }
 }
+
+void Particles::full_j_weighting(Current *current, Time *t)
+{
+  azimuthal_j_weighting(current);
+  move_half_reflect(t);
+  j_weighting(t, current);
+  back_velocity_to_rz();
+}
