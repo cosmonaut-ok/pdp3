@@ -228,6 +228,8 @@ public:
   virtual void reflection_single(unsigned int i);
   void move_half_reflect(Time *t);
 
+  void full_j_weighting(Current *current, Time *t);
+
 // protected:
   void half_step_pos_single(Time *t, unsigned int i);
   void back_position_to_rz_single(unsigned int i);
