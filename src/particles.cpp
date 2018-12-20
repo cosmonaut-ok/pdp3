@@ -459,7 +459,7 @@ void Particles::load_spatial_distribution(double n1, double n2, double left_plas
 }
 
 void Particles::simple_j_weighting(Time *time1,
-                                   Current *j1,
+                                   Current *current,
                                    double r_new,
                                    double z_new,
                                    double r_old,
@@ -469,8 +469,8 @@ void Particles::simple_j_weighting(Time *time1,
                                    int p_number)
 {
   double dr = geom1->dr;
-  double dr_pow2 = pow(dr, 2); // reduce operations number
   double dz = geom1->dz;
+
   double wj = 0;
   double delta_t = time1->delta_t;
 
@@ -478,98 +478,101 @@ void Particles::simple_j_weighting(Time *time1,
   double delta_r = r_new - r_old;
   double delta_z = z_new - z_old;
 
+  // local service variables to reduce operations number
+  double dr_pow2 = pow(dr, 2);
+  double dz_pow2 = pow(dz, 2);
+
   if ((abs(delta_r) < MNZL) || (abs(delta_z) < MNZL)) // MNZL see constant.h
     return;
   // if i cell is not equal 0
   if (i_n>=1)
-  {
-    // equation y = k*x+b;//
-    // finding k & b//
-    double k = delta_r/delta_z;
-    double b = r_old;
-    //calculate current jz in [i,k] cell//
-    wj = charge_array[p_number]/(2*dr*dz*delta_t*2*PI*i_n*dr_pow2) *
-      (dr*delta_z - k*delta_z*delta_z/2.0 - delta_z*b + dr_pow2/k *
-       ((i_n+0.5)*(i_n+0.5)-0.25)*log((k*delta_z+b)/b));
-    // set new weighting current value
-    j1->inc_j3(i_n,k_n, wj);
+    {
+      // equation y = k*x+b;//
+      // finding k & b//
+      double k = delta_r/delta_z;
+      double b = r_old;
+      //calculate current jz in [i,k] cell//
+      wj = charge_array[p_number]/(2*dr*dz*delta_t*2*PI*i_n*dr_pow2) *
+        (dr*delta_z - k*delta_z*delta_z/2.0 - delta_z*b + dr_pow2/k *
+         ((i_n+0.5)*(i_n+0.5)-0.25)*log((k*delta_z+b)/b));
+      // set new weighting current value
+      current->inc_j3(i_n,k_n, wj);
 
-    //calculate current in [i+1,k] cell//
-    wj = charge_array[p_number]/(2*dr*dz*delta_t*2*PI*(i_n+1)*dr_pow2) *
-      (k*delta_z*delta_z/2.0+delta_z*b + delta_z*dr + dr_pow2/k *
-       (0.25-(i_n+0.5)*(i_n+0.5)) * log((k*delta_z+b)/b));
-    // set new weighting current value
-    j1->inc_j3(i_n+1,k_n, wj);
+      //calculate current in [i+1,k] cell//
+      wj = charge_array[p_number]/(2*dr*dz*delta_t*2*PI*(i_n+1)*dr_pow2) *
+        (k*delta_z*delta_z/2.0+delta_z*b + delta_z*dr + dr_pow2/k *
+         (0.25-(i_n+0.5)*(i_n+0.5)) * log((k*delta_z+b)/b));
+      // set new weighting current value
+      current->inc_j3(i_n+1,k_n, wj);
 
-    ///////////////////////////////////
-    //calculate current jr in [i,k] cell//
-    // equation y = k*x+b;//
-    // finding k & b//
-    k = -delta_z/delta_r;
-    double r0 = (i_n+0.5)*dr;
-    double r1 =   r_old;
-    b= (k_n+1.0)*dz - z_old;
+      ///////////////////////////////////
+      //calculate current jr in [i,k] cell//
+      // equation y = k*x+b;//
+      // finding k & b//
+      k = -delta_z/delta_r;
+      double r0 = (i_n+0.5)*dr;
+      double r1 =   r_old;
+      b= (k_n+1.0)*dz - z_old;
 
-    //weighting jr in [i][k] cell
-    wj = charge_array[p_number]/(2*PI*r0*dz*dz*dr*delta_t) *
-      (r0*k*delta_r+k/2.0 * delta_r*(r_old+delta_r/2.0)+0.5*delta_r*
-       (b-k*(2*r0+r1))+ delta_r*(b-k*r1)*(4*r0*r0-dr_pow2)/(8*r_old*(r_old+delta_r)) +
-       (k*(r0*r0/2.0-dr_pow2/8.0))*log((r_old+delta_r)/r_old));
-    j1->inc_j1(i_n,k_n, wj);
+      //weighting jr in [i][k] cell
+      wj = charge_array[p_number]/(2*PI*r0*dz_pow2*dr*delta_t) *
+        (r0*k*delta_r+k/2.0 * delta_r*(r_old+delta_r/2.0)+0.5*delta_r*
+         (b-k*(2*r0+r1))+ delta_r*(b-k*r1)*(4*r0*r0-dr_pow2)/(8*r_old*(r_old+delta_r)) +
+         (k*(r0*r0/2.0-dr_pow2/8.0))*log((r_old+delta_r)/r_old));
+      current->inc_j1(i_n,k_n, wj);
 
-    b= z_old- k_n*dz;;
-    //weighting jr in [i][k+1] cell
-    wj = charge_array[p_number]/(2*PI*r0*dz*dz*dr*delta_t) *
-      (-r0*k*delta_r - k/2.0*delta_r*(r_old+delta_r/2.0)+0.5*delta_r*
-       (b+k*(2*r0+r1))+ delta_r*(b+k*r1)*(4*r0*r0-dr_pow2)/(8*r_old*(r_old+delta_r)) -
-       (k*(r0*r0/2.0-dr_pow2/8.0))*log((r_old+delta_r)/r_old));
-    j1->inc_j1(i_n, k_n+1, wj);
-  }
+      b= z_old- k_n*dz;;
+      //weighting jr in [i][k+1] cell
+      wj = charge_array[p_number]/(2*PI*r0*dz_pow2*dr*delta_t) *
+        (-r0*k*delta_r - k/2.0*delta_r*(r_old+delta_r/2.0)+0.5*delta_r*
+         (b+k*(2*r0+r1))+ delta_r*(b+k*r1)*(4*r0*r0-dr_pow2)/(8*r_old*(r_old+delta_r)) -
+         (k*(r0*r0/2.0-dr_pow2/8.0))*log((r_old+delta_r)/r_old));
+      current->inc_j1(i_n, k_n+1, wj);
+    }
   // if i cell is equal 0
   else
-  {
-    // equation y = k*x+b;//
-    // finding k & b//
-    double k = delta_r/delta_z;
-    double b = r_old;
-    //calculate current jz in [i,k] cell//
-    wj = charge_array[p_number]/(2.0*dr*dz*delta_t*PI*dr_pow2/4.0) *
-      (dr*delta_z - k*delta_z*delta_z/2.0 - delta_z*b );
-    // set new weighting current value
-    j1->inc_j3(i_n,k_n, wj);
+    {
+      // equation y = k*x+b;//
+      // finding k & b//
+      double k = delta_r/delta_z;
+      double b = r_old;
+      //calculate current jz in [i,k] cell//
+      wj = charge_array[p_number]/(2.0*dr*dz*delta_t*PI*dr_pow2/4.0) *
+        (dr*delta_z - k*delta_z*delta_z/2.0 - delta_z*b );
+      // set new weighting current value
+      current->inc_j3(i_n,k_n, wj);
 
-    //calculate current in [i+1,k] cell//
-    wj = charge_array[p_number]/(2.0*dr*dz*delta_t*2.0*PI*dr_pow2) *
-      (k*delta_z*delta_z/2.0 + delta_z*dr +delta_z*b);
-    // set new weighting current value
-    j1->inc_j3(i_n+1,k_n, wj);
+      //calculate current in [i+1,k] cell//
+      wj = charge_array[p_number]/(2.0*dr*dz*delta_t*2.0*PI*dr_pow2) *
+        (k*delta_z*delta_z/2.0 + delta_z*dr +delta_z*b);
+      // set new weighting current value
+      current->inc_j3(i_n+1,k_n, wj);
 
-    ///////////////////////////////////
-    //calculate current jr in [i,k] cell//
-    // equation y = k*x+b;//
-    // finding k & b//
-    k = -delta_z/delta_r;
-    double r0 = (i_n+0.5)*dr;
-    double r1 =   r_old;
-    b= (k_n+1.0)*dz - z_old;
+      ///////////////////////////////////
+      //calculate current jr in [i,k] cell//
+      // equation y = k*x+b;//
+      // finding k & b//
+      k = -delta_z/delta_r;
+      double r0 = (i_n+0.5)*dr;
+      double r1 =   r_old;
+      b= (k_n+1.0)*dz - z_old;
 
-    //weighting jr in [i][k] cell
-    wj = charge_array[p_number]/(2*PI*r0*dz*dz*dr*delta_t) *
-      (r0*k*delta_r+k/2.0 * delta_r*(r_old+delta_r/2.0)+0.5*delta_r*(b-k*(2*r0+r1))+
-       delta_r*(b-k*r1)*(4*r0*r0-dr_pow2)/(8*r_old*(r_old+delta_r)) +
-       (k*(r0*r0/2.0-dr_pow2/8.0))*log((r_old+delta_r)/r_old));
-    j1->inc_j1(i_n,k_n, wj);
+      //weighting jr in [i][k] cell
+      wj = charge_array[p_number]/(2*PI*r0*dz_pow2*dr*delta_t) *
+        (r0*k*delta_r+k/2.0 * delta_r*(r_old+delta_r/2.0)+0.5*delta_r*(b-k*(2*r0+r1))+
+         delta_r*(b-k*r1)*(4*r0*r0-dr_pow2)/(8*r_old*(r_old+delta_r)) +
+         (k*(r0*r0/2.0-dr_pow2/8.0))*log((r_old+delta_r)/r_old));
+      current->inc_j1(i_n,k_n, wj);
 
-    b= z_old- k_n*dz;;
-    //weighting jr in [i][k+1] cell
-    wj = charge_array[p_number]/(2*PI*r0*dz*dz*dr*delta_t) *
-      (-r0*k*delta_r - k/2.0*delta_r*(r_old+delta_r/2.0)+0.5*delta_r*(b+k*(2*r0+r1))+
-       delta_r*(b+k*r1)*(4*r0*r0-dr_pow2)/(8*r_old*(r_old+delta_r)) -
-       (k*(r0*r0/2.0-dr_pow2/8.0))*log((r_old+delta_r)/r_old));
-    j1->inc_j1(i_n, k_n+1, wj);
-  }
+      b= z_old- k_n*dz;;
+      //weighting jr in [i][k+1] cell
+      wj = charge_array[p_number]/(2*PI*r0*dz_pow2*dr*delta_t) *
+        (-r0*k*delta_r - k/2.0*delta_r*(r_old+delta_r/2.0)+0.5*delta_r*(b+k*(2*r0+r1))+
+         delta_r*(b+k*r1)*(4*r0*r0-dr_pow2)/(8*r_old*(r_old+delta_r)) -
+         (k*(r0*r0/2.0-dr_pow2/8.0))*log((r_old+delta_r)/r_old));
+      current->inc_j1(i_n, k_n+1, wj);
+    }
 
-  //}
 }
 
 void Particles::simple_constrho_j_weighting(Time *time1,
