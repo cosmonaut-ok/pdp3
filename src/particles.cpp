@@ -469,6 +469,7 @@ void Particles::simple_j_weighting(Time *time1,
                                    int p_number)
 {
   double dr = geom1->dr;
+  double dr_pow2 = pow(dr, 2); // reduce operations number
   double dz = geom1->dz;
   double wj = 0;
   double delta_t = time1->delta_t;
@@ -487,15 +488,15 @@ void Particles::simple_j_weighting(Time *time1,
     double k = delta_r/delta_z;
     double b = r_old;
     //calculate current jz in [i,k] cell//
-    wj = charge_array[p_number]/(2*dr*dz*delta_t*2*PI*i_n*dr*dr) *
-      (dr*delta_z - k*delta_z*delta_z/2.0 - delta_z*b + dr*dr/k *
+    wj = charge_array[p_number]/(2*dr*dz*delta_t*2*PI*i_n*dr_pow2) *
+      (dr*delta_z - k*delta_z*delta_z/2.0 - delta_z*b + dr_pow2/k *
        ((i_n+0.5)*(i_n+0.5)-0.25)*log((k*delta_z+b)/b));
     // set new weighting current value
     j1->inc_j3(i_n,k_n, wj);
 
     //calculate current in [i+1,k] cell//
-    wj = charge_array[p_number]/(2*dr*dz*delta_t*2*PI*(i_n+1)*dr*dr) *
-      (k*delta_z*delta_z/2.0+delta_z*b + delta_z*dr + dr*dr/k *
+    wj = charge_array[p_number]/(2*dr*dz*delta_t*2*PI*(i_n+1)*dr_pow2) *
+      (k*delta_z*delta_z/2.0+delta_z*b + delta_z*dr + dr_pow2/k *
        (0.25-(i_n+0.5)*(i_n+0.5)) * log((k*delta_z+b)/b));
     // set new weighting current value
     j1->inc_j3(i_n+1,k_n, wj);
@@ -512,16 +513,16 @@ void Particles::simple_j_weighting(Time *time1,
     //weighting jr in [i][k] cell
     wj = charge_array[p_number]/(2*PI*r0*dz*dz*dr*delta_t) *
       (r0*k*delta_r+k/2.0 * delta_r*(r_old+delta_r/2.0)+0.5*delta_r*
-       (b-k*(2*r0+r1))+ delta_r*(b-k*r1)*(4*r0*r0-dr*dr)/(8*r_old*(r_old+delta_r)) +
-       (k*(r0*r0/2.0-dr*dr/8.0))*log((r_old+delta_r)/r_old));
+       (b-k*(2*r0+r1))+ delta_r*(b-k*r1)*(4*r0*r0-dr_pow2)/(8*r_old*(r_old+delta_r)) +
+       (k*(r0*r0/2.0-dr_pow2/8.0))*log((r_old+delta_r)/r_old));
     j1->inc_j1(i_n,k_n, wj);
 
     b= z_old- k_n*dz;;
     //weighting jr in [i][k+1] cell
     wj = charge_array[p_number]/(2*PI*r0*dz*dz*dr*delta_t) *
       (-r0*k*delta_r - k/2.0*delta_r*(r_old+delta_r/2.0)+0.5*delta_r*
-       (b+k*(2*r0+r1))+ delta_r*(b+k*r1)*(4*r0*r0-dr*dr)/(8*r_old*(r_old+delta_r)) -
-       (k*(r0*r0/2.0-dr*dr/8.0))*log((r_old+delta_r)/r_old));
+       (b+k*(2*r0+r1))+ delta_r*(b+k*r1)*(4*r0*r0-dr_pow2)/(8*r_old*(r_old+delta_r)) -
+       (k*(r0*r0/2.0-dr_pow2/8.0))*log((r_old+delta_r)/r_old));
     j1->inc_j1(i_n, k_n+1, wj);
   }
   // if i cell is equal 0
@@ -532,13 +533,13 @@ void Particles::simple_j_weighting(Time *time1,
     double k = delta_r/delta_z;
     double b = r_old;
     //calculate current jz in [i,k] cell//
-    wj = charge_array[p_number]/(2.0*dr*dz*delta_t*PI*dr*dr/4.0) *
+    wj = charge_array[p_number]/(2.0*dr*dz*delta_t*PI*dr_pow2/4.0) *
       (dr*delta_z - k*delta_z*delta_z/2.0 - delta_z*b );
     // set new weighting current value
     j1->inc_j3(i_n,k_n, wj);
 
     //calculate current in [i+1,k] cell//
-    wj = charge_array[p_number]/(2.0*dr*dz*delta_t*2.0*PI*dr*dr) *
+    wj = charge_array[p_number]/(2.0*dr*dz*delta_t*2.0*PI*dr_pow2) *
       (k*delta_z*delta_z/2.0 + delta_z*dr +delta_z*b);
     // set new weighting current value
     j1->inc_j3(i_n+1,k_n, wj);
@@ -555,21 +556,22 @@ void Particles::simple_j_weighting(Time *time1,
     //weighting jr in [i][k] cell
     wj = charge_array[p_number]/(2*PI*r0*dz*dz*dr*delta_t) *
       (r0*k*delta_r+k/2.0 * delta_r*(r_old+delta_r/2.0)+0.5*delta_r*(b-k*(2*r0+r1))+
-       delta_r*(b-k*r1)*(4*r0*r0-dr*dr)/(8*r_old*(r_old+delta_r)) +
-       (k*(r0*r0/2.0-dr*dr/8.0))*log((r_old+delta_r)/r_old));
+       delta_r*(b-k*r1)*(4*r0*r0-dr_pow2)/(8*r_old*(r_old+delta_r)) +
+       (k*(r0*r0/2.0-dr_pow2/8.0))*log((r_old+delta_r)/r_old));
     j1->inc_j1(i_n,k_n, wj);
 
     b= z_old- k_n*dz;;
     //weighting jr in [i][k+1] cell
     wj = charge_array[p_number]/(2*PI*r0*dz*dz*dr*delta_t) *
       (-r0*k*delta_r - k/2.0*delta_r*(r_old+delta_r/2.0)+0.5*delta_r*(b+k*(2*r0+r1))+
-       delta_r*(b+k*r1)*(4*r0*r0-dr*dr)/(8*r_old*(r_old+delta_r)) -
-       (k*(r0*r0/2.0-dr*dr/8.0))*log((r_old+delta_r)/r_old));
+       delta_r*(b+k*r1)*(4*r0*r0-dr_pow2)/(8*r_old*(r_old+delta_r)) -
+       (k*(r0*r0/2.0-dr_pow2/8.0))*log((r_old+delta_r)/r_old));
     j1->inc_j1(i_n, k_n+1, wj);
   }
 
   //}
 }
+
 void Particles::simple_constrho_j_weighting(Time *time1,
                                             Current *j1,
                                             double r_new,
