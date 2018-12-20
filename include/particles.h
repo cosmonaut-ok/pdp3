@@ -192,11 +192,11 @@ public:
   void velocity_distribution(double tempr_ev);
   void load_spatial_distribution(double n1, double n2, double left_plasma_boundary, int type);
   void simple_j_weighting(Time *time1,
-                          Current *j1,
-                          double x1_new,
-                          double x3_new,
-                          double x1_old,
-                          double x3_old,
+                          Current *current,
+                          double r_new,
+                          double z_new,
+                          double r_old,
+                          double z_old,
                           int i_n,
                           int k_n,
                           int p_number);
