@@ -46,3 +46,9 @@ void ParticlesList::back_velocity_to_rz()
   for(size_t i = 0; i < part_list.size(); i++)
     part_list[i]->back_velocity_to_rz();
 }
+
+void ParticlesList::full_j_weighting(Current *current, Time *t)
+{
+  for(std::size_t i = 0; i < part_list.size(); i++)
+    part_list[i]->full_j_weighting(current, t);
+}
