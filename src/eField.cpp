@@ -123,8 +123,8 @@ void EField::calc_field(HField *h_field1,
     for(int k=1; k<(geom1->n_grid_2-1); k++)
     {
       int i=0;
-      double epsilonx2 = 2 * geom1->epsilon[i][k]*EPSILON0;
-      double sigma_t = geom1->sigma[i][k]*time1->delta_t;
+      double epsilonx2 = 2 * geom1->epsilon[i][k] * EPSILON0;
+      double sigma_t = geom1->sigma[i][k] * time1->delta_t;
 
       double koef_e = (epsilonx2 - sigma_t) / (epsilonx2 + sigma_t);
 
