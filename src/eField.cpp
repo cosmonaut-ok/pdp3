@@ -227,83 +227,98 @@ double* EField::get_field(double x1, double x3)
 
   double dr = geom1->dr;
   double dz = geom1->dz;
-  double r1, r2, r3; // temp variables for calculation
-  double dz1, dz2; // temp var.: width of k and k+1 cell
+  double r1, r2, r3, dz1, dz2, vol_1, vol_2, vol_i_top, vol_i_bottom, vol_i1_top, vol_i1_bottom;
   double er = 0;
   double efi = 0;
   double ez = 0;
-  double vol_1 = 0; // volume of i cell; Q/V, V - volume of elementary cell
-  double vol_2 = 0; // volume of i+1 cell;
-
-  r1 = x1-0.5*dr;
-  r3 = x1+0.5*dr;
 
   // weighting of E_r
   // finding number of cell. example dr=0.5, x1 = 0.7, i_r =0;!!
-  i_r = (int)ceil((x1-0.5*dr)/geom1->dr)-1;
-  k_z = (int)ceil((x3)/geom1->dz)-1;
+  i_r = (int)ceil((x1 -0.5 * dr) / dr) - 1;
+  k_z = (int)ceil(x3 / dz) - 1;
   // TODO: workaround: sometimes it gives -1.
   // Just get 0 cell if it happence
-  if (i_r < 0) { i_r = 0; }
-  if (k_z < 0) { k_z = 0; }
+  if (i_r < 0) i_r = 0;
+  if (k_z < 0) k_z = 0;
 
+  // volume of i cell; Q/V, V - volume of elementary cell
   vol_1 = PI*dz*dr*dr*(2*i_r+1);
+  // volume of i+1 cell;
   vol_2 = PI*dz*dr*dr*(2*i_r+3);
-  dz1 = (k_z+1)*dz-x3;
-  dz2 = x3 - k_z*dz;
+
+  dz1 = (k_z+1)*dz-x3; // width of k cell
+  dz2 = x3 - k_z*dz; // width of k+1 cell
+
+  // top and bottom radiuses of "own" particle's cell
+  r1 = x1-0.5*dr;
+  r3 = x1+0.5*dr;
+  // radius of current cell
   r2 = (i_r+1)*dr;
 
+  // volumes of i cell
+  vol_i_top = PI * dz1 * (r3 * r3 - r2 * r2);
+  vol_i_bottom = PI * dz1 * (r2 * r2 - r1 * r1);
+
+  // volumes of i+1 cell
+  vol_i1_top = PI * dz2 * (r3 * r3 - r2 * r2);
+  vol_i1_bottom = PI * dz2 * (r2 * r2 - r1 * r1);
+
   //weighting Er[i][k]//
-  er = er + field_r[i_r][k_z]*(PI*dz1*(r2*r2-r1*r1))/vol_1;
+  er = er + field_r[i_r][k_z] * vol_i_bottom / vol_1;
 
   //weighting Er[i+1][k]//
-  er = er + field_r[i_r+1][k_z]*(PI*dz1*(r3*r3-r2*r2))/vol_2;
+  er = er + field_r[i_r+1][k_z] * vol_i_top / vol_2;
 
   //weighting Er[i][k+1]//
-  er= er + field_r[i_r][k_z+1]*(PI*dz2*(r2*r2-r1*r1))/vol_1;
+  er= er + field_r[i_r][k_z+1] * vol_i1_bottom / vol_1;
 
   //weighting Er[i+1][k+1]//
-  er = er + field_r[i_r+1][k_z+1]*(PI*dz2*(r3*r3-r2*r2))/vol_2;
+  er = er + field_r[i_r+1][k_z+1] * vol_i1_top / vol_2;
 
   // weighting of E_z
   // finding number of cell. example dz=0.5, x3 = 0.7, z_k =0;!!
-  i_r = (int)ceil((x1)/geom1->dr)-1;
-  k_z = (int)ceil((x3-0.5*dz)/geom1->dz)-1;
+  i_r = (int)ceil(x1 / dr) - 1;
+  k_z = (int)ceil((x3 - 0.5 * dz) / dz) - 1;
   // TODO: workaround: sometimes it gives -1.
   // Just get 0 cell if it happence
-  if (i_r < 0) { i_r = 0; }
-  if (k_z < 0) { k_z = 0; }
+  if (i_r < 0) i_r = 0;
+  if (k_z < 0) k_z = 0;
 
   if (x1 > dr)
-    vol_1 = PI*dz*dr*dr*2*i_r;
+    vol_1 = PI * dz * dr * dr * 2 * i_r;
   else
-    vol_1 = PI*dz*dr*dr/4.0; // volume of first cell
+    vol_1 = PI * dz * dr * dr / 4; // volume of first cell
 
   r2 = (i_r+0.5)*dr;
   vol_2 = PI*dz*dr*dr*(2*i_r+2);
-  dz1 = (k_z+1.5)*dz - x3;
-  dz2 = x3 - (k_z+0.5)*dz;
+  dz1 = (k_z + 1.5) * dz - x3;
+  dz2 = x3 - (k_z + 0.5) * dz;
+
+  vol_i_top = PI * dz1 * (r3 * r3 - r2 * r2);
+  vol_i_bottom = PI * dz1 * (r2 * r2 - r1 * r1);
+  vol_i1_top = PI * dz2 * (r3 * r3 - r2 * r2);
+  vol_i1_bottom = PI * dz2 * (r2 * r2 - r1 * r1);
 
   // weighting Ez[i][k]
-  ez = ez + field_z[i_r][k_z]*(PI*dz1*(r2*r2-r1*r1))/vol_1;
+  ez = ez + field_z[i_r][k_z] * vol_i_bottom / vol_1;
 
   // weighting Ez[i+1][k]
-  ez = ez + field_z[i_r+1][k_z]*PI*dz1*(r3*r3-r2*r2)/vol_2;
+  ez = ez + field_z[i_r+1][k_z] * vol_i_top / vol_2;
 
   // weighting Ez[i][k+1]
-  ez = ez + field_z[i_r][k_z+1]*PI*dz2*(r2*r2-r1*r1)/vol_1;
+  ez = ez + field_z[i_r][k_z+1] * vol_i1_bottom / vol_1;
 
   //weighting Ez[i+1][k+1]//
-  ez = ez + field_z[i_r+1][k_z+1]*PI*dz2*(r3*r3-r2*r2)/vol_2;
+  ez = ez + field_z[i_r+1][k_z+1] * vol_i1_top / vol_2;
 
   // weighting of E_fi
   // finding number of cell. example dz=0.5, x3 = 0.7, z_k =1;
-  i_r = (int)ceil((x1)/geom1->dr)-1;
-  k_z = (int)ceil((x3)/geom1->dz)-1;
+  i_r = (int)ceil((x1) / dr) - 1;
+  k_z = (int)ceil((x3) / dz) - 1;
   // TODO: workaround: sometimes it gives -1.
   // Just get 0 cell if it happence
-  if (i_r < 0) { i_r = 0; }
-  if (k_z < 0) { k_z = 0; }
+  if (i_r < 0) i_r = 0;
+  if (k_z < 0) k_z = 0;
 
   if(x1>dr)
     vol_1 = PI*dz*dr*dr*2*i_r;
@@ -315,17 +330,22 @@ double* EField::get_field(double x1, double x3)
   dz1 = (k_z+1)*dz-x3;
   dz2 = x3-k_z*dz;
 
+  vol_i_top = PI * dz1 * (r3 * r3 - r2 * r2);
+  vol_i_bottom = PI * dz1 * (r2 * r2 - r1 * r1);
+  vol_i1_top = PI * dz2 * (r3 * r3 - r2 * r2);
+  vol_i1_bottom = PI * dz2 * (r2 * r2 - r1 * r1);
+
   // weighting Efi[i][k]
-  efi += field_phi[i_r][k_z]*PI*dz1*(r2*r2 - r1*r1)/vol_1;
+  efi += field_phi[i_r][k_z] * vol_i_bottom / vol_1;
 
   // weighting Efi[i+1][k]
-  efi += field_phi[i_r+1][k_z]*PI*dz1*(r3*r3-r2*r2)/vol_2;
+  efi += field_phi[i_r+1][k_z] * vol_i_top / vol_2;
 
   // weighting Efi[i][k+1]
-  efi += field_phi[i_r][k_z+1]*PI*dz2*(r2*r2-r1*r1)/vol_1;
+  efi += field_phi[i_r][k_z+1] * vol_i1_bottom / vol_1;
 
   // weighting Efi[i+1][k+1]
-  efi += field_phi[i_r+1][k_z+1]*PI*dz2*(r3*r3-r2*r2)/vol_2;
+  efi += field_phi[i_r+1][k_z+1] * vol_i1_top / vol_2;
 
   double* components = tinyvec3d::mkvector3d(er, efi, ez);
 
