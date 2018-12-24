@@ -868,95 +868,60 @@ void Particles::azimuthal_j_weighting(Current *this_j)
 
   for(unsigned int i=0;i<number;i++)
     if (is_alive[i])
-    {
-      int r_i=0;  // number of particle i cell
-      int z_k=0;  // number of particle k cell
-
-      double r1, r2, r3; // temp variables for calculation
-      double dz1, dz2;   // temp var.: width of k and k+1 cell
-
-      double ro_v =0; // charge density Q/V, V - volume of particle
-      double v_1 =0; // volume of [i][k] cell
-      double v_2= 0; // volume of [i+1][k] cell
-      //double ro_v_2=0; // charge density in i+1 cell
-
-      double rho =0; //charge density in cell
-      double current; // j_phi in cell
-      // double **temp = this_j->get_j2();
-
-      // finding number of i and k cell. example: dr = 0.5; r = 0.4; i =0
-      r_i = (int)ceil((pos[i][0])/dr)-1;
-      z_k = (int)ceil((pos[i][2])/dz)-1;
-      // TODO: workaround: sometimes it gives -1.
-      // Just get 0 cell if it happence
-      if (r_i < 0) { r_i = 0; }
-      if (z_k < 0) { z_k = 0; }
-
-      // in first cell other alg. of ro_v calc
-      if(pos[i][0]>dr)
       {
-        r1 = pos[i][0] - 0.5*dr;
-        r2 = (r_i+0.5)*dr;
-        r3 = pos[i][0] + 0.5*dr;
-        ro_v = charge_array[i]/(2.0*PI*dz*dr*pos[i][0]);
-        v_1 = PI*dz*dr*dr*2.0*(r_i);
-        v_2 = PI*dz*dr*dr*2.0*(r_i+1);
-        dz1 = (z_k+1)*dz-pos[i][2];
-        dz2 = pos[i][2] - z_k*dz;
+        double v_1, v_2, rho, current;
 
+        // finding number of i and k cell. example: dr = 0.5; r = 0.4; i =0
+        int r_i = (int)ceil((pos[i][0])/dr)-1; // number of particle i cell
+        int z_k = (int)ceil((pos[i][2])/dz)-1; // number of particle k cell
+
+        // TODO: workaround: sometimes it gives -1.
+        // Just get 0 cell if it happence
+        if (r_i < 0) r_i = 0;
+        if (z_k < 0) z_k = 0;
+
+        double r1 = pos[i][0] - 0.5 * dr; // bottom cell radius
+        double r2 = (r_i + 0.5) * dr; // particle's "own" radius
+        double r3 = pos[i][0] + 0.5 * dr; // top cell radius
+
+        // charge density Q/V, V - volume of particle
+        double ro_v = charge_array[i] / (2.0 * PI * dz * dr * pos[i][0]);
+
+        double dz1 = (z_k + 1) * dz - pos[i][2]; // width of k cell
+        double dz2 = pos[i][2] - z_k * dz; // width of k+1 cell
+
+        // calc cell volumes in different ways for 1st and other cells
+        // v_1 - volume of [i][k] cell, v_2 - volume of [i+1][k] cell
+        if(pos[i][0]>dr)
+          {
+            v_1 = PI * dz * dr * dr * 2.0 * r_i;
+            v_2 = PI * dz * dr * dr * 2.0 * (r_i+1);
+          }
+        else
+          {
+            v_1 = PI * dz * dr * dr / 4.0;
+            v_2 = PI * dz * dr * dr * 2.0 * (r_i+1);
+          }
         // weighting in j[i][k] cell
-        rho = ro_v*PI*dz1*(r2*r2-r1*r1)/v_1;
-        current = rho*vel[i][1];
+        rho = ro_v * PI * dz1 * (r2 * r2 - r1 * r1) / v_1; // charge density in cell
+        current = rho * vel[i][1]; // j_phi in cell
         this_j->inc_j2(r_i, z_k, current);
 
         // weighting in j[i+1][k] cell
-        rho = ro_v*PI*dz1*(r3*r3-r2*r2)/v_2;
-        current = rho*vel[i][1];
+        rho = ro_v * PI * dz1 * (r3 * r3 - r2 * r2) / v_2;
+        current = rho * vel[i][1];
         this_j->inc_j2(r_i+1,z_k, current);
 
         // weighting in j[i][k+1] cell
-        rho = ro_v*PI*dz2*(r2*r2-r1*r1)/v_1;
-        current = rho*vel[i][1];
-        this_j->inc_j2(r_i, z_k+1,  current);
+        rho = ro_v * PI * dz2 * (r2 * r2 - r1 * r1) / v_1;
+        current = rho * vel[i][1];
+        this_j->inc_j2(r_i, z_k+1, current);
 
         // weighting in j[i+1][k+1] cell
-        rho = ro_v*PI*dz2*(r3*r3-r2*r2)/v_2;
-        current = rho*vel[i][1];
+        rho = ro_v * PI * dz2 * (r3 * r3 - r2 * r2) / v_2;
+        current = rho * vel[i][1];
         this_j->inc_j2(r_i+1, z_k+1, current);
-
       }
-      else
-      {
-        r1 = pos[i][0] - 0.5*dr;
-        r2 = (r_i+0.5)*dr;
-        r3 = pos[i][0]+0.5*dr;
-        dz1 = (z_k+1)*dz-pos[i][2];
-        dz2 = pos[i][2] - z_k*dz;
-        ro_v = charge_array[i]/(2.0*PI*dz*dr*pos[i][0]);
-        v_1 = PI*dz*dr*dr/4.0;
-        v_2 = PI*dz*dr*dr*2.0*(r_i+1);
-
-        // weighting in j[i][k] cell
-        rho = ro_v*PI*dz1*(r2*r2-r1*r1)/v_1;
-        current = rho*vel[i][1];
-        this_j->inc_j2(r_i, z_k,  current);
-
-        // weighting in j[i+1][k] cell
-        rho = ro_v*PI*dz1*(r3*r3-r2*r2)/v_2;
-        current = rho*vel[i][1];
-        this_j->inc_j2(r_i+1,z_k,    current);
-
-        // weighting in j[i][k+1] cell
-        rho = ro_v*PI*dz2*(r2*r2-r1*r1)/v_1;
-        current = rho*vel[i][1];
-        this_j->inc_j2(r_i, z_k+1,  current);
-
-        // weighting in j[i+1][k+1] cell
-        rho = ro_v*PI*dz2*(r3*r3-r2*r2)/v_2;
-        current = rho*vel[i][1];
-        this_j->inc_j2(r_i+1, z_k+1,  current);
-      }
-    }
 }
 
 void Particles::strict_motion_weighting(Time *time1,
