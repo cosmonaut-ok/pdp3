@@ -27,3 +27,11 @@ public:
   ~Geometry(void);
 
 };
+
+//! \f$ ( \pi \times (dr * (i+0.5))^2 - \pi \times (dr * (i-0.5))^2 ) * dz \f$
+#define CELL_VOLUME(i, dr, dz) PI * (dz) * (dr) * (dr) * 2.0 * (i)
+
+// #define PARTICLE_VOLUME(x,y) (PI * dz * dr * dr * 2.0 * i)
+
+//! get cell number by 'radius'
+#define CELL_NUMBER(position, dx) (int)ceil((position) / (dx)) - 1

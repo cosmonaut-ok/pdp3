@@ -222,9 +222,6 @@ void EField::tridiagonal_solve(const double *a,
 double* EField::get_field(double x1, double x3)
 //! function for electric field weighting
 {
-  int i_r = 0; // number of particle i cell
-  int k_z = 0; // number of particle k cell
-
   double dr = geom1->dr;
   double dz = geom1->dz;
   double r1, r2, r3, dz1, dz2, vol_1, vol_2, vol_i_top, vol_i_bottom, vol_i1_top, vol_i1_bottom;
@@ -234,8 +231,9 @@ double* EField::get_field(double x1, double x3)
 
   // weighting of E_r
   // finding number of cell. example dr=0.5, x1 = 0.7, i_r =0;!!
-  i_r = (int)ceil((x1 - 0.5 * dr) / dr) - 1;
-  k_z = (int)ceil(x3 / dz) - 1;
+  int i_r = CELL_NUMBER(x1 - 0.5 * dr, dr); // number of particle i cell
+  int k_z = CELL_NUMBER(x3, dz); // number of particle k cell
+
   // TODO: workaround: sometimes it gives -1.
   // Just get 0 cell if it happence
   if (i_r < 0) i_r = 0;
@@ -277,8 +275,8 @@ double* EField::get_field(double x1, double x3)
 
   // weighting of E_z
   // finding number of cell. example dz=0.5, x3 = 0.7, z_k =0;!!
-  i_r = (int)ceil(x1 / dr) - 1;
-  k_z = (int)ceil((x3 - 0.5 * dz) / dz) - 1;
+  i_r = CELL_NUMBER(x1, dr);
+  k_z = CELL_NUMBER(x3 - 0.5 * dz, dz);
   // TODO: workaround: sometimes it gives -1.
   // Just get 0 cell if it happence
   if (i_r < 0) i_r = 0;
@@ -313,8 +311,8 @@ double* EField::get_field(double x1, double x3)
 
   // weighting of E_fi
   // finding number of cell. example dz=0.5, x3 = 0.7, z_k =1;
-  i_r = (int)ceil((x1) / dr) - 1;
-  k_z = (int)ceil((x3) / dz) - 1;
+  i_r = CELL_NUMBER(x1, dr);
+  k_z = CELL_NUMBER(x3, dz);
   // TODO: workaround: sometimes it gives -1.
   // Just get 0 cell if it happence
   if (i_r < 0) i_r = 0;

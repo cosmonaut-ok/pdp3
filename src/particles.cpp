@@ -162,8 +162,8 @@ void Particles::half_step_pos(Time *t)
 // function for charge density weighting
 void Particles::charge_weighting(ChargeDensity *ro1)
 {
-  int r_i = 0;  // number of particle i cell
-  int z_k = 0;  // number of particle k cell
+  // int r_i = 0;
+  // int z_k = 0;
 
   double dr = geom1->dr;
   double dz = geom1->dz;
@@ -189,22 +189,23 @@ void Particles::charge_weighting(ChargeDensity *ro1)
       }
 
       // finding number of i and k cell. example: dr = 0.5; r = 0.4; i =0
-      r_i = (int)ceil((pos[i][0])/dr)-1;
-      z_k = (int)ceil((pos[i][2])/dz)-1;
+      int r_i = CELL_NUMBER(pos[i][0], dr); // number of particle i cell
+      int z_k = CELL_NUMBER(pos[i][2], dz); // number of particle k cell
+
       // TODO: workaround: sometimes it gives -1.
-      // Just get 0 cell if it happence
-      if (r_i < 0) { r_i = 0; }
-      if (z_k < 0) { z_k = 0; }
+      // Just get 0 cell if it happens
+      if (r_i < 0) r_i = 0;
+      if (z_k < 0) z_k = 0;
 
       // in first cell other alg. of ro_v calc
       if(pos[i][0]>dr)
       {
-        r1 =   pos[i][0] - 0.5*dr;
+        r1 =   pos[i][0] - 0.5 * dr;
         r2 = (r_i+0.5)*dr;
         r3 = pos[i][0] + 0.5*dr;
         ro_v = charge_array[i]/(2.0*PI*dz*dr*pos[i][0]);
-        v_1 = PI*dz*dr*dr*2.0*(r_i);
-        v_2 = PI*dz*dr*dr*2.0*(r_i+1);
+        v_1 = CELL_VOLUME(r_i, dr, dz);
+        v_2 = CELL_VOLUME(r_i+1, dr, dz);
         dz1 = (z_k+1)*dz-pos[i][2];
         dz2 = pos[i][2] - z_k*dz;
 
@@ -235,7 +236,7 @@ void Particles::charge_weighting(ChargeDensity *ro1)
         dz2 = pos[i][2] - z_k*dz;
         ro_v = charge_array[i]/(PI*dz*(2.0*pos[i][0]*pos[i][0]+dr*dr/2.0));
         v_1 = PI*dz*dr*dr/4.0;
-        v_2 = PI*dz*dr*dr*2.0*(r_i+1);
+        v_2 = CELL_VOLUME(r_i+1, dr, dz);
         ///////////////////////////
 
         // weighting in ro[i][k] cell
@@ -265,7 +266,7 @@ void Particles::charge_weighting(ChargeDensity *ro1)
         dz2 = pos[i][2] - z_k*dz;
         ro_v = charge_array[i]/(2.0*PI*dz*dr*pos[i][0]);
         v_1 = PI*dz*dr*dr/4.0;
-        v_2 = PI*dz*dr*dr*2.0*(r_i+1);
+        v_2 = CELL_VOLUME(r_i+1, dr, dz);
         ///////////////////////////
 
         // weighting in ro[i][k] cell
@@ -872,8 +873,8 @@ void Particles::azimuthal_j_weighting(Current *this_j)
         double v_1, v_2, rho, current;
 
         // finding number of i and k cell. example: dr = 0.5; r = 0.4; i =0
-        int r_i = (int)ceil((pos[i][0])/dr)-1; // number of particle i cell
-        int z_k = (int)ceil((pos[i][2])/dz)-1; // number of particle k cell
+        int r_i = CELL_NUMBER(pos[i][0], dr); // number of particle i cell
+        int z_k = CELL_NUMBER(pos[i][2], dz); // number of particle k cell
 
         // TODO: workaround: sometimes it gives -1.
         // Just get 0 cell if it happence
@@ -892,16 +893,11 @@ void Particles::azimuthal_j_weighting(Current *this_j)
 
         // calc cell volumes in different ways for 1st and other cells
         // v_1 - volume of [i][k] cell, v_2 - volume of [i+1][k] cell
-        if(pos[i][0]>dr)
-          {
-            v_1 = PI * dz * dr * dr * 2.0 * r_i;
-            v_2 = PI * dz * dr * dr * 2.0 * (r_i+1);
-          }
+        if (pos[i][0]>dr)
+          v_1 = CELL_VOLUME(r_i, dr, dz);
         else
-          {
-            v_1 = PI * dz * dr * dr / 4.0;
-            v_2 = PI * dz * dr * dr * 2.0 * (r_i+1);
-          }
+          v_1 = PI * dz * dr * dr / 4.0;
+        v_2 = CELL_VOLUME(r_i+1, dr, dz);
         // weighting in j[i][k] cell
         rho = ro_v * PI * dz1 * (r2 * r2 - r1 * r1) / v_1; // charge density in cell
         current = rho * vel[i][1]; // j_phi in cell
