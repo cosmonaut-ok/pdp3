@@ -216,7 +216,7 @@ void EField::tridiagonal_solve(const double *a,
   x[n - 1] = d[n - 1];
 
   for(int i = n - 2; i >= 0; i--)
-    x[i] = d[i] - c[i] * x[i + 1];
+    x[i] = d[i] - c[i] * x[i+1];
 }
 
 double* EField::get_field(double x1, double x3)
@@ -283,7 +283,7 @@ double* EField::get_field(double x1, double x3)
   if (k_z < 0) k_z = 0;
 
   if (x1 > dr)
-    vol_1 = PI * dz * dr * dr * 2 * i_r;
+    vol_1 = CELL_VOLUME(i_r, dr, dz);
   else
     vol_1 = PI * dz * dr * dr / 4; // volume of first cell
 
@@ -319,7 +319,7 @@ double* EField::get_field(double x1, double x3)
   if (k_z < 0) k_z = 0;
 
   if(x1>dr)
-    vol_1 = PI * dz * dr * dr * 2 * i_r;
+    vol_1 = CELL_VOLUME(i_r, dr, dz);
   else
     vol_1 = PI * dz * dr * dr / 4; // volume of first cell
 

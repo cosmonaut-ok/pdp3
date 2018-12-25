@@ -203,11 +203,13 @@ double* HField::get_field(double x1, double x3)
 
   //// weighting of H_z
   //finding number of cell. example dr=0.5, x1 = 0.7, i_r =0;!!
-  i_r = (int)ceil((x1-0.5*dr)/geom1->dr)-1;
+  i_r = CELL_NUMBER(x1 - 0.5 * dr, dr);
+  k_z = CELL_NUMBER(x3, dz);
+
   // TODO: workaround: sometimes it gives -1.
-  // Just get 0 cell if it happence
-  if (i_r < 0) { i_r = 0; }
-  k_z = (int)ceil((x3)/geom1->dz)-1;
+  // Just get 0 cell if it happens
+  if (i_r < 0) i_r = 0;
+  if (k_z < 0) k_z = 0;
 
   vol_1 = PI*dz*dr*dr*(2*i_r+1);
   vol_2 = PI*dz*dr*dr*(2*i_r+3);
@@ -229,14 +231,16 @@ double* HField::get_field(double x1, double x3)
 
   //// weighting of Hr
   // finding number of cell. example dz=0.5, x3 = 0.7, z_k =0;!!
-  i_r = (int)ceil((x1)/geom1->dr)-1;
+  i_r = CELL_NUMBER(x1, dr);
+  k_z = CELL_NUMBER(x3 - 0.5 * dz, dz);
+
   // TODO: workaround: sometimes it gives -1.
   // Just get 0 cell if it happence
   if (i_r < 0) { i_r = 0; }
-  k_z = (int)ceil((x3-0.5*dz)/geom1->dz)-1;
+  if (k_z < 0) { k_z = 0; }
 
   if(x1>dr)
-    vol_1 = PI*dz*dr*dr*2*i_r;
+    vol_1 = CELL_VOLUME(i_r, dr, dz);
   else
     vol_1 = PI*dz*dr*dr/4.0; //volume of first cell
 
@@ -260,12 +264,13 @@ double* HField::get_field(double x1, double x3)
 
   //// weighting of H_fi
   // finding number of cell. example dz=0.5, x3 = 0.7, z_k =0;
-  i_r = (int)ceil((x1-0.5*dr)/geom1->dr)-1;
-  // TODO: workaround: sometimes it gives -1.
-  // Just get 0 cell if it happence
-  if (i_r < 0) { i_r = 0; }
+  i_r = CELL_NUMBER(x1 - 0.5 * dr, dr);
+  k_z = CELL_NUMBER(x3 - 0.5 * dz, dz);
 
-  k_z = (int)ceil((x3-0.5*dz)/geom1->dz)-1;
+  // TODO: workaround: sometimes it gives -1.
+  // Just get 0 cell if it happens
+  if (i_r < 0) i_r = 0;
+  if (k_z < 0) k_z = 0;
 
   r2 = (i_r+1)*dr;
   vol_1 = PI*dz*dr*dr*(2*i_r+1);
@@ -274,7 +279,7 @@ double* HField::get_field(double x1, double x3)
   dz2 = x3-(k_z+0.5)*dz;
 
   // weighting Hfi[i][k]
-  hfi = hfi + field_phi_half_time[i_r][k_z]*PI*dz1*(r2*r2-r1*r1)/vol_1;
+  hfi = hfi + field_phi_half_time[i_r][k_z]*REGULAR_VOLUME(dz1, r1, r2)/vol_1;
 
   // weighting Hfi[i+1][k]
   hfi = hfi + field_phi_half_time[i_r+1][k_z]*PI*dz1*(r3*r3-r2*r2)/vol_2;
