@@ -240,9 +240,9 @@ double* EField::get_field(double x1, double x3)
   if (k_z < 0) k_z = 0;
 
   // volume of i cell; Q/V, V - volume of elementary cell
-  vol_1 = PI * dz * dr * dr * (2 * i_r + 1);
+  vol_1 = PI * dz * dr * dr * 2 * (i_r + 1);
   // volume of i+1 cell;
-  vol_2 = PI * dz * dr * dr * (2 * i_r + 3);
+  vol_2 = PI * dz * dr * dr * 2 * (i_r + 3);
 
   dz1 = (k_z + 1) * dz - x3; // width of k cell
   dz2 = x3 - k_z * dz; // width of k+1 cell
@@ -288,7 +288,7 @@ double* EField::get_field(double x1, double x3)
     vol_1 = PI * dz * dr * dr / 4; // volume of first cell
 
   r2 = (i_r + 0.5) * dr;
-  vol_2 = PI * dz * dr * dr * (2 * i_r + 2);
+  vol_2 = PI * dz * dr * dr * 2 * (i_r + 2);
   dz1 = (k_z + 1.5) * dz - x3;
   dz2 = x3 - (k_z + 0.5) * dz;
 
@@ -324,7 +324,7 @@ double* EField::get_field(double x1, double x3)
     vol_1 = PI * dz * dr * dr / 4; // volume of first cell
 
   r2 = (i_r + 0.5) * dr;
-  vol_2 = PI * dz * dr * dr * (2 * i_r + 2);
+  vol_2 = PI * dz * dr * dr * 2 * (i_r + 2);
   dz1 = (k_z + 1) * dz - x3;
   dz2 = x3 - k_z * dz;
 

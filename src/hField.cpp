@@ -211,8 +211,8 @@ double* HField::get_field(double x1, double x3)
   if (i_r < 0) i_r = 0;
   if (k_z < 0) k_z = 0;
 
-  vol_1 = PI*dz*dr*dr*(2*i_r+1);
-  vol_2 = PI*dz*dr*dr*(2*i_r+3);
+  vol_1 = PI*dz*dr*dr*2*(i_r+1);
+  vol_2 = PI*dz*dr*dr*2*(i_r+3);
   dz1 = (k_z+1)*dz-x3;
   dz2 = x3 - k_z*dz;
   r2 = (i_r+1)*dr;
@@ -246,7 +246,7 @@ double* HField::get_field(double x1, double x3)
 
   r2 = (i_r+0.5)*dr;
 
-  vol_2 = PI*dz*dr*dr*(2*i_r+2);
+  vol_2 = PI*dz*dr*dr*2*(i_r+2);
   dz1 = (k_z+1.5)*dz - x3;
   dz2 = x3 - (k_z+0.5)*dz;
 
@@ -273,8 +273,8 @@ double* HField::get_field(double x1, double x3)
   if (k_z < 0) k_z = 0;
 
   r2 = (i_r+1)*dr;
-  vol_1 = PI*dz*dr*dr*(2*i_r+1);
-  vol_2 = PI*dz*dr*dr*(2*i_r+3);
+  vol_1 = PI*dz*dr*dr*2*(i_r+1);
+  vol_2 = PI*dz*dr*dr*2*(i_r+3);
   dz1 = (k_z+1.5)*dz-x3;
   dz2 = x3-(k_z+0.5)*dz;
 
