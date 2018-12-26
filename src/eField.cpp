@@ -64,7 +64,7 @@ void EField::set_homogeneous_efield(double E_r, double E_phi, double E_z)
 
 void EField::boundary_conditions()
 {
-  //// Border Er conditions
+  // Border Er conditions
   // last elements of array [ngrid-1]!!!
 #pragma omp parallel
   {
@@ -76,7 +76,7 @@ void EField::boundary_conditions()
       //field_r[i][0]=limit_conditions();
     }
 
-    //// Border Ef conditions
+    // Border Ef conditions
 #pragma omp for
     for(int k=0; k<(geom1->n_grid_2); k++)
     {
@@ -91,7 +91,7 @@ void EField::boundary_conditions()
       field_phi[i][geom1->n_grid_2-1]=0;
     }
 
-    //// Border Ez conditions
+    // Border Ez conditions
 #pragma omp for
     for(int k=0; k<(geom1->n_grid_2-1); k++)
     {

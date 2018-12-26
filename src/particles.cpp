@@ -170,6 +170,8 @@ void Particles::charge_weighting(ChargeDensity *ro1)
   double r1, r2, r3; // temp variables for calculation
   double dz1, dz2; // temp var.: width of k and k+1 cell
 
+  // particle's volume: \f$ v_part = \pi((r+\frac{dr}{2})^2 - (r-\frac{dr}{2})^2) \f$
+  double v_part = 0;
   double ro_v = 0; // charge density Q/V, V - volume of particle
   double v_1 = 0; // volume of [i][k] cell
   double v_2 = 0; // volume of [i+1][k] cell
@@ -200,14 +202,16 @@ void Particles::charge_weighting(ChargeDensity *ro1)
       // in first cell other alg. of ro_v calc
       if(pos[i][0]>dr)
       {
-        r1 =   pos[i][0] - 0.5 * dr;
+        r1 = pos[i][0] - 0.5 * dr;
         r2 = (r_i+0.5)*dr;
         r3 = pos[i][0] + 0.5*dr;
-        ro_v = charge_array[i]/(2.0*PI*dz*dr*pos[i][0]);
+
+        v_part = 2. * PI * dz * dr * pos[i][0];
+        ro_v = charge_array[i] / v_part;
         v_1 = CELL_VOLUME(r_i, dr, dz);
         v_2 = CELL_VOLUME(r_i+1, dr, dz);
-        dz1 = (z_k+1)*dz-pos[i][2];
-        dz2 = pos[i][2] - z_k*dz;
+        dz1 = (z_k+1) * dz - pos[i][2];
+        dz2 = pos[i][2] - z_k * dz;
 
         // weighting in ro[i][k] cell
         value = ro_v * CYL_RNG_VOL(dz1, r1, r2) / v_1;
@@ -234,7 +238,9 @@ void Particles::charge_weighting(ChargeDensity *ro1)
         r3 = pos[i][0]+0.5*dr;
         dz1 = (z_k+1)*dz-pos[i][2];
         dz2 = pos[i][2] - z_k*dz;
-        ro_v = charge_array[i]/(PI*dz*(2.0*pos[i][0]*pos[i][0]+dr*dr/2.0));
+
+        v_part = PI * dz * (2. * pos[i][0] * pos[i][0] + dr * dr / 2.);
+        ro_v = charge_array[i] / v_part;
         v_1 = PI*dz*dr*dr/4.0;
         v_2 = CELL_VOLUME(r_i+1, dr, dz);
         ///////////////////////////
@@ -244,7 +250,7 @@ void Particles::charge_weighting(ChargeDensity *ro1)
         ro1->set_ro_weighting(r_i, z_k, value);
 
         // weighting in ro[i+1][k] cell
-        value = ro_v*PI*dz1*(r3*r3-r2*r2)/v_2;
+        value = ro_v * CYL_RNG_VOL(dz1, r2, r3) / v_2;
         ro1->set_ro_weighting(r_i+1,z_k, value);
 
         // weighting in ro[i][k+1] cell
@@ -252,7 +258,7 @@ void Particles::charge_weighting(ChargeDensity *ro1)
         ro1->set_ro_weighting(r_i, z_k+1, value);
 
         // weighting in ro[i+1][k+1] cell
-        value = ro_v*PI*dz2*(r3*r3-r2*r2)/v_2;
+        value = ro_v * CYL_RNG_VOL(dz2, r2, r3) / v_2;
         ro1->set_ro_weighting(r_i+1, z_k+1, value);
 
       }
@@ -264,8 +270,10 @@ void Particles::charge_weighting(ChargeDensity *ro1)
         r3 = pos[i][0] + 0.5 * dr;
         dz1 = (z_k+1) * dz - pos[i][2];
         dz2 = pos[i][2] - z_k*dz;
-        ro_v = charge_array[i]/(2.0*PI*dz*dr*pos[i][0]);
-        v_1 = PI*dz*dr*dr/4.0;
+
+        v_part = 2. * PI * dz * dr * pos[i][0];
+        ro_v = charge_array[i] / v_part;
+        v_1 = PI * dz * dr * dr / 4.;
         v_2 = CELL_VOLUME(r_i+1, dr, dz);
         ///////////////////////////
 
@@ -885,8 +893,15 @@ void Particles::azimuthal_j_weighting(Current *this_j)
         double r2 = (r_i + 0.5) * dr; // particle's "own" radius
         double r3 = pos[i][0] + 0.5 * dr; // top cell radius
 
+        //! particle's volume
+        //! \f$ v_{particle} = \pi((r+\frac{dr}{2})^2 - (r-\frac{dr}{2})^2) dz \f$
+        //! where \f$ r \f$ is particle's radius,
+        //! \f$ dr \f$ is cell r-size and
+        //! \f$ dz \f$ is particle's longitude
+        double v_part = (2. * PI * pos[i][0] * dr * dz);
+
         // charge density Q/V, V - volume of particle
-        double ro_v = charge_array[i] / (2.0 * PI * dz * dr * pos[i][0]);
+        double ro_v = charge_array[i] / v_part;
 
         double dz1 = (z_k + 1) * dz - pos[i][2]; // width of k cell
         double dz2 = pos[i][2] - z_k * dz; // width of k+1 cell
@@ -904,17 +919,17 @@ void Particles::azimuthal_j_weighting(Current *this_j)
         this_j->inc_j2(r_i, z_k, current);
 
         // weighting in j[i+1][k] cell
-        rho = ro_v * PI * dz1 * (r3 * r3 - r2 * r2) / v_2;
+        rho = ro_v * CYL_RNG_VOL(dz1, r2, r3) / v_2;
         current = rho * vel[i][1];
         this_j->inc_j2(r_i+1,z_k, current);
 
         // weighting in j[i][k+1] cell
-        rho = ro_v * PI * dz2 * (r2 * r2 - r1 * r1) / v_1;
+        rho = ro_v * CYL_RNG_VOL(dz2, r1, r2) / v_1;
         current = rho * vel[i][1];
         this_j->inc_j2(r_i, z_k+1, current);
 
         // weighting in j[i+1][k+1] cell
-        rho = ro_v * PI * dz2 * (r3 * r3 - r2 * r2) / v_2;
+        rho = ro_v * CYL_RNG_VOL(dz2, r2, r3) / v_2;
         current = rho * vel[i][1];
         this_j->inc_j2(r_i+1, z_k+1, current);
       }

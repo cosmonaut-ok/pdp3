@@ -242,7 +242,7 @@ double* HField::get_field(double x1, double x3)
   if(x1>dr)
     vol_1 = CELL_VOLUME(i_r, dr, dz);
   else
-    vol_1 = PI*dz*dr*dr/4.0; //volume of first cell
+    vol_1 = PI * dz * dr * dr / 4.0; // volume of first cell
 
   r2 = (i_r+0.5)*dr;
 
@@ -251,16 +251,16 @@ double* HField::get_field(double x1, double x3)
   dz2 = x3 - (k_z+0.5)*dz;
 
   // weighting Hr[i][k]
-  hr = hr + field_r_half_time[i_r][k_z] * CYL_RNG_VOL(dz1, r1, r2) / vol_1;
+  hr += field_r_half_time[i_r][k_z] * CYL_RNG_VOL(dz1, r1, r2) / vol_1;
 
   // weighting Hr[i+1][k]
-  hr = hr + field_r_half_time[i_r+1][k_z] * CYL_RNG_VOL(dz1, r2, r3) / vol_2;
+  hr += field_r_half_time[i_r+1][k_z] * CYL_RNG_VOL(dz1, r2, r3) / vol_2;
 
   // weighting Hr[i][k+1]
-  hr = hr + field_r_half_time[i_r][k_z+1] * CYL_RNG_VOL(dz2, r1, r2) / vol_1;
+  hr += field_r_half_time[i_r][k_z+1] * CYL_RNG_VOL(dz2, r1, r2) / vol_1;
 
   // weighting Hr[i+1][k+1]
-  hr = hr + field_r_half_time[i_r+1][k_z+1] * CYL_RNG_VOL(dz2, r2, r3) / vol_2;
+  hr += field_r_half_time[i_r+1][k_z+1] * CYL_RNG_VOL(dz2, r2, r3) / vol_2;
 
   //// weighting of H_fi
   // finding number of cell. example dz=0.5, x3 = 0.7, z_k =0;
@@ -279,16 +279,16 @@ double* HField::get_field(double x1, double x3)
   dz2 = x3-(k_z+0.5)*dz;
 
   // weighting Hfi[i][k]
-  hfi = hfi + field_phi_half_time[i_r][k_z] * CYL_RNG_VOL(dz1, r1, r2) / vol_1;
+  hfi += field_phi_half_time[i_r][k_z] * CYL_RNG_VOL(dz1, r1, r2) / vol_1;
 
   // weighting Hfi[i+1][k]
-  hfi = hfi + field_phi_half_time[i_r+1][k_z] * CYL_RNG_VOL(dz1, r2, r3) / vol_2;
+  hfi += field_phi_half_time[i_r+1][k_z] * CYL_RNG_VOL(dz1, r2, r3) / vol_2;
 
   // weighting Hfi[i][k+1]
-  hfi = hfi + field_phi_half_time[i_r][k_z+1] * CYL_RNG_VOL(dz2, r1, r2) / vol_1;
+  hfi += field_phi_half_time[i_r][k_z+1] * CYL_RNG_VOL(dz2, r1, r2) / vol_1;
 
   // weighting Hfi[i+1][k+1]
-  hfi = hfi + field_phi_half_time[i_r+1][k_z+1] * CYL_RNG_VOL(dz2, r2, r3) / vol_2;
+  hfi += field_phi_half_time[i_r+1][k_z+1] * CYL_RNG_VOL(dz2, r2, r3) / vol_2;
 
   double* components = tinyvec3d::mkvector3d(hr, hfi, hz);
 
