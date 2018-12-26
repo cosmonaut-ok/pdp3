@@ -210,19 +210,19 @@ void Particles::charge_weighting(ChargeDensity *ro1)
         dz2 = pos[i][2] - z_k*dz;
 
         // weighting in ro[i][k] cell
-        value = ro_v*PI*dz1*(r2*r2-r1*r1)/v_1;
+        value = ro_v * CYL_RNG_VOL(dz1, r1, r2) / v_1;
         ro1->set_ro_weighting(r_i, z_k, value);
 
         // weighting in ro[i+1][k] cell
-        value = ro_v*PI*dz1*(r3*r3-r2*r2)/v_2;
+        value = ro_v * CYL_RNG_VOL(dz1, r2, r3) / v_2;
         ro1->set_ro_weighting(r_i+1,z_k, value);
 
         // weighting in ro[i][k+1] cell
-        value = ro_v*PI*dz2*(r2*r2-r1*r1)/v_1;
+        value = ro_v * CYL_RNG_VOL(dz2, r1, r2) / v_1;
         ro1->set_ro_weighting(r_i, z_k+1, value);
 
         // weighting in ro[i+1][k+1] cell
-        value = ro_v*PI*dz2*(r3*r3-r2*r2)/v_2;
+        value = ro_v * CYL_RNG_VOL(dz2, r2, r3) / v_2;
         ro1->set_ro_weighting(r_i+1, z_k+1, value);
 
       }
@@ -260,9 +260,9 @@ void Particles::charge_weighting(ChargeDensity *ro1)
       {
         ///////////////////////////
         r1 =   pos[i][0] - 0.5*dr;
-        r2 = (r_i+0.5)*dr;
-        r3 = pos[i][0]+0.5*dr;
-        dz1 = (z_k+1)*dz-pos[i][2];
+        r2 = (r_i + 0.5) * dr;
+        r3 = pos[i][0] + 0.5 * dr;
+        dz1 = (z_k+1) * dz - pos[i][2];
         dz2 = pos[i][2] - z_k*dz;
         ro_v = charge_array[i]/(2.0*PI*dz*dr*pos[i][0]);
         v_1 = PI*dz*dr*dr/4.0;
@@ -270,19 +270,19 @@ void Particles::charge_weighting(ChargeDensity *ro1)
         ///////////////////////////
 
         // weighting in ro[i][k] cell
-        value = ro_v*PI*dz1*(r2*r2-r1*r1)/v_1;
+        value = ro_v * CYL_RNG_VOL(dz1, r1, r2) / v_1;
         ro1->set_ro_weighting(r_i, z_k, value);
 
         // weighting in ro[i+1][k] cell
-        value = ro_v*PI*dz1*(r3*r3-r2*r2)/v_2;
+        value = ro_v * CYL_RNG_VOL(dz1, r2, r3) / v_2;
         ro1->set_ro_weighting(r_i+1,z_k, value);
 
         // weighting in ro[i][k+1] cell
-        value = ro_v*PI*dz2*(r2*r2-r1*r1)/v_1;
+        value = ro_v * CYL_RNG_VOL(dz2, r1, r2) / v_1;
         ro1->set_ro_weighting(r_i, z_k+1, value);
 
         // weighting in ro[i+1][k+1] cell
-        value = ro_v*PI*dz2*(r3*r3-r2*r2)/v_2;
+        value = ro_v * CYL_RNG_VOL(dz2, r2, r3) / v_2;
         ro1->set_ro_weighting(r_i+1, z_k+1, value);
       }
     }
@@ -290,40 +290,40 @@ void Particles::charge_weighting(ChargeDensity *ro1)
 
 void Particles::velocity_distribution(double tempr_ev)
 {
-  double therm_vel = sqrt(tempr_ev*2.0*EL_CHARGE/
-                          (this->init_const_mass*EL_MASS));
+  double therm_vel = sqrt(tempr_ev * 2.0 * EL_CHARGE/
+                          (this->init_const_mass * EL_MASS));
 
   // double R =0; // number from [0;1]
   // TODO: why 5e6?
-  double dv = therm_vel/0.5e7; // velocity step in calculation integral
+  double dv = therm_vel / 0.5e7; // velocity step in calculation integral
   // TODO: why 9.0?
-  double cutoff_vel = 9.0*therm_vel; // cutoff velocity
-  int lenght_arr = (int)cutoff_vel/dv;
+  double cutoff_vel = 9.0 * therm_vel; // cutoff velocity
+  int lenght_arr = (int)cutoff_vel / dv;
   double s = 0;
 
   double *integ_array = new double [lenght_arr];
 
-  double const1 = 2*therm_vel*therm_vel;
+  double const1 = 2 * therm_vel * therm_vel;
   // part of numerical integral calculation
   for (int i=0; i<lenght_arr; i++)
   {
     double ds = 0;
-    ds = exp(-dv*i*dv*i/const1)*dv;
-    s = s+ds;
+    ds = exp(-dv * i * dv * i / const1) * dv;
+    s = s + ds;
     integ_array[i] = s;
   }
 
 #pragma omp parallel for shared(integ_array, lenght_arr, const1, dv)
   for(unsigned int i_n=0; i_n<number; i_n++)
   {
-    double Rr = lib::random_reverse(i_n,3);
-    double Rfi = lib::random_reverse(i_n,5);
-    double Rz = lib::random_reverse(i_n,7);
-    double t_z = sqrt(PI/2.0)*therm_vel;
+    double Rr = lib::random_reverse(i_n, 3);
+    double Rfi = lib::random_reverse(i_n, 5);
+    double Rz = lib::random_reverse(i_n, 7);
+    double t_z = sqrt(PI / 2.0) * therm_vel;
     // R = rand()/(double)32768;
-    double f_vr = Rr*t_z;
-    double f_vfi = Rfi*t_z;
-    double f_vz = Rz*t_z;
+    double f_vr = Rr * t_z;
+    double f_vfi = Rfi * t_z;
+    double f_vz = Rz * t_z;
     int sign = 1;
     if (i_n%2 == 1)
       sign =-1;
@@ -899,7 +899,7 @@ void Particles::azimuthal_j_weighting(Current *this_j)
           v_1 = PI * dz * dr * dr / 4.0;
         v_2 = CELL_VOLUME(r_i+1, dr, dz);
         // weighting in j[i][k] cell
-        rho = ro_v * PI * dz1 * (r2 * r2 - r1 * r1) / v_1; // charge density in cell
+        rho = ro_v * CYL_RNG_VOL(dz1, r1, r2) / v_1; // charge density in cell
         current = rho * vel[i][1]; // j_phi in cell
         this_j->inc_j2(r_i, z_k, current);
 

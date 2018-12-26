@@ -240,9 +240,9 @@ double* EField::get_field(double x1, double x3)
   if (k_z < 0) k_z = 0;
 
   // volume of i cell; Q/V, V - volume of elementary cell
-  vol_1 = PI * dz * dr * dr * 2 * (i_r + 1);
+  vol_1 = CELL_VOLUME(i_r + 1, dr, dz);
   // volume of i+1 cell;
-  vol_2 = PI * dz * dr * dr * 2 * (i_r + 3);
+  vol_2 = CELL_VOLUME(i_r + 3, dr, dz);
 
   dz1 = (k_z + 1) * dz - x3; // width of k cell
   dz2 = x3 - k_z * dz; // width of k+1 cell
@@ -253,25 +253,17 @@ double* EField::get_field(double x1, double x3)
   // radius of current cell
   r2 = (i_r + 1) * dr;
 
-  // volumes of i cell
-  vol_i_top = PI * dz1 * (r3 * r3 - r2 * r2);
-  vol_i_bottom = PI * dz1 * (r2 * r2 - r1 * r1);
-
-  // volumes of i+1 cell
-  vol_i1_top = PI * dz2 * (r3 * r3 - r2 * r2);
-  vol_i1_bottom = PI * dz2 * (r2 * r2 - r1 * r1);
-
   //weighting Er[i][k]//
-  er += field_r[i_r][k_z] * vol_i_bottom / vol_1;
+  er += field_r[i_r][k_z] * CYL_RNG_VOL(dz1, r1, r2) / vol_1;
 
   //weighting Er[i+1][k]//
-  er += field_r[i_r+1][k_z] * vol_i_top / vol_2;
+  er += field_r[i_r+1][k_z] * CYL_RNG_VOL(dz1, r2, r3) / vol_2;
 
   //weighting Er[i][k+1]//
-  er += field_r[i_r][k_z+1] * vol_i1_bottom / vol_1;
+  er += field_r[i_r][k_z+1] * CYL_RNG_VOL(dz2, r1, r2) / vol_1;
 
   //weighting Er[i+1][k+1]//
-  er += field_r[i_r+1][k_z+1] * vol_i1_top / vol_2;
+  er += field_r[i_r+1][k_z+1] * CYL_RNG_VOL(dz2, r2, r3) / vol_2;
 
   // weighting of E_z
   // finding number of cell. example dz=0.5, x3 = 0.7, z_k =0;!!
@@ -292,22 +284,17 @@ double* EField::get_field(double x1, double x3)
   dz1 = (k_z + 1.5) * dz - x3;
   dz2 = x3 - (k_z + 0.5) * dz;
 
-  vol_i_top = PI * dz1 * (r3 * r3 - r2 * r2);
-  vol_i_bottom = PI * dz1 * (r2 * r2 - r1 * r1);
-  vol_i1_top = PI * dz2 * (r3 * r3 - r2 * r2);
-  vol_i1_bottom = PI * dz2 * (r2 * r2 - r1 * r1);
-
   // weighting Ez[i][k]
-  ez += field_z[i_r][k_z] * vol_i_bottom / vol_1;
+  ez += field_z[i_r][k_z] * CYL_RNG_VOL(dz1, r1, r2) / vol_1;
 
   // weighting Ez[i+1][k]
-  ez += field_z[i_r+1][k_z] * vol_i_top / vol_2;
+  ez += field_z[i_r+1][k_z] * CYL_RNG_VOL(dz1, r2, r3) / vol_2;
 
   // weighting Ez[i][k+1]
-  ez += field_z[i_r][k_z+1] * vol_i1_bottom / vol_1;
+  ez += field_z[i_r][k_z+1] * CYL_RNG_VOL(dz2, r1, r2) / vol_1;
 
   //weighting Ez[i+1][k+1]//
-  ez += field_z[i_r+1][k_z+1] * vol_i1_top / vol_2;
+  ez += field_z[i_r+1][k_z+1] * CYL_RNG_VOL(dz2, r2, r3) / vol_2;
 
   // weighting of E_fi
   // finding number of cell. example dz=0.5, x3 = 0.7, z_k =1;
@@ -328,22 +315,17 @@ double* EField::get_field(double x1, double x3)
   dz1 = (k_z + 1) * dz - x3;
   dz2 = x3 - k_z * dz;
 
-  vol_i_top = PI * dz1 * (r3 * r3 - r2 * r2);
-  vol_i_bottom = PI * dz1 * (r2 * r2 - r1 * r1);
-  vol_i1_top = PI * dz2 * (r3 * r3 - r2 * r2);
-  vol_i1_bottom = PI * dz2 * (r2 * r2 - r1 * r1);
-
   // weighting Efi[i][k]
-  efi += field_phi[i_r][k_z] * vol_i_bottom / vol_1;
+  efi += field_phi[i_r][k_z] * CYL_RNG_VOL(dz1, r1, r2) / vol_1;
 
   // weighting Efi[i+1][k]
-  efi += field_phi[i_r+1][k_z] * vol_i_top / vol_2;
+  efi += field_phi[i_r+1][k_z] * CYL_RNG_VOL(dz1, r2, r3) / vol_2;
 
   // weighting Efi[i][k+1]
-  efi += field_phi[i_r][k_z+1] * vol_i1_bottom / vol_1;
+  efi += field_phi[i_r][k_z+1] * CYL_RNG_VOL(dz2, r1, r2) / vol_1;
 
   // weighting Efi[i+1][k+1]
-  efi += field_phi[i_r+1][k_z+1] * vol_i1_top / vol_2;
+  efi += field_phi[i_r+1][k_z+1] * CYL_RNG_VOL(dz2, r2, r3) / vol_2;
 
   double* components = tinyvec3d::mkvector3d(er, efi, ez);
 

@@ -31,8 +31,8 @@ public:
 //! \f$ ( \pi \times (dr * (i+0.5))^2 - \pi \times (dr * (i-0.5))^2 ) * dz \f$
 #define CELL_VOLUME(i, dr, dz) PI * (dz) * (dr) * (dr) * 2.0 * (i)
 
-//! calculate regular volume by Z component and 2 radiuses
-#define REGULAR_VOLUME(dz, r1, r2) PI * (dz) * (r2 * r2 - r1 * r1)
+//! volume of the cylindrical ring
+#define CYL_RNG_VOL(z, r1, r2) PI * (z) * ((r2) * (r2) - (r1) * (r1))
 
 // #define PARTICLE_VOLUME(x,y) (PI * dz * dr * dr * 2.0 * i)
 
