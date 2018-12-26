@@ -1166,7 +1166,7 @@ void Particles::step_v_single(EField *e_fld, HField *h_fld,
   b = h_fld->get_field(pos[i][0], pos[i][2]);
 
   tinyvec3d::tv_product(e, const1);
-  tinyvec3d::tv_product(b, MAGN_CONST * const1 * 2); // const1 accepts half_dt, but we need full dt, so, just multiply to 2
+  tinyvec3d::tv_product(b, MAGN_CONST * const1);
 
   // set velocity vector components and
   // round very small velicities to avoid exceptions
