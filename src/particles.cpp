@@ -1162,7 +1162,7 @@ void Particles::step_v_single(EField *e_fld, HField *h_fld,
   double vtmp[3];
   double velocity[3];
 
-  double half_dt = t->delta_t / 2.0;
+  // double half_dt = t->delta_t / 2.0;
 
   // check if r and z are correct
   if (isnan(pos[i][0]) ||
@@ -1175,13 +1175,13 @@ void Particles::step_v_single(EField *e_fld, HField *h_fld,
   }
   //! \f$ const1 = \frac{q t}{2 m} \f$
   //! where \f$ q, m \f$ - particle charge and mass, \f$ t = \frac{\Delta t_{step}}{2} \f$
-  const1 = charge_array[i] * half_dt / (2 * mass_array[i]);
+  const1 = charge_array[i] * t->delta_t / (2 * mass_array[i]);
 
   e = e_fld->get_field(pos[i][0], pos[i][2]);
   b = h_fld->get_field(pos[i][0], pos[i][2]);
 
   tinyvec3d::tv_product(e, const1);
-  tinyvec3d::tv_product(b, MAGN_CONST * const1);
+  tinyvec3d::tv_product(b, MAGN_CONST * 2 * const1); // we need full \f$ \Delta t \f$ for rotation, so just multiply const1 to 2 :)
 
   // set velocity vector components and
   // round very small velicities to avoid exceptions
