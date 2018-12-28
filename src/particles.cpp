@@ -388,27 +388,31 @@ void Particles::velocity_distribution(double tempr_ev)
 void Particles::load_cylindrical_spatial_distribution(double n1, double n2, double left_plasma_boundary)
 //! calculate number of charged physical particles in macroparticle
 {
-  double rand_r;
-  double rand_z;
   double dr = geom1->dr;
   double dz = geom1->dz;
   double dn = n2 - n1;
+  // arithmetic mean of charge density
+  double n_q_am = (n2 + n1) / 2;
 
-  // number of macroparticles in cell
   double N_big_for_cell = (double)number / ((double)geom1->n_grid_1 * geom1->n_grid_2);
+  // double N_real_i = 8 * PI * n_q_am * dr * dz;
+  // double n_in_macro = 0;
 
-  double N_real_i = PI * (n2 + n1) / 2 * dr * dz;
-  double n_in_macro = 0;
-
-#pragma omp parallel for shared(dr, dz, dn, left_plasma_boundary, n1, n2) private(rand_r, rand_z, n_in_macro)
+#pragma omp parallel for shared(dr, dz, dn, left_plasma_boundary, n1, n2)
   for(unsigned int n = 0; n < number; n++)
   {
-    rand_r = lib::random_reverse(n, 13);
-    rand_z = lib::random_reverse(number - 1 - n, 11);
+    double rand_r = lib::random_reverse(n, 13);
+    double rand_z = lib::random_reverse(number - 1 - n, 11);
     pos[n][0] = (geom1->first_size - dr) * rand_r + dr / 2;
     pos[n][1] = 0;
 
-    n_in_macro = N_real_i * pos[n][0] / N_big_for_cell;
+    //////////////////////
+    double q_cell = n_q_am * CYL_RNG_VOL(dz, pos[n][0] - dr / 2, pos[n][0] + dr / 2);
+    double n_in_macro = q_cell / N_big_for_cell;
+    // cout << "AAAAA" << n_in_macro << endl;
+    //////////////////////
+
+    // n_in_macro = N_real_i * pos[n][0] / N_big_for_cell;
     charge_array[n] = charge * n_in_macro;
     mass_array[n] = mass * n_in_macro;
     //pos[n][2] = (geom1->second_size - dz)*(rand_z) + dz/2;
@@ -419,6 +423,34 @@ void Particles::load_cylindrical_spatial_distribution(double n1, double n2, doub
       + left_plasma_boundary + dz / 2;
   }
 }
+
+/* void Particles::load_cylindrical_spatial_distribution(double n1, double n2, double left_plasma_boundary) */
+/* //! calculate number of charged physical particles in macroparticle */
+/* { */
+/*   double rand_r; */
+/*   double rand_z; */
+/*   double dr = geom1->dr; */
+/*   double dz = geom1->dz; */
+/*   double dn = n2 - n1; */
+/*   double N_big_for_cell=(double) number/( (double) geom1->n_grid_1*geom1->n_grid_2); */
+/*   double N_real_i = 8.0*PI*(n2+n1)/2.0*dr*dz; */
+/*   double n_in_big =0; */
+
+/*   for(unsigned int n = 0; n < number; n++) */
+/*   { */
+
+/*     rand_r = lib::random_reverse(n,13); */
+/*     rand_z = lib::random_reverse(number - 1 - n,11); */
+/*     pos[n][0] = (geom1->first_size - dr)*(rand_r) + dr/2.0; */
+/*     pos[n][1] = 0; */
+/*     n_in_big =N_real_i*pos[n][0] / N_big_for_cell; */
+/*     charge_array[n] = charge * n_in_big; */
+/*     mass_array[n] = mass * n_in_big; */
+
+/*     pos[n][2] = (geom1->second_size - left_plasma_boundary - dz)/dn*(sqrt(n1*n1 + rand_z*(2*n1*dn + dn*dn)) - n1) + */
+/*       left_plasma_boundary + dz/2.0; */
+/*   } */
+/* } */
 
 void Particles::simple_j_weighting(Time *time1,
                                    Current *j1,
@@ -1139,14 +1171,14 @@ void Particles::step_v_single(EField *e_fld, HField *h_fld,
   }
   //! \f$ const1 = \frac{q t}{2 m} \f$
   //! where \f$ q, m \f$ - particle charge and mass, \f$ t = \frac{\Delta t_{step}}{2} \f$
-  const1 = charge_array[i] * t->delta_t / mass_array[i];
+  const1 = charge_array[i] * t->delta_t / 2 / mass_array[i];
 
   e = e_fld->get_field(pos[i][0], pos[i][2]);
   b = h_fld->get_field(pos[i][0], pos[i][2]);
 
   // double shit = pos[i][0] / geom1->dr;
-  double const1_half = const1 / 10;
-  tinyvec3d::tv_product(e, const1_half); // we need half \f$ \Delta t \f$ for electrical field move, so just divide const1 by 2 :)
+  double const1_half = const1; // / 10;
+  tinyvec3d::tv_product(e, const1); // we need half \f$ \Delta t \f$ for electrical field move, so just divide const1 by 2 :)
   tinyvec3d::tv_product(b, MAGN_CONST * const1);
 
   // set velocity vector components and
