@@ -116,7 +116,7 @@ void EField::calc_field(HField *h_field1,
   double dr = geom1->dr;
   double dz = geom1->dz;
 
-  // Er first[i] value
+  // Er at the center axis (except z=0 wall)
 #pragma omp parallel
   {
 #pragma omp for
@@ -134,7 +134,7 @@ void EField::calc_field(HField *h_field1,
         - (j1[i][k]+(h_phi[i][k] - h_phi[i][k-1]) / dz) * koef_h;
     }
 
-    // Ez=on axis
+    // Ez at the center axis
 #pragma omp for
     for(int k=0; k<(geom1->n_grid_2-1); k++)
     {
@@ -149,6 +149,7 @@ void EField::calc_field(HField *h_field1,
         - (j3[i][k] - 4.0 / dr*h_phi[i][k]) * koef_h;
     }
 
+    // generic case
 #pragma omp for
     for(int i=1; i<(geom1->n_grid_1-1); i++)
       for(int k=1; k<(geom1->n_grid_2-1); k++)
@@ -171,6 +172,7 @@ void EField::calc_field(HField *h_field1,
              - (h_phi[i][k] + h_phi[i-1][k]) / (2.0 * dr * i)) * koef_h;
       }
 
+    // E_z on the z=0 wall
 #pragma omp for
     for(int i=1; i<(geom1->n_grid_1-1); i++)
     {

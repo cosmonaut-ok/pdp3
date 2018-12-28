@@ -385,7 +385,7 @@ void Particles::velocity_distribution(double tempr_ev)
   delete []integ_array;
 }
 
-void Particles::load_spatial_distribution(double n1, double n2, double left_plasma_boundary, int type)
+void Particles::load_cylindrical_spatial_distribution(double n1, double n2, double left_plasma_boundary)
 //! calculate number of charged physical particles in macroparticle
 {
   double rand_r;
@@ -394,76 +394,29 @@ void Particles::load_spatial_distribution(double n1, double n2, double left_plas
   double dz = geom1->dz;
   double dn = n2 - n1;
 
-  switch (type)
-  {
-  case 0:
-  {
-    double n_in_macro = (PI * pow(geom1->first_size, 2) * geom1->second_size / number * (n2 + n1) / 2);
-    charge *= n_in_macro;
-    mass *= n_in_macro;
-#pragma omp parallel for shared (dr, dz, dn, left_plasma_boundary, n1)
-    for(unsigned int n = 0; n < number; n++)
-    {
-      rand_r = lib::random_reverse(n, 13); // TODO: why 11 and 13?
-      rand_z = lib::random_reverse(number - 1 - n, 11);
-      pos[n][0] = sqrt(rand_r * geom1->first_size * (geom1->first_size - dr) + pow(dr, 2) / 4);
-      pos[n][1] = 0;
-      //pos[n][2] = (geom1->second_size - dz)*sqrt(rand_z) + dz/2.0;
-      pos[n][2] = (geom1->second_size - left_plasma_boundary - dz) / dn * (sqrt(pow(n1, 2) + rand_z * (2 * n1 * dn + pow(dn, 2))) - n1) + left_plasma_boundary + dz / 2;
-      mass_array[n] = mass;
-      charge_array[n] = charge;
-    }
-  }
-  break;
-  case 1: //Normal distribution
-  {
-    double sigma = 0.01;
-    double n_in_macro = (PI * geom1->second_size * (n2 + n1) * pow(sigma, 2) * (1.0 - exp(-geom1->first_size * geom1->first_size / (2 * pow(sigma, 2)))) / number);
-    charge *= n_in_macro;
-    mass *= n_in_macro;
-    double R_sq = (geom1->first_size - dr / 2) * (geom1->first_size - dr / 2);
-    // double tt=0;
-#pragma omp parallel for shared (sigma, R_sq, dz)
-    for (unsigned int i = 0; i<number;i++)
-    {
-      rand_r = lib::random_reverse(i,13);
-      double int_rd = exp(-dr*dr/(8.0*sigma*sigma));
-      pos[i][0]=sigma*sqrt(-2.0*log(int_rd - rand_r*(int_rd-exp(-R_sq/(2.0*sigma*sigma)))));
-      pos[i][1] = 0;
-      //pos[i][0] = (geom1->first_size - dr)*(rand_r)*rand_r + dr/2.0;
-      // double tt = exp(-R_sq/(2.0*sigma*sigma));
-      rand_z = lib::random_reverse(number - 1 - i, 11);
-      pos[i][2] = (geom1->second_size - dz / 2) * rand_z + dz/2;
-      //pos[i][2] = (geom1->second_size - left_plasma_boundary - dz)/dn*(sqrt(n1*n1 + rand_z*(2*n1*dn + dn*dn)) - n1) + left_plasma_boundary + dz/2.0;
-    }
-  }
-  break;
+  // number of macroparticles in cell
+  double N_big_for_cell = (double)number / ((double)geom1->n_grid_1 * geom1->n_grid_2);
 
-  case 2: // cylindrical distribution
-  {
-    double N_big_for_cell = (double)number / ((double)geom1->n_grid_1 * geom1->n_grid_2);
-    double N_real_i = PI * (n2 + n1) / 2 * dr * dz;
-    double n_in_macro = 0;
+  double N_real_i = PI * (n2 + n1) / 2 * dr * dz;
+  double n_in_macro = 0;
 
 #pragma omp parallel for shared(dr, dz, dn, left_plasma_boundary, n1, n2) private(rand_r, rand_z, n_in_macro)
-    for(unsigned int n = 0; n < number; n++)
-    {
-      rand_r = lib::random_reverse(n, 13);
-      rand_z = lib::random_reverse(number - 1 - n, 11);
-      pos[n][0] = (geom1->first_size - dr) * rand_r + dr / 2;
-      pos[n][1] = 0;
-      n_in_macro = N_real_i * pos[n][0] / N_big_for_cell;
-      charge_array[n] = charge * n_in_macro;
-      mass_array[n] = mass * n_in_macro;
-      //pos[n][2] = (geom1->second_size - dz)*(rand_z) + dz/2;
-      //pos[n][2] = (geom1->second_size - dz)*sqrt(rand_z) + dz/2.0;
+  for(unsigned int n = 0; n < number; n++)
+  {
+    rand_r = lib::random_reverse(n, 13);
+    rand_z = lib::random_reverse(number - 1 - n, 11);
+    pos[n][0] = (geom1->first_size - dr) * rand_r + dr / 2;
+    pos[n][1] = 0;
 
-      pos[n][2] = (geom1->second_size - left_plasma_boundary - dz)
-        / dn * (sqrt(pow(n1, 2) + rand_z * (2 * n1 * dn + pow(dn, 2))) - n1)
-        + left_plasma_boundary + dz / 2;
-    }
-  }
-  break;
+    n_in_macro = N_real_i * pos[n][0] / N_big_for_cell;
+    charge_array[n] = charge * n_in_macro;
+    mass_array[n] = mass * n_in_macro;
+    //pos[n][2] = (geom1->second_size - dz)*(rand_z) + dz/2;
+    //pos[n][2] = (geom1->second_size - dz)*sqrt(rand_z) + dz/2.0;
+
+    pos[n][2] = (geom1->second_size - left_plasma_boundary - dz)
+      / dn * (sqrt(pow(n1, 2) + rand_z * (2 * n1 * dn + pow(dn, 2))) - n1)
+      + left_plasma_boundary + dz / 2;
   }
 }
 
@@ -1107,19 +1060,31 @@ void Particles::strict_motion_weighting(Time *time1,
   }
 }
 
-void Particles::back_position_to_rz()
+/* void Particles::back_position_to_rz() */
+/* { */
+/*   //! implementation of backing coodrinates to rz pane */
+/*   //! taken from https://www.particleincell.com/2015/rz-pic/ */
+/* #pragma omp parallel for */
+/*   for (unsigned int i=0; i<number; i++) */
+/*     if (is_alive[i]) */
+/*     { */
+/*       double r = sqrt(pos[i][0] * pos[i][0] + pos[i][1] * pos[i][1]); */
+/*       sin_theta_r[i] = pos[i][1]/r; */
+/*       cos_theta_r[i] = pos[i][0]/r; */
+/*       pos[i][0] = r; */
+/*       pos[i][1] = 0; */
+/*     } */
+/* } */
+
+void Particles::back_position_to_rz_single(unsigned int i)
 {
   //! implementation of backing coodrinates to rz pane
   //! taken from https://www.particleincell.com/2015/rz-pic/
-#pragma omp parallel for
-  for (unsigned int i=0; i<number; i++)
-    if (is_alive[i])
-    {
-      double r = sqrt(pos[i][0] * pos[i][0] + pos[i][1] * pos[i][1]);
-      sin_theta_r[i] = pos[i][1]/r;
-      pos[i][0] = r;
-      pos[i][1] = 0;
-    }
+  double r = sqrt(pos[i][0] * pos[i][0] + pos[i][1] * pos[i][1]);
+  sin_theta_r[i] = pos[i][1] / r;
+  cos_theta_r[i] = pos[i][0] / r;
+  pos[i][0] = r;
+  pos[i][1] = 0;
 }
 
 void Particles::back_velocity_to_rz_single(unsigned int i)
@@ -1127,9 +1092,8 @@ void Particles::back_velocity_to_rz_single(unsigned int i)
   //! implementation of backing velocities to rz pane
   //! taken from https://www.particleincell.com/2015/rz-pic/
   // rotate velocity
-  cos_theta_r[i] = sqrt( 1 - sin_theta_r[i] * sin_theta_r[i] );
-  double u_2 = cos_theta_r[i]*vel[i][0] - sin_theta_r[i]*vel[i][1];
-  double v_2 = sin_theta_r[i]*vel[i][0] + cos_theta_r[i]*vel[i][1];
+  double u_2 = cos_theta_r[i]*vel[i][0] + sin_theta_r[i]*vel[i][1];
+  double v_2 = cos_theta_r[i]*vel[i][1] - sin_theta_r[i]*vel[i][0];
   vel[i][0] = u_2;
   vel[i][1] = v_2;
 }
@@ -1180,7 +1144,9 @@ void Particles::step_v_single(EField *e_fld, HField *h_fld,
   e = e_fld->get_field(pos[i][0], pos[i][2]);
   b = h_fld->get_field(pos[i][0], pos[i][2]);
 
-  tinyvec3d::tv_product(e, const1 / 2); // we need half \f$ \Delta t \f$ for electrical field move, so just divide const1 by 2 :)
+  // double shit = pos[i][0] / geom1->dr;
+  double const1_half = const1 / 10;
+  tinyvec3d::tv_product(e, const1_half); // we need half \f$ \Delta t \f$ for electrical field move, so just divide const1 by 2 :)
   tinyvec3d::tv_product(b, MAGN_CONST * const1);
 
   // set velocity vector components and
@@ -1298,16 +1264,6 @@ void Particles::half_step_pos_single(Time *t, unsigned int i)
   //! we use "fake" rotation component to correct position from xy to rz pane
   pos[i][1] = pos[i][1] + vel[i][1] * half_dt;
   pos[i][2] = pos[i][2] + vel[i][2] * half_dt;
-}
-
-void Particles::back_position_to_rz_single(unsigned int i)
-{
-  //! implementation of backing coodrinates to rz pane
-  //! taken from https://www.particleincell.com/2015/rz-pic/
-  double r = sqrt(pos[i][0] * pos[i][0] + pos[i][1] * pos[i][1]);
-  sin_theta_r[i] = pos[i][1]/r;
-  pos[i][0] = r;
-  pos[i][1] = 0;
 }
 
 void Particles::boris_pusher(EField *e_fld, HField *h_fld, Time *t)
