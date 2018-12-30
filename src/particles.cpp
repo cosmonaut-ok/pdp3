@@ -103,23 +103,23 @@ void Particles::reflection()
     {
       double dr = geom1->dr;
       double dz = geom1->dz;
-      double r_wall = geom1->first_size - dr/2.0;
-      double z_wall = geom1->second_size - dz/2.0;
+      double radius_wall = geom1->first_size - dr/2.0;
+      double longitude_wall = geom1->second_size - dz/2.0;
       double half_dr = dr/2.0;
       double half_dz = dz/2.0;
-      double r_wallX2 = r_wall*2.0;
-      double z_wallX2 = z_wall*2.0;
+      double radius_wallX2 = radius_wall*2.0;
+      double longitude_wallX2 = longitude_wall*2.0;
 
       //! FIXME: fix wall reflections for r-position
-      if (pos[i][0] > r_wall)
+      if (pos[i][0] > radius_wall)
       {
-        pos[i][0] = r_wallX2 - pos[i][0];
+        pos[i][0] = radius_wallX2 - pos[i][0];
         vel[i][0] = -vel[i][0];
       }
 
-      if (pos[i][2] > z_wall)
+      if (pos[i][2] > longitude_wall)
       {
-        pos[i][2] = z_wallX2 - pos[i][2];
+        pos[i][2] = longitude_wallX2 - pos[i][2];
         vel[i][2] = -vel[i][2];
       }
 
@@ -145,10 +145,10 @@ void Particles::half_step_pos(Time *t)
   for(unsigned int i=0; i<number; i++)
     if (is_alive[i])
     {
-      // check if r and z are correct
+      // check if radius and longitude are correct
       if (isnan(pos[i][0]) || isinf(pos[i][0]) != 0 || isnan(pos[i][2]) || isinf(pos[i][2]) != 0)
       {
-        cerr << "ERROR(half_step_pos): r[" << i << "] or z[" << i << "] is not valid number. Can not continue." << endl;
+        cerr << "ERROR(half_step_pos): radius[" << i << "] or longitude[" << i << "] is not valid number. Can not continue." << endl;
         exit(1);
       }
       //
@@ -181,10 +181,10 @@ void Particles::charge_weighting(ChargeDensity *ro1)
   for(unsigned int i=0; i<number; i++)
     if (is_alive[i])
     {
-      // check if r and z are correct
+      // check if radius and longitude are correct
       if (isnan(pos[i][0]) || isinf(pos[i][0]) != 0 || isnan(pos[i][2]) || isinf(pos[i][2]) != 0)
       {
-        cerr << "ERROR(charge_weighting): r[" << i << "] or z[" << i << "] is not valid number. Can not continue." << endl;
+        cerr << "ERROR(charge_weighting): radius[" << i << "] or longitude[" << i << "] is not valid number. Can not continue." << endl;
         exit(1);
       }
 
@@ -203,25 +203,25 @@ void Particles::charge_weighting(ChargeDensity *ro1)
         r2 = (r_i+0.5)*dr;
         r3 = pos[i][0] + 0.5*dr;
         ro_v = charge_array[i]/(2.0*PI*dz*dr*pos[i][0]);
-        v_1 = PI*dz*dr*dr*2.0*(r_i);
-        v_2 = PI*dz*dr*dr*2.0*(r_i+1);
-        dz1 = (z_k+1)*dz-pos[i][2];
-        dz2 = pos[i][2] - z_k*dz;
+        v_1 = CELL_VOLUME(r_i, dr, dz);
+        v_2 = CELL_VOLUME(r_i+1, dr, dz);
+        dz1 = (z_k+1) * dz - pos[i][2];
+        dz2 = pos[i][2] - z_k * dz;
 
         // weighting in ro[i][k] cell
-        value = ro_v*PI*dz1*(r2*r2-r1*r1)/v_1;
+        value = ro_v * CYL_RNG_VOL(dz1, r1, r2) / v_1;
         ro1->set_ro_weighting(r_i, z_k, value);
 
         // weighting in ro[i+1][k] cell
-        value = ro_v*PI*dz1*(r3*r3-r2*r2)/v_2;
+        value = ro_v * CYL_RNG_VOL(dz1, r2, r3) / v_2;
         ro1->set_ro_weighting(r_i+1,z_k, value);
 
         // weighting in ro[i][k+1] cell
-        value = ro_v*PI*dz2*(r2*r2-r1*r1)/v_1;
+        value = ro_v * CYL_RNG_VOL(dz2, r1, r2) / v_1;
         ro1->set_ro_weighting(r_i, z_k+1, value);
 
         // weighting in ro[i+1][k+1] cell
-        value = ro_v*PI*dz2*(r3*r3-r2*r2)/v_2;
+        value = ro_v * CYL_RNG_VOL(dz2, r2, r3) / v_2;
         ro1->set_ro_weighting(r_i+1, z_k+1, value);
 
       }
@@ -235,7 +235,7 @@ void Particles::charge_weighting(ChargeDensity *ro1)
         dz2 = pos[i][2] - z_k*dz;
         ro_v = charge_array[i]/(PI*dz*(2.0*pos[i][0]*pos[i][0]+dr*dr/2.0));
         v_1 = PI*dz*dr*dr/4.0;
-        v_2 = PI*dz*dr*dr*2.0*(r_i+1);
+        v_2 = CELL_VOLUME(r_i+1, dr, dz);
         ///////////////////////////
 
         // weighting in ro[i][k] cell
@@ -243,7 +243,7 @@ void Particles::charge_weighting(ChargeDensity *ro1)
         ro1->set_ro_weighting(r_i, z_k, value);
 
         // weighting in ro[i+1][k] cell
-        value = ro_v*PI*dz1*(r3*r3-r2*r2)/v_2;
+        value = ro_v * CYL_RNG_VOL(dz1, r2, r3) / v_2;
         ro1->set_ro_weighting(r_i+1,z_k, value);
 
         // weighting in ro[i][k+1] cell
@@ -251,37 +251,37 @@ void Particles::charge_weighting(ChargeDensity *ro1)
         ro1->set_ro_weighting(r_i, z_k+1, value);
 
         // weighting in ro[i+1][k+1] cell
-        value = ro_v*PI*dz2*(r3*r3-r2*r2)/v_2;
+        value = ro_v * CYL_RNG_VOL(dz2, r2, r3) / v_2;
         ro1->set_ro_weighting(r_i+1, z_k+1, value);
 
       }
       else
       {
         ///////////////////////////
-        r1 =   pos[i][0] - 0.5*dr;
+        r1 = pos[i][0] - 0.5*dr;
         r2 = (r_i+0.5)*dr;
         r3 = pos[i][0]+0.5*dr;
         dz1 = (z_k+1)*dz-pos[i][2];
         dz2 = pos[i][2] - z_k*dz;
         ro_v = charge_array[i]/(2.0*PI*dz*dr*pos[i][0]);
         v_1 = PI*dz*dr*dr/4.0;
-        v_2 = PI*dz*dr*dr*2.0*(r_i+1);
+        v_2 = CELL_VOLUME(r_i+1, dr, dz);
         ///////////////////////////
 
         // weighting in ro[i][k] cell
-        value = ro_v*PI*dz1*(r2*r2-r1*r1)/v_1;
+        value = ro_v * CYL_RNG_VOL(dz1, r1, r2) / v_1;
         ro1->set_ro_weighting(r_i, z_k, value);
 
         // weighting in ro[i+1][k] cell
-        value = ro_v*PI*dz1*(r3*r3-r2*r2)/v_2;
+        value = ro_v * CYL_RNG_VOL(dz1, r2, r3) / v_2;
         ro1->set_ro_weighting(r_i+1,z_k, value);
 
         // weighting in ro[i][k+1] cell
-        value = ro_v*PI*dz2*(r2*r2-r1*r1)/v_1;
+        value = ro_v * CYL_RNG_VOL(dz2, r1, r2) / v_1;
         ro1->set_ro_weighting(r_i, z_k+1, value);
 
         // weighting in ro[i+1][k+1] cell
-        value = ro_v*PI*dz2*(r3*r3-r2*r2)/v_2;
+        value = ro_v * CYL_RNG_VOL(dz2, r2, r3) / v_2;
         ro1->set_ro_weighting(r_i+1, z_k+1, value);
       }
     }
@@ -459,11 +459,11 @@ void Particles::load_spatial_distribution(double n1, double n2, double left_plas
 }
 
 void Particles::simple_j_weighting(Time *time1,
-                                   Current *j1,
-                                   double r_new,
-                                   double z_new,
-                                   double r_old,
-                                   double z_old,
+                                   Current *el_current,
+                                   double radius_new,
+                                   double longitude_new,
+                                   double radius_old,
+                                   double longitude_old,
                                    int i_n,
                                    int k_n,
                                    int p_number)
@@ -474,8 +474,8 @@ void Particles::simple_j_weighting(Time *time1,
   double delta_t = time1->delta_t;
 
   // distance of particle moving//
-  double delta_r = r_new - r_old;
-  double delta_z = z_new - z_old;
+  double delta_r = radius_new - radius_old;
+  double delta_z = longitude_new - longitude_old;
 
   if ((abs(delta_r) < MNZL) || (abs(delta_z) < MNZL)) // MNZL see constant.h
     return;
@@ -485,20 +485,20 @@ void Particles::simple_j_weighting(Time *time1,
     // equation y = k*x+b;//
     // finding k & b//
     double k = delta_r/delta_z;
-    double b = r_old;
+    double b = radius_old;
     //calculate current jz in [i,k] cell//
     wj = charge_array[p_number]/(2*dr*dz*delta_t*2*PI*i_n*dr*dr) *
       (dr*delta_z - k*delta_z*delta_z/2.0 - delta_z*b + dr*dr/k *
        ((i_n+0.5)*(i_n+0.5)-0.25)*log((k*delta_z+b)/b));
     // set new weighting current value
-    j1->inc_j3(i_n,k_n, wj);
+    el_current->inc_j3(i_n,k_n, wj);
 
     //calculate current in [i+1,k] cell//
     wj = charge_array[p_number]/(2*dr*dz*delta_t*2*PI*(i_n+1)*dr*dr) *
       (k*delta_z*delta_z/2.0+delta_z*b + delta_z*dr + dr*dr/k *
        (0.25-(i_n+0.5)*(i_n+0.5)) * log((k*delta_z+b)/b));
     // set new weighting current value
-    j1->inc_j3(i_n+1,k_n, wj);
+    el_current->inc_j3(i_n+1,k_n, wj);
 
     ///////////////////////////////////
     //calculate current jr in [i,k] cell//
@@ -506,23 +506,23 @@ void Particles::simple_j_weighting(Time *time1,
     // finding k & b//
     k = -delta_z/delta_r;
     double r0 = (i_n+0.5)*dr;
-    double r1 =   r_old;
-    b= (k_n+1.0)*dz - z_old;
+    double r1 =   radius_old;
+    b= (k_n+1.0)*dz - longitude_old;
 
     //weighting jr in [i][k] cell
     wj = charge_array[p_number]/(2*PI*r0*dz*dz*dr*delta_t) *
-      (r0*k*delta_r+k/2.0 * delta_r*(r_old+delta_r/2.0)+0.5*delta_r*
-       (b-k*(2*r0+r1))+ delta_r*(b-k*r1)*(4*r0*r0-dr*dr)/(8*r_old*(r_old+delta_r)) +
-       (k*(r0*r0/2.0-dr*dr/8.0))*log((r_old+delta_r)/r_old));
-    j1->inc_j1(i_n,k_n, wj);
+      (r0*k*delta_r+k/2.0 * delta_r*(radius_old+delta_r/2.0)+0.5*delta_r*
+       (b-k*(2*r0+r1))+ delta_r*(b-k*r1)*(4*r0*r0-dr*dr)/(8*radius_old*(radius_old+delta_r)) +
+       (k*(r0*r0/2.0-dr*dr/8.0))*log((radius_old+delta_r)/radius_old));
+    el_current->inc_j1(i_n,k_n, wj);
 
-    b= z_old- k_n*dz;;
+    b= longitude_old- k_n*dz;;
     //weighting jr in [i][k+1] cell
     wj = charge_array[p_number]/(2*PI*r0*dz*dz*dr*delta_t) *
-      (-r0*k*delta_r - k/2.0*delta_r*(r_old+delta_r/2.0)+0.5*delta_r*
-       (b+k*(2*r0+r1))+ delta_r*(b+k*r1)*(4*r0*r0-dr*dr)/(8*r_old*(r_old+delta_r)) -
-       (k*(r0*r0/2.0-dr*dr/8.0))*log((r_old+delta_r)/r_old));
-    j1->inc_j1(i_n, k_n+1, wj);
+      (-r0*k*delta_r - k/2.0*delta_r*(radius_old+delta_r/2.0)+0.5*delta_r*
+       (b+k*(2*r0+r1))+ delta_r*(b+k*r1)*(4*r0*r0-dr*dr)/(8*radius_old*(radius_old+delta_r)) -
+       (k*(r0*r0/2.0-dr*dr/8.0))*log((radius_old+delta_r)/radius_old));
+    el_current->inc_j1(i_n, k_n+1, wj);
   }
   // if i cell is equal 0
   else
@@ -530,18 +530,18 @@ void Particles::simple_j_weighting(Time *time1,
     // equation y = k*x+b;//
     // finding k & b//
     double k = delta_r/delta_z;
-    double b = r_old;
+    double b = radius_old;
     //calculate current jz in [i,k] cell//
     wj = charge_array[p_number]/(2.0*dr*dz*delta_t*PI*dr*dr/4.0) *
       (dr*delta_z - k*delta_z*delta_z/2.0 - delta_z*b );
     // set new weighting current value
-    j1->inc_j3(i_n,k_n, wj);
+    el_current->inc_j3(i_n,k_n, wj);
 
     //calculate current in [i+1,k] cell//
     wj = charge_array[p_number]/(2.0*dr*dz*delta_t*2.0*PI*dr*dr) *
       (k*delta_z*delta_z/2.0 + delta_z*dr +delta_z*b);
     // set new weighting current value
-    j1->inc_j3(i_n+1,k_n, wj);
+    el_current->inc_j3(i_n+1,k_n, wj);
 
     ///////////////////////////////////
     //calculate current jr in [i,k] cell//
@@ -549,33 +549,33 @@ void Particles::simple_j_weighting(Time *time1,
     // finding k & b//
     k = -delta_z/delta_r;
     double r0 = (i_n+0.5)*dr;
-    double r1 =   r_old;
-    b= (k_n+1.0)*dz - z_old;
+    double r1 =   radius_old;
+    b= (k_n+1.0)*dz - longitude_old;
 
     //weighting jr in [i][k] cell
     wj = charge_array[p_number]/(2*PI*r0*dz*dz*dr*delta_t) *
-      (r0*k*delta_r+k/2.0 * delta_r*(r_old+delta_r/2.0)+0.5*delta_r*(b-k*(2*r0+r1))+
-       delta_r*(b-k*r1)*(4*r0*r0-dr*dr)/(8*r_old*(r_old+delta_r)) +
-       (k*(r0*r0/2.0-dr*dr/8.0))*log((r_old+delta_r)/r_old));
-    j1->inc_j1(i_n,k_n, wj);
+      (r0*k*delta_r+k/2.0 * delta_r*(radius_old+delta_r/2.0)+0.5*delta_r*(b-k*(2*r0+r1))+
+       delta_r*(b-k*r1)*(4*r0*r0-dr*dr)/(8*radius_old*(radius_old+delta_r)) +
+       (k*(r0*r0/2.0-dr*dr/8.0))*log((radius_old+delta_r)/radius_old));
+    el_current->inc_j1(i_n,k_n, wj);
 
-    b= z_old- k_n*dz;;
+    b= longitude_old- k_n*dz;;
     //weighting jr in [i][k+1] cell
     wj = charge_array[p_number]/(2*PI*r0*dz*dz*dr*delta_t) *
-      (-r0*k*delta_r - k/2.0*delta_r*(r_old+delta_r/2.0)+0.5*delta_r*(b+k*(2*r0+r1))+
-       delta_r*(b+k*r1)*(4*r0*r0-dr*dr)/(8*r_old*(r_old+delta_r)) -
-       (k*(r0*r0/2.0-dr*dr/8.0))*log((r_old+delta_r)/r_old));
-    j1->inc_j1(i_n, k_n+1, wj);
+      (-r0*k*delta_r - k/2.0*delta_r*(radius_old+delta_r/2.0)+0.5*delta_r*(b+k*(2*r0+r1))+
+       delta_r*(b+k*r1)*(4*r0*r0-dr*dr)/(8*radius_old*(radius_old+delta_r)) -
+       (k*(r0*r0/2.0-dr*dr/8.0))*log((radius_old+delta_r)/radius_old));
+    el_current->inc_j1(i_n, k_n+1, wj);
   }
 
   //}
 }
 void Particles::simple_constrho_j_weighting(Time *time1,
-                                            Current *j1,
-                                            double r_new,
-                                            double z_new,
-                                            double r_old,
-                                            double z_old,
+                                            Current *el_current,
+                                            double radius_new,
+                                            double longitude_new,
+                                            double radius_old,
+                                            double longitude_old,
                                             int i_n,
                                             int k_n,
                                             int p_number)
@@ -586,25 +586,25 @@ void Particles::simple_constrho_j_weighting(Time *time1,
   double delta_t = time1->delta_t;
 
   // distance of particle moving//
-  double delta_r = r_new - r_old;
-  double delta_z = z_new - z_old;
+  double delta_r = radius_new - radius_old;
+  double delta_z = longitude_new - longitude_old;
 
   // if i cell is not equal 0
   if (i_n>=1)
   {
-    j1->inc_j3(i_n,k_n, wj);
+    el_current->inc_j3(i_n,k_n, wj);
 
     //calculate current in [i+1,k] cell//
-    j1->inc_j3(i_n+1,k_n, wj);
+    el_current->inc_j3(i_n+1,k_n, wj);
 
     //weighting jr in [i][k] cell
     // wj = charge/(2*PI*r0*dz*dz*dr*delta_t) *();
-    j1->inc_j1(i_n,k_n, wj);
+    el_current->inc_j1(i_n,k_n, wj);
 
-    // double b = z_old- k_n*dz;;
+    // double b = longitude_old- k_n*dz;;
     //weighting jr in [i][k+1] cell
     //   wj = charge/(2*PI*r0*dz*dz*dr*delta_t) * ();
-    j1->inc_j1(i_n, k_n+1, wj);
+    el_current->inc_j1(i_n, k_n+1, wj);
   }
   // if i cell is equal 0
   else
@@ -612,16 +612,16 @@ void Particles::simple_constrho_j_weighting(Time *time1,
     // equation y = k*x+b;
     // finding k & b
     double k = delta_r/delta_z;
-    double b = r_old;
+    double b = radius_old;
     // calculate current jz in [i,k] cell
     // wj = charge/(2.0*dr*dz*delta_t*PI*dr*dr/4.0) * (dr*delta_z - k*delta_z*delta_z/2.0 - delta_z*b );
     // set new weighting current value
-    j1->inc_j3(i_n,k_n, wj);
+    el_current->inc_j3(i_n,k_n, wj);
 
     // calculate current in [i+1,k] cell
     // wj = charge/(2.0*dr*dz*delta_t*2.0*PI*dr*dr) * (k*delta_z*delta_z/2.0 + delta_z*dr +delta_z*b);
     // set new weighting current value
-    j1->inc_j3(i_n+1,k_n, wj);
+    el_current->inc_j3(i_n+1,k_n, wj);
 
     ///////////////////////////////////
     //calculate current jr in [i,k] cell//
@@ -629,27 +629,27 @@ void Particles::simple_constrho_j_weighting(Time *time1,
     // finding k & b//
     k = -delta_z/delta_r;
     double r0 = (i_n+0.5)*dr;
-    double r1 =   r_old;
-    b= (k_n+1.0)*dz - z_old;
+    double r1 =   radius_old;
+    b= (k_n+1.0)*dz - longitude_old;
 
     //weighting jr in [i][k] cell
     wj = charge_array[p_number]/(2*PI*r0*dz*dz*dr*delta_t) *
-      (r0*k*delta_r+k/2.0 * delta_r*(r_old+delta_r/2.0)+0.5*delta_r*(b-k*(2*r0+r1))+
-       delta_r*(b-k*r1)*(4*r0*r0-dr*dr)/(8*r_old*(r_old+delta_r)) +
-       (k*(r0*r0/2.0-dr*dr/8.0))*log((r_old+delta_r)/r_old));
-    j1->inc_j1(i_n,k_n, wj);
+      (r0*k*delta_r+k/2.0 * delta_r*(radius_old+delta_r/2.0)+0.5*delta_r*(b-k*(2*r0+r1))+
+       delta_r*(b-k*r1)*(4*r0*r0-dr*dr)/(8*radius_old*(radius_old+delta_r)) +
+       (k*(r0*r0/2.0-dr*dr/8.0))*log((radius_old+delta_r)/radius_old));
+    el_current->inc_j1(i_n,k_n, wj);
 
-    b = z_old - k_n*dz;
+    b = longitude_old - k_n*dz;
     //weighting jr in [i][k+1] cell
     wj = charge_array[p_number]/(2*PI*r0*dz*dz*dr*delta_t) *
-      (-r0*k*delta_r - k/2.0*delta_r*(r_old+delta_r/2.0)+0.5*delta_r*(b+k*(2*r0+r1))+
-       delta_r*(b+k*r1)*(4*r0*r0-dr*dr)/(8*r_old*(r_old+delta_r)) -
-       (k*(r0*r0/2.0-dr*dr/8.0))*log((r_old+delta_r)/r_old));
-    j1->inc_j1(i_n, k_n+1, wj);
+      (-r0*k*delta_r - k/2.0*delta_r*(radius_old+delta_r/2.0)+0.5*delta_r*(b+k*(2*r0+r1))+
+       delta_r*(b+k*r1)*(4*r0*r0-dr*dr)/(8*radius_old*(radius_old+delta_r)) -
+       (k*(r0*r0/2.0-dr*dr/8.0))*log((radius_old+delta_r)/radius_old));
+    el_current->inc_j1(i_n, k_n+1, wj);
   }
 }
 
-void Particles::j_weighting(Time *time1, Current *j1)
+void Particles::j_weighting(Time *time1, Current *el_current)
 {
   double dr = geom1->dr;
   double dz = geom1->dz;
@@ -678,14 +678,14 @@ void Particles::j_weighting(Time *time1, Current *j1)
 
       if ((abs(pos[i][0] - pos_old[i][0]) < MNZL)
           || (abs(pos[i][2] - pos_old[i][2]) < MNZL))
-        strict_motion_weighting(time1, j1, pos[i][0], pos[i][2],
+        strict_motion_weighting(time1, el_current, pos[i][0], pos[i][2],
                                 pos_old[i][0], pos_old[i][2], i);
       else
       {
         switch (res_cell)
         {
           // 1) charge in four nodes
-        case 0: simple_j_weighting(time1, j1, pos[i][0], pos[i][2],
+        case 0: simple_j_weighting(time1, el_current, pos[i][0], pos[i][2],
                                    pos_old[i][0], pos_old[i][2], i_n, k_n, i);
           break;
           // 2) charge in 7 nodes
@@ -702,9 +702,9 @@ void Particles::j_weighting(Time *time1, Current *j1)
               double delta_r = r_boundary - pos[i][0];
               double z_boundary = pos[i][2] + delta_r / a;
 
-              simple_j_weighting(time1, j1, r_boundary, z_boundary,
+              simple_j_weighting(time1, el_current, r_boundary, z_boundary,
                                  pos_old[i][0], pos_old[i][2], i_n+1, k_n, i);
-              simple_j_weighting(time1,j1, pos[i][0], pos[i][2],
+              simple_j_weighting(time1,el_current, pos[i][0], pos[i][2],
                                  r_boundary, z_boundary, i_n, k_n, i);
             }
             // moving to wall
@@ -715,8 +715,8 @@ void Particles::j_weighting(Time *time1, Current *j1)
               double delta_r = r_boundary - pos_old[i][0];
               double z_boundary = pos_old[i][2] + delta_r / a;
 
-              simple_j_weighting(time1, j1, r_boundary, z_boundary, pos_old[i][0], pos_old[i][2], i_n-1, k_n, i);
-              simple_j_weighting(time1, j1, pos[i][0], pos[i][2], r_boundary, z_boundary, i_n, k_n, i);
+              simple_j_weighting(time1, el_current, r_boundary, z_boundary, pos_old[i][0], pos_old[i][2], i_n-1, k_n, i);
+              simple_j_weighting(time1, el_current, pos[i][0], pos[i][2], r_boundary, z_boundary, i_n, k_n, i);
             }
           }
           // charge in seven cells. Moving on z-axis (k_new != k_old)
@@ -729,8 +729,8 @@ void Particles::j_weighting(Time *time1, Current *j1)
               double delta_z  = z_boundary - pos_old[i][2];
               double a = (pos[i][0] - pos_old[i][0]) / (pos[i][2] - pos_old[i][2]);
               double r_boundary = pos_old[i][0] + a * delta_z;
-              simple_j_weighting(time1, j1, r_boundary, z_boundary ,pos_old[i][0], pos_old[i][2], i_n, k_n-1, i);
-              simple_j_weighting(time1, j1, pos[i][0], pos[i][2], r_boundary, z_boundary, i_n, k_n, i);
+              simple_j_weighting(time1, el_current, r_boundary, z_boundary ,pos_old[i][0], pos_old[i][2], i_n, k_n-1, i);
+              simple_j_weighting(time1, el_current, pos[i][0], pos[i][2], r_boundary, z_boundary, i_n, k_n, i);
             }
             // moving backward
             else
@@ -739,8 +739,8 @@ void Particles::j_weighting(Time *time1, Current *j1)
               double delta_z = z_boundary - pos[i][2];
               double a = (pos_old[i][0] - pos[i][0]) / (pos_old[i][2] - pos[i][2]);
               double r_boundary = pos[i][0] + a * delta_z;
-              simple_j_weighting(time1,j1, r_boundary, z_boundary, pos_old[i][0], pos_old[i][2], i_n, k_n+1, i);
-              simple_j_weighting(time1,j1, pos[i][0], pos[i][2], r_boundary, z_boundary, i_n, k_n, i);
+              simple_j_weighting(time1,el_current, r_boundary, z_boundary, pos_old[i][0], pos_old[i][2], i_n, k_n+1, i);
+              simple_j_weighting(time1,el_current, pos[i][0], pos[i][2], r_boundary, z_boundary, i_n, k_n, i);
             }
           }
         }
@@ -763,15 +763,15 @@ void Particles::j_weighting(Time *time1, Current *j1)
               double r2 = pos_old[i][0] + delta_r2;
               if (z1 < k_n * dz)
               {
-                simple_j_weighting(time1, j1, r1, z1 ,pos_old[i][0], pos_old[i][2], i_n-1, k_n-1,i);
-                simple_j_weighting(time1, j1, r2, z2, r1, z1, i_n, k_n-1,i);
-                simple_j_weighting(time1, j1, pos[i][0], pos[i][2], r2, z2, i_n, k_n,i);
+                simple_j_weighting(time1, el_current, r1, z1 ,pos_old[i][0], pos_old[i][2], i_n-1, k_n-1,i);
+                simple_j_weighting(time1, el_current, r2, z2, r1, z1, i_n, k_n-1,i);
+                simple_j_weighting(time1, el_current, pos[i][0], pos[i][2], r2, z2, i_n, k_n,i);
               }
               else if (z1>k_n*dz)
               {
-                simple_j_weighting(time1, j1, r2, z2 ,pos_old[i][0], pos_old[i][2], i_n-1, k_n-1,i);
-                simple_j_weighting(time1, j1, r1, z1, r2, z2,i_n-1, k_n,i);
-                simple_j_weighting(time1, j1, pos[i][0], pos[i][2], r1, z1, i_n, k_n,i);
+                simple_j_weighting(time1, el_current, r2, z2 ,pos_old[i][0], pos_old[i][2], i_n-1, k_n-1,i);
+                simple_j_weighting(time1, el_current, r1, z1, r2, z2,i_n-1, k_n,i);
+                simple_j_weighting(time1, el_current, pos[i][0], pos[i][2], r1, z1, i_n, k_n,i);
               }
             }
             // case, when particle move from [i-1][k+1] -> [i][k] cell
@@ -787,15 +787,15 @@ void Particles::j_weighting(Time *time1, Current *j1)
               double r2 = pos_old[i][0]+ delta_r2;
               if (z1>(k_n+1)*dz)
               {
-                simple_j_weighting(time1, j1, r1, z1 ,pos_old[i][0], pos_old[i][2], i_n-1, k_n+1,i);
-                simple_j_weighting(time1, j1, r2, z2, r1, z1, i_n, k_n+1,i);
-                simple_j_weighting(time1, j1, pos[i][0], pos[i][2], r2, z2, i_n, k_n,i);
+                simple_j_weighting(time1, el_current, r1, z1 ,pos_old[i][0], pos_old[i][2], i_n-1, k_n+1,i);
+                simple_j_weighting(time1, el_current, r2, z2, r1, z1, i_n, k_n+1,i);
+                simple_j_weighting(time1, el_current, pos[i][0], pos[i][2], r2, z2, i_n, k_n,i);
               }
               else if (z1<(k_n+1)*dz)
               {
-                simple_j_weighting(time1, j1, r2, z2 ,pos_old[i][0], pos_old[i][2], i_n-1, k_n+1,i);
-                simple_j_weighting(time1, j1, r1, z1, r2, z2,i_n-1, k_n,i);
-                simple_j_weighting(time1, j1, pos[i][0], pos[i][2], r1, z1, i_n, k_n,i);
+                simple_j_weighting(time1, el_current, r2, z2 ,pos_old[i][0], pos_old[i][2], i_n-1, k_n+1,i);
+                simple_j_weighting(time1, el_current, r1, z1, r2, z2,i_n-1, k_n,i);
+                simple_j_weighting(time1, el_current, pos[i][0], pos[i][2], r1, z1, i_n, k_n,i);
               }
             }
           }
@@ -816,15 +816,15 @@ void Particles::j_weighting(Time *time1, Current *j1)
 
               if (z1<(k_n)*dz)
               {
-                simple_j_weighting(time1, j1, r1, z1 ,pos_old[i][0], pos_old[i][2], i_n+1, k_n-1,i);
-                simple_j_weighting(time1,j1, r2, z2, r1, z1, i_n, k_n-1,i);
-                simple_j_weighting(time1,j1, pos[i][0], pos[i][2], r2, z2, i_n, k_n,i);
+                simple_j_weighting(time1, el_current, r1, z1 ,pos_old[i][0], pos_old[i][2], i_n+1, k_n-1,i);
+                simple_j_weighting(time1,el_current, r2, z2, r1, z1, i_n, k_n-1,i);
+                simple_j_weighting(time1,el_current, pos[i][0], pos[i][2], r2, z2, i_n, k_n,i);
               }
               else if (z1>(k_n)*dz)
               {
-                simple_j_weighting(time1, j1, r2, z2 ,pos_old[i][0], pos_old[i][2], i_n+1, k_n-1,i);
-                simple_j_weighting(time1, j1, r1, z1, r2, z2,i_n+1, k_n,i);
-                simple_j_weighting(time1, j1, pos[i][0], pos[i][2], r1, z1, i_n, k_n,i);
+                simple_j_weighting(time1, el_current, r2, z2 ,pos_old[i][0], pos_old[i][2], i_n+1, k_n-1,i);
+                simple_j_weighting(time1, el_current, r1, z1, r2, z2,i_n+1, k_n,i);
+                simple_j_weighting(time1, el_current, pos[i][0], pos[i][2], r1, z1, i_n, k_n,i);
               }
 
             }
@@ -842,15 +842,15 @@ void Particles::j_weighting(Time *time1, Current *j1)
 
               if (z1>(k_n+1)*dz)
               {
-                simple_j_weighting(time1, j1, r1, z1, pos_old[i][0],pos_old[i][2], i_n+1, k_n+1,i);
-                simple_j_weighting(time1, j1, r2, z2, r1, z1, i_n, k_n+1,i);
-                simple_j_weighting(time1, j1, pos[i][0], pos[i][2], r2, z2, i_n, k_n,i);
+                simple_j_weighting(time1, el_current, r1, z1, pos_old[i][0],pos_old[i][2], i_n+1, k_n+1,i);
+                simple_j_weighting(time1, el_current, r2, z2, r1, z1, i_n, k_n+1,i);
+                simple_j_weighting(time1, el_current, pos[i][0], pos[i][2], r2, z2, i_n, k_n,i);
               }
               else if (z1<(k_n+1)*dz)
               {
-                simple_j_weighting(time1, j1, r2, z2, pos_old[i][0], pos_old[i][2], i_n+1, k_n+1,i);
-                simple_j_weighting(time1, j1, r1, z1, r2, z2,i_n+1, k_n,i);
-                simple_j_weighting(time1, j1, pos[i][0], pos[i][2], r1, z1, i_n, k_n,i);
+                simple_j_weighting(time1, el_current, r2, z2, pos_old[i][0], pos_old[i][2], i_n+1, k_n+1,i);
+                simple_j_weighting(time1, el_current, r1, z1, r2, z2,i_n+1, k_n,i);
+                simple_j_weighting(time1, el_current, pos[i][0], pos[i][2], r1, z1, i_n, k_n,i);
               }
             }
           }
@@ -961,20 +961,20 @@ void Particles::azimuthal_j_weighting(Current *this_j)
 
 void Particles::strict_motion_weighting(Time *time1,
                                         Current *this_j,
-                                        double r_new,
-                                        double z_new,
-                                        double r_old,
-                                        double z_old,
+                                        double radius_new,
+                                        double longitude_new,
+                                        double radius_old,
+                                        double longitude_old,
                                         int p_number)
 {
   double dr = geom1->dr;
   double dz = geom1->dz;
 
   // defining number of cell
-  int i_n = (int)ceil((r_new)/dr)-1;
-  int k_n =(int)ceil((z_new)/dz)-1;
-  int i_o = (int)ceil((r_old)/dr)-1;
-  int k_o =(int)ceil((z_old)/dz)-1;
+  int i_n = (int)ceil((radius_new)/dr)-1;
+  int k_n =(int)ceil((longitude_new)/dz)-1;
+  int i_o = (int)ceil((radius_old)/dr)-1;
+  int k_o =(int)ceil((longitude_old)/dz)-1;
   // TODO: workaround: sometimes it gives -1.
   // Just get 0 cell if it happence
   if (i_n < 0) { i_n = 0; }
@@ -982,21 +982,21 @@ void Particles::strict_motion_weighting(Time *time1,
   if (i_o < 0) { i_o = 0; }
   if (k_o < 0) { k_o = 0; }
 
-  if ((abs(r_new-r_old)<MNZL)&&(abs(z_new-z_old)<MNZL))
+  if ((abs(radius_new-radius_old)<MNZL)&&(abs(longitude_new-longitude_old)<MNZL))
   {
     // cerr<<"WARNING! zero velocity!" << endl; // TODO: why it is warning?
     return;
   }
   // stirct axis motion
-  if (abs(r_new-r_old)<MNZL)
+  if (abs(radius_new-radius_old)<MNZL)
   {
     double r1=0, r2=0,r3=0;
     double delta_z = 0.0;
-    double  value_part = 2.0*PI*r_new*dr*dz;
+    double  value_part = 2.0*PI*radius_new*dr*dz;
     double wj_lower =0;
-    r1 = r_new-0.5*dr;
+    r1 = radius_new-0.5*dr;
     r2 = (i_n+0.5)*dr;
-    r3 = r_new+0.5*dr;
+    r3 = radius_new+0.5*dr;
     if (i_n==0)
       wj_lower = charge_array[p_number]/(time1->delta_t*PI*dr*dr/4.0) * PI*(r2*r2-r1*r1)/value_part;
     else
@@ -1010,7 +1010,7 @@ void Particles::strict_motion_weighting(Time *time1,
     {
     case 0:
     {
-      delta_z = z_new - z_old;
+      delta_z = longitude_new - longitude_old;
       wj = wj_lower*delta_z;
       this_j->inc_j3(i_n,k_n,wj);
       wj = wj_upper*delta_z;
@@ -1020,13 +1020,13 @@ void Particles::strict_motion_weighting(Time *time1,
 
     case 1:
     {
-      delta_z = k_n*dz - z_old;
+      delta_z = k_n*dz - longitude_old;
       wj = wj_lower*delta_z;
       this_j->inc_j3(i_n,k_n-1,wj);
       wj = wj_upper*delta_z;
       this_j->inc_j3(i_n+1,k_n-1,wj);
 
-      delta_z = z_new - k_n*dz;
+      delta_z = longitude_new - k_n*dz;
       wj = wj_lower*delta_z;
       this_j->inc_j3(i_n,k_n,wj);
       wj = wj_upper*delta_z;
@@ -1036,13 +1036,13 @@ void Particles::strict_motion_weighting(Time *time1,
 
     case -1:
     {
-      delta_z = (k_n+1)*dz - z_old;
+      delta_z = (k_n+1)*dz - longitude_old;
       wj = wj_lower*delta_z;
       this_j->inc_j3(i_n,k_n+1,wj);
       wj = wj_upper*delta_z;
       this_j->inc_j3(i_n+1,k_n+1,wj);
 
-      delta_z = z_new - (k_n+1)*dz;
+      delta_z = longitude_new - (k_n+1)*dz;
       wj = wj_lower*delta_z;
       this_j->inc_j3(i_n,k_n,wj);
       wj = wj_upper*delta_z;
@@ -1053,7 +1053,7 @@ void Particles::strict_motion_weighting(Time *time1,
   }
 
   // stirct radial motion
-  else if (abs(z_new-z_old)<MNZL)
+  else if (abs(longitude_new-longitude_old)<MNZL)
   {
     double r0 = (i_n+0.5)*dr;
     double wj= 0;
@@ -1065,12 +1065,12 @@ void Particles::strict_motion_weighting(Time *time1,
     {
     case  0:
     {
-      delta_r = r_new - r_old;
-      left_delta_z = (k_n+1)*dz-z_new;
-      right_delta_z = z_new - k_n*dz;
+      delta_r = radius_new - radius_old;
+      left_delta_z = (k_n+1)*dz-longitude_new;
+      right_delta_z = longitude_new - k_n*dz;
       wj = charge_array[p_number]/(PI*4.0*r0*dz*dz*dr*time1->delta_t)*
-        (delta_r - r0*r0/(r_old+delta_r) + r0*r0/r_old + dr*dr/(4.0*(r_old+delta_r)) -
-         dr*dr/(4.0*r_old));
+        (delta_r - r0*r0/(radius_old+delta_r) + r0*r0/radius_old + dr*dr/(4.0*(radius_old+delta_r)) -
+         dr*dr/(4.0*radius_old));
       res_j = wj*left_delta_z;
       this_j->inc_j1(i_n,k_n,res_j);
       res_j = wj*right_delta_z;
@@ -1079,19 +1079,19 @@ void Particles::strict_motion_weighting(Time *time1,
     break;
     case 1:
     {
-      delta_r = (i_n)*dr- r_old;
-      left_delta_z = (k_n+1)*dz-z_new;
-      right_delta_z = z_new - k_n*dz;
+      delta_r = (i_n)*dr- radius_old;
+      left_delta_z = (k_n+1)*dz-longitude_new;
+      right_delta_z = longitude_new - k_n*dz;
       r0 = (i_n-0.5)*dr;
       wj = charge_array[p_number]/(PI*4.0*r0*dz*dz*dr*time1->delta_t) *
-        (delta_r - r0*r0/(r_old+delta_r) +r0*r0/r_old + dr*dr/(4.0*(r_old+delta_r)) -
-         dr*dr/(4.0*r_old));
+        (delta_r - r0*r0/(radius_old+delta_r) +r0*r0/radius_old + dr*dr/(4.0*(radius_old+delta_r)) -
+         dr*dr/(4.0*radius_old));
       res_j = wj*left_delta_z;
       this_j->inc_j1(i_n-1,k_n,res_j);
       res_j = wj*right_delta_z;
       this_j->inc_j1(i_n-1,k_n+1,res_j);
 
-      delta_r = r_new - i_n*dr;
+      delta_r = radius_new - i_n*dr;
       r0 = (i_n+0.5)*dr;
       wj = charge_array[p_number]/(PI*4.0*r0*dz*dz*dr*time1->delta_t) *
         (delta_r - r0*r0/(i_n*dr+delta_r) +r0*r0/i_n*dr + dr*dr/(4.0*(i_n*dr+delta_r)) -
@@ -1104,19 +1104,19 @@ void Particles::strict_motion_weighting(Time *time1,
     break;
     case -1:
     {
-      delta_r = (i_n+1)*dr - r_old ;
-      left_delta_z = (k_n+1)*dz-z_new;
-      right_delta_z = z_new - k_n*dz;
+      delta_r = (i_n+1)*dr - radius_old ;
+      left_delta_z = (k_n+1)*dz-longitude_new;
+      right_delta_z = longitude_new - k_n*dz;
       r0 = (i_n+1.5)*dr;
       wj = charge_array[p_number]/(PI*4.0*r0*dz*dz*dr*time1->delta_t) *
-        (delta_r - r0*r0/(r_old+delta_r) +r0*r0/r_old + dr*dr/(4.0*(r_old+delta_r)) -
-         dr*dr/(4.0*r_old));
+        (delta_r - r0*r0/(radius_old+delta_r) +r0*r0/radius_old + dr*dr/(4.0*(radius_old+delta_r)) -
+         dr*dr/(4.0*radius_old));
       res_j = wj*left_delta_z;
       this_j->inc_j1(i_n+1,k_n,res_j);
       res_j = wj*right_delta_z;
       this_j->inc_j1(i_n+1,k_n+1,res_j);
 
-      delta_r = r_new - (i_n+1)*dr;
+      delta_r = radius_new - (i_n+1)*dr;
       r0 = (i_n+0.5)*dr;
       wj = charge_array[p_number]/(PI*4.0*r0*dz*dz*dr*time1->delta_t) *
         (delta_r - r0*r0/((i_n+1)*dr+delta_r) +r0*r0/(i_n+1)*dr + dr*dr/(4.0*((i_n+1)*dr+delta_r)) -
@@ -1186,13 +1186,13 @@ void Particles::step_v_single(EField *e_fld, HField *h_fld,
   double vtmp[3];
   double velocity[3];
 
-  // check if r and z are correct
+  // check if radius and longitude are correct
   if (isnan(pos[i][0]) ||
       isinf(pos[i][0]) != 0 ||
       isnan(pos[i][2]) ||
       isinf(pos[i][2]) != 0)
   {
-    cerr << "ERROR(step_v): r[" << i << "] or z[" << i << "] is not valid number. Can not continue." << endl;
+    cerr << "ERROR(step_v): radius[" << i << "] or longitude[" << i << "] is not valid number. Can not continue." << endl;
     exit(1);
   }
   //! \f$ const1 = \frac{q t}{2 m} \f$
@@ -1309,10 +1309,10 @@ void Particles::dump_position_to_old()
 void Particles::half_step_pos_single(Time *t, unsigned int i)
 {
   double half_dt = t->delta_t/2.0;
-  // check if r and z are correct
+  // check if radius and longitude are correct
   if (isnan(pos[i][0]) || isinf(pos[i][0]) != 0 || isnan(pos[i][2]) || isinf(pos[i][2]) != 0)
   {
-    cerr << "ERROR(half_step_pos): r[" << i << "] or z[" << i << "] is not valid number. Can not continue." << endl;
+    cerr << "ERROR(half_step_pos): radius[" << i << "] or longitude[" << i << "] is not valid number. Can not continue." << endl;
     exit(1);
   }
   //
@@ -1354,23 +1354,23 @@ void Particles::reflection_single(unsigned int i)
 {
   double dr = geom1->dr;
   double dz = geom1->dz;
-  double r_wall = geom1->first_size - dr/2.0;
-  double z_wall = geom1->second_size - dz/2.0;
+  double radius_wall = geom1->first_size - dr/2.0;
+  double longitude_wall = geom1->second_size - dz/2.0;
   double half_dr = dr/2.0;
   double half_dz = dz/2.0;
-  double r_wallX2 = r_wall*2.0;
-  double z_wallX2 = z_wall*2.0;
+  double radius_wallX2 = radius_wall*2.0;
+  double longitude_wallX2 = longitude_wall*2.0;
 
   //! FIXME: fix wall reflections for r-position
-  if (pos[i][0] > r_wall)
+  if (pos[i][0] > radius_wall)
   {
-    pos[i][0] = r_wallX2 - pos[i][0];
+    pos[i][0] = radius_wallX2 - pos[i][0];
     vel[i][0] = -vel[i][0];
   }
 
-  if (pos[i][2] > z_wall)
+  if (pos[i][2] > longitude_wall)
   {
-    pos[i][2] = z_wallX2 - pos[i][2];
+    pos[i][2] = longitude_wallX2 - pos[i][2];
     vel[i][2] = -vel[i][2];
   }
 
