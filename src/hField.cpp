@@ -182,7 +182,7 @@ void HField::calc_field(EField *e_field1, Time *time1)
   }
 }
 
-double* HField::get_field(double x1, double x3)
+double* HField::get_field(double radius, double longitude)
 //! function for magnetic field weighting
 {
   int i_r=0; // number of particle i cell
@@ -198,92 +198,94 @@ double* HField::get_field(double x1, double x3)
   double vol_1 =0; // volume of i cell; Q/V, V - volume of elementary cell
   double vol_2 =0; // volume of i+1 cell;
 
-  r1 = x1-0.5*dr;
-  r3 = x1+0.5*dr;
+  r1 = radius-0.5*dr;
+  r3 = radius+0.5*dr;
 
   //// weighting of H_z
-  //finding number of cell. example dr=0.5, x1 = 0.7, i_r =0;!!
-  i_r = (int)ceil((x1-0.5*dr)/geom1->dr)-1;
+  //finding number of cell. example dr=0.5, radius = 0.7, i_r =0;!!
+  i_r = CELL_NUMBER(radius-0.5*dr, dr);
+  k_z = CELL_NUMBER(longitude, dz);
   // TODO: workaround: sometimes it gives -1.
   // Just get 0 cell if it happence
-  if (i_r < 0) { i_r = 0; }
-  k_z = (int)ceil((x3)/geom1->dz)-1;
+  if (i_r < 0) i_r = 0;
+  if (k_z < 0) k_z = 0;
 
   vol_1 = PI*dz*dr*dr*(2*i_r+1);
   vol_2 = PI*dz*dr*dr*(2*i_r+3);
-  dz1 = (k_z+1)*dz-x3;
-  dz2 = x3 - k_z*dz;
+  dz1 = (k_z+1)*dz-longitude;
+  dz2 = longitude - k_z*dz;
   r2 = (i_r+1)*dr;
 
   // weighting Hz[i][k]
-  hz = hz + field_z_half_time[i_r][k_z]*(PI*dz1*(r2*r2-r1*r1))/vol_1;
+  hz = hz + field_z_half_time[i_r][k_z]*(CYL_RNG_VOL(dz1, r1, r2))/vol_1;
 
   // weighting Hz[i+1][k]
-  hz = hz + field_z_half_time[i_r+1][k_z]*(PI*dz1*(r3*r3-r2*r2))/vol_2;
+  hz = hz + field_z_half_time[i_r+1][k_z]*(CYL_RNG_VOL(dz1, r2, r3))/vol_2;
 
   // weighting Hz[i][k+1]
-  hz= hz + field_z_half_time[i_r][k_z+1]*(PI*dz2*(r3*r3-r2*r2))/vol_1;
+  hz= hz + field_z_half_time[i_r][k_z+1]*(CYL_RNG_VOL(dz2, r2, r3))/vol_1;
 
   // weighting Hz[i+1][k+1]
-  hz = hz + field_z_half_time[i_r+1][k_z+1]*(PI*dz2*(r3*r3-r2*r2))/vol_2;
+  hz = hz + field_z_half_time[i_r+1][k_z+1]*(CYL_RNG_VOL(dz2, r2, r3))/vol_2;
 
   //// weighting of Hr
-  // finding number of cell. example dz=0.5, x3 = 0.7, z_k =0;!!
-  i_r = (int)ceil((x1)/geom1->dr)-1;
+  // finding number of cell. example dz=0.5, longitude = 0.7, z_k =0;!!
+  i_r = CELL_NUMBER(radius, dr);
+  k_z = CELL_NUMBER(longitude - 0.5 * dz, dz);
   // TODO: workaround: sometimes it gives -1.
   // Just get 0 cell if it happence
-  if (i_r < 0) { i_r = 0; }
-  k_z = (int)ceil((x3-0.5*dz)/geom1->dz)-1;
+  if (i_r < 0) i_r = 0;
+  if (k_z < 0) k_z = 0;
 
-  if(x1>dr)
-    vol_1 = PI*dz*dr*dr*2*i_r;
+  if(radius>dr)
+    vol_1 = CELL_VOLUME(i_r, dr, dz);
   else
     vol_1 = PI*dz*dr*dr/4.0; //volume of first cell
 
   r2 = (i_r+0.5)*dr;
 
   vol_2 = PI*dz*dr*dr*(2*i_r+2);
-  dz1 = (k_z+1.5)*dz - x3;
-  dz2 = x3 - (k_z+0.5)*dz;
+  dz1 = (k_z+1.5)*dz - longitude;
+  dz2 = longitude - (k_z+0.5)*dz;
 
   // weighting Hr[i][k]
-  hr = hr + field_r_half_time[i_r][k_z]*(PI*dz1*(r2*r2-r1*r1))/vol_1;
+  hr = hr + field_r_half_time[i_r][k_z]*(CYL_RNG_VOL(dz1, r1, r2))/vol_1;
 
   // weighting Hr[i+1][k]
-  hr = hr + field_r_half_time[i_r+1][k_z]*PI*dz1*(r3*r3-r2*r2)/vol_2;
+  hr = hr + field_r_half_time[i_r+1][k_z]*CYL_RNG_VOL(dz1, r2, r3)/vol_2;
 
   // weighting Hr[i][k+1]
-  hr = hr + field_r_half_time[i_r][k_z+1]*PI*dz2*(r2*r2-r1*r1)/vol_1;
+  hr = hr + field_r_half_time[i_r][k_z+1]*CYL_RNG_VOL(dz2, r1, r2)/vol_1;
 
   // weighting Hr[i+1][k+1]
-  hr = hr + field_r_half_time[i_r+1][k_z+1]*PI*dz2*(r3*r3-r2*r2)/vol_2;
+  hr = hr + field_r_half_time[i_r+1][k_z+1]*CYL_RNG_VOL(dz2, r2, r3)/vol_2;
 
   //// weighting of H_fi
-  // finding number of cell. example dz=0.5, x3 = 0.7, z_k =0;
-  i_r = (int)ceil((x1-0.5*dr)/geom1->dr)-1;
+  // finding number of cell. example dz=0.5, longitude = 0.7, z_k =0;
+  i_r = CELL_NUMBER(radius - 0.5 * dr, dr);
+  k_z = CELL_NUMBER(longitude - 0.5 * dz, dz);
   // TODO: workaround: sometimes it gives -1.
   // Just get 0 cell if it happence
-  if (i_r < 0) { i_r = 0; }
-
-  k_z = (int)ceil((x3-0.5*dz)/geom1->dz)-1;
+  if (i_r < 0) i_r = 0;
+  if (k_z < 0) k_z = 0;
 
   r2 = (i_r+1)*dr;
   vol_1 = PI*dz*dr*dr*(2*i_r+1);
   vol_2 = PI*dz*dr*dr*(2*i_r+3);
-  dz1 = (k_z+1.5)*dz-x3;
-  dz2 = x3-(k_z+0.5)*dz;
+  dz1 = (k_z+1.5)*dz-longitude;
+  dz2 = longitude-(k_z+0.5)*dz;
 
   // weighting Hfi[i][k]
-  hfi = hfi + field_phi_half_time[i_r][k_z]*PI*dz1*(r2*r2-r1*r1)/vol_1;
+  hfi = hfi + field_phi_half_time[i_r][k_z]*CYL_RNG_VOL(dz1, r1, r2)/vol_1;
 
   // weighting Hfi[i+1][k]
-  hfi = hfi + field_phi_half_time[i_r+1][k_z]*PI*dz1*(r3*r3-r2*r2)/vol_2;
+  hfi = hfi + field_phi_half_time[i_r+1][k_z]*CYL_RNG_VOL(dz1, r2, r3)/vol_2;
 
   // weighting Hfi[i][k+1]
   hfi = hfi + field_phi_half_time[i_r][k_z+1]*dz2*PI*(r2*r2-r1*r1)/vol_1;
 
   // weighting Hfi[i+1][k+1]
-  hfi = hfi + field_phi_half_time[i_r+1][k_z+1]*PI*dz2*(r3*r3-r2*r2)/vol_2;
+  hfi = hfi + field_phi_half_time[i_r+1][k_z+1]*CYL_RNG_VOL(dz2, r2, r3)/vol_2;
 
   double* components = tinyvec3d::mkvector3d(hr, hfi, hz);
 

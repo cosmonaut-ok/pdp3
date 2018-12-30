@@ -27,3 +27,15 @@ public:
   ~Geometry(void);
 
 };
+
+// some geometry-related macros
+//! \f$ ( \pi \times (dr * (i+0.5))^2 - \pi \times (dr * (i-0.5))^2 ) * dz \f$
+#define CELL_VOLUME(i, dr, dz) PI * (dz) * (dr) * (dr) * 2.0 * (i)
+
+//! volume of the cylindrical ring
+#define CYL_RNG_VOL(z, r1, r2) PI * (z) * ((r2) * (r2) - (r1) * (r1))
+
+// #define PARTICLE_VOLUME(x,y) (PI * dz * dr * dr * 2.0 * i)
+
+//! get cell number by 'radius'
+#define CELL_NUMBER(position, dx) (int)ceil((position) / (dx)) - 1
