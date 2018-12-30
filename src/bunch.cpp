@@ -92,16 +92,16 @@ void Bunch::reflection_single(unsigned int i)
 {
   double dr = geom1->dr;
   double dz = geom1->dz;
-  double x1_wall = geom1->first_size - dr/2.0;
-  double x3_wall = geom1->second_size - dz/2.0;
+  double radius_wall = geom1->first_size - dr/2.0;
+  double longitude_wall = geom1->second_size - dz/2.0;
   double half_dr = dr/2.0;
   double half_dz = dz/2.0;
 
   //! FIXME: fix wall reflections for r-position
-  if (pos[i][0] > x1_wall)
+  if (pos[i][0] > radius_wall)
     is_alive[i] = false;
 
-  if (pos[i][2] > x3_wall)
+  if (pos[i][2] > longitude_wall)
     is_alive[i] = false;
 
   if (pos[i][0] < half_dr)
