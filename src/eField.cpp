@@ -37,7 +37,7 @@ EField::EField(Geometry *geom1_t) : Field (geom1_t)
 // destructor
 EField::~EField()
 {
-  for (int i=0; i<(geom1->n_grid_1);i++)
+  for (int i=0; i<(geom1->n_grid_1); i++)
   {
     delete[]fi[i];
     delete[]t_charge_density[i];
@@ -71,8 +71,8 @@ void EField::boundary_conditions()
 #pragma omp for
     for(int i=0; i<(geom1->n_grid_1-1); i++)
     {
-      field_r[i][0]=0;
-      field_r[i][geom1->n_grid_2-1]=0;
+      field_r[i][0] = 0;
+      field_r[i][geom1->n_grid_2-1] = 0;
       //field_r[i][0]=limit_conditions();
     }
 
@@ -80,23 +80,23 @@ void EField::boundary_conditions()
 #pragma omp for
     for(int k=0; k<(geom1->n_grid_2); k++)
     {
-      field_phi[0][k]=0;
-      field_phi[geom1->n_grid_1-1][k]=0;
+      field_phi[0][k] = 0;
+      field_phi[geom1->n_grid_1-1][k] = 0;
     }
 
 #pragma omp for
     for(int i=0; i<(geom1->n_grid_1); i++)
     {
-      field_phi[i][0]=0;
-      field_phi[i][geom1->n_grid_2-1]=0;
+      field_phi[i][0] = 0;
+      field_phi[i][geom1->n_grid_2-1] = 0;
     }
 
     //// Border Ez conditions
 #pragma omp for
     for(int k=0; k<(geom1->n_grid_2-1); k++)
     {
-      field_z[0][k]=0;
-      field_z[geom1->n_grid_1-1][k]=0;
+      field_z[0][k] = 0;
+      field_z[geom1->n_grid_1-1][k] = 0;
       // field_r[0][k]=limit_conditions();
     }
   }
@@ -139,11 +139,11 @@ void EField::calc_field(HField *h_field1,
     for(int k=0; k<(geom1->n_grid_2-1); k++)
     {
       int i=0;
-      double epsilonx2 = 2 * geom1->epsilon[i][k]*EPSILON0;
+      double epsilonx2 = 2 * geom1->epsilon[i][k] * EPSILON0;
       double sigma_t = geom1->sigma[i][k]*time1->delta_t;
 
       double koef_e = (epsilonx2 - sigma_t) / (epsilonx2 + sigma_t);
-      double koef_h =  2 * time1->delta_t / (epsilonx2 + sigma_t);
+      double koef_h = 2 * time1->delta_t / (epsilonx2 + sigma_t);
 
       field_z[i][k]=field_z[i][k] * koef_e
         - (j3[i][k] - 4.0 / dr*h_phi[i][k]) * koef_h;
@@ -193,7 +193,7 @@ void EField::set_fi_on_z()
 {
 #pragma omp parallel for
   for (int k=0; k<(geom1->n_grid_2);k++)
-    fi[geom1->n_grid_1-1][k]=0;
+    fi[geom1->n_grid_1-1][k] = 0;
 }
 
 void EField::tridiagonal_solve(const double *a,
@@ -206,10 +206,11 @@ void EField::tridiagonal_solve(const double *a,
   c[0] /= b[0]; // Division by zero risk
   d[0] /= b[0]; // Division by zero would imply a singular matrix
 
-  for(int i = 1; i < n; i++){
+  for(int i = 1; i < n; i++)
+  {
     double id = (b[i] - c[i-1] * a[i]); // Division by zero risk
     c[i] /= id; // Last value calculated is redundant
-    d[i] = (d[i] - d[i-1] * a[i])/id;
+    d[i] = (d[i] - d[i-1] * a[i]) / id;
   }
 
   // Now, back substitute
@@ -219,7 +220,7 @@ void EField::tridiagonal_solve(const double *a,
     x[i] = d[i] - c[i] * x[i + 1];
 }
 
-double* EField::get_field(double x1, double x3)
+double* EField::get_field(double radius, double longitude)
 //! function for electric field weighting
 {
   int i_r = 0; // number of particle i cell
@@ -235,97 +236,98 @@ double* EField::get_field(double x1, double x3)
   double vol_1 = 0; // volume of i cell; Q/V, V - volume of elementary cell
   double vol_2 = 0; // volume of i+1 cell;
 
-  r1 = x1-0.5*dr;
-  r3 = x1+0.5*dr;
+  r1 = radius - 0.5 * dr;
+  r3 = radius + 0.5 * dr;
 
   // weighting of E_r
-  // finding number of cell. example dr=0.5, x1 = 0.7, i_r =0;!!
-  i_r = (int)ceil((x1-0.5*dr)/geom1->dr)-1;
-  k_z = (int)ceil((x3)/geom1->dz)-1;
+  // finding number of cell. example dr=0.5, radius = 0.7, i_r =0;!!
+  i_r = CELL_NUMBER(radius - 0.5 * dr, dr);
+  k_z = CELL_NUMBER(longitude, dz);
   // TODO: workaround: sometimes it gives -1.
   // Just get 0 cell if it happence
-  if (i_r < 0) { i_r = 0; }
-  if (k_z < 0) { k_z = 0; }
+  if (i_r < 0) i_r = 0;
+  if (k_z < 0) k_z = 0;
 
   vol_1 = PI*dz*dr*dr*(2*i_r+1);
   vol_2 = PI*dz*dr*dr*(2*i_r+3);
-  dz1 = (k_z+1)*dz-x3;
-  dz2 = x3 - k_z*dz;
+  dz1 = (k_z+1)*dz-longitude;
+  dz2 = longitude - k_z*dz;
   r2 = (i_r+1)*dr;
 
   //weighting Er[i][k]//
-  er = er + field_r[i_r][k_z]*(PI*dz1*(r2*r2-r1*r1))/vol_1;
+  er = er + field_r[i_r][k_z] * CYL_RNG_VOL(dz1, r1, r2) / vol_1;
 
   //weighting Er[i+1][k]//
-  er = er + field_r[i_r+1][k_z]*(PI*dz1*(r3*r3-r2*r2))/vol_2;
+  er = er + field_r[i_r+1][k_z] * CYL_RNG_VOL(dz1, r2, r3) / vol_2;
 
   //weighting Er[i][k+1]//
-  er= er + field_r[i_r][k_z+1]*(PI*dz2*(r2*r2-r1*r1))/vol_1;
+  er= er + field_r[i_r][k_z+1] * CYL_RNG_VOL(dz2, r1, r2) / vol_1;
 
   //weighting Er[i+1][k+1]//
-  er = er + field_r[i_r+1][k_z+1]*(PI*dz2*(r3*r3-r2*r2))/vol_2;
+  er = er + field_r[i_r+1][k_z+1] * CYL_RNG_VOL(dz2, r2, r3) / vol_2;
 
   // weighting of E_z
-  // finding number of cell. example dz=0.5, x3 = 0.7, z_k =0;!!
-  i_r = (int)ceil((x1)/geom1->dr)-1;
-  k_z = (int)ceil((x3-0.5*dz)/geom1->dz)-1;
+  // finding number of cell. example dz=0.5, longitude = 0.7, z_k =0;!!
+  i_r = CELL_NUMBER(radius, dr);
+  k_z = CELL_NUMBER(longitude - 0.5 * dz, dz);
   // TODO: workaround: sometimes it gives -1.
   // Just get 0 cell if it happence
-  if (i_r < 0) { i_r = 0; }
-  if (k_z < 0) { k_z = 0; }
+  if (i_r < 0) i_r = 0;
+  if (k_z < 0) k_z = 0;
 
-  if (x1 > dr)
-    vol_1 = PI*dz*dr*dr*2*i_r;
+  if (radius > dr)
+    vol_1 = CELL_VOLUME(i_r, dr, dz);
   else
     vol_1 = PI*dz*dr*dr/4.0; // volume of first cell
 
   r2 = (i_r+0.5)*dr;
   vol_2 = PI*dz*dr*dr*(2*i_r+2);
-  dz1 = (k_z+1.5)*dz - x3;
-  dz2 = x3 - (k_z+0.5)*dz;
+  dz1 = (k_z+1.5)*dz - longitude;
+  dz2 = longitude - (k_z+0.5)*dz;
 
   // weighting Ez[i][k]
-  ez = ez + field_z[i_r][k_z]*(PI*dz1*(r2*r2-r1*r1))/vol_1;
+  ez += field_z[i_r][k_z] * CYL_RNG_VOL(dz1, r1, r2) / vol_1;
 
   // weighting Ez[i+1][k]
-  ez = ez + field_z[i_r+1][k_z]*PI*dz1*(r3*r3-r2*r2)/vol_2;
+  ez += field_z[i_r+1][k_z] * CYL_RNG_VOL(dz1, r2, r3) / vol_2;
 
   // weighting Ez[i][k+1]
-  ez = ez + field_z[i_r][k_z+1]*PI*dz2*(r2*r2-r1*r1)/vol_1;
+  ez += field_z[i_r][k_z+1] * CYL_RNG_VOL(dz2, r1, r2) / vol_1;
 
   //weighting Ez[i+1][k+1]//
-  ez = ez + field_z[i_r+1][k_z+1]*PI*dz2*(r3*r3-r2*r2)/vol_2;
+  ez += field_z[i_r+1][k_z+1] * CYL_RNG_VOL(dz2, r2, r3) / vol_2;
 
   // weighting of E_fi
-  // finding number of cell. example dz=0.5, x3 = 0.7, z_k =1;
-  i_r = (int)ceil((x1)/geom1->dr)-1;
-  k_z = (int)ceil((x3)/geom1->dz)-1;
+  // finding number of cell. example dz=0.5, longitude = 0.7, z_k =1;
+
+  i_r = CELL_NUMBER(radius, dr);
+  k_z = CELL_NUMBER(longitude, dz);
   // TODO: workaround: sometimes it gives -1.
   // Just get 0 cell if it happence
-  if (i_r < 0) { i_r = 0; }
-  if (k_z < 0) { k_z = 0; }
+  if (i_r < 0) i_r = 0;
+  if (k_z < 0) k_z = 0;
 
-  if(x1>dr)
-    vol_1 = PI*dz*dr*dr*2*i_r;
+  if(radius>dr)
+    vol_1 = CELL_VOLUME(i_r, dr, dz);
   else
     vol_1 = PI*dz*dr*dr/4.0; // volume of first cell
 
   r2 = (i_r+0.5)*dr;
   vol_2 = PI*dz*dr*dr*(2*i_r+2);
-  dz1 = (k_z+1)*dz-x3;
-  dz2 = x3-k_z*dz;
+  dz1 = (k_z+1)*dz-longitude;
+  dz2 = longitude-k_z*dz;
 
   // weighting Efi[i][k]
-  efi += field_phi[i_r][k_z]*PI*dz1*(r2*r2 - r1*r1)/vol_1;
+  efi += field_phi[i_r][k_z] * CYL_RNG_VOL(dz1, r1, r2) / vol_1;
 
   // weighting Efi[i+1][k]
-  efi += field_phi[i_r+1][k_z]*PI*dz1*(r3*r3-r2*r2)/vol_2;
+  efi += field_phi[i_r+1][k_z] * CYL_RNG_VOL(dz1, r2, r3) / vol_2;
 
   // weighting Efi[i][k+1]
-  efi += field_phi[i_r][k_z+1]*PI*dz2*(r2*r2-r1*r1)/vol_1;
+  efi += field_phi[i_r][k_z+1] * CYL_RNG_VOL(dz2, r1, r2) / vol_1;
 
   // weighting Efi[i+1][k+1]
-  efi += field_phi[i_r+1][k_z+1]*PI*dz2*(r3*r3-r2*r2)/vol_2;
+  efi += field_phi[i_r+1][k_z+1] * CYL_RNG_VOL(dz2, r2, r3) / vol_2;
 
   double* components = tinyvec3d::mkvector3d(er, efi, ez);
 
