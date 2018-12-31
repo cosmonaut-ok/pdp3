@@ -210,23 +210,23 @@ double* HField::get_field(double radius, double longitude)
   if (i_r < 0) i_r = 0;
   if (k_z < 0) k_z = 0;
 
-  vol_1 = PI*dz*dr*dr*(2*i_r+1);
-  vol_2 = PI*dz*dr*dr*(2*i_r+3);
+  vol_1 = CELL_VOLUME(i_r+1, dr, dz);
+  vol_2 = CELL_VOLUME(i_r+3, dr, dz);
   dz1 = (k_z+1)*dz-longitude;
   dz2 = longitude - k_z*dz;
   r2 = (i_r+1)*dr;
 
   // weighting Hz[i][k]
-  hz = hz + field_z_half_time[i_r][k_z]*(CYL_RNG_VOL(dz1, r1, r2))/vol_1;
+  hz = hz + field_z_half_time[i_r][k_z] * CYL_RNG_VOL(dz1, r1, r2) / vol_1;
 
   // weighting Hz[i+1][k]
-  hz = hz + field_z_half_time[i_r+1][k_z]*(CYL_RNG_VOL(dz1, r2, r3))/vol_2;
+  hz = hz + field_z_half_time[i_r+1][k_z] * CYL_RNG_VOL(dz1, r2, r3) / vol_2;
 
   // weighting Hz[i][k+1]
-  hz= hz + field_z_half_time[i_r][k_z+1]*(CYL_RNG_VOL(dz2, r2, r3))/vol_1;
+  hz= hz + field_z_half_time[i_r][k_z+1] * CYL_RNG_VOL(dz2, r2, r3) / vol_1;
 
   // weighting Hz[i+1][k+1]
-  hz = hz + field_z_half_time[i_r+1][k_z+1]*(CYL_RNG_VOL(dz2, r2, r3))/vol_2;
+  hz = hz + field_z_half_time[i_r+1][k_z+1] * CYL_RNG_VOL(dz2, r2, r3) / vol_2;
 
   //// weighting of Hr
   // finding number of cell. example dz=0.5, longitude = 0.7, z_k =0;!!
@@ -240,7 +240,7 @@ double* HField::get_field(double radius, double longitude)
   if(radius>dr)
     vol_1 = CELL_VOLUME(i_r, dr, dz);
   else
-    vol_1 = PI*dz*dr*dr/4.0; //volume of first cell
+    vol_1 = CYL_VOL(dz, dr); // volume of first cell
 
   r2 = (i_r+0.5)*dr;
 
@@ -249,16 +249,16 @@ double* HField::get_field(double radius, double longitude)
   dz2 = longitude - (k_z+0.5)*dz;
 
   // weighting Hr[i][k]
-  hr = hr + field_r_half_time[i_r][k_z]*(CYL_RNG_VOL(dz1, r1, r2))/vol_1;
+  hr += field_r_half_time[i_r][k_z]*(CYL_RNG_VOL(dz1, r1, r2)) / vol_1;
 
   // weighting Hr[i+1][k]
-  hr = hr + field_r_half_time[i_r+1][k_z]*CYL_RNG_VOL(dz1, r2, r3)/vol_2;
+  hr += field_r_half_time[i_r+1][k_z] * CYL_RNG_VOL(dz1, r2, r3) / vol_2;
 
   // weighting Hr[i][k+1]
-  hr = hr + field_r_half_time[i_r][k_z+1]*CYL_RNG_VOL(dz2, r1, r2)/vol_1;
+  hr += field_r_half_time[i_r][k_z+1] * CYL_RNG_VOL(dz2, r1, r2) / vol_1;
 
   // weighting Hr[i+1][k+1]
-  hr = hr + field_r_half_time[i_r+1][k_z+1]*CYL_RNG_VOL(dz2, r2, r3)/vol_2;
+  hr += field_r_half_time[i_r+1][k_z+1] * CYL_RNG_VOL(dz2, r2, r3) / vol_2;
 
   //// weighting of H_fi
   // finding number of cell. example dz=0.5, longitude = 0.7, z_k =0;
@@ -269,23 +269,23 @@ double* HField::get_field(double radius, double longitude)
   if (i_r < 0) i_r = 0;
   if (k_z < 0) k_z = 0;
 
-  r2 = (i_r+1)*dr;
-  vol_1 = PI*dz*dr*dr*(2*i_r+1);
-  vol_2 = PI*dz*dr*dr*(2*i_r+3);
-  dz1 = (k_z+1.5)*dz-longitude;
-  dz2 = longitude-(k_z+0.5)*dz;
+  r2 = (i_r+1) * dr;
+  vol_1 = CELL_VOLUME(i_r+1, dr, dz);
+  vol_2 = CELL_VOLUME(i_r+3, dr, dz);
+  dz1 = (k_z+1.5) * dz - longitude;
+  dz2 = longitude - (k_z+0.5) * dz;
 
   // weighting Hfi[i][k]
-  hfi = hfi + field_phi_half_time[i_r][k_z]*CYL_RNG_VOL(dz1, r1, r2)/vol_1;
+  hfi += field_phi_half_time[i_r][k_z] * CYL_RNG_VOL(dz1, r1, r2) / vol_1;
 
   // weighting Hfi[i+1][k]
-  hfi = hfi + field_phi_half_time[i_r+1][k_z]*CYL_RNG_VOL(dz1, r2, r3)/vol_2;
+  hfi += field_phi_half_time[i_r+1][k_z] * CYL_RNG_VOL(dz1, r2, r3) / vol_2;
 
   // weighting Hfi[i][k+1]
-  hfi = hfi + field_phi_half_time[i_r][k_z+1]*dz2*PI*(r2*r2-r1*r1)/vol_1;
+  hfi += field_phi_half_time[i_r][k_z+1] * CYL_RNG_VOL(dz2, r1, r2) / vol_1;
 
   // weighting Hfi[i+1][k+1]
-  hfi = hfi + field_phi_half_time[i_r+1][k_z+1]*CYL_RNG_VOL(dz2, r2, r3)/vol_2;
+  hfi += field_phi_half_time[i_r+1][k_z+1] * CYL_RNG_VOL(dz2, r2, r3) / vol_2;
 
   double* components = tinyvec3d::mkvector3d(hr, hfi, hz);
 
