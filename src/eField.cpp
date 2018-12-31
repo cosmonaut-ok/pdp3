@@ -248,8 +248,8 @@ double* EField::get_field(double radius, double longitude)
   if (i_r < 0) i_r = 0;
   if (k_z < 0) k_z = 0;
 
-  vol_1 = PI*dz*dr*dr*(2*i_r+1);
-  vol_2 = PI*dz*dr*dr*(2*i_r+3);
+  vol_1 = CELL_VOLUME(i_r+1, dr, dz);
+  vol_2 = CELL_VOLUME(i_r+3, dr, dz);
   dz1 = (k_z+1)*dz-longitude;
   dz2 = longitude - k_z*dz;
   r2 = (i_r+1)*dr;
@@ -278,10 +278,10 @@ double* EField::get_field(double radius, double longitude)
   if (radius > dr)
     vol_1 = CELL_VOLUME(i_r, dr, dz);
   else
-    vol_1 = PI*dz*dr*dr/4.0; // volume of first cell
+    vol_1 = CYL_VOL(dz, dr); // volume of first cell
 
   r2 = (i_r+0.5)*dr;
-  vol_2 = PI*dz*dr*dr*(2*i_r+2);
+  vol_2 = CELL_VOLUME(i_r+2, dr, dz);
   dz1 = (k_z+1.5)*dz - longitude;
   dz2 = longitude - (k_z+0.5)*dz;
 
@@ -310,10 +310,10 @@ double* EField::get_field(double radius, double longitude)
   if(radius>dr)
     vol_1 = CELL_VOLUME(i_r, dr, dz);
   else
-    vol_1 = PI*dz*dr*dr/4.0; // volume of first cell
+    vol_1 = CYL_VOL(dz, dr); // volume of first cell
 
   r2 = (i_r+0.5)*dr;
-  vol_2 = PI*dz*dr*dr*(2*i_r+2);
+  vol_2 = CELL_VOLUME(i_r+2, dr, dz);
   dz1 = (k_z+1)*dz-longitude;
   dz2 = longitude-k_z*dz;
 
