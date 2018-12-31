@@ -37,8 +37,6 @@ AC_SUBST(HDF5_VERSION)
 AC_SUBST(MKDIR)
 MKDIR=mkdir
 
-AC_SUBST(RESULT_DIR)
-
 AC_SUBST(RELEASE)
 RELEASE=${PACKAGE_VERSION}
 
@@ -56,7 +54,6 @@ AC_ARG_ENABLE([omp_dynamic], [AC_HELP_STRING([--enable-omp-dynamic], [Enable ope
 AC_ARG_ENABLE([hdf5], [AC_HELP_STRING([--enable-hdf5], [Build application with hdf5 library support])], [HDF5="$enableval"], [HDF5=no])
 
 AC_ARG_WITH([doc-formats], [AC_HELP_STRING([--with-doc-formats], [Set list of documentation formats to be generated])], [DOXYGEN_FORMATS="$withval"], [DOXYGEN_FORMATS="latex html rtf"])
-AC_ARG_WITH([result-dir], [AC_HELP_STRING([--with-result-dir], [Set default result directory])], [RESULT_DIR="$withval"], [RESULT_DIR="./"])
 AC_ARG_WITH([pusher], [AC_HELP_STRING([--with-pusher], [Set particles pusher (supported: boris-adaptive (default), boris, boris-relativistic, vai (n/a), hc (n/a), rrll (n/a))])], [PUSHER="$withval"], [PUSHER="boris-adaptive"])
 
 AC_PROG_CXXCPP

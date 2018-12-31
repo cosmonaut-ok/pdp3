@@ -107,7 +107,7 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 CLEAN_FILES  = y.tab.c y.tab.h lex.yy.c core *.orig *.rej \
                \\\#*\\\# *~ *% .\\\#*
 
-BUILD_DIRS = @RESULT_DIR@ @RESULT_DIR@/Dump $(OBJDIR) $(OBJDIR)/math $(TARGETDIR)
+BUILD_DIRS = $(OBJDIR) $(OBJDIR)/math $(TARGETDIR)
 space :=
 space +=
 comma :=,
@@ -137,7 +137,7 @@ $(pdp3_MODULE): $(pdp3_OBJS)
 	$(CXX) $(CXXFLAGS) $(CXXEXTRA) $(DEFINCL) $(LDFLAGS) -o $@ $(pdp3_OBJS) $(pdp3_LIBRARY_PATH) $(pdp3_LIBRARIES:%=-l%)
 
 distclean: clean
-	$(RM) -r *.avi *.png $(BUILD_DIRS) $(RELEASE) $(RELEASE).zip autom4te.cache config.log config.status configure Makefile parameters.xml @RESULT_DIR@ test/functional/test.sh test/functional/parameters*tmpl
+	$(RM) -r *.avi *.png $(BUILD_DIRS) $(RELEASE) $(RELEASE).zip autom4te.cache config.log config.status configure Makefile parameters.xml test/functional/test.sh test/functional/parameters*tmpl
 
 run: bootstrap
 	./pdp3
@@ -171,9 +171,7 @@ doxygen:
 doc: doxygen $(DOXYGEN_FORMATS)
 
 dist: all doc
-	$(MKDIR) -p $(RELEASE)/$(@RESULT_DIR@)
 	cp pdp3 $(RELEASE)
-	sed "s/<path_to_result>.*<\/path_to_result>/<path_to_result>${@RESULT_DIR@}\/<\/path_to_result>/g" parameters.xml > $(RELEASE)/parameters.xml
 	cp -r CHANGELOG.md $(RELEASE)
 	cp -r tools $(RELEASE)/tools
 	$(MKDIR) -p $(RELEASE)/doc

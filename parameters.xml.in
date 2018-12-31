@@ -83,7 +83,7 @@
   <boundary_conditions type = "dirichlet">0</boundary_conditions>
 
   <file_save_parameters>
-    <result_path>@RESULT_DIR@</result_path>              <!-- path to modeling results data -->
+    <result_path>.</result_path>              <!-- path to modeling results data -->
     <data_root>pdp3_result</data_root>              <!-- path to modeling results data -->
     <debug_data_root>pdp3_result_debug</debug_data_root>              <!-- path to modeling results data -->
     <frames_per_file>10</frames_per_file> <!-- how many image frames should be placed in one data file -->
