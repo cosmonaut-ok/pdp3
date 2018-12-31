@@ -32,8 +32,11 @@ public:
 //! \f$ ( \pi \times (dr * (i+0.5))^2 - \pi \times (dr * (i-0.5))^2 ) * dz \f$
 #define CELL_VOLUME(i, dr, dz) PI * (dz) * (dr) * (dr) * 2.0 * (i)
 
-//! volume of the cylindrical ring
+//! volume of the cylindrical ring (internal cylinder on r1 is cut out)
 #define CYL_RNG_VOL(z, r1, r2) PI * (z) * ((r2) * (r2) - (r1) * (r1))
+
+//! volume of the cylinder
+#define CYL_VOL(z, r) PI * (z) * (r) * (r) / 4.
 
 // #define PARTICLE_VOLUME(x,y) (PI * dz * dr * dr * 2.0 * i)
 
