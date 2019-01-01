@@ -112,7 +112,7 @@ public:
   void half_step_pos(Time *t);
   void charge_weighting(ChargeDensity *ro1);
   void velocity_distribution(double tempr_ev);
-  void load_spatial_distribution(double n1, double n2, double left_plasma_boundary, int type);
+  void load_cylindrical_spatial_distribution(double n1, double n2, double left_plasma_boundary);
   void simple_j_weighting(Time *time1,
                           Current *j1,
                           double radius_new,
