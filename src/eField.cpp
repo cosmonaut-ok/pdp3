@@ -123,7 +123,7 @@ void EField::calc_field(HField *h_field1,
     for(int k=1; k<(geom1->n_grid_2-1); k++)
     {
       int i=0;
-      double epsilonx2 = 2 * geom1->epsilon[i][k]*EPSILON0;
+      double epsilonx2 = 2 * geom1->epsilon[i][k] * EPSILON0;
       double sigma_t = geom1->sigma[i][k]*time1->delta_t;
 
       double koef_e = (epsilonx2 - sigma_t) / (epsilonx2 + sigma_t);
@@ -153,7 +153,7 @@ void EField::calc_field(HField *h_field1,
     for(int i=1; i<(geom1->n_grid_1-1); i++)
       for(int k=1; k<(geom1->n_grid_2-1); k++)
       {
-        double epsilonx2 = 2 * geom1->epsilon[i][k]*EPSILON0;
+        double epsilonx2 = 2 * geom1->epsilon[i][k] * EPSILON0;
         double sigma_t = geom1->sigma[i][k]*time1->delta_t;
 
         double koef_e = (epsilonx2 - sigma_t) / (epsilonx2 + sigma_t);
@@ -175,7 +175,7 @@ void EField::calc_field(HField *h_field1,
     for(int i=1; i<(geom1->n_grid_1-1); i++)
     {
       int k=0;
-      double epsilonx2 = 2 * geom1->epsilon[i][k]*EPSILON0;
+      double epsilonx2 = 2 * geom1->epsilon[i][k] * EPSILON0;
       double sigma_t = geom1->sigma[i][k]*time1->delta_t;
 
       double koef_e = (epsilonx2 - sigma_t) / (epsilonx2 + sigma_t);
@@ -217,7 +217,7 @@ void EField::tridiagonal_solve(const double *a,
   x[n - 1] = d[n - 1];
 
   for(int i = n - 2; i >= 0; i--)
-    x[i] = d[i] - c[i] * x[i + 1];
+    x[i] = d[i] - c[i] * x[i+1];
 }
 
 double* EField::get_field(double radius, double longitude)

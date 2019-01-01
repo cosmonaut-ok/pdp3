@@ -137,7 +137,7 @@ void LoadInitParam::init_particles()
 		p_list->part_list.push_back(prtls); // push particles to particles list vector
 
     // case 2 is for cylindrical distribution
-    prtls->load_spatial_distribution(p_p.left_density, p_p.right_density, 0, 2);
+    prtls->load_cylindrical_spatial_distribution(p_p.left_density, p_p.right_density, 0);
     prtls->velocity_distribution(p_p.temperature);
   }
 
