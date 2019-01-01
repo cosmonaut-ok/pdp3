@@ -103,12 +103,12 @@ void Particles::reflection()
     {
       double dr = geom1->dr;
       double dz = geom1->dz;
-      double radius_wall = geom1->first_size - dr/2.0;
-      double longitude_wall = geom1->second_size - dz/2.0;
-      double half_dr = dr/2.0;
-      double half_dz = dz/2.0;
-      double radius_wallX2 = radius_wall*2.0;
-      double longitude_wallX2 = longitude_wall*2.0;
+      double radius_wall = geom1->first_size - dr / 2.;
+      double longitude_wall = geom1->second_size - dz / 2.;
+      double half_dr = dr / 2.;
+      double half_dz = dz / 2.;
+      double radius_wallX2 = radius_wall * 2.;
+      double longitude_wallX2 = longitude_wall * 2.;
 
       //! FIXME: fix wall reflections for r-position
       if (pos[i][0] > radius_wall)
@@ -189,12 +189,12 @@ void Particles::charge_weighting(ChargeDensity *ro1)
       }
 
       // finding number of i and k cell. example: dr = 0.5; r = 0.4; i =0
-      r_i = (int)ceil((pos[i][0])/dr)-1;
-      z_k = (int)ceil((pos[i][2])/dz)-1;
+      r_i = CELL_NUMBER(pos[i][0], dr);
+      z_k = CELL_NUMBER(pos[i][2], dz);
       // TODO: workaround: sometimes it gives -1.
       // Just get 0 cell if it happence
-      if (r_i < 0) { r_i = 0; }
-      if (z_k < 0) { z_k = 0; }
+      if (r_i < 0) r_i = 0;
+      if (z_k < 0) z_k = 0;
 
       // in first cell other alg. of ro_v calc
       if(pos[i][0]>dr)
@@ -225,7 +225,7 @@ void Particles::charge_weighting(ChargeDensity *ro1)
         ro1->set_ro_weighting(r_i+1, z_k+1, value);
 
       }
-      else if (pos[i][0]<=dr/2.0)
+      else if (pos[i][0]<=dr / 2.)
       {
         r_i = 0;
         r1 =   0.0;
@@ -233,13 +233,13 @@ void Particles::charge_weighting(ChargeDensity *ro1)
         r3 = pos[i][0]+0.5*dr;
         dz1 = (z_k+1)*dz-pos[i][2];
         dz2 = pos[i][2] - z_k*dz;
-        ro_v = charge_array[i]/(PI*dz*(2.0*pos[i][0]*pos[i][0]+dr*dr/2.0));
-        v_1 = PI*dz*dr*dr/4.0;
+        ro_v = charge_array[i]/(PI*dz*(2.0*pos[i][0]*pos[i][0]+dr*dr / 2.));
+        v_1 = CYL_VOL(dz, dr);
         v_2 = CELL_VOLUME(r_i+1, dr, dz);
         ///////////////////////////
 
         // weighting in ro[i][k] cell
-        value = ro_v*PI*dz1*(dr*dr/2.0-pos[i][0]*dr+pos[i][0]*pos[i][0])/v_1;
+        value = ro_v*PI*dz1*(dr*dr / 2.-pos[i][0]*dr+pos[i][0]*pos[i][0])/v_1;
         ro1->set_ro_weighting(r_i, z_k, value);
 
         // weighting in ro[i+1][k] cell
@@ -247,7 +247,7 @@ void Particles::charge_weighting(ChargeDensity *ro1)
         ro1->set_ro_weighting(r_i+1,z_k, value);
 
         // weighting in ro[i][k+1] cell
-        value = ro_v*PI*dz2*(dr*dr/2.0-pos[i][0]*dr+pos[i][0]*pos[i][0])/v_1;
+        value = ro_v*PI*dz2*(dr*dr / 2.-pos[i][0]*dr+pos[i][0]*pos[i][0])/v_1;
         ro1->set_ro_weighting(r_i, z_k+1, value);
 
         // weighting in ro[i+1][k+1] cell
@@ -264,7 +264,7 @@ void Particles::charge_weighting(ChargeDensity *ro1)
         dz1 = (z_k+1)*dz-pos[i][2];
         dz2 = pos[i][2] - z_k*dz;
         ro_v = charge_array[i]/(2.0*PI*dz*dr*pos[i][0]);
-        v_1 = PI*dz*dr*dr/4.0;
+        v_1 = CYL_VOL(dz, dr);
         v_2 = CELL_VOLUME(r_i+1, dr, dz);
         ///////////////////////////
 
@@ -376,85 +376,47 @@ void Particles::velocity_distribution(double tempr_ev)
   delete []integ_array;
 }
 
-void Particles::load_spatial_distribution(double n1, double n2, double left_plasma_boundary, int type)
+void Particles::load_cylindrical_spatial_distribution(double n1, double n2, double left_plasma_boundary)
 //! calculate number of charged physical particles in macroparticle
 {
-  double rand_r;
-  double rand_z;
   double dr = geom1->dr;
   double dz = geom1->dz;
   double dn = n2 - n1;
 
-  switch (type)
-  {
-  case 0:
-  {
-    double n_in_macro = (PI * pow(geom1->first_size, 2) * geom1->second_size / number * (n2 + n1) / 2);
-    charge *= n_in_macro;
-    mass *= n_in_macro;
-#pragma omp parallel for shared (dr, dz, dn, left_plasma_boundary, n1)
-    for(unsigned int n = 0; n < number; n++)
-    {
-      rand_r = lib::random_reverse(n, 13); // TODO: why 11 and 13?
-      rand_z = lib::random_reverse(number - 1 - n, 11);
-      pos[n][0] = sqrt(rand_r * geom1->first_size * (geom1->first_size - dr) + pow(dr, 2) / 4);
-      pos[n][1] = 0;
-      //pos[n][2] = (geom1->second_size - dz)*sqrt(rand_z) + dz/2.0;
-      pos[n][2] = (geom1->second_size - left_plasma_boundary - dz) / dn * (sqrt(pow(n1, 2) + rand_z * (2 * n1 * dn + pow(dn, 2))) - n1) + left_plasma_boundary + dz / 2;
-      mass_array[n] = mass;
-      charge_array[n] = charge;
-    }
-  }
-  break;
-  case 1: //Normal distribution
-  {
-    double sigma = 0.01;
-    double n_in_macro = (PI * geom1->second_size * (n2 + n1) * pow(sigma, 2) * (1.0 - exp(-geom1->first_size * geom1->first_size / (2 * pow(sigma, 2)))) / number);
-    charge *= n_in_macro;
-    mass *= n_in_macro;
-    double R_sq = (geom1->first_size - dr / 2) * (geom1->first_size - dr / 2);
-    // double tt=0;
-#pragma omp parallel for shared (sigma, R_sq, dz)
-    for (unsigned int i = 0; i<number;i++)
-    {
-      rand_r = lib::random_reverse(i,13);
-      double int_rd = exp(-dr*dr/(8.0*sigma*sigma));
-      pos[i][0]=sigma*sqrt(-2.0*log(int_rd - rand_r*(int_rd-exp(-R_sq/(2.0*sigma*sigma)))));
-      pos[i][1] = 0;
-      //pos[i][0] = (geom1->first_size - dr)*(rand_r)*rand_r + dr/2.0;
-      // double tt = exp(-R_sq/(2.0*sigma*sigma));
-      rand_z = lib::random_reverse(number - 1 - i, 11);
-      pos[i][2] = (geom1->second_size - dz / 2) * rand_z + dz/2;
-      //pos[i][2] = (geom1->second_size - left_plasma_boundary - dz)/dn*(sqrt(n1*n1 + rand_z*(2*n1*dn + dn*dn)) - n1) + left_plasma_boundary + dz/2.0;
-    }
-  }
-  break;
+  // summary volume of all macroparticles
+  double v_sum = 0;
 
-  case 2: // cylindrical distribution
+  for (unsigned int n = 0; n < number; n++)
   {
-    double N_big_for_cell = (double)number / ((double)geom1->n_grid_1 * geom1->n_grid_2);
-    double N_real_i = PI * (n2 + n1) / 2 * dr * dz;
-    double n_in_macro = 0;
+    double rand_r = lib::random_reverse(n, 13);
+    double rand_z = lib::random_reverse(number - 1 - n, 11);
 
-#pragma omp parallel for shared(dr, dz, dn, left_plasma_boundary, n1, n2) private(rand_r, rand_z, n_in_macro)
-    for(unsigned int n = 0; n < number; n++)
-    {
-      rand_r = lib::random_reverse(n, 13);
-      rand_z = lib::random_reverse(number - 1 - n, 11);
-      pos[n][0] = (geom1->first_size - dr) * rand_r + dr / 2;
-      pos[n][1] = 0;
-      n_in_macro = N_real_i * pos[n][0] / N_big_for_cell;
-      charge_array[n] = charge * n_in_macro;
-      mass_array[n] = mass * n_in_macro;
-      //pos[n][2] = (geom1->second_size - dz)*(rand_z) + dz/2;
-      //pos[n][2] = (geom1->second_size - dz)*sqrt(rand_z) + dz/2.0;
+    pos[n][0] = (geom1->first_size - dr) * rand_r + dr / 2;
+    pos[n][1] = 0;
+    pos[n][2] = (geom1->second_size - left_plasma_boundary - dz)
+      / dn * (sqrt(pow(n1, 2) + rand_z * (2 * n1 * dn + pow(dn, 2))) - n1)
+      + left_plasma_boundary + dz / 2;
 
-      pos[n][2] = (geom1->second_size - left_plasma_boundary - dz)
-        / dn * (sqrt(pow(n1, 2) + rand_z * (2 * n1 * dn + pow(dn, 2))) - n1)
-        + left_plasma_boundary + dz / 2;
-    }
+    v_sum += 2 * PI * pos[n][0] * dr * dz;
   }
-  break;
+
+  // average volume of single macroparticle
+  double v_avg = v_sum / number;
+  double N_total = (n1 + n2) / 2 * PI * geom1->first_size * geom1->first_size * geom1->second_size;
+
+  double n_per_macro_avg = N_total / number;
+
+  for (unsigned int n = 0; n < number; n++)
+  {
+    // coefitient of normalization
+    double norm =  2 * PI * pos[n][0] * dr * dz / v_avg;
+
+    // number of real particles per macroparticle
+    double n_per_macro = n_per_macro_avg * norm;
+
+    // set charge and mass of macroparticle
+    charge_array[n] = charge * n_per_macro;
+    mass_array[n] = mass * n_per_macro;
   }
 }
 
@@ -549,7 +511,7 @@ void Particles::simple_j_weighting(Time *time1,
     // finding k & b//
     k = -delta_z/delta_r;
     double r0 = (i_n+0.5)*dr;
-    double r1 =   radius_old;
+    double r1 = radius_old;
     b= (k_n+1.0)*dz - longitude_old;
 
     //weighting jr in [i][k] cell
@@ -629,7 +591,7 @@ void Particles::simple_constrho_j_weighting(Time *time1,
     // finding k & b//
     k = -delta_z/delta_r;
     double r0 = (i_n+0.5)*dr;
-    double r1 =   radius_old;
+    double r1 = radius_old;
     b= (k_n+1.0)*dz - longitude_old;
 
     //weighting jr in [i][k] cell
@@ -658,16 +620,16 @@ void Particles::j_weighting(Time *time1, Current *el_current)
     if (is_alive[i])
     {
       //finding number new and old cells
-      int i_n = (int)ceil((pos[i][0]) / dr) - 1;
-      int k_n = (int)ceil((pos[i][2]) / dz) - 1;
-      int i_o = (int)ceil((pos_old[i][0]) / dr) - 1;
-      int k_o = (int)ceil((pos_old[i][2]) / dz) - 1;
+      int i_n = CELL_NUMBER(pos[i][0], dr);
+      int k_n = CELL_NUMBER(pos[i][2], dz);
+      int i_o = CELL_NUMBER(pos_old[i][0], dr);
+      int k_o = CELL_NUMBER(pos_old[i][2], dz);
       // TODO: workaround: sometimes it gives -1.
       // Just get 0 cell if it happence
-      if (i_n < 0) { i_n = 0; }
-      if (k_n < 0) { k_n = 0; }
-      if (i_o < 0) { i_o = 0; }
-      if (k_o < 0) { k_o = 0; }
+      if (i_n < 0) i_n = 0;
+      if (k_n < 0) k_n = 0;
+      if (i_o < 0) i_o = 0;
+      if (k_o < 0) k_o = 0;
 
       if (pos_old[i][0] == (i_o + 1) * dr) i_o = i_n;
       if (pos_old[i][2] == (k_o + 1) * dz) k_o = k_n;
@@ -885,8 +847,8 @@ void Particles::azimuthal_j_weighting(Current *this_j)
       // double **temp = this_j->get_j2();
 
       // finding number of i and k cell. example: dr = 0.5; r = 0.4; i =0
-      r_i = (int)ceil((pos[i][0])/dr)-1;
-      z_k = (int)ceil((pos[i][2])/dz)-1;
+      r_i = CELL_NUMBER(pos[i][0], dr);
+      z_k = CELL_NUMBER(pos[i][2], dz);
       // TODO: workaround: sometimes it gives -1.
       // Just get 0 cell if it happence
       if (r_i < 0) { r_i = 0; }
@@ -899,62 +861,62 @@ void Particles::azimuthal_j_weighting(Current *this_j)
         r2 = (r_i+0.5)*dr;
         r3 = pos[i][0] + 0.5*dr;
         ro_v = charge_array[i]/(2.0*PI*dz*dr*pos[i][0]);
-        v_1 = PI*dz*dr*dr*2.0*(r_i);
-        v_2 = PI*dz*dr*dr*2.0*(r_i+1);
-        dz1 = (z_k+1)*dz-pos[i][2];
-        dz2 = pos[i][2] - z_k*dz;
+        v_1 = CELL_VOLUME(r_i, dr, dz);
+        v_2 = CELL_VOLUME(r_i+1, dr, dz);
+        dz1 = (z_k+1) * dz - pos[i][2];
+        dz2 = pos[i][2] - z_k * dz;
 
         // weighting in j[i][k] cell
-        rho = ro_v*PI*dz1*(r2*r2-r1*r1)/v_1;
+        rho = ro_v * CYL_RNG_VOL(dz1, r1, r2)/v_1;
         current = rho*vel[i][1];
         this_j->inc_j2(r_i, z_k, current);
 
         // weighting in j[i+1][k] cell
-        rho = ro_v*PI*dz1*(r3*r3-r2*r2)/v_2;
+        rho = ro_v * CYL_RNG_VOL(dz1, r2, r3)/v_2;
         current = rho*vel[i][1];
         this_j->inc_j2(r_i+1,z_k, current);
 
         // weighting in j[i][k+1] cell
-        rho = ro_v*PI*dz2*(r2*r2-r1*r1)/v_1;
+        rho = ro_v * CYL_RNG_VOL(dz2, r1, r2)/v_1;
         current = rho*vel[i][1];
-        this_j->inc_j2(r_i, z_k+1,  current);
+        this_j->inc_j2(r_i, z_k+1, current);
 
         // weighting in j[i+1][k+1] cell
-        rho = ro_v*PI*dz2*(r3*r3-r2*r2)/v_2;
+        rho = ro_v * CYL_RNG_VOL(dz2, r2, r3)/v_2;
         current = rho*vel[i][1];
         this_j->inc_j2(r_i+1, z_k+1, current);
 
       }
       else
       {
-        r1 = pos[i][0] - 0.5*dr;
-        r2 = (r_i+0.5)*dr;
-        r3 = pos[i][0]+0.5*dr;
+        r1 = pos[i][0] - 0.5 * dr;
+        r2 = (r_i + 0.5) * dr;
+        r3 = pos[i][0] + 0.5 * dr;
         dz1 = (z_k+1)*dz-pos[i][2];
-        dz2 = pos[i][2] - z_k*dz;
-        ro_v = charge_array[i]/(2.0*PI*dz*dr*pos[i][0]);
-        v_1 = PI*dz*dr*dr/4.0;
-        v_2 = PI*dz*dr*dr*2.0*(r_i+1);
+        dz2 = pos[i][2] - z_k * dz;
+        ro_v = charge_array[i] / (2. * PI * dz * dr * pos[i][0]);
+        v_1 = CYL_VOL(dz, dr);
+        v_2 = CELL_VOLUME(r_i+1, dr, dz);
 
         // weighting in j[i][k] cell
-        rho = ro_v*PI*dz1*(r2*r2-r1*r1)/v_1;
+        rho = ro_v * CYL_RNG_VOL(dz1, r1, r2)/v_1;
         current = rho*vel[i][1];
-        this_j->inc_j2(r_i, z_k,  current);
+        this_j->inc_j2(r_i, z_k, current);
 
         // weighting in j[i+1][k] cell
-        rho = ro_v*PI*dz1*(r3*r3-r2*r2)/v_2;
+        rho = ro_v * CYL_RNG_VOL(dz1, r2, r3)/v_2;
         current = rho*vel[i][1];
-        this_j->inc_j2(r_i+1,z_k,    current);
+        this_j->inc_j2(r_i+1,z_k, current);
 
         // weighting in j[i][k+1] cell
-        rho = ro_v*PI*dz2*(r2*r2-r1*r1)/v_1;
+        rho = ro_v * CYL_RNG_VOL(dz2, r1, r2)/v_1;
         current = rho*vel[i][1];
-        this_j->inc_j2(r_i, z_k+1,  current);
+        this_j->inc_j2(r_i, z_k+1, current);
 
         // weighting in j[i+1][k+1] cell
-        rho = ro_v*PI*dz2*(r3*r3-r2*r2)/v_2;
+        rho = ro_v * CYL_RNG_VOL(dz2, r2, r3)/v_2;
         current = rho*vel[i][1];
-        this_j->inc_j2(r_i+1, z_k+1,  current);
+        this_j->inc_j2(r_i+1, z_k+1, current);
       }
     }
 }
@@ -971,16 +933,16 @@ void Particles::strict_motion_weighting(Time *time1,
   double dz = geom1->dz;
 
   // defining number of cell
-  int i_n = (int)ceil((radius_new)/dr)-1;
-  int k_n =(int)ceil((longitude_new)/dz)-1;
-  int i_o = (int)ceil((radius_old)/dr)-1;
-  int k_o =(int)ceil((longitude_old)/dz)-1;
+  int i_n = CELL_NUMBER(radius_new, dr);
+  int k_n = CELL_NUMBER(longitude_new, dz);
+  int i_o = CELL_NUMBER(radius_old, dr);;
+  int k_o = CELL_NUMBER(longitude_old, dz);;
   // TODO: workaround: sometimes it gives -1.
   // Just get 0 cell if it happence
-  if (i_n < 0) { i_n = 0; }
-  if (k_n < 0) { k_n = 0; }
-  if (i_o < 0) { i_o = 0; }
-  if (k_o < 0) { k_o = 0; }
+  if (i_n < 0) i_n = 0;
+  if (k_n < 0) k_n = 0;
+  if (i_o < 0) i_o = 0;
+  if (k_o < 0) k_o = 0;
 
   if ((abs(radius_new-radius_old)<MNZL)&&(abs(longitude_new-longitude_old)<MNZL))
   {
@@ -992,7 +954,7 @@ void Particles::strict_motion_weighting(Time *time1,
   {
     double r1=0, r2=0,r3=0;
     double delta_z = 0.0;
-    double  value_part = 2.0*PI*radius_new*dr*dz;
+    double value_part = 2.0*PI*radius_new*dr*dz;
     double wj_lower =0;
     r1 = radius_new-0.5*dr;
     r2 = (i_n+0.5)*dr;
@@ -1354,12 +1316,12 @@ void Particles::reflection_single(unsigned int i)
 {
   double dr = geom1->dr;
   double dz = geom1->dz;
-  double radius_wall = geom1->first_size - dr/2.0;
-  double longitude_wall = geom1->second_size - dz/2.0;
-  double half_dr = dr/2.0;
-  double half_dz = dz/2.0;
-  double radius_wallX2 = radius_wall*2.0;
-  double longitude_wallX2 = longitude_wall*2.0;
+  double radius_wall = geom1->first_size - dr / 2.;
+  double longitude_wall = geom1->second_size - dz / 2.;
+  double half_dr = dr / 2.;
+  double half_dz = dz / 2.;
+  double radius_wallX2 = radius_wall * 2.;
+  double longitude_wallX2 = longitude_wall * 2.;
 
   //! FIXME: fix wall reflections for r-position
   if (pos[i][0] > radius_wall)
