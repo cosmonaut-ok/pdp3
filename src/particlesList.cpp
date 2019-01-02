@@ -17,10 +17,10 @@ void ParticlesList::charge_weighting(ChargeDensity *rho)
     part_list[i]->charge_weighting(rho);
 }
 
-void ParticlesList::boris_pusher(EField *e_fld, HField *h_fld, Time *t)
+void ParticlesList::step_v(EField *e_fld, HField *h_fld, Time *t)
 {
   for(std::size_t i = 0; i < part_list.size(); i++)
-    part_list[i]->boris_pusher(e_fld, h_fld, t);
+    part_list[i]->step_v(e_fld, h_fld, t);
 }
 
 void ParticlesList::move_half_reflect(Time *t)
