@@ -21,7 +21,7 @@ build:
     - plasma
   script:
     - ./autogen.sh
-    - ./configure
+    - ./configure --enable-ieee
     - make
 
 test:
