@@ -1128,11 +1128,11 @@ void Particles::back_velocity_to_rz()
       back_velocity_to_rz_single(i);
 }
 
-void Particles::step_v_single(EField *e_fld, HField *h_fld,
-                              Time *t, unsigned int i)
+void Particles::boris_pusher_single(EField *e_fld, HField *h_fld,
+                                    Time *t, unsigned int i)
 {
   //!
-  //! step_v
+  //! boris pusher single
   //!
   // define vars directly in loop, because of multithreading
   double const1, const2, sq_velocity;
@@ -1294,14 +1294,14 @@ void Particles::back_position_to_rz_single(unsigned int i)
   pos[i][1] = 0;
 }
 
-void Particles::boris_pusher(EField *e_fld, HField *h_fld, Time *t)
+void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
 {
 #pragma omp parallel for shared(e_fld, h_fld, t)
   for(unsigned int i=0; i<number; i++)
   {
     if (is_alive[i])
     {
-      step_v_single(e_fld, h_fld, t, i);
+      boris_pusher_single(e_fld, h_fld, t, i);
       //! dump position to old
       dump_position_to_old_single(i);
       //! half step position
