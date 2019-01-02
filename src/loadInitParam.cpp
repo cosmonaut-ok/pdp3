@@ -479,7 +479,7 @@ void LoadInitParam::run(void)
       the_time = clock();
 #endif
 
-      p_list->boris_pusher(efield, hfield, params->time);
+      p_list->step_v(efield, hfield, params->time);
 #ifdef DEBUG
       cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: p_list->boris_pusher" << endl;
       the_time = clock();
