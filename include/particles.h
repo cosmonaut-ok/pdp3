@@ -146,7 +146,7 @@ public:
 
   void dump_position_to_old();
 
-  void boris_pusher(EField *e_fld, HField *h_fld, Time *t);
+  void step_v(EField *e_fld, HField *h_fld, Time *t);
   virtual void reflection_single(unsigned int i);
   void move_half_reflect(Time *t);
 
@@ -157,6 +157,6 @@ public:
   void back_position_to_rz_single(unsigned int i);
   void dump_position_to_old_single(unsigned int i);
   void back_velocity_to_rz_single(unsigned int i);
-  void step_v_single(EField *e_fld, HField *h_fld,
-                     Time *t, unsigned int i);
+  void boris_pusher_single(EField *e_fld, HField *h_fld,
+                           Time *t, unsigned int i);
 };
