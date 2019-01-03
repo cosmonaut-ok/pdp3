@@ -1154,15 +1154,16 @@ void Particles::boris_pusher_single(EField *e_fld, HField *h_fld,
       isnan(pos[i][2]) ||
       isinf(pos[i][2]) != 0)
   {
-    cerr << "ERROR(step_v): radius[" << i << "] or longitude[" << i << "] is not valid number. Can not continue." << endl;
+    cerr << "ERROR(boris_pusher): radius[" << i << "] or longitude[" << i << "] is not valid number. Can not continue." << endl;
     exit(1);
   }
-  //! \f$ const1 = \frac{q t}{2 m} \f$
-  //! where \f$ q, m \f$ - particle charge and mass, \f$ t = \frac{\Delta t_{step}}{2} \f$
-  const1 = charge_array[i]*t->delta_t/(2 * mass_array[i]);
 
   e = e_fld->get_field(pos[i][0], pos[i][2]);
   b = h_fld->get_field(pos[i][0], pos[i][2]);
+
+  //! \f$ const1 = \frac{q t}{2 m} \f$
+  //! where \f$ q, m \f$ - particle charge and mass, \f$ t = \frac{\Delta t_{step}}{2} \f$
+  const1 = charge_array[i]*t->delta_t/(2 * mass_array[i]);
 
   tinyvec3d::tv_product(e, const1);
   tinyvec3d::tv_product(b, MAGN_CONST * const1);
@@ -1254,6 +1255,110 @@ void Particles::boris_pusher_single(EField *e_fld, HField *h_fld,
   delete [] b;
 }
 
+void Particles::vay_pusher_single(EField *e_fld, HField *h_fld,
+                                  Time *t, unsigned int i)
+{
+  //!
+  //! Vay pusher single
+  //!
+
+  double gamma;
+
+  double const1, const2, sq_velocity;
+  double* e;
+  double* b;
+
+  double momentum[3];
+  double velocity[3];
+  double vtmp[3];
+
+  // check if radius and longitude are correct
+  if (isnan(pos[i][0]) ||
+      isinf(pos[i][0]) != 0 ||
+      isnan(pos[i][2]) ||
+      isinf(pos[i][2]) != 0)
+  {
+    cerr << "ERROR(vay_pusher): radius[" << i << "] or longitude[" << i << "] is not valid number. Can not continue." << endl;
+    exit(1);
+  }
+
+  e = e_fld->get_field(pos[i][0], pos[i][2]);
+  b = h_fld->get_field(pos[i][0], pos[i][2]);
+
+  //! \f$ const1 = \frac{q t}{2 m} \f$
+  //! where \f$ q, m \f$ - particle charge and mass, \f$ t = \frac{\Delta t_{step}}{2} \f$
+  const1 = charge_array[i]*t->delta_t/(2 * mass_array[i]);
+
+  tinyvec3d::tv_product(e, 2 * const1);
+  tinyvec3d::tv_product(b, MAGN_CONST * const1);
+
+  // set velocity vector components and
+  // round very small velicities to avoid exceptions
+  velocity[0] = (abs(vel[i][0]) < MNZL) ? 0 : vel[i][0];
+  velocity[1] = (abs(vel[i][1]) < MNZL) ? 0 : vel[i][1];
+  velocity[2] = (abs(vel[i][2]) < MNZL) ? 0 : vel[i][2];
+
+  // get normalized relativistic momentum \f$ \gamma v \f$
+  sq_velocity = tinyvec3d::tv_squared_sum(velocity);
+  gamma = lib::get_gamma(sq_velocity);
+  tinyvec3d::tv_product(velocity, gamma);
+
+  // ____________________________________________
+  // Part I: Computation of uprime
+
+  tinyvec3d::tv_copy_components(velocity, vtmp);
+
+  // Add Electric field
+  tinyvec3d::tv_product(b, 2 * const1);
+  tinyvec3d::tv_add(velocity, e);
+
+  // Add magnetic field
+  tinyvec3d::tv_product(b, const1);
+
+  sq_velocity = tinyvec3d::tv_squared_sum(vtmp);
+  gamma = lib::get_gamma_inv(sq_velocity);
+
+  velocity[0] += gamma * (vtmp[1] * b[2] - vtmp[2] * b[1]);
+  velocity[1] += gamma * (vtmp[2] * b[0] - vtmp[0] * b[2]);
+  velocity[2] += gamma * (vtmp[0] * b[1] - vtmp[1] * b[0]);
+
+    // alpha is 1 / gamma^2
+    sq_velocity = tinyvec3d::tv_squared_sum(velocity);
+    gamma = lib::get_gamma_inv(sq_velocity);
+
+  double alpha = 1. / gamma / gamma;
+  double B2 = tinyvec3d::tv_squared_sum(b);
+
+  // ___________________________________________
+  // Part II: Computation of Gamma^{i+1}
+
+  // s is sigma
+  double s = alpha - B2;
+  double us2 = pow(tinyvec3d::tv_dot(velocity, b), 2);
+
+  // alpha becomes 1/gamma^{i+1}
+  alpha = 1. / sqrt(0.5 * (s + sqrt(s*s + 4.0*( B2 + us2 ))));
+
+  tinyvec3d::tv_product(b, alpha);
+
+  s = 1. / (1. + tinyvec3d::tv_squared_sum(b));
+  alpha = tinyvec3d::tv_dot(velocity, b);
+
+  vtmp[0] = s * (velocity[0] + alpha * b[0] + b[2] * velocity[1] - b[1] * velocity[2]);
+  vtmp[1] = s * (velocity[1] + alpha * b[1] + b[0] * velocity[2] - b[2] * velocity[0]);
+  vtmp[2] = s * (velocity[2] + alpha * b[2] + b[1] * velocity[0] - b[0] * velocity[1]);
+
+  // Inverse Gamma factor
+  sq_velocity = tinyvec3d::tv_squared_sum(vtmp);
+  gamma = lib::get_gamma_inv(sq_velocity);
+  tinyvec3d::tv_product(vtmp, gamma);
+
+  tinyvec3d::tv_copy_components(vtmp, vel[i]);
+
+  delete [] e;
+  delete [] b;
+}
+
 void Particles::dump_position_to_old_single(unsigned int i)
 {
   pos_old[i][0] = pos[i][0];
@@ -1301,7 +1406,11 @@ void Particles::step_v(EField *e_fld, HField *h_fld, Time *t)
   {
     if (is_alive[i])
     {
+#if defined (PUSHER_BORIS_RELATIVISTIC) || defined (PUSHER_BORIS_ADAPTIVE) || (PUSHER_BORIS_CLASSIC)
       boris_pusher_single(e_fld, h_fld, t, i);
+#elif defined (PUSHER_VAY)
+      vay_pusher_single(e_fld, h_fld, t, i);
+#endif
       //! dump position to old
       dump_position_to_old_single(i);
       //! half step position
