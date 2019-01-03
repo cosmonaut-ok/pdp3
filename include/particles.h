@@ -159,4 +159,6 @@ public:
   void back_velocity_to_rz_single(unsigned int i);
   void boris_pusher_single(EField *e_fld, HField *h_fld,
                            Time *t, unsigned int i);
+  void vay_pusher_single(EField *e_fld, HField *h_fld,
+                         Time *t, unsigned int i);
 };
