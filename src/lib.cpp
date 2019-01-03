@@ -65,7 +65,7 @@ namespace lib
     //! get_gamma_inv takes squared velocity,
     //! only because of some features of code
     //! and optimisation issues
-    double gamma = pow(1.0 + sq_velocity / LIGHT_SPEED_POW_2, 0.5);
+    double gamma = pow(1.0 + sq_velocity / LIGHT_SPEED_POW_2, -0.5);
 
     return gamma;
   }
