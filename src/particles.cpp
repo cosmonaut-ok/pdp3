@@ -1188,7 +1188,7 @@ void Particles::boris_pusher_single(EField *e_fld, HField *h_fld,
 #if defined (PUSHER_BORIS_RELATIVISTIC) || defined (PUSHER_BORIS_ADAPTIVE)
   {
     sq_velocity = tinyvec3d::tv_squared_sum(velocity);
-    gamma = lib::get_gamma_inv(sq_velocity);
+    gamma = lib::get_gamma(sq_velocity);
     tinyvec3d::tv_product(velocity, gamma);
   }
 #endif
@@ -1243,7 +1243,7 @@ void Particles::boris_pusher_single(EField *e_fld, HField *h_fld,
   {
     sq_velocity = tinyvec3d::tv_squared_sum(velocity);
     gamma = lib::get_gamma_inv(sq_velocity);
-    tinyvec3d::tv_div(velocity, gamma);
+    tinyvec3d::tv_product(velocity, gamma);
   }
 #endif
   vel[i][0] = velocity[0];
