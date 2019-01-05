@@ -2,7 +2,6 @@
 
 #include <typeinfo>  //for 'typeid' to work
 
-
 using namespace std;
 using namespace math::fourier;
 
@@ -51,7 +50,7 @@ LoadInitParam::LoadInitParam(char *xml_file_name)
   {
 #ifdef USE_HDF5
 #ifndef LEGACY
-    cerr << "ERROR! HDF5 still not supported by expedimental data mode" << endl;
+    cerr << "ERROR! HDF5 support still not implemented" << endl;
     exit(1);
 #else
     c_io_class = new IOHDF5 (params->dump_result_path, params->dump_result_path, params->dump_compress);
@@ -62,25 +61,25 @@ LoadInitParam::LoadInitParam(char *xml_file_name)
 #endif
   }
   else
-    {
+  {
 #ifndef LEGACY
-      for (auto i = params->probes.begin(); i != params->probes.end(); ++i)
-      {
-	char* dump_data_root = new char[100];
-	sprintf(dump_data_root, "%s/%s", params->dump_result_path, params->dump_data_root);
+    for (auto i = params->probes.begin(); i != params->probes.end(); ++i)
+    {
+      char* dump_data_root = new char[100];
+      sprintf(dump_data_root, "%s/%s", params->dump_result_path, params->dump_data_root);
 
-        ProbePlain *wp = new ProbePlain(
-          dump_data_root, (char*)i->component,
-          i->type, i->r_start, i->z_start, i->r_end, i->z_end,
-          params->dump_compress, params->dump_compress_level,
-          i->schedule);
+      ProbePlain *wp = new ProbePlain(
+        dump_data_root, (char*)i->component,
+        i->type, i->r_start, i->z_start, i->r_end, i->z_end,
+        params->dump_compress, params->dump_compress_level,
+        i->schedule);
 
-        c_probes.push_back(wp);
-      }
-#else
-      c_io_class = new IOText (params->dump_result_path, params->dump_result_path, params->dump_compress);
-#endif
+      c_probes.push_back(wp);
     }
+#else
+    c_io_class = new IOText (params->dump_result_path, params->dump_result_path, params->dump_compress);
+#endif
+  }
 #ifdef LEGACY
   c_io_class->compress_level = params->dump_compress_level;
 #endif
@@ -91,16 +90,12 @@ LoadInitParam::LoadInitParam(char *xml_file_name)
 
   //! 3. load particle parameters
   cout << "Initializing Particles Data" << endl;
-  init_particles();
-
-  //! 4. load particles beam
-  cout << "Initializing Particles Beam Data" << endl;
+  init_particles ();
   current_bunch_number = 0;
-  // init_beam();
 
-  //! 5. load boundary conditions
+  //! 4. load boundary conditions
   cout << "Initializing Boundary Conditions Data" << endl;
-  init_boundary();
+  init_boundary ();
 
   cout << "Initialization complete" << endl;
 }
@@ -126,9 +121,9 @@ void LoadInitParam::init_particles()
   c_rho_bunch = new ChargeDensity(params->geom);
   c_current = new Current(params->geom);
 
-  for (unsigned int i=0; i < params->particle_species.size(); i++)
+  for (auto i = params->particle_species.begin(); i != params->particle_species.end(); ++i)
   {
-    particle_specie p_p = params->particle_species[i];
+    particle_specie p_p = *i;
 
     cout << "  Initializing " << p_p.name << " Data" << endl;
 
@@ -228,7 +223,7 @@ void LoadInitParam::init_beam()
 
 void LoadInitParam::init_boundary ()
 {
-  // //! initialize boundaries and boundary conditions
+  //! initialize boundaries and boundary conditions
 
   // Maxwell initial conditions
   BoundaryMaxwellConditions maxwell_rad(efield); // TODO: WTF?
@@ -240,7 +235,7 @@ void LoadInitParam::init_boundary ()
   if (params->boundary_conditions == 0)
   {
     p_list->charge_weighting(c_rho_new);
-    Fourier four1();
+
     // Seems: https://en.wikipedia.org/wiki/Dirichlet_distribution
     PoissonDirichlet dirih(params->geom);
     dirih.poisson_solve(efield, c_rho_new);
@@ -253,8 +248,8 @@ void LoadInitParam::init_fields ()
   efield = new EField(params->geom);
   hfield = new HField(params->geom);
   efield->boundary_conditions();
-  efield->set_homogeneous_efield(0.0, 0.0, 0.0);
-  hfield->set_homogeneous_h(0.0, 0.0, 0.0);
+  efield->set_homogeneous_efield(0., 0., 0.);
+  hfield->set_homogeneous_h(0.0, 0., 0.);
   efield->set_fi_on_z();
 }
 
@@ -263,13 +258,6 @@ void LoadInitParam::print_data(int probe_type, char* component, int step_number,
   int print_header_step = 20;
   if (printed_step % print_header_step == 0)
   {
-    char avg_step_exec_time[24];
-#ifdef _OPENMP
-    sprintf(avg_step_exec_time, "%.2fs", (double)(time(0) - time_counter) / print_header_step / omp_get_num_threads());
-#else
-    sprintf(avg_step_exec_time, "%.2fs", (double)(time(0) - time_counter) / print_header_step);
-#endif
-    time_counter = time(0);
 
     cout << endl
          << left << setw(8) << "Step"
@@ -278,7 +266,6 @@ void LoadInitParam::print_data(int probe_type, char* component, int step_number,
          << left << setw(21) << "Shape"
          << left << setw(18) << "Model Time (sec)"
          << left << setw(21) << "Simulation Duration"
-         << left << setw(26) << "Avg. step execution time: " << avg_step_exec_time
          << endl;
   }
 
@@ -286,35 +273,35 @@ void LoadInitParam::print_data(int probe_type, char* component, int step_number,
   char probe_shape[100];
 
   switch (probe_type)
-    {
-    case 0:
-      sprintf(type_comp, "frame/%s", component);
-      sprintf(probe_shape, "[%i,%i,%i,%i]", shape[0], shape[1], shape[2], shape[3]);
-      break;
-    case 1:
-      sprintf(type_comp, "column/%s", component);
-      sprintf(probe_shape, "[%i]", shape[1]);
-      break;
-    case 2:
-      sprintf(type_comp, "row/%s", component);
-      sprintf(probe_shape, "[%i]", shape[0]);
-      break;
-    case 3:
-      sprintf(type_comp, "dot/%s", component);
-      sprintf(probe_shape, "[%i,%i]", shape[0], shape[1]);
-      break;
-    case 4:
-      sprintf(type_comp, "mpframe/%s", component);
-      sprintf(probe_shape, "[%i,%i,%i,%i]", shape[0], shape[1], shape[2], shape[3]);
-      break;
-    }
+  {
+  case 0:
+    sprintf(type_comp, "frame/%s", component);
+    sprintf(probe_shape, "[%i,%i,%i,%i]", shape[0], shape[1], shape[2], shape[3]);
+    break;
+  case 1:
+    sprintf(type_comp, "column/%s", component);
+    sprintf(probe_shape, "[%i]", shape[1]);
+    break;
+  case 2:
+    sprintf(type_comp, "row/%s", component);
+    sprintf(probe_shape, "[%i]", shape[0]);
+    break;
+  case 3:
+    sprintf(type_comp, "dot/%s", component);
+    sprintf(probe_shape, "[%i,%i]", shape[0], shape[1]);
+    break;
+  case 4:
+    sprintf(type_comp, "mpframe/%s", component);
+    sprintf(probe_shape, "[%i,%i,%i,%i]", shape[0], shape[1], shape[2], shape[3]);
+    break;
+  }
 
   cout << left << setw(8) << step_number * dump_interval
        << left << setw(13) << step_number
        << left << setw(20) << type_comp
        << left << setw(21) << probe_shape
        << left << setw(18) << params->time->current_time
-       << left << setw(18) << lib::get_simulation_time()
+       << left << setw(18) << lib::get_simulation_duration()
        << endl;
   ++printed_step;
 }
@@ -333,9 +320,10 @@ void LoadInitParam::dump_data(int step_number)
     {
       int file_number;
       if (w->type == 4)
-	file_number = w->step_number;
+        file_number = w->step_number;
       else
-	file_number = floor(w->step_number / params->dump_frames_per_file);
+        file_number = floor(w->step_number / params->dump_frames_per_file);
+
       char file_name[100];
       sprintf(file_name, "%d", file_number);
       int shape[4] = {w->start_r, w->start_z, w->end_r, w->end_z};
@@ -431,139 +419,143 @@ void LoadInitParam::run(void)
   //! THIS IS ENTRY POINT TO MAIN PDP3 CALCULATION LOOP
   cout << endl << "Launch Simulation" << endl << endl;
 
+#ifdef DEBUG
   clock_t the_time = 0;
-  int step_number = 0;
+#endif
+#ifdef LEGACY
   time_t t1 = time(0);
   char avg_step_exec_time[24]; // rounded and formatted average step execution time
+#endif
+  int step_number = 0;
 
   //! Main calculation loop
   while (params->time->current_time < params->time->end_time)
-    {
-      //! Steps:
+  {
+    //! Steps:
 #ifdef DEBUG
-      the_time = 0;
-      cerr << the_time << " sec. loop iteration begin" << endl;
-      the_time = clock();
+    the_time = 0;
+    cerr << the_time << " sec. loop iteration begin" << endl;
+    the_time = clock();
 #endif
 
-      //! 1. inject beam
-      init_beam();
+    //! 1. inject beam
+    init_beam();
 #ifdef DEBUG
-      cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_bunches[i]->bunch_inject" << endl;
-      the_time = clock();
+    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_bunches[i]->bunch_inject" << endl;
+    the_time = clock();
 #endif
 
-      //! 2. Calculate H field
-      hfield->calc_field(efield, params->time);
+    //! 2. Calculate H field
+    hfield->calc_field(efield, params->time);
 #ifdef DEBUG
-      cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: hfield->calc_field" << endl;
-      the_time = clock();
+    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: hfield->calc_field" << endl;
+    the_time = clock();
 #endif
 
-      //! 3. Calculate v
-      c_current->reset_j();
+    //! 3. Calculate v
+    c_current->reset_j();
 #ifdef DEBUG
-      cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_current->reset_j" << endl;
-      the_time = clock();
+    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_current->reset_j" << endl;
+    the_time = clock();
 #endif
 
-      c_rho_old->reset_rho();
+    c_rho_old->reset_rho();
 #ifdef DEBUG
-      cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_rho_old->reset_rho" << endl;
-      the_time = clock();
+    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_rho_old->reset_rho" << endl;
+    the_time = clock();
 #endif
 
-      c_rho_bunch->reset_rho();
+    c_rho_bunch->reset_rho();
 #ifdef DEBUG
-      cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_rho_bunch->reset_rho" << endl;
-      the_time = clock();
+    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_rho_bunch->reset_rho" << endl;
+    the_time = clock();
 #endif
 
-      p_list->step_v(efield, hfield, params->time);
+    p_list->step_v(efield, hfield, params->time);
 #ifdef DEBUG
-      cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: p_list->boris_pusher" << endl;
-      the_time = clock();
+    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: p_list->boris_pusher" << endl;
+    the_time = clock();
 #endif
 
 #ifdef DEBUG
-      cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: full_j_weighting" << endl;
-      the_time = clock();
+    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: full_j_weighting" << endl;
+    the_time = clock();
 #endif
-      p_list->full_j_weighting(c_current, params->time);
+    p_list->full_j_weighting(c_current, params->time);
 
-      //! 5. Calculate E
-      // maxwell_rad.probe_mode_exitation(&geom1,&current1, 1,7e8, time1.current_time);
-      efield->calc_field(hfield, params->time, c_current);
+    //! 5. Calculate E
+    // maxwell_rad.probe_mode_exitation(&geom1,&current1, 1,7e8, time1.current_time);
+    efield->calc_field(hfield, params->time, c_current);
 #ifdef DEBUG
-      cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: efield->calc_field" << endl;
-      the_time = clock();
+    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: efield->calc_field" << endl;
+    the_time = clock();
 #endif
 
-      //! 6. Continuity equation
-      c_rho_new->reset_rho(); // TODO: is it 4?
+    //! 6. Continuity equation
+    c_rho_new->reset_rho(); // TODO: is it 4?
 #ifdef DEBUG
-      cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_rho_new->reset_rho" << endl;
-      the_time = clock();
+    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_rho_new->reset_rho" << endl;
+    the_time = clock();
 #endif
 
-      //! FIXME: for some reason charge_weighting has no effect on result
-      // p_list->charge_weighting(c_rho_new); // continuity equation
+    //! FIXME: for some reason charge_weighting has no effect on result
+    // p_list->charge_weighting(c_rho_new); // continuity equation
 
 #ifdef LEGACY
-      //! print header on every 20 logging steps
-      if  ((int)(params->time->current_time / params->time->delta_t) % (params->dump_data_interval * 20) == 0)
-      {
-        cout << endl
-             << left << setw(8) << "Step"
-             << left << setw(13) << "Saved Frame"
-             << left << setw(18) << "Model Time (sec)"
-             << left << setw(18) << "Simulation Time"
-             << left << setw(34) << "Avg. Step Calculation Time"
-             << endl;
-      }
+    //! print header on every 20 logging steps
+    if  ((int)(params->time->current_time / params->time->delta_t) % (params->dump_data_interval * 20) == 0)
+    {
+      cout << endl
+           << left << setw(8) << "Step"
+           << left << setw(13) << "Saved Frame"
+           << left << setw(18) << "Model Time (sec)"
+           << left << setw(18) << "Simulation Time"
+           << left << setw(34) << "Avg. Step Calculation Time"
+           << endl;
+    }
 
-      //! dump data to corresponding files every `parameters.xml->file_save_parameters->data_dump_interval` steps
-      if  ((int)(params->time->current_time / params->time->delta_t) % params->dump_data_interval == 0)
-      {
+    //! dump data to corresponding files every `parameters.xml->file_save_parameters->data_dump_interval` steps
+    if  ((int)(params->time->current_time / params->time->delta_t) % params->dump_data_interval == 0)
+    {
 #ifdef _OPENMP
-        sprintf(avg_step_exec_time, "%.2fs", (double)(time(0) - t1) / params->dump_data_interval / omp_get_num_threads());
+      sprintf(avg_step_exec_time, "%.2fs", (double)(time(0) - t1) / params->dump_data_interval / omp_get_num_threads());
 #else
-        sprintf(avg_step_exec_time, "%.2fs", (double)(time(0) - t1) / params->dump_data_interval);
+      sprintf(avg_step_exec_time, "%.2fs", (double)(time(0) - t1) / params->dump_data_interval);
 #endif
 
-        cout << left << setw(8) << step_number * params->dump_data_interval
-             << left << setw(13) << step_number
-             << left << setw(18) << params->time->current_time
-             << left << setw(18) << lib::get_simulation_time()
-             << left << setw(34) << avg_step_exec_time
-             << endl;
+      cout << left << setw(8) << step_number * params->dump_data_interval
+           << left << setw(13) << step_number
+           << left << setw(18) << params->time->current_time
+           << left << setw(18) << lib::get_simulation_duration()
+           << left << setw(34) << avg_step_exec_time
+           << endl;
 
-        for (auto i = c_bunches.begin(); i != c_bunches.end(); ++i)
-          (*i)->charge_weighting(c_rho_bunch);
+      for (auto i = c_bunches.begin(); i != c_bunches.end(); ++i)
+        (*i)->charge_weighting(c_rho_bunch);
 
 #ifdef DEBUG
-        cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_bunches[i]->charge_weighting" << endl;
-        the_time = clock();
+      cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_bunches[i]->charge_weighting" << endl;
+      the_time = clock();
 #endif
 
-        dump_data(step_number);
+      dump_data(step_number);
 
 #ifdef DEBUG
-        cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: dump_data" << endl;
-        the_time = clock();
+      cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: dump_data" << endl;
+      the_time = clock();
 #endif
 
-        ++step_number;
-        t1 = time(0);
-      }
+      ++step_number;
+      t1 = time(0);
+    }
 #endif
 
 #ifndef LEGACY
-      for (auto i = c_bunches.begin(); i != c_bunches.end(); ++i)
-        (*i)->charge_weighting(c_rho_bunch);
-      dump_data(step_number);
+    for (auto i = c_bunches.begin(); i != c_bunches.end(); ++i)
+      (*i)->charge_weighting(c_rho_bunch);
+    dump_data(step_number);
 #endif
-      params->time->current_time = params->time->current_time + params->time->delta_t;
-    }
+    params->time->current_time = params->time->current_time + params->time->delta_t;
+  }
   cout << endl << "Simulation Completed" << endl << endl;
 }
