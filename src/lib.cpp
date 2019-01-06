@@ -88,7 +88,7 @@ namespace lib
     return r;
   }
 
-  char* get_simulation_time()
+  char* get_simulation_duration()
   // get the time, spent since simulation launched (in "d h m s" format)
   {
     double time_sec = std::time(nullptr) - SIMULATION_START_TIME;
