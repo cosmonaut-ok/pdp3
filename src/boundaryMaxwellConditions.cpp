@@ -25,14 +25,14 @@ void BoundaryMaxwellConditions::specify_initial_field(Geometry *cyl_geom,
 #pragma omp parallel shared(E_fi_left, E_fi_right, E_fi_upper, n_grid1, n_grid2)
   {
 #pragma omp for
-    for (int i=0;i<(n_grid1);i++)
+    for (unsigned int i=0; i < n_grid1; i++)
     {
       e_fld->field_phi[i][0]=E_fi_left;
       e_fld->field_phi[i][n_grid2-1]=E_fi_right;
     }
 
 #pragma omp for
-    for(int k=0;k<n_grid2;k++)
+    for(unsigned int k=0; k<n_grid2; k++)
       e_fld->field_phi[n_grid1-1][k]=E_fi_upper;
   }
 }
