@@ -33,7 +33,7 @@ Bunch::Bunch (char *p_name,
 #pragma omp parallel for
   for(unsigned int i = 0; i < number; i++)
   {
-    double rand_r = lib::random_reverse(bunch_number + i, 9); // TODO: why 9
+    double rand_r = lib::random_reverse(i, 9); // TODO: why 9
 
     pos[i][0] = (radius - dr) * rand_r + dr / 2;
     pos[i][1] = 0.;
@@ -66,12 +66,7 @@ Bunch::Bunch (char *p_name,
 
   double charge_total = density * PI * radius * radius * b_lenght * charge;
   double charge_total_macro = 0.;
-
-  for (unsigned i=0; i < number; i++)
-    charge_total_macro += charge_array[i];
-
-  cout << "charges: " << charge_total << " " << charge_total_macro << endl;
-
+  int onax = 0;
 }
 
 // Destructor
