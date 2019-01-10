@@ -106,15 +106,13 @@ private:
   double *cos_theta_r;
 
 public:
-  void set_v_0();
-  void set_x_0();
   void reflection();
   void half_step_pos(Time *t);
   void charge_weighting(ChargeDensity *ro1);
   void velocity_distribution(double tempr_ev);
   void load_cylindrical_spatial_distribution(double n1, double n2, double left_plasma_boundary);
   void simple_j_weighting(Time *time1,
-                          Current *j1,
+                          Current *j_r,
                           double radius_new,
                           double longitude_new,
                           double radius_old,
@@ -123,7 +121,7 @@ public:
                           int k_n,
                           int p_number);
   void simple_constrho_j_weighting(Time *time1,
-                                   Current *j1,
+                                   Current *j_r,
                                    double radius_new,
                                    double longitude_new,
                                    double radius_old,
@@ -131,10 +129,10 @@ public:
                                    int i_n,
                                    int k_n,
                                    int p_number);
-  void j_weighting(Time *time1, Current *j1);
+  void j_weighting(Time *time1, Current *j_r);
   void azimuthal_j_weighting(Current *this_j);
   void strict_motion_weighting(Time *time1,
-                               Current *j1,
+                               Current *j_r,
                                double radius_new,
                                double longitude_new,
                                double radius_old,
@@ -162,3 +160,16 @@ public:
   void vay_pusher_single(EField *e_fld, HField *h_fld,
                          Time *t, unsigned int i);
 };
+
+
+
+#define SOME_SHIT_DENSITY_STRICT(q, r, dr, dz, delta_t) \
+  (q) / (PI * 4. * (r) * (dz) * (dz) * (dr) * (delta_t));
+
+#define SOME_SHIT_DENSITY_R(q, r, dr, dz, delta_t) \
+  (q) / (2 * PI * (r) * (dr) * (dz) \
+         * (delta_t) * 2 * (dr));
+
+#define SOME_SHIT_DENSITY_Z(q, r, dr, dz, delta_t) \
+  (q) / (2 * PI * (r) * (dr) * (dz) \
+         * (delta_t) * (dz));

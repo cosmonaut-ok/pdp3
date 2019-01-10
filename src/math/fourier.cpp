@@ -1,7 +1,4 @@
 #include "math/fourier.h"
-// #include <complex>
-// #include "stdio.h"
-// #include "constant.h"
 
 using namespace std;
 using namespace constant;

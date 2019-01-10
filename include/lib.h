@@ -11,6 +11,10 @@
 #include <pmmintrin.h>
 #endif
 
+#ifdef __AVX__
+#include <immintrin.h>//AVX Intrinsic Functions
+#endif
+
 #ifdef _WIN32
 #include <direct.h> // _mkdir
 #endif
@@ -28,6 +32,9 @@ namespace lib
   double get_gamma_inv (double velocity);
   double random_reverse(double vel, int power);
   char* get_simulation_duration();
-  bool directoryExists(const std::string& path);
-  bool makeDirectory(const std::string& path);
+  bool directory_exists(const std::string& path);
+  bool make_directory(const std::string& path);
+  double sq_rt(double x);
+  char *get_cmd_option(char **begin, char **end, const std::string &option);
+  bool cmd_option_exists(char **begin, char **end, const std::string &option);
 }
