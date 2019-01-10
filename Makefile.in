@@ -7,7 +7,7 @@ INCLUDEDIR            = $(ROOTDIR)include
 SUBDIRS               =
 TESTSUBDIRS           = test/unit
 EXES                  = pdp3
-TESTDIR               = testdir
+TESTDIR               = testingdir
 ### Common settings
 CEXTRA                =
 CXXEXTRA              =
@@ -147,11 +147,11 @@ $(TESTSUBDIRS:%=%/__test__): dummy
 
 test-unit: $(TESTSUBDIRS:%=%/__test__)
 
-test: clean all
-	TESTDIR=$(TESTDIR) /bin/bash ./test/functional/test.sh
+test:
+	@python3 ./test/functional/test.py
 
 test-ext: clean all
-	TESTDIR=$(TESTDIR) /bin/bash ./test/functional/test.sh extended
+	@python3 ./test/functional/test.py --type=ext
 
 test-tools: test
 	TESTDIR=$(TESTDIR) /bin/bash ./test/functional/tools.sh
