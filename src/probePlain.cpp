@@ -7,8 +7,8 @@ ProbePlain::ProbePlain(void)
 }
 
 ProbePlain::ProbePlain(char *c_path, char *c_component, int c_type,
-                         int c_start_r, int c_start_z, int c_end_r, int c_end_z,
-                         bool c_compress, int c_compress_level, int c_schedule)
+                       int c_start_r, int c_start_z, int c_end_r, int c_end_z,
+                       bool c_compress, int c_compress_level, int c_schedule)
 {
   strcpy(path, c_path);
   strcpy(component, c_component);
@@ -28,28 +28,28 @@ ProbePlain::ProbePlain(char *c_path, char *c_component, int c_type,
     cerr << "WARNING! compression is not supported by plaintext backend" << endl;
 
   switch (type)
-    {
-    case 0:
-      sprintf(path_result, "%s/%s/frame_%d:%d_%d:%d", c_path, c_component,
-              c_start_r, c_start_z, c_end_r, c_end_z);
-      break;
-    case 1:
-      sprintf(path_result, "%s/%s/col_%d", c_path, c_component, c_start_z);
-      break;
-    case 2:
-      sprintf(path_result, "%s/%s/row_%d", c_path, c_component, c_start_r);
-      break;
-    case 3:
-      sprintf(path_result, "%s/%s/dot_%d_%d", c_path, c_component,
-              c_start_r, c_start_z);
-      break;
-    case 4:
-      sprintf(path_result, "%s/%s/mpframe_%d:%d_%d:%d", c_path, c_component,
-              c_start_r, c_start_z, c_end_r, c_end_z);
-      break;
-    }
+  {
+  case 0:
+    sprintf(path_result, "%s/%s/frame_%d:%d_%d:%d", c_path, c_component,
+            c_start_r, c_start_z, c_end_r, c_end_z);
+    break;
+  case 1:
+    sprintf(path_result, "%s/%s/col_%d", c_path, c_component, c_start_z);
+    break;
+  case 2:
+    sprintf(path_result, "%s/%s/row_%d", c_path, c_component, c_start_r);
+    break;
+  case 3:
+    sprintf(path_result, "%s/%s/dot_%d_%d", c_path, c_component,
+            c_start_r, c_start_z);
+    break;
+  case 4:
+    sprintf(path_result, "%s/%s/mpframe_%d:%d_%d:%d", c_path, c_component,
+            c_start_r, c_start_z, c_end_r, c_end_z);
+    break;
+  }
 
-  lib::makeDirectory(path_result);
+  lib::make_directory(path_result);
 }
 
 ProbePlain::~ProbePlain(void)
@@ -144,20 +144,20 @@ void ProbePlain::write_dot(char *name, double **out_value, bool is_rewrite = fal
 void ProbePlain::write(char *name, double **out_value)
 {
   switch (type)
-    {
-    case 0:
-      write_frame(name, out_value, false);
-      break;
-    case 1:
-      write_col(name, out_value, false);
-      break;
-    case 2:
-      write_row(name, out_value, false);
-      break;
-    case 3:
-      write_dot(name, out_value, false);
-      break;
-    }
+  {
+  case 0:
+    write_frame(name, out_value, false);
+    break;
+  case 1:
+    write_col(name, out_value, false);
+    break;
+  case 2:
+    write_row(name, out_value, false);
+    break;
+  case 3:
+    write_dot(name, out_value, false);
+    break;
+  }
 }
 
 void ProbePlain::mpwrite(char *name, Particles *p_specie)

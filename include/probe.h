@@ -15,17 +15,17 @@ using namespace std;
 
 class Probe
 {
- protected:
+protected:
   char path_result[100];
   char path_dump[100];
 
- protected:
+protected:
   void write_frame(double **data);
   void write_col(double **data);
   void write_row(double **data);
   void write_dot(double **data);
 
- public:
+public:
   char name[100];
   char path[256];
   char component[10];

@@ -29,16 +29,16 @@ void ParticlesList::move_half_reflect(Time *t)
     part_list[i]->move_half_reflect(t);
 }
 
-void ParticlesList::j_weighting(Time *time1, Current *j1)
+void ParticlesList::j_weighting(Time *time1, Current *j_r)
 {
   for(std::size_t i = 0; i < part_list.size(); i++)
-    part_list[i]->j_weighting(time1,j1);
+    part_list[i]->j_weighting(time1,j_r);
 }
 
-void ParticlesList::azimuthal_j_weighting(Time *time1, Current *j1)
+void ParticlesList::azimuthal_j_weighting(Time *time1, Current *j_r)
 {
   for(std::size_t i=0; i<part_list.size(); i++)
-    part_list[i]->azimuthal_j_weighting(j1);
+    part_list[i]->azimuthal_j_weighting(j_r);
 }
 
 void ParticlesList::back_velocity_to_rz()
