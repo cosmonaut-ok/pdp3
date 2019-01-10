@@ -2,7 +2,7 @@
 #include "constant.h"
 
 class PoissonNeumann :
-  public Poisson
+public Poisson
 {
 public:
   PoissonNeumann(Geometry *cyl_geom);

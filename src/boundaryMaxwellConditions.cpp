@@ -19,8 +19,8 @@ void BoundaryMaxwellConditions::specify_initial_field(Geometry *cyl_geom,
                                                         double E_fi_left,
                                                         double E_fi_right)
 {
-  int n_grid1 = cyl_geom->n_grid_1;
-  int n_grid2 = cyl_geom->n_grid_2;
+  int n_grid1 = cyl_geom->n_grid_r;
+  int n_grid2 = cyl_geom->n_grid_z;
 // setazimuthal component electric field initial value
 #pragma omp parallel shared(E_fi_left, E_fi_right, E_fi_upper, n_grid1, n_grid2)
   {

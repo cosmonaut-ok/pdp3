@@ -10,27 +10,20 @@ public:
   Current(void);
   Current(Geometry *geom1);
   ~Current(void);
-  double **get_j1() const;
-  double **get_j2() const;
-  double **get_j3() const;
+  double **get_j_r() const;
+  double **get_j_phi() const;
+  double **get_j_z() const;
 
-  double *get_j1_1d() const;
-  double *get_j2_1d() const;
-  double *get_j3_1d() const;
-
-  void j1_add_1d(double *input);
-  void j2_add_1d(double *input);
-  void j3_add_1d(double *input);
-
-  void inc_j1(int i, int k, double value);
-  void inc_j2(int i, int k, double value);
-  void inc_j3(int i, int k, double value);
+  void inc_j_r(int i, int k, double value);
+  void inc_j_phi(int i, int k, double value);
+  void inc_j_z(int i, int k, double value);
   void reset_j();
+
 protected:
-  double **j1;
-  double **j2;
-  double **j3;
-  double *j1_1d;
-  double *j2_1d;
-  double *j3_1d;
+  double **j_r;
+  double **j_phi;
+  double **j_z;
+  double *j_r_1d;
+  double *j_phi_1d;
+  double *j_z_1d;
 };
