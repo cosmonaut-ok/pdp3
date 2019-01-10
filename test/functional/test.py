@@ -96,6 +96,7 @@ class bootstrap ():
         tools_dir = os.path.join(self.rootdir, 'tools')
 
         print("Copying files to testing directory")
+        print(self.testdir)
         utils.mkdir(self.testdir, True)
         utils.cp(pdp3_file, self.testdir)
         utils.cp(tools_dir, self.testdir)
@@ -152,35 +153,36 @@ class pdp3Test ():
 
         isc = np.allclose(test_data, true_data, rtol=self.r_tol, atol=self.a_tol)
 
-        if not isc and self.verbose:
-            print("Difference in component {}:".format(component_name))
-            for i in range(0, len(true_data)):
-                if abs(test_data[i] - true_data[i]) > self.a_tol + self.r_tol * abs(true_data[i]):
-                    print("number: {}, true data: {}, real data: {}".format(i, true_data[i], test_data[i]))
         if isc:
             print("Data matching for " + component_name + ":" + filename,
                   Fore.BLUE + "PASSED" + Style.RESET_ALL)
         else:
             print("Data matching for " + component_name + ":" + filename,
                   Fore.RED + "FAILED" + Style.RESET_ALL)
+
+        if not isc and self.verbose:
+            print("Difference in component {}:".format(component_name))
+            for i in range(0, len(true_data)):
+                if abs(test_data[i] - true_data[i]) > self.a_tol + self.r_tol * abs(true_data[i]):
+                    print("number: {}, true data: {}, real data: {}".format(i, true_data[i], test_data[i]))
+
         return isc
 
 
-def test_example(template_name, number, accept_ieee=True, rel_tolerance=0.01):
-    verb=False
+def test_example(template_name, number, accept_ieee=True,
+                 rel_tolerance=0.01, verbose=False):
     status=True
-    if LOGLEVEL > 0: verb=True
 
     b = bootstrap(testdir='testingdir',
                   parameters_template_name=template_name,
-                  keep_working_dir=verb, # if verbose, keep working dir for analysis
+                  keep_working_dir=verbose, # if verbose, keep working dir for analysis
                   accept_ieee=accept_ieee,
-                  verbose=verb)
+                  verbose=verbose)
 
     t = pdp3Test(os.path.join(b.testdir, 'parameters.xml'),
                  rel_tolerance=rel_tolerance,
                  abs_tolerance=1) # use abs tolerance to avoid comparing of very small numbers
-    t.verbose = verb
+    t.verbose = verbose
 
     t.components['E_r'] = 'frame_0:0_32:256'
     t.components['E_phi'] = 'frame_32:256_64:512'
@@ -227,7 +229,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     ieee = not args.fastmath
-    LOGLEVEL = args.verbose
     status = True
 
     if args.type == 'smoke':
@@ -236,14 +237,16 @@ if __name__ == "__main__":
         else:
             rtol = 0.1
         status = test_example('parameters.xml.tmpl', 4,
-                              accept_ieee=ieee, rel_tolerance=rtol)
+                              accept_ieee=ieee, rel_tolerance=rtol,
+                              verbose=args.verbose)
     elif args.type == 'ext':
         if ieee:
             rtol = 0.001
         else:
             rtol = 0.25
         status = test_example('parameters_ext.xml.tmpl', 11,
-                              accept_ieee=ieee, rel_tolerance=rtol)
+                              accept_ieee=ieee, rel_tolerance=rtol,
+                              verbose=args.verbose)
     else:
         raise Exception("there is no test type {}".format(args.type))
 
