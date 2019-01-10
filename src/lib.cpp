@@ -11,13 +11,27 @@ namespace lib
   using std::isnan;
 #endif
 
-#ifdef __SSE__
-  float sqrt_recip(float x)
+#ifdef __AVX__
+  double sqrt_recip(double x)
   {
-    //! 1/sqrt(x), using MMX and Newton-Raphson approximation
-    return _mm_cvtss_f32( _mm_rsqrt_ss( _mm_set_ps1(x) ) ); //same as _mm_set1_ps
+    //! 1/sqrt(x), using AVX squared root procedure
+    double d[4];
+    __m256d c = _mm256_sqrt_pd(_mm256_set_pd(x, 0, 0, 0));
+
+    _mm256_store_pd(d, c);
+
+    return d[3];
   }
 #endif
+
+  double sq_rt(double x)
+  {
+#if defined (__AVX__) // && defined (EXPERIMENTAL)
+    return sqrt_recip(x);
+#else
+    return sqrt(x);
+#endif
+  }
 
   bool to_bool(string str)
   {
@@ -40,24 +54,19 @@ namespace lib
     if (beta > 1) // it's VERY BAD! Beta should not be more, than 1
     {
       cerr << "CRITICAL!(get_gamma): Lorentz factor aka gamma is complex. Can not continue." << endl
-           << "\tvelocity is: " << sqrt(sq_velocity) << endl;
+           << "\tvelocity is: " << sq_rt(sq_velocity) << endl;
       exit(1);
     }
 
-#if defined (__SSE__) && defined (EXPERIMENTAL)
-    gamma = sqrt_recip(1.0 - beta);
-#else
-    gamma = pow(1.0 - beta, -0.5);
-#endif
+    gamma = 1 / sq_rt(1.0 - beta);
 
-    if (isinf(gamma) == 1) { // avoid infinity values
-      cerr << "WARNING(get_gamma): gamma (Lorenz factor) girects to infinity for velocity" << sqrt(sq_velocity) << endl;
+    if (isinf(gamma) == 1)
+    { // avoid infinity values
+      cerr << "WARNING(get_gamma): gamma (Lorenz factor) girects to infinity for velocity" << sq_rt(sq_velocity) << endl;
       return 1e100; // just return some very big value
     }
     else
-    {
       return gamma;
-    }
   }
 
   double get_gamma_inv (double sq_velocity)
@@ -129,7 +138,7 @@ namespace lib
   }
 
 // Make directory and check if it exists
-  bool directoryExists(const std::string& path)
+  bool directory_exists(const std::string& path)
   {
 #ifdef _WIN32
     struct _stat info;
@@ -144,7 +153,7 @@ namespace lib
 #endif
   }
 
-  bool makeDirectory(const std::string& path)
+  bool make_directory(const std::string& path)
   {
 #ifdef DEBUG
     cerr << "Creating directory " << path << endl;
@@ -171,7 +180,7 @@ namespace lib
       if (pos == std::string::npos)
 #endif
         return false;
-      if (!makeDirectory(path.substr(0, pos)))
+      if (!make_directory(path.substr(0, pos)))
         return false;
     }
     // now, try to create again
@@ -183,10 +192,24 @@ namespace lib
 
     case EEXIST:
       // done!
-      return directoryExists(path);
+      return directory_exists(path);
 
     default:
       return false;
     }
   }
+
+  char *get_cmd_option(char **begin, char **end, const std::string &option)
+  {
+    char * *itr = std::find(begin, end, option);
+    if (itr != end && ++itr != end)
+      return *itr;
+    return 0;
+  }
+
+  bool cmd_option_exists(char **begin, char **end, const std::string &option)
+  {
+    return std::find(begin, end, option) != end;
+  }
+
 }

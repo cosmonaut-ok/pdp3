@@ -49,8 +49,8 @@ public:
                   int number,
                   int particles_number);
   void out_pos_dump(char *comp_name,
-                      double **pos,
-                      int particles_number);
+                    double **pos,
+                    int particles_number);
   void out_velocity_dump(char *comp_name,
                          double **vel,
                          int particles_number);

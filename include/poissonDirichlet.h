@@ -1,7 +1,7 @@
 #include "poisson.h"
 
 class PoissonDirichlet :
-  public Poisson
+public Poisson
 {
 public:
   PoissonDirichlet(Geometry *cyl_geom);
