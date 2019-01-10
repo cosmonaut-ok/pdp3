@@ -11,6 +11,8 @@ import argparse
 
 import jinja2 as j2
 
+import colorama
+from colorama import Fore, Back, Style
 LOGLEVEL=0
 
 me = os.path.realpath(os.path.dirname(__file__))
@@ -156,13 +158,17 @@ class pdp3Test ():
                 if abs(test_data[i] - true_data[i]) > self.a_tol + self.r_tol * abs(true_data[i]):
                     print("number: {}, true data: {}, real data: {}".format(i, true_data[i], test_data[i]))
         if isc:
-            print("Data matching for " + component_name + ":" + filename, "PASSED")
+            print("Data matching for " + component_name + ":" + filename,
+                  Fore.BLUE + "PASSED" + Style.RESET_ALL)
         else:
-            print("Data matching for " + component_name + ":" + filename, "FAILED")
+            print("Data matching for " + component_name + ":" + filename,
+                  Fore.RED + "FAILED" + Style.RESET_ALL)
         return isc
 
 
 def test_example(template_name, number, accept_ieee=True, rel_tolerance=0.01):
+    verb=False
+    status=True
     if LOGLEVEL > 0: verb=True
 
     b = bootstrap(testdir='testingdir',
@@ -196,13 +202,18 @@ def test_example(template_name, number, accept_ieee=True, rel_tolerance=0.01):
 
     components = ['E_r', 'E_phi', 'E_z', 'H_r', 'H_phi', 'H_z', 'J_r', 'J_phi', 'J_z', 'rho_beam']
     for i in components:
-        t.compare(i, '{}.dat'.format(number))
+        s = t.compare(i, '{}.dat'.format(number))
+        if status: status = s
 
     for i in ['Electrons', 'Ions']:
         for j in ['vel', 'pos']:
             for k in ['r', 'z']:
-                t.compare(i, "{}_{}_{}.dat".format(number, j, k))
-        t.compare(i, "{}_vel_phi.dat".format(number))
+                s = t.compare(i, "{}_{}_{}.dat".format(number, j, k))
+                if status: status = s
+        s = t.compare(i, "{}_vel_phi.dat".format(number))
+        if status: status = s
+
+    return status
 
 
 if __name__ == "__main__":
@@ -217,20 +228,26 @@ if __name__ == "__main__":
 
     ieee = not args.fastmath
     LOGLEVEL = args.verbose
+    status = True
 
     if args.type == 'smoke':
         if ieee:
             rtol = 0.001
         else:
             rtol = 0.1
-        test_example('parameters.xml.tmpl', 4,
-                     accept_ieee=ieee, rel_tolerance=rtol)
+        status = test_example('parameters.xml.tmpl', 4,
+                              accept_ieee=ieee, rel_tolerance=rtol)
     elif args.type == 'ext':
         if ieee:
             rtol = 0.001
         else:
             rtol = 0.25
-        test_example('parameters_ext.xml.tmpl', 11,
-                     accept_ieee=ieee, rel_tolerance=rtol)
+        status = test_example('parameters_ext.xml.tmpl', 11,
+                              accept_ieee=ieee, rel_tolerance=rtol)
     else:
         raise Exception("there is no test type {}".format(args.type))
+
+    if status:
+        print(Fore.BLUE + "Test PASSED" + Style.RESET_ALL)
+    else:
+        print(Fore.RED + "Test FAILED" + Style.RESET_ALL)

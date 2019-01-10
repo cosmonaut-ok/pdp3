@@ -4,7 +4,7 @@ variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
 before_script:
-  - apt-get -y -qq install build-essential git autoconf imagemagick doxygen pandoc pandoc-citeproc || true
+  - apt-get -y -qq install build-essential git autoconf imagemagick doxygen pandoc pandoc-citeproc python3-numpy python3-colorama || true
 
 stages:
   - build
@@ -26,7 +26,7 @@ build:
 
 test:
   stage: test
-  dependencies: 
+  dependencies:
     - build
   tags:
     - plasma
@@ -35,7 +35,7 @@ test:
 
 doc:
   stage: postbuild
-  dependencies: 
+  dependencies:
     - build
   tags:
     - plasma
