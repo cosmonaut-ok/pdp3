@@ -5,10 +5,10 @@
 class Geometry
 {
 public:
-  double first_size;
-  double second_size;
-  int n_grid_1;
-  int n_grid_2;
+  double r_size;
+  double z_size;
+  int n_grid_r;
+  int n_grid_z;
   double dr;
   double dz;
   double **epsilon;
@@ -19,9 +19,9 @@ public:
 
   void set_epsilon();
   void set_pml(double comparative_l_1, double comparative_l_2, double comparative_l_3,
-              double sigma1, double sigma2);
+               double sigma1, double sigma2);
 
-	Geometry(double fs, double ss, int ng1, int ng2);
+	Geometry(double rs, double zs, int ngr, int ngz);
   Geometry();
 
   ~Geometry(void);

@@ -27,7 +27,7 @@ LoadInitParam::LoadInitParam(char *xml_file_name)
 #else
   int cores = omp_get_num_procs();
   cerr << "INFO! Number of calculation processors: " << cores << endl;
-  omp_set_dynamic(0);         // Explicitly disable dynamic teams
+  omp_set_dynamic(0); // Explicitly disable dynamic teams
   omp_set_num_threads(cores); // Use 4 threads for all consecutive parallel regions
 #endif
 #endif
@@ -36,12 +36,12 @@ LoadInitParam::LoadInitParam(char *xml_file_name)
   //! Steps to initialize:
 
   //! 1. read XML config file
-  cout << "Reading configuration file ``" << xml_file_name << "``" << endl;
+  cerr << "INFO! Reading configuration file ``" << xml_file_name << "``" << endl;
   params = new Parameters(xml_file_name);
   // read_xml(xml_file_name);
 
   //! 2. load File Saving Paths
-  cout << "Initializing File Saving Paths" << endl;
+  cerr << "INFO! Initializing File Saving Paths" << endl;
   //! initialize file saving parameters, like path to computed data files,
   //! path to system state data files max frames number, placed to one file etc.
   // c_io_class = new InputOutputClass (params->dump_result_path, params->dump_save_state_path);
@@ -85,19 +85,19 @@ LoadInitParam::LoadInitParam(char *xml_file_name)
 #endif
 
   //! 2. creating field objects
-  cout << "Initializing E/M Fields Data" << endl;
+  cerr << "INFO! Initializing E/M Fields Data" << endl;
   init_fields ();
 
   //! 3. load particle parameters
-  cout << "Initializing Particles Data" << endl;
+  cerr << "INFO! Initializing Particles Data" << endl;
   init_particles ();
   current_bunch_number = 0;
 
   //! 4. load boundary conditions
-  cout << "Initializing Boundary Conditions Data" << endl;
+  cerr << "INFO! Initializing Boundary Conditions Data" << endl;
   init_boundary ();
 
-  cout << "Initialization complete" << endl;
+  cerr << "INFO! Initialization complete" << endl;
 }
 
 LoadInitParam::~LoadInitParam(void)
@@ -125,7 +125,7 @@ void LoadInitParam::init_particles()
   {
     particle_specie p_p = *i;
 
-    cout << "  Initializing " << p_p.name << " Data" << endl;
+    cerr << "      Initializing " << p_p.name << " Data" << endl;
 
     //! init and setup particles properties
     prtls = new Particles(p_p.name, p_p.charge, p_p.mass, p_p.number_macro, params->geom);
@@ -158,7 +158,7 @@ void LoadInitParam::init_beam()
 
   double estimated_bunch_erase_number = (
     params->time->current_time
-    - params->geom->second_size / params->beam_initial_velocity
+    - params->geom->z_size / params->beam_initial_velocity
     - duration )
     / (duration + hole_duration);
 
@@ -345,11 +345,11 @@ void LoadInitParam::dump_data(int step_number)
         w->write(file_name, hfield->field_z);
       //
       else if (strcmp(w->component, "J_r") == 0)
-        w->write(file_name, c_current->get_j1());
+        w->write(file_name, c_current->get_j_r());
       else if (strcmp(w->component, "J_phi") == 0)
-        w->write(file_name, c_current->get_j2());
+        w->write(file_name, c_current->get_j_phi());
       else if (strcmp(w->component, "J_z") == 0)
-        w->write(file_name, c_current->get_j3());
+        w->write(file_name, c_current->get_j_z());
       //
       else if (strcmp(w->component, "rho_beam") == 0)
         w->write(file_name, c_rho_bunch->get_rho());
@@ -369,46 +369,46 @@ void LoadInitParam::dump_data(int step_number)
 #else
   if (params->dump_e_r)
     c_io_class->out_data("E_r", efield->field_r, step_number,
-                         params->dump_frames_per_file, params->geom->n_grid_1 - 1, params->geom->n_grid_2 - 1);
+                         params->dump_frames_per_file, params->geom->n_grid_r - 1, params->geom->n_grid_z - 1);
 
   if (params->dump_e_phi)
     c_io_class->out_data("E_phi", efield->field_phi, step_number,
-                         params->dump_frames_per_file, params->geom->n_grid_1 - 1, params->geom->n_grid_2 - 1);
+                         params->dump_frames_per_file, params->geom->n_grid_r - 1, params->geom->n_grid_z - 1);
 
   if (params->dump_e_z)
     c_io_class->out_data("E_z", efield->field_z, step_number,
-                         params->dump_frames_per_file, params->geom->n_grid_1 - 1, params->geom->n_grid_2 - 1);
+                         params->dump_frames_per_file, params->geom->n_grid_r - 1, params->geom->n_grid_z - 1);
 
   // magnetic fields
   if (params->dump_h_r)
     c_io_class->out_data("H_r", hfield->field_r, step_number,
-                         params->dump_frames_per_file, params->geom->n_grid_1 - 1, params->geom->n_grid_2 - 1);
+                         params->dump_frames_per_file, params->geom->n_grid_r - 1, params->geom->n_grid_z - 1);
 
   if (params->dump_h_phi)
     c_io_class->out_data("H_phi", hfield->field_phi, step_number,
-                         params->dump_frames_per_file, params->geom->n_grid_1 - 1, params->geom->n_grid_2 - 1);
+                         params->dump_frames_per_file, params->geom->n_grid_r - 1, params->geom->n_grid_z - 1);
 
   if (params->dump_h_z)
     c_io_class->out_data("H_z", hfield->field_z, step_number,
-                         params->dump_frames_per_file, params->geom->n_grid_1 - 1, params->geom->n_grid_2 - 1);
+                         params->dump_frames_per_file, params->geom->n_grid_r - 1, params->geom->n_grid_z - 1);
 
   // currents
   if (params->dump_current_r)
-    c_io_class->out_data("J_r", c_current->get_j1(), step_number,
-                         params->dump_frames_per_file, params->geom->n_grid_1 - 1, params->geom->n_grid_2 - 1);
+    c_io_class->out_data("J_r", c_current->get_j_r(), step_number,
+                         params->dump_frames_per_file, params->geom->n_grid_r - 1, params->geom->n_grid_z - 1);
 
   if (params->dump_current_phi)
-    c_io_class->out_data("J_phi", c_current->get_j2(), step_number,
-                         params->dump_frames_per_file, params->geom->n_grid_1 - 1, params->geom->n_grid_2 - 1);
+    c_io_class->out_data("J_phi", c_current->get_j_phi(), step_number,
+                         params->dump_frames_per_file, params->geom->n_grid_r - 1, params->geom->n_grid_z - 1);
 
   if (params->dump_current_z)
-    c_io_class->out_data("J_z", c_current->get_j3(), step_number,
-                         params->dump_frames_per_file, params->geom->n_grid_1 - 1, params->geom->n_grid_2 - 1);
+    c_io_class->out_data("J_z", c_current->get_j_z(), step_number,
+                         params->dump_frames_per_file, params->geom->n_grid_r - 1, params->geom->n_grid_z - 1);
 
   // beam density
   if (params->dump_rho_beam)
     c_io_class->out_data("rho_beam", c_rho_bunch->get_rho(), step_number,
-                         params->dump_frames_per_file, params->geom->n_grid_1 - 1, params->geom->n_grid_2 - 1);
+                         params->dump_frames_per_file, params->geom->n_grid_r - 1, params->geom->n_grid_z - 1);
 
 #endif
 }

@@ -19,7 +19,7 @@ IOHDF5::IOHDF5(char *c_pathres, char *c_pathdump, bool c_compress)
 #ifdef DEBUG
   cerr << "Creating directory " << path_data << endl;
 #endif
-  lib::makeDirectory(path_data);
+  lib::make_directory(path_data);
 
   strcpy(hdf5_file, path_data);
   strcat(hdf5_file, "data.h5");
