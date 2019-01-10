@@ -30,7 +30,6 @@ Bunch::Bunch (char *p_name,
   double dr = geom1->dr;
   double dz = geom1->dz;
 
-#pragma omp parallel for
   for(unsigned int i = 0; i < number; i++)
   {
     double rand_r = lib::random_reverse(i, 9); // TODO: why 9
@@ -44,7 +43,10 @@ Bunch::Bunch (char *p_name,
     vel[i][1] = 0.;
     vel[i][2] = 0.;
 
-    v_total += 2 * PI * pos[i][0] * dr * dz;
+    if (pos[i][0] > dr)
+      v_total += 2 * PI * pos[i][0] * dr * dz;
+    else
+      v_total += PI * pos[i][0] * pos[i][0] * dz;
   }
 
   // average volume of single macroparticle
@@ -54,7 +56,11 @@ Bunch::Bunch (char *p_name,
   for (unsigned int i = 0; i < number; i++)
   {
     // coefitient of normalization
-    double norm =  2 * PI * pos[i][0] * dr * dz / v_avg;
+    double norm;
+    if (pos[i][0] > dr)
+      norm = 2 * PI * pos[i][0] * dr * dz / v_avg;
+    else
+      norm = PI * pos[i][0] * pos[i][0] * dz / v_avg;
 
     // number of real particles per macroparticle
     double n_per_macro = n_per_macro_avg * norm;
@@ -113,8 +119,8 @@ void Bunch::reflection_single(unsigned int i)
 {
   double dr = geom1->dr;
   double dz = geom1->dz;
-  double radius_wall = geom1->first_size - dr / 2.;
-  double longitude_wall = geom1->second_size - dz / 2.;
+  double radius_wall = geom1->r_size - dr / 2.;
+  double longitude_wall = geom1->z_size - dz / 2.;
   double half_dr = dr / 2.;
   double half_dz = dz / 2.;
 
