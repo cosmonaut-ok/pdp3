@@ -304,8 +304,7 @@ x64/
 *.a
 pdp3
 pdp3_result/
-testdir/
-testdir_h5/
+testingdir/
 GPATH
 GRTAGS
 GTAGS
