@@ -8,6 +8,7 @@ import shutil
 import subprocess
 import gzip
 import argparse
+from scipy.fftpack import fft
 
 import jinja2 as j2
 
@@ -17,9 +18,16 @@ LOGLEVEL=0
 
 me = os.path.realpath(os.path.dirname(__file__))
 
+regression_dir = os.path.join(os.sep, 'home', 'cosmonaut', 'regression')
+
 sys.path.append(me + '/../../tools/')
 
 from lib.parameters import Parameters
+from lib.plot_builder import PlotBuilder
+from lib.h5_reader import H5Reader
+from lib.plain_reader import PlainReader
+
+## end import path
 
 class Util ():
     def __init__(self):
@@ -216,6 +224,28 @@ def test_example(template_name, number, accept_ieee=True,
         if status: status = s
 
     return status
+
+
+def regression_test_example(template_name, accept_ieee=True, verbose=False):
+    status=True
+
+    # regression_dir
+
+    b = bootstrap(testdir='testingdir',
+                  parameters_template_name=template_name,
+                  keep_working_dir=verbose, # if verbose, keep working dir for analysis
+                  accept_ieee=accept_ieee,
+                  verbose=verbose)
+
+    t = pdp3Test(os.path.join(b.testdir, 'parameters.xml'),
+                 rel_tolerance=rel_tolerance,
+                 abs_tolerance=1) # use abs tolerance to avoid comparing of very small numbers
+    t.verbose = verbose
+    ##
+
+
+    return status
+
 
 
 if __name__ == "__main__":
