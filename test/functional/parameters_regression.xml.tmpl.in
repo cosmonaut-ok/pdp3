@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2011 rel. 2 -->
+<initial_parameters>
+  <debug>false</debug>
+
+  <use_hdf5>@HDF5_OPTION@</use_hdf5>
+
+  <geometry>
+    <r_size>0.15</r_size>      <!-- model radial size -->
+    <z_size>1.2</z_size>          <!-- model longitudal size-->
+    <n_grid_r>255</n_grid_r>    <!-- number of strips in model grid in radial direction -->
+    <n_grid_z>2047</n_grid_z>   <!-- number of strips in model grid in longitudal direction -->
+    <debug_n_grid_r>127</debug_n_grid_r>
+    <debug_n_grid_z>1023</debug_n_grid_z>
+  </geometry>
+
+  <pml>
+    <comparative_l_1>0</comparative_l_1>  <!-- left boundary -->
+    <comparative_l_2>0</comparative_l_2>  <!-- right boundary -->
+    <comparative_l_3>0</comparative_l_3>  <!-- top boundary -->
+    <sigma_1>1e-5</sigma_1>
+    <sigma_2>1.5</sigma_2>
+  </pml>
+
+  <time>
+    <start_time>0</start_time>
+    <relaxation_time>0</relaxation_time>
+    <current_time>0</current_time>
+    <end_time>1.1e-8</end_time>
+    <step_interval>1e-12</step_interval> <!-- time interval in one time-step -->
+  </time>
+
+  <!-- number_of_part_kinds: 2 -->
+
+  <particles>
+    <particle_specie name="electrons">
+      <charge>-1</charge>       <!-- physical particle charge-->
+      <mass>1</mass>            <!-- physical particle mass -->
+      <number_macro>5e5</number_macro> <!-- number of macroparticles in whole modeling volume -->
+      <debug_number_macro>5e4</debug_number_macro>
+      <left_density>1e17</left_density> <!-- physical particles density -->
+      <right_density>1.05e17</right_density>
+      <temperature>1.0</temperature> <!-- temperature of particle gas (in eV) -->
+    </particle_specie>
+
+    <particle_specie name="ions">
+      <charge>1</charge>
+      <mass>1836</mass> <!-- electron mass -->
+      <number_macro>5e5</number_macro>
+      <debug_number_macro>5e4</debug_number_macro>
+      <left_density>1e17</left_density>
+      <right_density>1.05e17</right_density>
+      <temperature>0.1</temperature>
+    </particle_specie>
+  </particles>
+
+  <particle_beam name="electron_beam">
+    <charge>-1</charge>         <!-- physical particles charge in particle beam -->
+    <mass>1</mass>              <!-- physical particles mass in particle beam -->
+    <initial_velocity>2.8e8</initial_velocity> <!-- beam bunches initial velocity -->
+    <number_bunches>100</number_bunches>       <!-- number of bunches in particle beam -->
+    <bunches_distance>0.0914</bunches_distance> <!-- distance between bunches in beam -->
+
+    <bunch_number_macro>5e5</bunch_number_macro> <!-- number of macroparticles in bunch -->
+    <debug_bunch_number_macro>5e4</debug_bunch_number_macro>
+
+    <!-- <bunch_length>0.017</bunch_length> -->
+    <bunch_length>0.0056</bunch_length> <!-- length of single bunch in beam -->
+    <bunch_radius>0.005</bunch_radius> <!-- radius of bunches in beam -->
+    <bunch_density>5e16</bunch_density> <!-- physical particles density in beam bunch -->
+  </particle_beam>
+
+  <boundary_maxwell_conditions>
+    <e_fi_upper>0</e_fi_upper>
+    <e_fi_left>0</e_fi_left>
+    <e_fi_right>0</e_fi_right>
+  </boundary_maxwell_conditions>
+
+  <boundary_conditions type = "dirichlet">0</boundary_conditions>
+
+  <file_save_parameters>
+    <result_path>{{result_path}}</result_path>              <!-- path to modeling results data -->
+    <data_root>{{data_root}}</data_root>              <!-- path to modeling results data -->
+    <frames_per_file>2</frames_per_file> <!-- how many image frames should be placed in one data file -->
+    <compress>false</compress>
+    <compress_level>1</compress_level>
+
+    <probes>
+      <probe type="dot" r="34" z="341" schedule="50" component="E_r" />
+      <probe type="dot" r="34" z="341" schedule="50" component="E_z" />
+      <probe type="dot" r="34" z="341" schedule="50" component="H_phi" />
+
+      <probe type="mpframe" r_start="90" r_end="130" z_start="1000" z_end="1200" schedule="50" component="electrons" />
+      <probe type="mpframe" r_start="90" r_end="130" z_start="1000" z_end="1200" schedule="50" component="ions" />
+
+      <probe type="frame" r_start="0" z_start="0" r_end="100" z_end="500" schedule="50" component="E_r" />
+      <probe type="frame" r_start="0" z_start="0" r_end="100" z_end="500" schedule="50" component="E_z" />
+      <probe type="frame" r_start="0" z_start="0" r_end="100" z_end="500" schedule="50" component="rho_beam" />
+    </probes>
+  </file_save_parameters>
+
+  <plot>
+    <subplot>
+      <cmap>terrain</cmap>
+      <number_x_ticks>20</number_x_ticks>
+      <number_y_ticks>8</number_y_ticks>
+      <number_z_ticks>20</number_z_ticks>
+      <number_cbar_ticks>5</number_cbar_ticks>
+    </subplot>
+    <figure>
+      <color>None</color>
+      <width>10.5</width>
+      <height>7</height>
+      <dpi>100</dpi>
+      <font>
+        <family>sans-serif</family>
+        <size>10</size>
+        <name>DejaVu Sans</name>
+      </font>
+    </figure>
+    <video>
+      <codec>mjpeg</codec>
+      <fps>20</fps>
+      <bitrate>32000</bitrate>
+    </video>
+  </plot>
+
+</initial_parameters>
