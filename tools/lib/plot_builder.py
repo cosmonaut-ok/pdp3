@@ -283,3 +283,6 @@ class PlotBuilder:
         ''' Redraw figure (can be used for animation and video writing) '''
         self.__figure__.canvas.draw_idle()
         self.__figure__.canvas.flush_events()
+
+    def save(self, file):
+        self.__figure__.savefig(file)

@@ -9,8 +9,14 @@ int main(int argc, char **argv)
 
   if (lib::cmd_option_exists(argv, argv+argc, "-h"))
   {
-    cerr << "USAGE:" << endl << "  pdp3 [ -f configfile_path ]" << endl;
+    cerr << "USAGE:" << endl << "  pdp3 [ --version | -f path/to/parameters.xml ]" << endl;
     return 1;
+  }
+
+  if (lib::cmd_option_exists(argv, argv+argc, "--version"))
+  {
+    cerr << PACKAGE_NAME << " " << PACKAGE_VERSION << endl;
+    return 0;
   }
 
   if (lib::cmd_option_exists(argv, argv+argc, "-f"))
