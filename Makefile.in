@@ -146,11 +146,14 @@ $(TESTSUBDIRS:%=%/__test__): dummy
 
 test-unit: $(TESTSUBDIRS:%=%/__test__)
 
-test:
+test: clean
 	@python3 ./test/functional/test.py
 
-test-ext: clean all
+test-ext: clean
 	@python3 ./test/functional/test.py --type=ext
+
+test-regression: clean
+	@python3 ./test/functional/test.py --type=regression --fastmath
 
 test-tools: test
 	TESTDIR=$(TESTDIR) /bin/bash ./test/functional/tools.sh
