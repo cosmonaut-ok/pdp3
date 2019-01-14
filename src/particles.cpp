@@ -399,121 +399,7 @@ void Particles::load_cylindrical_spatial_distribution(double n1, double n2, doub
   }
 }
 
-// void Particles::simple_j_weighting(Time *time1,
-//                                    Current *el_current,
-//                                    double radius_new,
-//                                    double longitude_new,
-//                                    double radius_old,
-//                                    double longitude_old,
-//                                    int i_n,
-//                                    int k_n,
-//                                    int p_number)
-// {
-//   double dr = geom1->dr;
-//   double dz = geom1->dz;
-//   double wj = 0;
-//   double delta_t = time1->delta_t;
-
-//   // distance of particle moving //
-//   double delta_r = radius_new - radius_old;
-//   double delta_z = longitude_new - longitude_old;
-
-//   if ((abs(delta_r) < MNZL) || (abs(delta_z) < MNZL)) // MNZL see constant.h
-//     return;
-//   // if i cell is not equal 0
-//   if (i_n>=1)
-//   {
-//     // equation y = k*x + b; //
-//     // finding k & b //
-//     double k = delta_r / delta_z;
-//     double b = radius_old;
-//     // calculate current jz in [i,k] cell //
-//     wj = charge_array[p_number] / (2 * dr * dz * delta_t * 2 * PI * i_n * dr * dr) *
-//       (dr * delta_z - k * delta_z * delta_z / 2. - delta_z * b + dr * dr / k *
-//        ((i_n + 0.5) * (i_n + 0.5)-0.25) * log((k * delta_z + b) / b));
-//     // set new weighting current value
-//     el_current->inc_j_z(i_n,k_n, wj);
-
-//     // calculate current in [i + 1,k] cell //
-//     wj = charge_array[p_number] / (2 * dr * dz * delta_t * 2 * PI * (i_n + 1) * dr * dr) *
-//       (k * delta_z * delta_z / 2. + delta_z * b + delta_z * dr + dr * dr / k *
-//        (0.25-(i_n + 0.5) * (i_n + 0.5)) * log((k * delta_z + b) / b));
-//     // set new weighting current value
-//     el_current->inc_j_z(i_n + 1,k_n, wj);
-
-//     ////////////////////////////////// /
-//     // calculate current jr in [i,k] cell //
-//     // equation y = k * x + b; //
-//     // finding k & b //
-//     k = -delta_z / delta_r;
-//     double r0 = (i_n + 0.5) * dr;
-//     double r1 =  radius_old;
-//     b= (k_n + 1.) * dz - longitude_old;
-
-//     // weighting jr in [i][k] cell
-//     wj = charge_array[p_number] / (2 * PI * r0 * dz * dz * dr * delta_t) *
-//       (r0 * k * delta_r + k / 2. * delta_r * (radius_old + delta_r / 2.) + 0.5 * delta_r *
-//        (b-k * (2 * r0 + r1)) + delta_r * (b-k * r1) * (4 * r0 * r0-dr * dr) / (8 * radius_old * (radius_old + delta_r)) +
-//        (k * (r0 * r0 / 2.-dr * dr / 8.)) * log((radius_old + delta_r) / radius_old));
-//     el_current->inc_j_r(i_n,k_n, wj);
-
-//     b= longitude_old- k_n * dz;;
-//     // weighting jr in [i][k + 1] cell
-//     wj = charge_array[p_number] / (2 * PI * r0 * dz * dz * dr * delta_t) *
-//       (-r0 * k * delta_r - k / 2. * delta_r * (radius_old + delta_r / 2.) + 0.5 * delta_r *
-//        (b + k * (2 * r0 + r1)) + delta_r * (b + k * r1) * (4 * r0 * r0-dr * dr) / (8 * radius_old * (radius_old + delta_r)) -
-//        (k * (r0 * r0 / 2.-dr * dr / 8.)) * log((radius_old + delta_r) / radius_old));
-//     el_current->inc_j_r(i_n, k_n + 1, wj);
-//   }
-//   // if i cell is equal 0
-//   else
-//   {
-//     // equation y = k * x + b; //
-//     // finding k & b //
-//     double k = delta_r / delta_z;
-//     double b = radius_old;
-//     // calculate current jz in [i,k] cell //
-//     wj = charge_array[p_number] / (2. * dr * dz * delta_t * PI * dr * dr / 4.) *
-//       (dr * delta_z - k * delta_z * delta_z / 2. - delta_z * b );
-//     // set new weighting current value
-//     el_current->inc_j_z(i_n,k_n, wj);
-
-//     // calculate current in [i + 1,k] cell //
-//     wj = charge_array[p_number] / (2. * dr * dz * delta_t * 2. * PI * dr * dr) *
-//       (k * delta_z * delta_z / 2. + delta_z * dr + delta_z * b);
-//     // set new weighting current value
-//     el_current->inc_j_z(i_n + 1,k_n, wj);
-
-//     ////////////////////////////////// /
-//     // calculate current jr in [i,k] cell //
-//     // equation y = k * x + b; //
-//     // finding k & b //
-//     k = -delta_z / delta_r;
-//     double r0 = (i_n + 0.5) * dr;
-//     double r1 = radius_old;
-//     b= (k_n + 1.) * dz - longitude_old;
-
-//     // weighting jr in [i][k] cell
-//     wj = charge_array[p_number] / (2 * PI * r0 * dz * dz * dr * delta_t) *
-//       (r0 * k * delta_r + k / 2. * delta_r * (radius_old + delta_r / 2.) + 0.5 * delta_r * (b-k * (2 * r0 + r1)) +
-//        delta_r * (b-k * r1) * (4 * r0 * r0-dr * dr) / (8 * radius_old * (radius_old + delta_r)) +
-//        (k * (r0 * r0 / 2.-dr * dr / 8.)) * log((radius_old + delta_r) / radius_old));
-//     el_current->inc_j_r(i_n,k_n, wj);
-
-//     b= longitude_old- k_n * dz;;
-//     // weighting jr in [i][k + 1] cell
-//     wj = charge_array[p_number] / (2 * PI * r0 * dz * dz * dr * delta_t) *
-//       (-r0 * k * delta_r - k / 2. * delta_r * (radius_old + delta_r / 2.) + 0.5 * delta_r * (b + k * (2 * r0 + r1)) +
-//        delta_r * (b + k * r1) * (4 * r0 * r0-dr * dr) / (8 * radius_old * (radius_old + delta_r)) -
-//        (k * (r0 * r0 / 2.-dr * dr / 8.)) * log((radius_old + delta_r) / radius_old));
-//     el_current->inc_j_r(i_n, k_n + 1, wj);
-//   }
-
-//   // }
-// }
-
-
-void Particles::simple_j_weighting(Time *time1,
+void Particles::simple_current_distribution(Time *time1,
                                    Current *el_current,
                                    double radius_new,
                                    double longitude_new,
@@ -656,7 +542,7 @@ void Particles::simple_j_weighting(Time *time1,
   }
 }
 
-void Particles::j_weighting(Time * time1, Current * el_current)
+void Particles::current_distribution(Time * time1, Current * el_current)
 {
   double dr = geom1->dr;
   double dz = geom1->dz;
@@ -692,7 +578,7 @@ void Particles::j_weighting(Time * time1, Current * el_current)
         switch (res_cell)
         {
           // 1) charge in four nodes
-        case 0: simple_j_weighting(time1, el_current, pos[i][0], pos[i][2],
+        case 0: simple_current_distribution(time1, el_current, pos[i][0], pos[i][2],
                                    pos_old[i][0], pos_old[i][2], i_n, k_n, i);
           break;
           // 2) charge in 7 nodes
@@ -709,9 +595,9 @@ void Particles::j_weighting(Time * time1, Current * el_current)
               double delta_r = r_boundary - pos[i][0];
               double z_boundary = pos[i][2] + delta_r / a;
 
-              simple_j_weighting(time1, el_current, r_boundary, z_boundary,
+              simple_current_distribution(time1, el_current, r_boundary, z_boundary,
                                  pos_old[i][0], pos_old[i][2], i_n + 1, k_n, i);
-              simple_j_weighting(time1,el_current, pos[i][0], pos[i][2],
+              simple_current_distribution(time1,el_current, pos[i][0], pos[i][2],
                                  r_boundary, z_boundary, i_n, k_n, i);
             }
             // moving to wall
@@ -722,8 +608,8 @@ void Particles::j_weighting(Time * time1, Current * el_current)
               double delta_r = r_boundary - pos_old[i][0];
               double z_boundary = pos_old[i][2] + delta_r / a;
 
-              simple_j_weighting(time1, el_current, r_boundary, z_boundary, pos_old[i][0], pos_old[i][2], i_n-1, k_n, i);
-              simple_j_weighting(time1, el_current, pos[i][0], pos[i][2], r_boundary, z_boundary, i_n, k_n, i);
+              simple_current_distribution(time1, el_current, r_boundary, z_boundary, pos_old[i][0], pos_old[i][2], i_n-1, k_n, i);
+              simple_current_distribution(time1, el_current, pos[i][0], pos[i][2], r_boundary, z_boundary, i_n, k_n, i);
             }
           }
           // charge in seven cells. Moving on z-axis (k_new != k_old)
@@ -736,8 +622,8 @@ void Particles::j_weighting(Time * time1, Current * el_current)
               double delta_z = z_boundary - pos_old[i][2];
               double a = (pos[i][0] - pos_old[i][0]) / (pos[i][2] - pos_old[i][2]);
               double r_boundary = pos_old[i][0] + a * delta_z;
-              simple_j_weighting(time1, el_current, r_boundary, z_boundary ,pos_old[i][0], pos_old[i][2], i_n, k_n-1, i);
-              simple_j_weighting(time1, el_current, pos[i][0], pos[i][2], r_boundary, z_boundary, i_n, k_n, i);
+              simple_current_distribution(time1, el_current, r_boundary, z_boundary ,pos_old[i][0], pos_old[i][2], i_n, k_n-1, i);
+              simple_current_distribution(time1, el_current, pos[i][0], pos[i][2], r_boundary, z_boundary, i_n, k_n, i);
             }
             // moving backward
             else
@@ -746,8 +632,8 @@ void Particles::j_weighting(Time * time1, Current * el_current)
               double delta_z = z_boundary - pos[i][2];
               double a = (pos_old[i][0] - pos[i][0]) / (pos_old[i][2] - pos[i][2]);
               double r_boundary = pos[i][0] + a * delta_z;
-              simple_j_weighting(time1,el_current, r_boundary, z_boundary, pos_old[i][0], pos_old[i][2], i_n, k_n + 1, i);
-              simple_j_weighting(time1,el_current, pos[i][0], pos[i][2], r_boundary, z_boundary, i_n, k_n, i);
+              simple_current_distribution(time1,el_current, r_boundary, z_boundary, pos_old[i][0], pos_old[i][2], i_n, k_n + 1, i);
+              simple_current_distribution(time1,el_current, pos[i][0], pos[i][2], r_boundary, z_boundary, i_n, k_n, i);
             }
           }
         }
@@ -770,15 +656,15 @@ void Particles::j_weighting(Time * time1, Current * el_current)
               double r2 = pos_old[i][0] + delta_r2;
               if (z1 < k_n * dz)
               {
-                simple_j_weighting(time1, el_current, r1, z1 ,pos_old[i][0], pos_old[i][2], i_n-1, k_n-1,i);
-                simple_j_weighting(time1, el_current, r2, z2, r1, z1, i_n, k_n-1,i);
-                simple_j_weighting(time1, el_current, pos[i][0], pos[i][2], r2, z2, i_n, k_n,i);
+                simple_current_distribution(time1, el_current, r1, z1 ,pos_old[i][0], pos_old[i][2], i_n-1, k_n-1,i);
+                simple_current_distribution(time1, el_current, r2, z2, r1, z1, i_n, k_n-1,i);
+                simple_current_distribution(time1, el_current, pos[i][0], pos[i][2], r2, z2, i_n, k_n,i);
               }
               else if (z1>k_n * dz)
               {
-                simple_j_weighting(time1, el_current, r2, z2 ,pos_old[i][0], pos_old[i][2], i_n-1, k_n-1,i);
-                simple_j_weighting(time1, el_current, r1, z1, r2, z2,i_n-1, k_n,i);
-                simple_j_weighting(time1, el_current, pos[i][0], pos[i][2], r1, z1, i_n, k_n,i);
+                simple_current_distribution(time1, el_current, r2, z2 ,pos_old[i][0], pos_old[i][2], i_n-1, k_n-1,i);
+                simple_current_distribution(time1, el_current, r1, z1, r2, z2,i_n-1, k_n,i);
+                simple_current_distribution(time1, el_current, pos[i][0], pos[i][2], r1, z1, i_n, k_n,i);
               }
             }
             // case, when particle move from [i-1][k + 1] -> [i][k] cell
@@ -794,15 +680,15 @@ void Particles::j_weighting(Time * time1, Current * el_current)
               double r2 = pos_old[i][0] + delta_r2;
               if (z1>(k_n + 1) * dz)
               {
-                simple_j_weighting(time1, el_current, r1, z1 ,pos_old[i][0], pos_old[i][2], i_n-1, k_n + 1,i);
-                simple_j_weighting(time1, el_current, r2, z2, r1, z1, i_n, k_n + 1,i);
-                simple_j_weighting(time1, el_current, pos[i][0], pos[i][2], r2, z2, i_n, k_n,i);
+                simple_current_distribution(time1, el_current, r1, z1 ,pos_old[i][0], pos_old[i][2], i_n-1, k_n + 1,i);
+                simple_current_distribution(time1, el_current, r2, z2, r1, z1, i_n, k_n + 1,i);
+                simple_current_distribution(time1, el_current, pos[i][0], pos[i][2], r2, z2, i_n, k_n,i);
               }
               else if (z1<(k_n + 1) * dz)
               {
-                simple_j_weighting(time1, el_current, r2, z2 ,pos_old[i][0], pos_old[i][2], i_n-1, k_n + 1,i);
-                simple_j_weighting(time1, el_current, r1, z1, r2, z2,i_n-1, k_n,i);
-                simple_j_weighting(time1, el_current, pos[i][0], pos[i][2], r1, z1, i_n, k_n,i);
+                simple_current_distribution(time1, el_current, r2, z2 ,pos_old[i][0], pos_old[i][2], i_n-1, k_n + 1,i);
+                simple_current_distribution(time1, el_current, r1, z1, r2, z2,i_n-1, k_n,i);
+                simple_current_distribution(time1, el_current, pos[i][0], pos[i][2], r1, z1, i_n, k_n,i);
               }
             }
           }
@@ -823,15 +709,15 @@ void Particles::j_weighting(Time * time1, Current * el_current)
 
               if (z1<(k_n) * dz)
               {
-                simple_j_weighting(time1, el_current, r1, z1 ,pos_old[i][0], pos_old[i][2], i_n + 1, k_n-1,i);
-                simple_j_weighting(time1,el_current, r2, z2, r1, z1, i_n, k_n-1,i);
-                simple_j_weighting(time1,el_current, pos[i][0], pos[i][2], r2, z2, i_n, k_n,i);
+                simple_current_distribution(time1, el_current, r1, z1 ,pos_old[i][0], pos_old[i][2], i_n + 1, k_n-1,i);
+                simple_current_distribution(time1,el_current, r2, z2, r1, z1, i_n, k_n-1,i);
+                simple_current_distribution(time1,el_current, pos[i][0], pos[i][2], r2, z2, i_n, k_n,i);
               }
               else if (z1>(k_n) * dz)
               {
-                simple_j_weighting(time1, el_current, r2, z2 ,pos_old[i][0], pos_old[i][2], i_n + 1, k_n-1,i);
-                simple_j_weighting(time1, el_current, r1, z1, r2, z2,i_n + 1, k_n,i);
-                simple_j_weighting(time1, el_current, pos[i][0], pos[i][2], r1, z1, i_n, k_n,i);
+                simple_current_distribution(time1, el_current, r2, z2 ,pos_old[i][0], pos_old[i][2], i_n + 1, k_n-1,i);
+                simple_current_distribution(time1, el_current, r1, z1, r2, z2,i_n + 1, k_n,i);
+                simple_current_distribution(time1, el_current, pos[i][0], pos[i][2], r1, z1, i_n, k_n,i);
               }
 
             }
@@ -849,15 +735,15 @@ void Particles::j_weighting(Time * time1, Current * el_current)
 
               if (z1>(k_n + 1) * dz)
               {
-                simple_j_weighting(time1, el_current, r1, z1, pos_old[i][0],pos_old[i][2], i_n + 1, k_n + 1,i);
-                simple_j_weighting(time1, el_current, r2, z2, r1, z1, i_n, k_n + 1,i);
-                simple_j_weighting(time1, el_current, pos[i][0], pos[i][2], r2, z2, i_n, k_n,i);
+                simple_current_distribution(time1, el_current, r1, z1, pos_old[i][0],pos_old[i][2], i_n + 1, k_n + 1,i);
+                simple_current_distribution(time1, el_current, r2, z2, r1, z1, i_n, k_n + 1,i);
+                simple_current_distribution(time1, el_current, pos[i][0], pos[i][2], r2, z2, i_n, k_n,i);
               }
               else if (z1<(k_n + 1) * dz)
               {
-                simple_j_weighting(time1, el_current, r2, z2, pos_old[i][0], pos_old[i][2], i_n + 1, k_n + 1,i);
-                simple_j_weighting(time1, el_current, r1, z1, r2, z2,i_n + 1, k_n,i);
-                simple_j_weighting(time1, el_current, pos[i][0], pos[i][2], r1, z1, i_n, k_n,i);
+                simple_current_distribution(time1, el_current, r2, z2, pos_old[i][0], pos_old[i][2], i_n + 1, k_n + 1,i);
+                simple_current_distribution(time1, el_current, r1, z1, r2, z2,i_n + 1, k_n,i);
+                simple_current_distribution(time1, el_current, pos[i][0], pos[i][2], r1, z1, i_n, k_n,i);
               }
             }
           }
@@ -868,7 +754,7 @@ void Particles::j_weighting(Time * time1, Current * el_current)
     }
 }
 
-void Particles::azimuthal_j_weighting(Current * this_j)
+void Particles::azimuthal_current_distribution(Current * this_j)
 {
   double dr = geom1->dr;
   double dz = geom1->dz;
@@ -1547,10 +1433,10 @@ void Particles::move_half_reflect(Time *t)
     }
 }
 
-void Particles::full_j_weighting(Current * current, Time *t)
+void Particles::full_current_distribution(Current * current, Time *t)
 {
-  azimuthal_j_weighting(current);
+  azimuthal_current_distribution(current);
   move_half_reflect(t);
-  j_weighting(t, current);
+  current_distribution(t, current);
   back_velocity_to_rz();
 }
