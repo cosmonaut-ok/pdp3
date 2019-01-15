@@ -97,6 +97,11 @@ LoadInitParam::LoadInitParam(char *xml_file_name)
   cerr << "INFO! Initializing Boundary Conditions Data" << endl;
   init_boundary ();
 
+  LimitationsChecker *limcheck = new LimitationsChecker(params);
+  limcheck->check_velocity_time_step();
+  limcheck->check_grid_size();
+  limcheck->check_system_size();
+
   cerr << "INFO! Initialization complete" << endl;
 }
 
@@ -478,10 +483,10 @@ void LoadInitParam::run(void)
 #endif
 
 #ifdef DEBUG
-    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: full_j_weighting" << endl;
+    cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: full_current_distribution" << endl;
     the_time = clock();
 #endif
-    p_list->full_j_weighting(c_current, params->time);
+    p_list->full_current_distribution(c_current, params->time);
 
     //! 5. Calculate E
     // maxwell_rad.probe_mode_exitation(&geom1,&current1, 1,7e8, time1.current_time);
