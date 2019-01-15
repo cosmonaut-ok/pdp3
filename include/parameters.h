@@ -1,6 +1,8 @@
 //! Class for reading configfile and calculate parameters,
 //! requires for modeling
 
+#pragma once
+
 #include <vector>
 
 #include "tinyxml2.h"
