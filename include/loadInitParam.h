@@ -16,6 +16,7 @@
 #include "math/fourier.h"
 
 #include "lib.h"
+#include "limitationsChecker.h"
 #include "boundaryMaxwellConditions.h"
 #include "bunch.h"
 #include "current.h"

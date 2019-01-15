@@ -29,16 +29,16 @@ void ParticlesList::move_half_reflect(Time *t)
     part_list[i]->move_half_reflect(t);
 }
 
-void ParticlesList::j_weighting(Time *time1, Current *j_r)
+void ParticlesList::current_distribution(Time *time1, Current *j_r)
 {
   for(std::size_t i = 0; i < part_list.size(); i++)
-    part_list[i]->j_weighting(time1,j_r);
+    part_list[i]->current_distribution(time1,j_r);
 }
 
-void ParticlesList::azimuthal_j_weighting(Time *time1, Current *j_r)
+void ParticlesList::azimuthal_current_distribution(Time *time1, Current *j_r)
 {
   for(std::size_t i=0; i<part_list.size(); i++)
-    part_list[i]->azimuthal_j_weighting(j_r);
+    part_list[i]->azimuthal_current_distribution(j_r);
 }
 
 void ParticlesList::back_velocity_to_rz()
@@ -47,8 +47,8 @@ void ParticlesList::back_velocity_to_rz()
     part_list[i]->back_velocity_to_rz();
 }
 
-void ParticlesList::full_j_weighting(Current *current, Time *t)
+void ParticlesList::full_current_distribution(Current *current, Time *t)
 {
   for(std::size_t i = 0; i < part_list.size(); i++)
-    part_list[i]->full_j_weighting(current, t);
+    part_list[i]->full_current_distribution(current, t);
 }

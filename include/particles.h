@@ -111,7 +111,7 @@ public:
   void charge_weighting(ChargeDensity *ro1);
   void velocity_distribution(double tempr_ev);
   void load_cylindrical_spatial_distribution(double n1, double n2, double left_plasma_boundary);
-  void simple_j_weighting(Time *time1,
+  void simple_current_distribution(Time *time1,
                           Current *j_r,
                           double radius_new,
                           double longitude_new,
@@ -120,7 +120,7 @@ public:
                           int i_n,
                           int k_n,
                           int p_number);
-  void simple_constrho_j_weighting(Time *time1,
+  void simple_constrho_current_distribution(Time *time1,
                                    Current *j_r,
                                    double radius_new,
                                    double longitude_new,
@@ -129,8 +129,8 @@ public:
                                    int i_n,
                                    int k_n,
                                    int p_number);
-  void j_weighting(Time *time1, Current *j_r);
-  void azimuthal_j_weighting(Current *this_j);
+  void current_distribution(Time *time1, Current *j_r);
+  void azimuthal_current_distribution(Current *this_j);
   void strict_motion_weighting(Time *time1,
                                Current *j_r,
                                double radius_new,
@@ -148,7 +148,7 @@ public:
   virtual void reflection_single(unsigned int i);
   void move_half_reflect(Time *t);
 
-  void full_j_weighting(Current *current, Time *t);
+  void full_current_distribution(Current *current, Time *t);
 
 // protected:
   void half_step_pos_single(Time *t, unsigned int i);
