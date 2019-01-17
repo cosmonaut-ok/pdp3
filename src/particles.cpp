@@ -420,9 +420,12 @@ void Particles::simple_current_distribution(Time *time1,
 
   double some_shit_density;
 
+  double dr2 = dr * dr;
+
   if ((abs(delta_r) < MNZL) || (abs(delta_z) < MNZL)) // MNZL see constant.h
     return;
   // if i cell is not equal 0
+  double const2_log = log((radius_old + delta_r) / radius_old);
   if (i_n>=1)
   {
     // equation y = k*x + b; //
@@ -430,21 +433,29 @@ void Particles::simple_current_distribution(Time *time1,
     double k = delta_r / delta_z;
     double b = radius_old;
 
+    double const1_r = charge_array[p_number] / (2 * PI * dr * dz * delta_t * 2 * dr);
+    double const1_z = charge_array[p_number] / (2 * PI * dr * dz * delta_t * dz);
+
+    double const1_log = log((k * delta_z + b) / b);
+    double const5 = k * delta_z * delta_z / 2.;
+    double const7 = dr * delta_z * dr;
+    double const8 = dr * delta_z * b;
+
     // calculate current jz in [i,k] cell
-    some_shit_density = SOME_SHIT_DENSITY_R(charge_array[p_number], i_n * dr, dr, dz, delta_t);
+    some_shit_density = const1_r / (i_n * dr);
 
     wj = some_shit_density
-      * (dr * delta_z - k * delta_z * delta_z / 2. - delta_z * b + dr * dr / k
-         * ((i_n + 0.5) * (i_n + 0.5) - 0.25) * log((k * delta_z + b) / b));
+      * (const7 - const5 - const8 + dr2 / k
+         * ((i_n + 0.5) * (i_n + 0.5) - 0.25) * const1_log);
     // set new weighting current value
     el_current->inc_j_z(i_n, k_n, wj);
 
-    some_shit_density = SOME_SHIT_DENSITY_R(charge_array[p_number], (i_n + 1) * dr, dr, dz, delta_t);
+    some_shit_density = const1_r / ((i_n + 1) * dr);
 
     // calculate current in [i+1,k] cell //
     wj = some_shit_density
-      * (k * delta_z * delta_z / 2. + delta_z * b + delta_z * dr + dr * dr / k *
-         (0.25-(i_n + 0.5) * (i_n + 0.5)) * log((k * delta_z + b) / b));
+      * (const5 + const8 + const7 + dr2 / k
+         * (0.25-(i_n + 0.5) * (i_n + 0.5)) * const1_log);
     // set new weighting current value
     el_current->inc_j_z(i_n+1, k_n, wj);
 
@@ -455,29 +466,38 @@ void Particles::simple_current_distribution(Time *time1,
     k = -delta_z / delta_r;
     double r0 = (i_n + 0.5) * dr;
     double r1 =  radius_old;
+    double r02 = r0 * r0;
+
     b = (k_n + 1.) * dz - longitude_old;
 
     // weighting jr in [i][k] cell
-    some_shit_density = SOME_SHIT_DENSITY_Z(charge_array[p_number], r0, dr, dz, delta_t);
+    some_shit_density = const1_z / r0;
+
+    double const2 = k / 2 * delta_r * (radius_old + delta_r / 2.);
+    double const3 = 8 * radius_old * (radius_old + delta_r);
+    double const4 = k * (r02 / 2.-dr2 / 8.);
+    double const6 = r0 * k * delta_r;
+    double const9 = k * (2 * r0 + r1);
+    double const10 = (4 * r02 - dr2);
 
     wj = some_shit_density
-      * (r0 * k * delta_r + k / 2. * delta_r * (radius_old + delta_r / 2.)
-         + 0.5 * delta_r * (b - k * (2 * r0 + r1))
-         + delta_r * (b-k * r1) * (4 * r0 * r0-dr * dr)
-         / (8 * radius_old * (radius_old + delta_r)) +
-         (k * (r0 * r0 / 2.-dr * dr / 8.))
-         * log((radius_old + delta_r) / radius_old));
+      * (const6 + const2
+         + 0.5 * delta_r * (b - const9)
+         + delta_r * (b - k * r1) * const10
+         / const3
+         + const4
+         * const2_log);
     el_current->inc_j_r(i_n,k_n, wj);
 
     b = longitude_old - k_n * dz;
     // weighting jr in [i][k+1] cell
     wj = some_shit_density
-      * (-r0 * k * delta_r - k / 2. * delta_r * (radius_old + delta_r / 2.)
-         + 0.5 * delta_r * (b + k * (2 * r0 + r1))
-         + delta_r * (b + k * r1) * (4 * r0 * r0 - dr * dr)
-         / (8 * radius_old * (radius_old + delta_r))
-         - (k * (r0 * r0 / 2.-dr * dr / 8.))
-         * log((radius_old + delta_r) / radius_old));
+      * (-const6 - const2
+         + 0.5 * delta_r * (b + const9)
+         + delta_r * (b + k * r1) * const10
+         / const3
+         - const4
+         * const2_log);
     el_current->inc_j_r(i_n, k_n+1, wj);
   }
   // if i cell is equal 0
@@ -513,18 +533,20 @@ void Particles::simple_current_distribution(Time *time1,
     k = -delta_z / delta_r;
     double r0 = (i_n + 0.5) * dr;
     double r1 = radius_old;
-    b= (k_n + 1.) * dz - longitude_old;
+    double r02 = r0 * r0;
+
+    b = (k_n + 1.) * dz - longitude_old;
 
     // weighting jr in [i][k] cell
     some_shit_density = SOME_SHIT_DENSITY_Z(charge_array[p_number], r0, dr, dz, delta_t);
 
     wj = some_shit_density
       * (r0 * k * delta_r + k / 2. * delta_r * (radius_old + delta_r / 2.)
-         + 0.5 * delta_r * (b-k * (2 * r0 + r1))
-         + delta_r * (b-k * r1) * (4 * r0 * r0-dr * dr)
+         + 0.5 * delta_r * (b - k * (2 * r0 + r1))
+         + delta_r * (b-k * r1) * (4 * r02 - dr2)
          / (8 * radius_old * (radius_old + delta_r))
-         + (k * (r0 * r0 / 2.-dr * dr / 8.))
-         * log((radius_old + delta_r) / radius_old));
+         + (k * (r02 / 2. - dr2 / 8.))
+         * const2_log);
     el_current->inc_j_r(i_n,k_n, wj);
 
     b = longitude_old- k_n * dz;;
@@ -534,10 +556,10 @@ void Particles::simple_current_distribution(Time *time1,
     wj = some_shit_density
       * (-r0 * k * delta_r - k / 2. * delta_r * (radius_old + delta_r / 2.)
          + 0.5 * delta_r * (b + k * (2 * r0 + r1))
-         + delta_r * (b + k * r1) * (4 * r0 * r0-dr * dr)
+         + delta_r * (b + k * r1) * (4 * r02 - dr2)
          / (8 * radius_old * (radius_old + delta_r))
-         - (k * (r0 * r0 / 2.-dr * dr / 8.)) *
-         log((radius_old + delta_r) / radius_old));
+         - (k * (r02 / 2. - dr2 / 8.))
+         * const2_log);
     el_current->inc_j_r(i_n, k_n + 1, wj);
   }
 }
