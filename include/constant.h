@@ -23,6 +23,6 @@ namespace constant
   // minimal possible distance or velocity.
   // Smaller values should be rounded to zero
   const double MNZL = 1e-15; // Minimal Non-Zeroing Limit
-  // Boltzmann constant
-  const double BOLTZMANN = 1.38e-23;
+  // Boltzmann constant, eV * K^-1
+  const double BOLTZMANN = 1.381e-23;
 }

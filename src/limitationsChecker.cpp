@@ -30,13 +30,8 @@ LimitationsChecker::LimitationsChecker(Parameters *config)
   }
 
   plasma_freq = sqrt(electron_density * EL_CHARGE * EL_CHARGE / (EL_MASS * EPSILON0));
-  debye_length = sqrt(EPSILON0 * BOLTZMANN * electron_temperature / (4 * PI * electron_density * EL_CHARGE * EL_CHARGE));
-}
-
-
-bool check()
-{
-
+  // 7400 is a coefficient, when T is in electron volts and N is in \f$ m^-3 \f$
+  debye_length = 7400 * sqrt(electron_temperature / electron_density);
 }
 
 bool LimitationsChecker::check_velocity_time_step()
@@ -69,14 +64,14 @@ bool LimitationsChecker::check_grid_size()
 // implement d{r,z} < \lambda debye
 {
   bool status;
-  int debye_multiplicator = 10;
+  int debye_multiplicator = 50;
 
-  if (cfg->geom->dr < debye_length * debye_multiplicator
-      || cfg->geom->dr < debye_length * debye_multiplicator)
+  if (cfg->geom->dr > debye_length * debye_multiplicator
+      || cfg->geom->dr > debye_length * debye_multiplicator)
   {
-    cerr << "ERROR! too small grid size: ``"
+    cerr << "ERROR! too large grid size: ``"
          << cfg->geom->dr << " x " << cfg->geom->dz
-         << " m.''. Should be more, than ``"
+         << " m.''. Should be less, than ``"
          << debye_length * debye_multiplicator
          << " m.''. Exiting" << endl;
     exit(1);
@@ -88,18 +83,32 @@ bool LimitationsChecker::check_grid_size()
 }
 
 bool LimitationsChecker::check_system_size()
-// implement d{r,z} < \lambda debye
 {
   bool status = true;
   int debye_multiplicator = 100;
 
-  if (cfg->geom->r_size * debye_multiplicator < debye_length * number_macro
-      || cfg->geom->z_size * debye_multiplicator < debye_length * number_macro)
+  // implement \f$ L >> R_{debye} \f$
+  if (cfg->geom->r_size < debye_length * debye_multiplicator
+      || cfg->geom->z_size < debye_length * debye_multiplicator)
   {
+    cerr << cfg->geom->dr << endl;
     cerr << "ERROR! too small system size: ``"
          << cfg->geom->r_size << " x " << cfg->geom->z_size
          << " m.''. Should be more, than ``"
-         <<  debye_length * number_macro / debye_multiplicator
+         <<  debye_length * debye_multiplicator
+         << " m.''. Exiting" << endl;
+    exit(1);
+  }
+
+  // implement \f$ L << N_{particles} * R_{debye} \f$
+  if (cfg->geom->r_size > debye_length * number_macro * debye_multiplicator
+      || cfg->geom->z_size > debye_length * number_macro * debye_multiplicator)
+  {
+    cerr << cfg->geom->dr << endl;
+    cerr << "ERROR! too large system size: ``"
+         << cfg->geom->r_size << " x " << cfg->geom->z_size
+         << " m.''. Should be less, than ``"
+         <<  debye_length * number_macro * debye_multiplicator
          << " m.''. Exiting" << endl;
     exit(1);
   }

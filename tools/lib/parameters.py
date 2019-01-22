@@ -7,12 +7,13 @@ from os.path import normpath
 
 
 class Probe:
-    def __init__(self, probe_type, component, schedule, r_start=-1, z_start=-1, r_end=-1, z_end=-1):
+    def __init__(self, probe_type, component, schedule, r_start=-1, z_start=-1, r_end=-1, z_end=-1, specie=None):
         if (probe_type == 'frame' or probe_type == 'col' or probe_type == 'row' or probe_type == 'dot' or probe_type == 'mpframe'):
             self.type = probe_type
 
         self.component = component
         self.schedule = schedule
+        self.specie = specie
         self.r_start = r_start
         self.z_start = z_start
         self.r_end = r_end
@@ -73,6 +74,7 @@ class Parameters:
         for i in probes:
             p_type = i.getAttribute('type')
             p_compon = i.getAttribute('component')
+            p_specie = i.getAttribute('specie')
             p_schedule = int(i.getAttribute('schedule'))
 
             r_start = -1
@@ -87,26 +89,26 @@ class Parameters:
                 z_end = int(i.getAttribute('z_end'))
                 p = Probe(p_type, p_compon, p_schedule,
                           r_start, z_start,
-                          r_end, z_end)
+                          r_end, z_end, p_specie)
 
             elif p_type == 'col':
                 z_start = int(i.getAttribute('z'))
                 p = Probe(p_type, p_compon, p_schedule,
                           r_start, z_start,
-                          r_end, z_end)
+                          r_end, z_end, p_specie)
 
             elif p_type == 'row':
                 r_start = int(i.getAttribute('r'))
                 p = Probe(p_type, p_compon, p_schedule,
                           r_start, z_start,
-                          r_end, z_end)
+                          r_end, z_end, p_specie)
 
             elif p_type == 'dot':
                 r_start = int(i.getAttribute('r'))
                 z_start = int(i.getAttribute('z'))
                 p = Probe(p_type, p_compon, p_schedule,
                           r_start, z_start,
-                          r_end, z_end)
+                          r_end, z_end, p_specie)
             else:
                 raise NameError('probe type can not be {}'.format(p_type))
 

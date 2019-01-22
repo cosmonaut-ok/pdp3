@@ -18,6 +18,7 @@ using namespace tinyxml2;
 
 struct probe {
   char *component;
+  char *specie; // required only for temperature
   unsigned int type;
   unsigned int r_start;
   unsigned int r_end;
@@ -131,8 +132,8 @@ public:
 
 private:
   XMLElement* xml_data;
-  XMLElement* try_first_child(XMLElement* element, const char* name);
-  const char* try_atribute(XMLElement* element, const char* name);
+  XMLElement* try_first_child(XMLElement* element, const char* name, bool fail = true);
+  const char* try_atribute(XMLElement* element, const char* name, bool fail = true);
 
   void init_particles();
   void init_probes();
