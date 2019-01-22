@@ -24,6 +24,8 @@
 #include "hField.h"
 #include "ioText.h"
 
+#include "temperature.h"
+
 #include "probe.h"
 #include "probePlain.h"
 
