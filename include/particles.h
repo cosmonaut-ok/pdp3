@@ -12,6 +12,8 @@
 
 #include "lib.h"
 #include "constant.h"
+#include "math/rand.h"
+#include "math/maxwellJuttner.h"
 
 #include "geometry.h"
 #include "pdp3Time.h"
@@ -19,6 +21,7 @@
 #include "current.h"
 #include "eField.h"
 #include "hField.h"
+
 
 using namespace std;
 

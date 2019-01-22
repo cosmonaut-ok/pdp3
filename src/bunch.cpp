@@ -1,6 +1,7 @@
 #include "bunch.h"
 
 using namespace constant;
+using namespace math::random;
 
 Bunch::Bunch (char *p_name,
               double p_charge,
@@ -32,8 +33,11 @@ Bunch::Bunch (char *p_name,
 
   for(unsigned int i = 0; i < number; i++)
   {
-    double rand_r = lib::random_reverse(i, 9); // TODO: why 9
-
+#ifdef TESTMODE
+    double rand_r = random_reverse(i, 9); // TODO: why 9
+#else
+    double rand_r = uniform();
+#endif
     pos[i][0] = (radius - dr) * rand_r + dr / 2;
     pos[i][1] = 0.;
     pos[i][2] = 0.;
@@ -99,7 +103,11 @@ void Bunch::bunch_inject(Time *time)
 #pragma omp for
     for(unsigned int i = 0; i < particles_in_step; i++)
     {
-      double rand_z = lib::random_reverse(start_number + i, 11); // TODO: why 11?
+#ifdef TESTMODE
+      double rand_z = random_reverse(start_number + i, 11); // TODO: why 11?
+#else
+      double rand_z = uniform();
+#endif
 
       if (i+start_number < number)
       {

@@ -1,3 +1,4 @@
+#include "math/rand.h"
 #include "particles.h"
 
 class Bunch : public Particles

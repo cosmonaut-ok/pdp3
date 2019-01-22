@@ -107,6 +107,25 @@ bool LimitationsChecker::check_system_size()
   return status;
 }
 
+bool LimitationsChecker::check_macro_number()
+{
+  bool status = true;
+  int grid_multiplicator = 10;
+
+  if (cfg->geom->r_size * cfg->geom->r_size * grid_multiplicator > number_macro)
+  {
+    cerr << "WARNING! too small summary number of macroparticles: ``"
+         << number_macro
+         << "''. Should be more, than ``"
+         <<  cfg->geom->r_size * cfg->geom->r_size * grid_multiplicator
+         << "''. You could get not relevant results." << endl;
+
+    status = false;
+  }
+
+  return status;
+}
+
 LimitationsChecker::~LimitationsChecker(void)
 {
 }

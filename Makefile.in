@@ -117,6 +117,7 @@ clean: $(SUBDIRS:%=%/__clean__) $(EXTRASUBDIRS:%=%/__clean__) $(TESTSUBDIRS:%=%/
 	$(RM) $(LIBS) $(EXES) $(EXES:%=%.so)
 	$(RM) -r $(ROOTDIR)/tools/__pycache__/
 	$(RM) -r $(DOXYGEN_DIRS)
+	$(RM) -r $(TARGETDIR)
 
 $(SUBDIRS:%=%/__clean__): dummy
 	-cd `dirname $@` && $(MAKE) clean
