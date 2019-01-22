@@ -20,6 +20,7 @@ AC_SUBST(EXPERIMENTAL_OPTION)
 AC_SUBST(LEGACY_OPTION)
 AC_SUBST(IEEE)
 AC_SUBST(DEBUG)
+AC_SUBST(TESTMODE)
 AC_SUBST(SINGLETHREAD)
 AC_SUBST(HDF5)
 AC_SUBST(CFLAGS_DEFAULT)
@@ -46,6 +47,7 @@ HDF5_VERSION="hdf5-1.10.3"
 AC_ARG_ENABLE([experimental], [AC_HELP_STRING([--enable-experimental], [Enable experimental features (only for debug/development)])], [ENABLE_EXPERIMENTAL="$enableval"], [ENABLE_EXPERIMENTAL=no])
 AC_ARG_ENABLE([legacy], [AC_HELP_STRING([--enable-legacy], [Use legacy instead of current features])], [ENABLE_LEGACY="$enableval"], [ENABLE_LEGACY=no])
 AC_ARG_ENABLE([debug], [AC_HELP_STRING([--enable-debug], [Enable debug (optimized for GDB)])], [DEBUG="$enableval"], [DEBUG=no])
+AC_ARG_ENABLE([testmode], [AC_HELP_STRING([--enable-testmode], [Enable test mode with reproducible random numbers to compare result (USE ONLY FOR FUNCTIONAL OR OTHER TESTS)])], [TESTMODE="$enableval"], [TESTMODE=no])
 AC_ARG_ENABLE([profiler], [AC_HELP_STRING([--enable-profiler], [Enable profiler support for performance debug])], [PROFILER="$enableval"], [PROFILER=no])
 AC_ARG_ENABLE([ieee], [AC_HELP_STRING([--enable-ieee], [Keep IEEE compliant rounding and disable hardware acceleration. Decrease calculation speed])], [IEEE="$enableval"], [IEEE=no])
 AC_ARG_ENABLE([singlethread], [AC_HELP_STRING([--enable-singlethread], [Build application to run in single-thread mode (used in debug by default)])], [SINGLETHREAD="$enableval"], [SINGLETHREAD=${DEBUG}])
@@ -106,6 +108,13 @@ if test x$DEBUG = xyes; then
   CFLAGS_ADDITIONAL="$CFLAGS_ADDITIONAL -O0 -Wall -Wextra -ggdb3 -fvar-tracking -ggnu-pubnames -pedantic -time -ftree-vectorizer-verbose=7"
   DEBUG_OPTION=true
   AC_DEFINE([DEBUG], [true], [Use debug option])
+else
+  DEBUG_OPTION=false
+fi
+
+# debug
+if test x$TESTMODE = xyes; then
+  AC_DEFINE([TESTMODE], [true], [Use testmode. Only for functional tests with reproducible random numbers])
 else
   DEBUG_OPTION=false
 fi

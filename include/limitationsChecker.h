@@ -55,6 +55,7 @@ public:
   bool check_velocity_time_step();
   bool check_grid_size();
   bool check_system_size();
+  bool check_macro_number();
 
 private:
   Parameters *cfg;

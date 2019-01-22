@@ -79,24 +79,6 @@ namespace lib
     return gamma;
   }
 
-  double random_reverse(double vel, int power)
-  {
-    int int_vel =(int) floor(vel);
-    double ost = 0;
-    double r = 0;
-    int order = 1;
-    while(int_vel >= 1)
-    {
-      ost = int_vel % power;
-
-      r = r + ost * pow((double)power, (-order));
-
-      int_vel = (int_vel - ost)/power;
-      order = order+1;
-    }
-    return r;
-  }
-
   char* get_simulation_duration()
   // get the time, spent since simulation launched (in "d h m s" format)
   {
@@ -212,4 +194,28 @@ namespace lib
     return std::find(begin, end, option) != end;
   }
 
+  std::vector<double> read_file_to_double(const char *filename)
+  {
+    std::ifstream ifile(filename, std::ios::in);
+    std::vector<double> scores;
+
+    //check to see that the file was opened correctly:
+    if (!ifile.is_open())
+    {
+      cerr << "CRITICAL!(read_file_to_double): Can not open file " << filename << ". Can not continue." << endl;
+	exit(1);
+    }
+
+    double num = 0.0;
+    //keep storing values from the text file so long as data exists:
+    while (ifile >> num)
+      scores.push_back(num);
+
+    //verify that the scores were stored correctly:
+    // for (int i = 0; i < scores.size(); ++i) {
+    //   std::cout << scores[i] << std::endl;
+    // }
+
+    return scores;
+  }
 }

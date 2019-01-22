@@ -1,3 +1,5 @@
+#pragma once
+
 #include <sstream>
 #include <iostream>
 #include <string>
@@ -6,6 +8,9 @@
 #include <math.h>
 #include <algorithm>
 #include <ctime>
+#include <fstream>
+#include <vector>
+#include <cstdlib>
 
 #ifdef __SSE__
 #include <pmmintrin.h>
@@ -30,7 +35,6 @@ namespace lib
   bool to_bool(string str);
   double get_gamma (double velocity);
   double get_gamma_inv (double velocity);
-  double random_reverse(double vel, int power);
   char* get_simulation_duration();
   bool directory_exists(const std::string& path);
   bool make_directory(const std::string& path);

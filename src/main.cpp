@@ -61,6 +61,9 @@ int main(int argc, char **argv)
 #ifdef PUSHER_VAY
   cerr << "INFO! Using fully-relativistic Vay particles pusher" << endl;
 #endif
+#ifdef TESTMODE
+  cerr << "WARNING! Using TESTMODE with reproducible random numbers to compare result" << endl;
+#endif
 
   LoadInitParam init_param(filename);
 
