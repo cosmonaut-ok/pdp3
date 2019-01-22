@@ -39,7 +39,7 @@ void Temperature::calc_t_r(Particles *prtls)
 
 
     t_r_sum[i_r][k_z] = t_r_sum[i_r][k_z] + prtls->vel[i][0];
-    count[i_r][k_z] = count[i_r][k_z]++;
+    count[i_r][k_z] = count[i_r][k_z] + 1;
   }
 
 // #pragma omp parallel for
