@@ -8,10 +8,12 @@ ProbePlain::ProbePlain(void)
 
 ProbePlain::ProbePlain(char *c_path, char *c_component, int c_type,
                        int c_start_r, int c_start_z, int c_end_r, int c_end_z,
-                       bool c_compress, int c_compress_level, int c_schedule)
+                       bool c_compress, int c_compress_level, int c_schedule,
+                       char *c_specie="none")
 {
   strcpy(path, c_path);
   strcpy(component, c_component);
+  strcpy(specie, c_specie);
 
   type = c_type;
   start_r = c_start_r;

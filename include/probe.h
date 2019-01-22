@@ -27,6 +27,7 @@ protected:
 
 public:
   char name[100];
+  char specie[100]; // only for temperature measurement
   char path[256];
   char component[10];
   int type; // 0 - frame, 1 - col, 2 - row, 3 - dot

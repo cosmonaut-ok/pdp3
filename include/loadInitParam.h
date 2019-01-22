@@ -38,6 +38,7 @@
 #include "pdp3Time.h"
 #include "poissonDirichlet.h"
 #include "parameters.h"
+#include "temperature.h"
 
 using namespace std;
 using namespace tinyxml2;
@@ -69,6 +70,7 @@ public:
   ParticlesList *p_list;
   EField *efield;
   HField *hfield;
+  Temperature *temperature;
 
 #ifndef LEGACY
   Probe *c_probe_e_r;
