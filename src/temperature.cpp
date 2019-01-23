@@ -1,6 +1,5 @@
 #include "temperature.h"
 
-
 //// constructor
 Temperature::Temperature(Geometry *geom1):geom(geom1)
 {
@@ -38,8 +37,9 @@ void Temperature::calc_t_r(Particles *prtls)
     unsigned int k_z = CELL_NUMBER(prtls->pos[i][2], geom->dz);
 
 
-    t_r_sum[i_r][k_z] = t_r_sum[i_r][k_z] + prtls->vel[i][0];
-    count[i_r][k_z] = count[i_r][k_z] + 1;
+    t_r_sum[i_r][k_z] = t_r_sum[i_r][k_z] + abs(prtls->vel[i][0]);
+    // count[i_r][k_z] = count[i_r][k_z] + 1;
+    count[i_r][k_z]++;
   }
 
 // #pragma omp parallel for
@@ -55,8 +55,9 @@ void Temperature::calc_t_phi(Particles *prtls)
     unsigned int i_r = CELL_NUMBER(prtls->pos[i][0], geom->dr);
     unsigned int k_z = CELL_NUMBER(prtls->pos[i][2], geom->dz);
 
-    t_phi_sum[i_r][k_z] = t_phi_sum[i_r][k_z] + prtls->vel[i][1];
-    count[i_r][k_z] = count[i_r][k_z]++;
+    t_phi_sum[i_r][k_z] = t_phi_sum[i_r][k_z] + abs(prtls->vel[i][1]);
+    // count[i_r][k_z] = count[i_r][k_z] + 1;
+    count[i_r][k_z]++;
   }
 
 // #pragma omp parallel for
@@ -72,8 +73,9 @@ void Temperature::calc_t_z(Particles *prtls)
     unsigned int i_r = CELL_NUMBER(prtls->pos[i][0], geom->dr);
     unsigned int k_z = CELL_NUMBER(prtls->pos[i][2], geom->dz);
 
-    t_z_sum[i_r][k_z] = t_z_sum[i_r][k_z] + prtls->vel[i][2];
-    count[i_r][k_z] = count[i_r][k_z]++;
+    t_z_sum[i_r][k_z] = t_z_sum[i_r][k_z] + abs(prtls->vel[i][2]);
+    // count[i_r][k_z] = count[i_r][k_z] + 1;
+    count[i_r][k_z]++;
   }
 
 // #pragma omp parallel for
