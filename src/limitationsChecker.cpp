@@ -34,12 +34,6 @@ LimitationsChecker::LimitationsChecker(Parameters *config)
   debye_length = 7400 * sqrt(electron_temperature / electron_density);
 }
 
-
-bool check()
-{
-
-}
-
 bool LimitationsChecker::check_velocity_time_step()
 {
   bool status;
@@ -89,11 +83,11 @@ bool LimitationsChecker::check_grid_size()
 }
 
 bool LimitationsChecker::check_system_size()
-// implement \f$ L >> R_debye \f$
 {
   bool status = true;
   int debye_multiplicator = 100;
 
+  // implement \f$ L >> R_{debye} \f$
   if (cfg->geom->r_size < debye_length * debye_multiplicator
       || cfg->geom->z_size < debye_length * debye_multiplicator)
   {
@@ -102,6 +96,19 @@ bool LimitationsChecker::check_system_size()
          << cfg->geom->r_size << " x " << cfg->geom->z_size
          << " m.''. Should be more, than ``"
          <<  debye_length * debye_multiplicator
+         << " m.''. Exiting" << endl;
+    exit(1);
+  }
+
+  // implement \f$ L << N_{particles} * R_{debye} \f$
+  if (cfg->geom->r_size > debye_length * number_macro * debye_multiplicator
+      || cfg->geom->z_size > debye_length * number_macro * debye_multiplicator)
+  {
+    cerr << cfg->geom->dr << endl;
+    cerr << "ERROR! too large system size: ``"
+         << cfg->geom->r_size << " x " << cfg->geom->z_size
+         << " m.''. Should be less, than ``"
+         <<  debye_length * number_macro * debye_multiplicator
          << " m.''. Exiting" << endl;
     exit(1);
   }
