@@ -89,14 +89,15 @@ bool LimitationsChecker::check_grid_size()
 }
 
 bool LimitationsChecker::check_system_size()
-// implement d{r,z} < \lambda debye
+// implement \f$ L >> R_debye \f$
 {
   bool status = true;
   int debye_multiplicator = 100;
 
-  if (cfg->geom->dr < debye_length * debye_multiplicator
-      || cfg->geom->dz < debye_length * debye_multiplicator)
+  if (cfg->geom->r_size < debye_length * debye_multiplicator
+      || cfg->geom->z_size < debye_length * debye_multiplicator)
   {
+    cerr << cfg->geom->dr << endl;
     cerr << "ERROR! too small system size: ``"
          << cfg->geom->r_size << " x " << cfg->geom->z_size
          << " m.''. Should be more, than ``"
