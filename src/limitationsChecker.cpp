@@ -30,7 +30,8 @@ LimitationsChecker::LimitationsChecker(Parameters *config)
   }
 
   plasma_freq = sqrt(electron_density * EL_CHARGE * EL_CHARGE / (EL_MASS * EPSILON0));
-  debye_length = sqrt(EPSILON0 * BOLTZMANN * electron_temperature / (4 * PI * electron_density * EL_CHARGE * EL_CHARGE));
+  // 7400 is a coefficient, when T is in electron volts and N is in \f$ m^-3 \f$
+  debye_length = 7400 * sqrt(electron_temperature / electron_density);
 }
 
 
@@ -93,13 +94,13 @@ bool LimitationsChecker::check_system_size()
   bool status = true;
   int debye_multiplicator = 100;
 
-  if (cfg->geom->r_size * debye_multiplicator < debye_length * number_macro
-      || cfg->geom->z_size * debye_multiplicator < debye_length * number_macro)
+  if (cfg->geom->dr < debye_length * debye_multiplicator
+      || cfg->geom->dz < debye_length * debye_multiplicator)
   {
     cerr << "ERROR! too small system size: ``"
          << cfg->geom->r_size << " x " << cfg->geom->z_size
          << " m.''. Should be more, than ``"
-         <<  debye_length * number_macro / debye_multiplicator
+         <<  debye_length * debye_multiplicator
          << " m.''. Exiting" << endl;
     exit(1);
   }

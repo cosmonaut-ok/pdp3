@@ -3,6 +3,10 @@
 #include <math.h>
 #include "particles.h"
 #include "geometry.h"
+#include "constant.h"
+#include "lib.h"
+
+using namespace constant;
 
 class Temperature
 {
@@ -33,3 +37,5 @@ private:
   void inc_count(unsigned int i, unsigned int j);
   void inc_sum(unsigned int i, unsigned int j, double t);
 };
+
+#define VEL_TO_TEMPR(vel, mass) (mass) * pow(lib::get_gamma(vel) * vel, 2) / 2 / BOLTZMANN
