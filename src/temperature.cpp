@@ -36,16 +36,15 @@ void Temperature::calc_t_r(Particles *prtls)
     unsigned int i_r = CELL_NUMBER(prtls->pos[i][0], geom->dr);
     unsigned int k_z = CELL_NUMBER(prtls->pos[i][2], geom->dz);
 
-
-    t_r_sum[i_r][k_z] = t_r_sum[i_r][k_z] + abs(prtls->vel[i][0]);
-    // count[i_r][k_z] = count[i_r][k_z] + 1;
+    t_r_sum[i_r][k_z] = t_r_sum[i_r][k_z] + VEL_TO_TEMPR(abs(prtls->vel[i][0]), prtls->mass);
     count[i_r][k_z]++;
   }
 
 // #pragma omp parallel for
   for (unsigned int i = 0; i < geom->n_grid_r; i++)
     for (unsigned int j = 0; j < geom->n_grid_z; j++)
-      t_r[i][j] = VEL_TO_TEMPR(t_r_sum[i][j], prtls->mass) / count[i][j];
+      // t_r[i][j] = VEL_TO_TEMPR(t_r_sum[i][j], prtls->mass) / count[i][j];
+      t_r[i][j] = t_r_sum[i][j] / count[i][j];
 }
 
 void Temperature::calc_t_phi(Particles *prtls)
@@ -55,15 +54,14 @@ void Temperature::calc_t_phi(Particles *prtls)
     unsigned int i_r = CELL_NUMBER(prtls->pos[i][0], geom->dr);
     unsigned int k_z = CELL_NUMBER(prtls->pos[i][2], geom->dz);
 
-    t_phi_sum[i_r][k_z] = t_phi_sum[i_r][k_z] + abs(prtls->vel[i][1]);
-    // count[i_r][k_z] = count[i_r][k_z] + 1;
+    t_phi_sum[i_r][k_z] = t_phi_sum[i_r][k_z] + VEL_TO_TEMPR(abs(prtls->vel[i][1]), prtls->mass);
     count[i_r][k_z]++;
   }
 
 // #pragma omp parallel for
   for (unsigned int i = 0; i < geom->n_grid_r; i++)
     for (unsigned int j = 0; j < geom->n_grid_z; j++)
-      t_phi[i][j] = VEL_TO_TEMPR(t_phi_sum[i][j], prtls->mass) / count[i][j];
+      t_phi[i][j] = t_phi_sum[i][j] / count[i][j];
 }
 
 void Temperature::calc_t_z(Particles *prtls)
@@ -73,15 +71,14 @@ void Temperature::calc_t_z(Particles *prtls)
     unsigned int i_r = CELL_NUMBER(prtls->pos[i][0], geom->dr);
     unsigned int k_z = CELL_NUMBER(prtls->pos[i][2], geom->dz);
 
-    t_z_sum[i_r][k_z] = t_z_sum[i_r][k_z] + abs(prtls->vel[i][2]);
-    // count[i_r][k_z] = count[i_r][k_z] + 1;
+    t_z_sum[i_r][k_z] = t_z_sum[i_r][k_z] + VEL_TO_TEMPR(abs(prtls->vel[i][2]), prtls->mass);
     count[i_r][k_z]++;
   }
 
 // #pragma omp parallel for
   for (unsigned int i = 0; i < geom->n_grid_r; i++)
     for (unsigned int j = 0; j < geom->n_grid_z; j++)
-      t_z[i][j] = VEL_TO_TEMPR(t_z_sum[i][j], prtls->mass) / count[i][j];
+      t_z[i][j] = t_z_sum[i][j] / count[i][j];
 }
 
 void Temperature::reset(void)

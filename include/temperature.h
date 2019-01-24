@@ -38,4 +38,5 @@ private:
   void inc_sum(unsigned int i, unsigned int j, double t);
 };
 
-#define VEL_TO_TEMPR(vel, mass) (mass) * pow(lib::get_gamma(vel) * vel, 2) / 2 / BOLTZMANN
+// #define VEL_TO_TEMPR(vel, mass) (mass) * pow((vel), 2) / (3 * BOLTZMANN * 11604.505)
+#define VEL_TO_TEMPR(vel, mass) (mass) * pow(lib::get_gamma(vel) * (vel), 2) / (2 * EL_CHARGE)

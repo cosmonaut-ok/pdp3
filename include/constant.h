@@ -24,5 +24,5 @@ namespace constant
   // Smaller values should be rounded to zero
   const double MNZL = 1e-15; // Minimal Non-Zeroing Limit
   // Boltzmann constant, eV * K^-1
-  const double BOLTZMANN = 8.62e-5;
+  const double BOLTZMANN = 1.381e-23;
 }
