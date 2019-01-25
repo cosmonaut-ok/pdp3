@@ -29,24 +29,32 @@ ProbePlain::ProbePlain(char *c_path, char *c_component, int c_type,
   if (compress)
     cerr << "WARNING! compression is not supported by plaintext backend" << endl;
 
+
+  char result_component[100];
+
+  if (strcmp(c_specie, "none") == 0)
+    strcpy(result_component, c_component);
+  else
+    sprintf(result_component, "%s/%s", c_component, c_specie);
+
   switch (type)
   {
   case 0:
-    sprintf(path_result, "%s/%s/frame_%d:%d_%d:%d", c_path, c_component,
+    sprintf(path_result, "%s/%s/frame_%d:%d_%d:%d", c_path, result_component,
             c_start_r, c_start_z, c_end_r, c_end_z);
     break;
   case 1:
-    sprintf(path_result, "%s/%s/col_%d", c_path, c_component, c_start_z);
+    sprintf(path_result, "%s/%s/col_%d", c_path, result_component, c_start_z);
     break;
   case 2:
-    sprintf(path_result, "%s/%s/row_%d", c_path, c_component, c_start_r);
+    sprintf(path_result, "%s/%s/row_%d", c_path, result_component, c_start_r);
     break;
   case 3:
-    sprintf(path_result, "%s/%s/dot_%d_%d", c_path, c_component,
+    sprintf(path_result, "%s/%s/dot_%d_%d", c_path, result_component,
             c_start_r, c_start_z);
     break;
   case 4:
-    sprintf(path_result, "%s/%s/mpframe_%d:%d_%d:%d", c_path, c_component,
+    sprintf(path_result, "%s/%s/mpframe_%d:%d_%d:%d", c_path, result_component,
             c_start_r, c_start_z, c_end_r, c_end_z);
     break;
   }

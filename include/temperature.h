@@ -11,15 +11,11 @@ using namespace constant;
 class Temperature
 {
 public:
-  double **t_r;
-  double **t_phi;
-  double **t_z;
+  double **t;
   Geometry *geom;
 
 private:
-  double **t_r_sum;
-  double **t_phi_sum;
-  double **t_z_sum;
+  double **t_sum;
   double **count;
 
 public:
@@ -31,6 +27,7 @@ public:
   void calc_t_r(Particles *prtls);
   void calc_t_phi(Particles *prtls);
   void calc_t_z(Particles *prtls);
+  void calc_t(Particles *prtls);
   void reset(void);
 
 private:

@@ -64,14 +64,14 @@ bool LimitationsChecker::check_grid_size()
 // implement d{r,z} < \lambda debye
 {
   bool status;
-  int debye_multiplicator = 10;
+  int debye_multiplicator = 50;
 
-  if (cfg->geom->dr < debye_length * debye_multiplicator
-      || cfg->geom->dr < debye_length * debye_multiplicator)
+  if (cfg->geom->dr > debye_length * debye_multiplicator
+      || cfg->geom->dr > debye_length * debye_multiplicator)
   {
-    cerr << "ERROR! too small grid size: ``"
+    cerr << "ERROR! too large grid size: ``"
          << cfg->geom->dr << " x " << cfg->geom->dz
-         << " m.''. Should be more, than ``"
+         << " m.''. Should be less, than ``"
          << debye_length * debye_multiplicator
          << " m.''. Exiting" << endl;
     exit(1);
