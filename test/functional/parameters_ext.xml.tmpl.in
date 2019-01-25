@@ -108,8 +108,8 @@
 
       <probe type="frame" r_start="0" z_start="0" r_end="254" z_end="2046" schedule="20" component="rho_beam" />
 
-      <probe type="mpframe" r_start="100" z_start="100" r_end="150" z_end="150" schedule="20" component="Electrons" />
-      <probe type="mpframe" r_start="100" z_start="100" r_end="150" z_end="150" schedule="20" component="Ions" />
+      <probe type="frame" r_start="100" z_start="100" r_end="150" z_end="150" schedule="20" component="T" specie="Electrons" />
+      <probe type="frame" r_start="100" z_start="100" r_end="150" z_end="150" schedule="20" component="T" specie="Ions" />
     </probes>
 
   </file_save_parameters>

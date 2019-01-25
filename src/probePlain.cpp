@@ -53,10 +53,6 @@ ProbePlain::ProbePlain(char *c_path, char *c_component, int c_type,
     sprintf(path_result, "%s/%s/dot_%d_%d", c_path, result_component,
             c_start_r, c_start_z);
     break;
-  case 4:
-    sprintf(path_result, "%s/%s/mpframe_%d:%d_%d:%d", c_path, result_component,
-            c_start_r, c_start_z, c_end_r, c_end_z);
-    break;
   }
 
   lib::make_directory(path_result);
