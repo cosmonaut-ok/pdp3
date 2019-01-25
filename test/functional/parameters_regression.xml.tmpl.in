@@ -90,8 +90,8 @@
       <probe type="dot" r="34" z="341" schedule="50" component="E_z" />
       <probe type="dot" r="34" z="341" schedule="50" component="H_phi" />
 
-      <probe type="mpframe" r_start="90" r_end="130" z_start="1000" z_end="1200" schedule="50" component="electrons" />
-      <probe type="mpframe" r_start="90" r_end="130" z_start="1000" z_end="1200" schedule="50" component="ions" />
+      <probe type="frame" r_start="90" r_end="130" z_start="1000" z_end="1200" schedule="50" component="T" specie="electrons" />
+      <probe type="frame" r_start="90" r_end="130" z_start="1000" z_end="1200" schedule="50" component="T" specie="ions" />
 
       <probe type="frame" r_start="0" z_start="0" r_end="100" z_end="500" schedule="50" component="E_r" />
       <probe type="frame" r_start="0" z_start="0" r_end="100" z_end="500" schedule="50" component="E_z" />
