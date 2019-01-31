@@ -29,6 +29,7 @@ public:
   void calc_t_z(Particles *prtls);
   void calc_t(Particles *prtls);
   void reset(void);
+  void inc_tmpr(unsigned int r, unsigned int z, double value);
 
 private:
   void inc_count(unsigned int i, unsigned int j);
