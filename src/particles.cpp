@@ -237,7 +237,7 @@ void Particles::velocity_distribution(double tempr_ev)
     double therm_vel_el = lib::sq_rt(2 * EL_CHARGE * energies[p] / mass);
 
     // velocity for components. Require to normalize values
-    double norm_coeff = 1; // 0.7071067811865475;
+    double norm_coeff = 0.7071067811865475;
     therm_vel_el = therm_vel_el * norm_coeff;
       
     double rnd_0, rnd_1, rnd_2;
