@@ -143,8 +143,8 @@ void Particles::charge_weighting(ChargeDensity *ro1)
         ro_v = charge_array[i] / (2. * PI * dz * dr * pos[i][0]);
         v_1 = CELL_VOLUME(r_i, dr, dz);
         v_2 = CELL_VOLUME(r_i + 1, dr, dz);
-        dz1 = (z_k + 1) * dz - pos[i][2];
-        dz2 = pos[i][2] - z_k * dz;
+	dz1 = (z_k + 0.5) * dz - (pos[i][2] - 0.5 * dz);
+	dz2 = (pos[i][2] + 0.5 * dz) - (z_k + 0.5) * dz;
 
         // weighting in ro[i][k] cell
         value = ro_v * CYL_RNG_VOL(dz1, r1, r2) / v_1;
@@ -169,8 +169,8 @@ void Particles::charge_weighting(ChargeDensity *ro1)
         r1 =  0.;
         r2 = (r_i + 0.5) * dr;
         r3 = pos[i][0] + 0.5 * dr;
-        dz1 = (z_k + 1) * dz-pos[i][2];
-        dz2 = pos[i][2] - z_k * dz;
+	dz1 = (z_k + 0.5) * dz - (pos[i][2] - 0.5 * dz);
+	dz2 = (pos[i][2] + 0.5 * dz) - (z_k + 0.5) * dz;
         ro_v = charge_array[i] / (PI * dz * (2. * pos[i][0] * pos[i][0] + dr * dr / 2.));
         v_1 = CYL_VOL(dz, dr);
         v_2 = CELL_VOLUME(r_i + 1, dr, dz);
@@ -199,8 +199,8 @@ void Particles::charge_weighting(ChargeDensity *ro1)
         r1 = pos[i][0] - 0.5 * dr;
         r2 = (r_i + 0.5) * dr;
         r3 = pos[i][0] + 0.5 * dr;
-        dz1 = (z_k + 1) * dz-pos[i][2];
-        dz2 = pos[i][2] - z_k * dz;
+	dz1 = (z_k + 0.5) * dz - (pos[i][2] - 0.5 * dz);
+	dz2 = (pos[i][2] + 0.5 * dz) - (z_k + 0.5) * dz;
         ro_v = charge_array[i] / (2. * PI * dz * dr * pos[i][0]);
         v_1 = CYL_VOL(dz, dr);
         v_2 = CELL_VOLUME(r_i + 1, dr, dz);
@@ -237,7 +237,7 @@ void Particles::velocity_distribution(double tempr_ev)
     double therm_vel_el = lib::sq_rt(2 * EL_CHARGE * energies[p] / mass);
 
     // velocity for components. Require to normalize values
-    double norm_coeff = 0.7071067811865475;
+    double norm_coeff = 1; // 0.7071067811865475;
     therm_vel_el = therm_vel_el * norm_coeff;
       
     double rnd_0, rnd_1, rnd_2;
@@ -715,9 +715,9 @@ void Particles::azimuthal_current_distribution(Current * this_j)
         ro_v = charge_array[i] / (2. * PI * dz * dr * pos[i][0]);
         v_1 = CELL_VOLUME(r_i, dr, dz);
         v_2 = CELL_VOLUME(r_i + 1, dr, dz);
-        dz1 = (z_k + 1) * dz - pos[i][2];
-        dz2 = pos[i][2] - z_k * dz;
-
+	dz1 = (z_k + 0.5) * dz - (pos[i][2] - 0.5 * dz);
+	dz2 = (pos[i][2] + 0.5 * dz) - (z_k + 0.5) * dz;
+	
         // weighting in j[i][k] cell
         rho = ro_v * CYL_RNG_VOL(dz1, r1, r2) / v_1;
         current = rho * vel[i][1];
@@ -744,8 +744,8 @@ void Particles::azimuthal_current_distribution(Current * this_j)
         r1 = pos[i][0] - 0.5 * dr;
         r2 = (r_i + 0.5) * dr;
         r3 = pos[i][0] + 0.5 * dr;
-        dz1 = (z_k + 1) * dz-pos[i][2];
-        dz2 = pos[i][2] - z_k * dz;
+	dz1 = (z_k + 0.5) * dz - (pos[i][2] - 0.5 * dz);
+	dz2 = (pos[i][2] + 0.5 * dz) - (z_k + 0.5) * dz;
         ro_v = charge_array[i] / (2. * PI * dz * dr * pos[i][0]);
         v_1 = CYL_VOL(dz, dr);
         v_2 = CELL_VOLUME(r_i + 1, dr, dz);
