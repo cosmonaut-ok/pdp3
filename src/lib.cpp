@@ -203,7 +203,7 @@ namespace lib
     if (!ifile.is_open())
     {
       cerr << "CRITICAL!(read_file_to_double): Can not open file " << filename << ". Can not continue." << endl;
-	exit(1);
+      exit(1);
     }
 
     double num = 0.0;
@@ -217,5 +217,94 @@ namespace lib
     // }
 
     return scores;
+  }
+
+  void bilinear_interpolation(double** a, double** b, unsigned int x_size, unsigned int y_size)
+  {
+#pragma omp parallel
+    {
+      // "cross" linear interpolation
+#pragma omp for
+      for (unsigned int i = 1; i < x_size; i++)
+        for (unsigned int j = 1; j < y_size - 1; j++)
+          b[i][j] = (a[i-1][j-1] + a[i][j-1] + a[i-1][j] + a[i][j]) / 4;
+
+#pragma omp for
+      // process border conditions
+      for (unsigned int i = 1; i < x_size - 1; i++)
+        b[i][0] = (a[i-1][0] + a[i][0]) / 2;
+
+#pragma omp for
+      for (unsigned int j = 1; j < y_size - 1; j++)
+        b[0][j] = (a[0][j-1] + a[0][j]) / 2;
+
+      // process corners
+      b[0][0] = a[0][0];
+      b[x_size-1][0] = a[x_size-1][0];
+      b[0][y_size-1] = a[0][y_size-1];
+      b[x_size-1][y_size-1] = a[x_size-1][y_size-1];
+    }
+  }
+
+  // double get_gamma_inv (double sq_velocity)
+  void bicubic_interpolation(double** a, double** b, unsigned int x_size, unsigned int y_size)
+  {
+    double b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11, b12, b13, b14, b15, b16;
+
+#pragma omp parallel for
+    for (unsigned int i = 2; i < x_size - 2; i++)
+      for (unsigned int j = 2; j < y_size - 2; j++)
+      {
+        b1 = (i-1) * (i-2) * (i+1) * (j-1) * (j-2) * (j+1) / 4;
+        b2 = - i * (i+1) * (i-2) * (j-1) * (j-2) * (j+1) / 4;
+        b3 = - (i-1) * (i-2) * (i+1) * j * (j-2) * (j+1) / 4;
+        b4 = i * (i-2) * (i+1) * j * (j-2) * (j+1) / 4;
+        b5 = - i * (i-1) * (i-2) * (j-1) * (j-2) * (j+1) / 12;
+        b6 = - (i-1) * (i-2) * (i+1) * j * (j-2) * (j-1) / 12;
+        b7 = i * (i-2) * (i-1) * j * (j-2) * (j+1) / 12;
+        b8 = i * (i-2) * (i+1) * j * (j-2) * (j-1) / 12;
+        b9 = i * (i-1) * (i+1) * (j-1) * (j-2) * (j+1) / 12;
+        b10 = (i-1) * (i-2) * (i+1) * j * (j-1) * (j+1) / 12;
+        b11 = i * (i-2) * (i-1) * j * (j-2) * (j-1) / 36;
+        b12 = - i * (i-1) * (i+1) * j * (j-2) * (j+1) / 12;
+        b13 = - i * (i-2) * (i+1) * j * (j-1) * (j+1) / 12;
+        b14 = - i * (i-1) * (i+1) * j * (j-2) * (j-1) / 36;
+        b15 = - i * (i-2) * (i-1) * j * (j-1) * (j+1) / 36;
+        b16 = i * (i-1) * (i+1) * j * (j-1) * (j+1) / 36;
+
+        b[i][j] = b1 * a[i][j]
+          + b2 * a[i][j+1]
+          + b3 * a[i+1][j]
+          + b4 * a[i+1][j+1]
+          + b5 * a[i][j-1]
+          + b6 * a[i-1][j]
+          + b7 * a[i+1][j-1]
+          + b8 * a[i-1][j+1]
+          + b9 * a[i][j+2]
+          + b10 * a[i+2][j]
+          + b11 * a[i-1][j-1]
+          + b12 * a[i+1][j+2]
+          + b13 * a[i+2][j+1]
+          + b14 * a[i-1][j+2]
+          + b15 * a[i+2][j-1]
+          + b16 * a[i+2][j+2];
+      }
+
+    // TODO: make correct border processing
+    for (unsigned int j = 0; j < y_size; j++)
+    {
+      b[0][j] = 0;
+      b[1][j] = 0;
+      b[x_size-1][j] = 0;
+      b[x_size-2][j] = 0;
+    }
+
+    for (unsigned int i = 0; i < x_size; i++)
+    {
+      b[i][0] = 0;
+      b[i][1] = 0;
+      b[i][y_size-1] = 0;
+      b[i][y_size-2] = 0;
+    }
   }
 }
