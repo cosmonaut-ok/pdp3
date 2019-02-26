@@ -3,8 +3,8 @@ image: cosmonaut/hdf5-builder:latest
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
-before_script:
-  - apt-get -y -qq install build-essential git autoconf imagemagick doxygen pandoc pandoc-citeproc python3-numpy python3-colorama python3-jinja2 python3-scipy python3-matplotlib python3-h5py || true
+# before_script:
+#   - apt-get -y -qq install build-essential git autoconf imagemagick doxygen pandoc pandoc-citeproc python3-numpy python3-colorama python3-jinja2 python3-scipy python3-matplotlib python3-h5py || true
 
 stages:
   - build

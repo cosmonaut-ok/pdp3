@@ -7,7 +7,7 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 RUN echo 'deb-src http://deb.debian.org/debian stretch main' >> /etc/apt/sources.list
 RUN apt-get update -y -qq
 
-RUN apt-get -y -qq install apt-utils build-essential git imagemagick pandoc pandoc-citeproc libtool libtool-bin wget
+RUN apt-get -y -qq install apt-utils build-essential git imagemagick pandoc pandoc-citeproc libtool libtool-bin wget autoconf doxygen pandoc-citeproc python3-numpy python3-colorama python3-jinja2 python3-scipy python3-matplotlib
 
 # because mainstream openjdk does not want to be installed w/o some (pseudo)graphics
 RUN apt-get -y -qq install default-jdk-headless || true
@@ -21,3 +21,6 @@ RUN ./autogen.sh
 RUN ./configure --enable-cxx --enable-build-mode=production --prefix=/usr
 RUN make
 RUN make install
+
+## install H5py separately
+RUN apt-get -y -qq install python3-h5py
