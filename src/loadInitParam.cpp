@@ -267,7 +267,7 @@ void LoadInitParam::init_fields ()
   efield->set_fi_on_z();
 }
 
-void LoadInitParam::print_data(int probe_type, char* component, int step_number, int dump_interval, int* shape)
+void LoadInitParam::print_data(int probe_type, char* component, int step_number, int dump_interval, int* shape, char* specie)
 {
   int print_header_step = 20;
   if (printed_step % print_header_step == 0)
@@ -289,20 +289,29 @@ void LoadInitParam::print_data(int probe_type, char* component, int step_number,
   switch (probe_type)
   {
   case 0:
-    sprintf(type_comp, "frame/%s", component);
+    strcmp(specie, "none") ? sprintf(type_comp, "frame/%s/%s", component, specie)
+      : sprintf(type_comp, "frame/%s", component);
     sprintf(probe_shape, "[%i,%i,%i,%i]", shape[0], shape[1], shape[2], shape[3]);
     break;
   case 1:
-    sprintf(type_comp, "column/%s", component);
+    strcmp(specie, "none") ? sprintf(type_comp, "column/%s/%s", component, specie)
+      : sprintf(type_comp, "column/%s", component);
     sprintf(probe_shape, "[%i]", shape[1]);
     break;
   case 2:
-    sprintf(type_comp, "row/%s", component);
+    strcmp(specie, "none") ? sprintf(type_comp, "row/%s/%s", component, specie)
+      : sprintf(type_comp, "row/%s", component);
     sprintf(probe_shape, "[%i]", shape[0]);
     break;
   case 3:
-    sprintf(type_comp, "dot/%s", component);
+    strcmp(specie, "none") ? sprintf(type_comp, "dot/%s/%s", component, specie)
+      : sprintf(type_comp, "dot/%s", component);
     sprintf(probe_shape, "[%i,%i]", shape[0], shape[1]);
+    break;
+  case 4:
+    strcmp(specie, "none") ? sprintf(type_comp, "mpframe/%s/%s", component, specie)
+      : sprintf(type_comp, "mpframe/%s", component);
+    sprintf(probe_shape, "[%i,%i,%i,%i]", shape[0], shape[1], shape[2], shape[3]);
     break;
   }
 
@@ -335,7 +344,7 @@ void LoadInitParam::dump_data(int step_number)
       sprintf(file_name, "%d", file_number);
       int shape[4] = {w->start_r, w->start_z, w->end_r, w->end_z};
 
-      print_data(w->type, w->component, w->step_number, w->schedule, shape);
+      print_data(w->type, w->component, w->step_number, w->schedule, shape, w->specie);
 
       if (strcmp(w->component, "E_r") == 0)
         w->write(file_name, efield->field_r);
@@ -360,41 +369,23 @@ void LoadInitParam::dump_data(int step_number)
       //
       else if (strcmp(w->component, "rho_beam") == 0)
         w->write(file_name, c_rho_bunch->get_rho());
-      else if (strcmp(w->component, "T_r") == 0)
-      {
-        for (auto i = p_list->part_list.begin(); i != p_list->part_list.end(); ++i)
-          if (strcmp((*i)->name, w->specie) == 0)
-          {
-            temperature->calc_t_r(*i);
-            w->write(file_name, temperature->t);
-          }
-      }
-      else if (strcmp(w->component, "T_phi") == 0)
-      {
-        for (auto i = p_list->part_list.begin(); i != p_list->part_list.end(); ++i)
-          if (strcmp((*i)->name, w->specie) == 0)
-          {
-            temperature->calc_t_phi(*i);
-            w->write(file_name, temperature->t);
-          }
-      }
-      else if (strcmp(w->component, "T_z") == 0)
-      {
-        for (auto i = p_list->part_list.begin(); i != p_list->part_list.end(); ++i)
-          if (strcmp((*i)->name, w->specie) == 0)
-          {
-            temperature->calc_t_z(*i);
-            w->write(file_name, temperature->t);
-          }
-      }
+      //
       else if (strcmp(w->component, "T") == 0)
       {
         for (auto i = p_list->part_list.begin(); i != p_list->part_list.end(); ++i)
           if (strcmp((*i)->name, w->specie) == 0)
           {
+            temperature->reset();
             temperature->calc_t(*i);
+            temperature->normalize(*i);
             w->write(file_name, temperature->t);
           }
+      }
+      else if (w->type == 4) // (strcmp(w->type, "mpframe") == 0)
+      {
+        for (auto i = p_list->part_list.begin(); i != p_list->part_list.end(); ++i)
+          if (strcmp((*i)->name, w->component) == 0)
+            w->mpwrite(file_name, (*i));
       }
       else
         cerr << "WARNING! probe for component ``" << w->component << "'' does not exist. Skipping" << endl;
