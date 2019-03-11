@@ -12,11 +12,16 @@ class Temperature
 {
 public:
   double **t;
-  Geometry *geom;
 
 private:
+  Geometry *geom;
   double **t_sum;
+  double **t_vec_r;
+  double **t_vec_z;
+  double **t_vec_phi;
+  double **masses;
   double **count;
+  double **count_sum;
 
 public:
   Temperature(Geometry *geom1);
@@ -24,16 +29,16 @@ public:
 
   ~Temperature(void);
 
-  void calc_t_r(Particles *prtls);
-  void calc_t_phi(Particles *prtls);
-  void calc_t_z(Particles *prtls);
   void calc_t(Particles *prtls);
   void reset(void);
+  void inc_tmpr(unsigned int r, unsigned int z, double value);
+  void inc_vec_r(unsigned int r, unsigned int z, double value);
+  void inc_vec_z(unsigned int r, unsigned int z, double value);
+  void inc_vec_phi(unsigned int r, unsigned int z, double value);
+  void inc_count(unsigned int r, unsigned int z, double value);
+  void normalize(Particles *prtls);
 
 private:
   void inc_count(unsigned int i, unsigned int j);
   void inc_sum(unsigned int i, unsigned int j, double t);
 };
-
-// #define VEL_TO_TEMPR(vel, mass) (mass) * pow((vel), 2) / (3 * BOLTZMANN * 11604.505)
-#define VEL_TO_TEMPR(vel, mass) (mass) * pow(lib::get_gamma(vel) * (vel), 2) / (2 * EL_CHARGE)

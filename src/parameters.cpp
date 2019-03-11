@@ -154,6 +154,14 @@ void Parameters::init_probes ()
       p_probe.z_start = atoi(try_atribute(probe_xml, "z"));
       p_probe.z_end = -1;
     }
+    else if ( strcmp(p_type, "mpframe") == 0 )
+    {
+      p_probe.type = 4;
+      p_probe.r_start = atoi(try_atribute(probe_xml, "r_start"));
+      p_probe.r_end = atoi(try_atribute(probe_xml, "r_end"));
+      p_probe.z_start = atoi(try_atribute(probe_xml, "z_start"));
+      p_probe.z_end = atoi(try_atribute(probe_xml, "z_end"));
+    }
     else
     {
       cerr << "ERROR! probe type ``" << p_type << "'' is not supported" << endl;

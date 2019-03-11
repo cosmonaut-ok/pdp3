@@ -41,4 +41,6 @@ namespace lib
   double sq_rt(double x);
   char *get_cmd_option(char **begin, char **end, const std::string &option);
   bool cmd_option_exists(char **begin, char **end, const std::string &option);
+  void bilinear_interpolation(double **a, double **b, unsigned int x_size, unsigned int y_size);
+  void bicubic_interpolation(double **a, double **b, unsigned int x_size, unsigned int y_size);
 }

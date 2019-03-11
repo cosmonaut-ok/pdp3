@@ -53,7 +53,7 @@ public:
 public:
   double *read_double_params(const char *p_name);
   void dump_data(int step_number);
-  void print_data(int probe_type, char* component, int step_number, int dump_interval, int* shape);
+  void print_data(int probe_type, char* component, int step_number, int dump_interval, int* shape, char* specie);
   void run(void);
 
 public:
