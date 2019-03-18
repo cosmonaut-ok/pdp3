@@ -94,6 +94,7 @@ LoadInitParam::LoadInitParam(char *xml_file_name)
   cerr << "INFO! Initializing E/M Fields Data" << endl;
   init_fields ();
   temperature = new Temperature(params->geom);
+  density = new ParticlesDensity(params->geom);
 
   //! 3. load particle parameters
   cerr << "INFO! Initializing Particles Data" << endl;
@@ -276,7 +277,7 @@ void LoadInitParam::print_data(int probe_type, char* component, int step_number,
     cout << endl
          << left << setw(8) << "Step"
          << left << setw(13) << "Saved Frame"
-         << left << setw(20) << "Dumping Probe Name"
+         << left << setw(25) << "Dumping Probe Name"
          << left << setw(21) << "Shape"
          << left << setw(18) << "Model Time (sec)"
          << left << setw(21) << "Simulation Duration"
@@ -317,7 +318,7 @@ void LoadInitParam::print_data(int probe_type, char* component, int step_number,
 
   cout << left << setw(8) << step_number * dump_interval
        << left << setw(13) << step_number
-       << left << setw(20) << type_comp
+       << left << setw(25) << type_comp
        << left << setw(21) << probe_shape
        << left << setw(18) << params->time->current_time
        << left << setw(18) << lib::get_simulation_duration()
@@ -381,6 +382,19 @@ void LoadInitParam::dump_data(int step_number)
             w->write(file_name, temperature->t);
           }
       }
+
+      //
+      else if (strcmp(w->component, "density") == 0)
+      {
+        for (auto i = p_list->part_list.begin(); i != p_list->part_list.end(); ++i)
+          if (strcmp((*i)->name, w->specie) == 0)
+          {
+            density->reset();
+            density->calc_density(*i);
+            w->write(file_name, density->density);
+          }
+      }
+
       else if (w->type == 4) // (strcmp(w->type, "mpframe") == 0)
       {
         for (auto i = p_list->part_list.begin(); i != p_list->part_list.end(); ++i)

@@ -24,8 +24,6 @@
 #include "hField.h"
 #include "ioText.h"
 
-#include "temperature.h"
-
 #include "probe.h"
 #include "probePlain.h"
 
@@ -39,6 +37,7 @@
 #include "poissonDirichlet.h"
 #include "parameters.h"
 #include "temperature.h"
+#include "particlesDensity.h"
 
 using namespace std;
 using namespace tinyxml2;
@@ -71,6 +70,7 @@ public:
   EField *efield;
   HField *hfield;
   Temperature *temperature;
+  ParticlesDensity *density;
 
 #ifndef LEGACY
   Probe *c_probe_e_r;

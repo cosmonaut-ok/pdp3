@@ -267,7 +267,7 @@ class PlotBuilder:
             __ticklabels = np.linspace(ticklabels[0], ticklabels[1], self.number_cbar_ticks) if ticklabels else __ticks
 
             def format_s(x):
-                return('%.0e' % x)
+                return('%.1e' % x)
 
             __ticklabels = list(map(format_s, __ticklabels))
 

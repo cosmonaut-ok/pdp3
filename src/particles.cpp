@@ -239,7 +239,7 @@ void Particles::velocity_distribution(double tempr_ev)
     // velocity for components. Require to normalize values
     double norm_coeff = 0.7071067811865475;
     therm_vel_el = therm_vel_el * norm_coeff;
-      
+
     double rnd_0, rnd_1, rnd_2;
 
 #ifdef TESTMODE
@@ -306,10 +306,15 @@ void Particles::load_cylindrical_spatial_distribution(double n1, double n2, doub
 
   double n_per_macro_avg = N_total / number;
 
+  double norm;
+
   for (unsigned int n = 0; n < number; n++)
   {
     // coefitient of normalization
-    double norm = 2 * PI * pos[n][0] * dr * dz / v_avg;
+    if (pos[n][0] > dr / 2)
+      norm = 2 * PI * pos[n][0] * dr * dz / v_avg;
+    else
+      norm = PI * (pos[n][0] * pos[n][0] + pos[n][0] * dr + dr * dr / 4) * dz / v_avg;
 
     // number of real particles per macroparticle
     double n_per_macro = n_per_macro_avg * norm;
@@ -717,7 +722,7 @@ void Particles::azimuthal_current_distribution(Current * this_j)
         v_2 = CELL_VOLUME(r_i + 1, dr, dz);
 	dz1 = (z_k + 0.5) * dz - (pos[i][2] - 0.5 * dz);
 	dz2 = (pos[i][2] + 0.5 * dz) - (z_k + 0.5) * dz;
-	
+
         // weighting in j[i][k] cell
         rho = ro_v * CYL_RNG_VOL(dz1, r1, r2) / v_1;
         current = rho * vel[i][1];
