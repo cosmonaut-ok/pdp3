@@ -61,10 +61,10 @@ Bunch::Bunch (char *p_name,
   {
     // coefitient of normalization
     double norm;
-    if (pos[i][0] > dr)
+    if (pos[i][0] > dr / 2)
       norm = 2 * PI * pos[i][0] * dr * dz / v_avg;
     else
-      norm = PI * pos[i][0] * pos[i][0] * dz / v_avg;
+      norm = PI * (pos[i][0] * pos[i][0] + pos[i][0] * dr + dr * dr / 4) * dz / v_avg;
 
     // number of real particles per macroparticle
     double n_per_macro = n_per_macro_avg * norm;
