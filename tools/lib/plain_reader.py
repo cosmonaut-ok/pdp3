@@ -414,17 +414,20 @@ class PlainReader:
         to_ds, to_frame_in_ds = self.get_ds_frame_by_frame(to_frame)
         frames = np.empty([frame_range, size[0], size[1]])
 
-        # first ds
-        frames[0:self.__fpds__ - from_frame_in_ds] = self.get_all_frames_in_ds(p_component, shape, from_ds)[from_frame_in_ds:]
-        # last ds
-        frames[frame_range - to_frame_in_ds - 1:frame_range - 1] = self.get_all_frames_in_ds(p_component, shape, to_ds)[:to_frame_in_ds]
+        if frame_range >= self.__fpds__:
+            # first ds
+            frames[0:self.__fpds__ - from_frame_in_ds] = self.get_all_frames_in_ds(p_component, shape, from_ds)[from_frame_in_ds:]
+            # last ds
+            if to_frame_in_ds > 0: frames[frame_range - to_frame_in_ds - 1:frame_range - 1] = self.get_all_frames_in_ds(p_component, shape, to_ds)[:to_frame_in_ds]
 
-        shifted_frame = self.__fpds__ - from_frame_in_ds # + 1
-        for i in range(from_ds + 1, to_ds):
-            i_shifted = i - from_ds - 1   # from_ds + 1 -> 0
-            k = i_shifted * self.__fpds__ # from_ds + 1 -> 0
-            k_1 = (i_shifted + 1) * self.__fpds__ # from_ds + 1 -> 10
-            frames[shifted_frame + k:shifted_frame + k_1] = self.get_all_frames_in_ds(p_component, shape, i)[0:self.__fpds__]
+            shifted_frame = self.__fpds__ - from_frame_in_ds # + 1
+            for i in range(from_ds + 1, to_ds):
+                i_shifted = i - from_ds - 1   # from_ds + 1 -> 0
+                k = i_shifted * self.__fpds__ # from_ds + 1 -> 0
+                k_1 = (i_shifted + 1) * self.__fpds__ # from_ds + 1 -> 10
+                frames[shifted_frame + k:shifted_frame + k_1] = self.get_all_frames_in_ds(p_component, shape, i)[0:self.__fpds__]
+        else:
+            frames[0:to_frame_in_ds] = self.get_all_frames_in_ds(p_component, shape, from_ds)[from_frame_in_ds:to_frame_in_ds]
 
         return frames
 

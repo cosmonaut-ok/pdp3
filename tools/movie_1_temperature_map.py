@@ -12,33 +12,24 @@ from lib.plot_builder import PlotBuilder
 from lib.h5_reader import H5Reader
 from lib.plain_reader import PlainReader
 
-def run(config_file, clim_e_r, clim_e_z, rho_beam_scale, video_file=None,
-        time_range=None, cmap=None, frame_step=1, dry_run=False, view=False, use_grid=False):
+def run(config_file, clim_t, video_file=None,
+        time_range=None, cmap=None, frame_step=1, specie='electrons', dry_run=False, view=False, use_grid=False):
 
     ##  configuration options
     x_axis_label = r'$\mathit{Z (m)}$'
     y_axis_label = r'$\mathit{R (m)}$'
-    cbar_axis_label = r'$\frac{V}{m}$'
-    cbar_bunch_density_axis_label = r'$m^{-3}$'
+    cbar_axis_label = r'$\mathit{T (eV)}$'
 
-    e_r_plot_name = r'$\mathbf{Electrical\enspace Field\enspace Radial\enspace Component}\enspace(E_r)$'
-    e_z_plot_name = r'$\mathbf{Electrical\enspace Field\enspace Longitudal\enspace Component}\enspace(E_z)$'
-    rho_beam_plot_name = r'$\mathbf{Electron\enspace Bunch\enspace Density}\enspace (\rho_{bunch})$'
+    t_plot_name = r'$\mathbf{Temperature\enspace}\enspace(T)$'
 
     ## read configfile
     cfg = Parameters(config_file)
 
     # calculate/update color limit values
-    el_charge = 1.6e-19
-    clim_rho_beam = [-(cfg.bunch_density * el_charge * rho_beam_scale), 0]
-    clim_estimation = cfg.get_clim_estimation()
-
-    if not clim_e_r: clim_e_r = [-clim_estimation, clim_estimation]
-    if not clim_e_z: clim_e_z = [-clim_estimation, clim_estimation]
-    if not rho_beam_scale: rho_beam_scale = 1
+    if not clim_t: clim_t = [0, 4]
 
     # calculate/update video file path
-    video_file = os.path.join(os.path.dirname(config_file), 'field_movie.avi') if not video_file else video_file
+    video_file = os.path.join(os.path.dirname(config_file), 'temperature_movie.avi') if not video_file else video_file
 
     # define reader (plain reader used)
     autoselect = True
@@ -49,7 +40,7 @@ def run(config_file, clim_e_r, clim_e_z, rho_beam_scale, video_file=None,
                              fullframe_size=[cfg.number_r_grid, cfg.number_z_grid],
                              fpds=cfg.frames_per_file,
                              use_cache=use_cache,
-                             verbose=True)
+                             verbose=False)
     else:
         reader = H5Reader(str(os.path.join(cfg.data_path, 'data.h5')), use_cache=False)
         reader.verbose = True
@@ -64,35 +55,34 @@ def run(config_file, clim_e_r, clim_e_z, rho_beam_scale, video_file=None,
 
                        x_ticklabel_end=cfg.z_size, y_ticklabel_end=cfg.r_size,
                        tickbox=True, grid=use_grid, is_invert_y_axe=False,
-                       aspect='equal', image_interpolation='nearest')
+                       aspect='equal', image_interpolation='bicubic')
 
     # add subplots
-    plot.add_subplot_cartesian_2d(e_r_plot_name, 311, x_axe_label=x_axis_label, y_axe_label=y_axis_label)
-    plot.add_subplot_cartesian_2d(e_z_plot_name, 312, x_axe_label=x_axis_label, y_axe_label=y_axis_label)
-    plot.add_subplot_cartesian_2d(rho_beam_plot_name, 313, x_axe_label=x_axis_label, y_axe_label=y_axis_label)
+    plot.add_subplot_cartesian_2d(t_plot_name, 111, x_axe_label=x_axis_label, y_axe_label=y_axis_label)
 
     # add initial image with zeros and colorbar
     initial_image = np.zeros([cfg.number_r_grid, cfg.number_z_grid])
 
-    plot.add_image(e_r_plot_name, initial_image, cmap=cmap, clim=clim_e_r)
-    plot.add_colorbar(e_r_plot_name, ticks=clim_e_r, title=cbar_axis_label)
-
-    plot.add_image(e_z_plot_name, initial_image, cmap=cmap, clim=clim_e_z)
-    plot.add_colorbar(e_z_plot_name, ticks=clim_e_z, title=cbar_axis_label)
-
-    plot.add_image(rho_beam_plot_name, initial_image, cmap=cmap, clim=clim_rho_beam)
-    plot.add_colorbar(rho_beam_plot_name, ticks=clim_rho_beam, title=cbar_bunch_density_axis_label)
+    plot.add_image(t_plot_name, initial_image, cmap=cmap, clim=clim_t)
+    plot.add_colorbar(t_plot_name, ticks=clim_t, title=cbar_axis_label)
 
     if view: plot.show()
 
+    # dirty hack
+    for p in cfg.probes:
+        if p.component == 'T':
+            dump_interval = p.schedule
+            break
+
     if not time_range:
-        start_frame = cfg.get_frame_number_by_timestamp(cfg.start_time)
-        end_frame = cfg.get_frame_number_by_timestamp(cfg.end_time)
+        start_frame = cfg.get_frame_number_by_timestamp(cfg.start_time, dump_interval)
+        end_frame = cfg.get_frame_number_by_timestamp(cfg.end_time, dump_interval)
     else:
         if time_range[0] > time_range[1]: raise ValueError("End time should not be less, than start time. The values were: {}, {}".format(time_range[0], time_range[1]))
         if time_range[1] > cfg.end_time: raise IndexError("End time is out of simulation range {}. The value was {}".format(cfg.end_time, time_range[1]))
-        start_frame = cfg.get_frame_number_by_timestamp(time_range[0])
-        end_frame = cfg.get_frame_number_by_timestamp(time_range[1])
+
+        start_frame = cfg.get_frame_number_by_timestamp(time_range[0], dump_interval)
+        end_frame = cfg.get_frame_number_by_timestamp(time_range[1], dump_interval)
     if cfg.use_hdf5:
         start_data_set = start_frame
         end_data_set = end_frame
@@ -116,17 +106,13 @@ def run(config_file, clim_e_r, clim_e_z, rho_beam_scale, video_file=None,
             sys.stdout.write('Loading dataset ' + str(i) + ' ')
             sys.stdout.flush()
             if cfg.use_hdf5:
-                data_r = reader.get_frame('E_r', i)
-                data_z = reader.get_frame('E_z', i)
-                data_beam = reader.get_frame('rho_beam', i)
+                data_t = reader.get_frame('T', i)
 
                 # add timestamp to each frame
-                timestamp = cfg.get_timestamp_by_frame_number(i)
+                timestamp = cfg.get_timestamp_by_frame_number(i, dump_interval)
                 fig.suptitle("Time: {:.2e} s".format(timestamp), x=.85, y=.95)
                 if i % frame_step == 0:
-                    plot.add_image(e_r_plot_name, data_r, cmap=cmap, clim=clim_e_r)
-                    plot.add_image(e_z_plot_name, data_z, cmap=cmap, clim=clim_e_z)
-                    plot.add_image(rho_beam_plot_name, data_beam, cmap=cmap, clim=clim_rho_beam)
+                    plot.add_image(t_plot_name, data_t, cmap=cmap, clim=clim_t)
 
                     if view: plot.redraw()
                     if not dry_run: writer.grab_frame()
@@ -134,27 +120,25 @@ def run(config_file, clim_e_r, clim_e_z, rho_beam_scale, video_file=None,
                 else:
                     print('skip')
             else:
-                data_r = reader.get_all_frames_in_ds('E_r', [], i)
-                data_z = reader.get_all_frames_in_ds('E_z', i)
-                data_beam = reader.get_all_frames_in_ds('rho_beam', i)
+                shape = [0, 0, cfg.number_r_grid, cfg.number_z_grid]
+                data_t = reader.get_all_frames_in_ds('T/{}'.format(specie), shape, i)
 
                 frame = 0
-                for r, z, beam in zip(data_r, data_z, data_beam):
+                for t in data_t:
                     if (frame + i * cfg.frames_per_file) % frame_step == 0:
                         # print without newline
                         sys.stdout.write('.')
                         sys.stdout.flush()
 
                         # add timestamp to each frame
-                        timestamp = cfg.get_timestamp_by_frame_number(frame + i * cfg.frames_per_file)
+                        timestamp = cfg.get_timestamp_by_frame_number(frame + i * cfg.frames_per_file, dump_interval)
                         fig.suptitle("Time: {:.2e} s".format(timestamp), x=.85, y=.95)
 
-                        plot.add_image(e_r_plot_name, r, cmap=cmap, clim=clim_e_r)
-                        plot.add_image(e_z_plot_name, z, cmap=cmap, clim=clim_e_z)
-                        plot.add_image(rho_beam_plot_name, beam, cmap=cmap, clim=clim_rho_beam)
+                        if i % frame_step == 0:
+                            plot.add_image(t_plot_name, t, cmap=cmap, clim=clim_t)
 
-                        if view: plot.redraw()
-                        if not dry_run: writer.grab_frame()
+                            if view: plot.redraw()
+                            if not dry_run: writer.grab_frame()
                     frame = frame + 1
                 print('done')
 
@@ -188,11 +172,8 @@ def main():
                         help='Use only every Nth frame for movie creation. Default: 1',
                         default=1)
 
-    parser.add_argument('--clim-e-r', type=str,
-                        help='Color limit range for Electrical field longitual component', default=None)
-
-    parser.add_argument('--clim-e-z', type=str,
-                        help='Color limit range for Electrical field radial component', default=None)
+    parser.add_argument('--clim-t', type=str,
+                        help='Color limit range for Temperature', default=None)
 
     parser.add_argument('--dry-run', action='store_true', help='Do not write anything. Just for debug', default=False)
 
@@ -210,12 +191,9 @@ def main():
         if args.time_range:
             time_range = list(map(float, args.time_range.split(':')))
 
-        clim_e_r = list(map(float, args.clim_e_r.split(':'))) if args.clim_e_r else None
-        clim_e_z = list(map(float, args.clim_e_z.split(':'))) if args.clim_e_r else None
+        clim_t = list(map(float, args.clim_t.split(':'))) if args.clim_t else None
         run(args.properties_path,
-            clim_e_r=clim_e_r,
-            clim_e_z=clim_e_z,
-            rho_beam_scale=args.beam_scale_factor,
+            clim_t=clim_t,
             video_file=args.video_file,
             time_range=time_range,
             frame_step=args.frame_step,
@@ -233,6 +211,6 @@ def main():
 if __name__ == "__main__":
     main()
 
-# run(config_file, clim_e_r, clim_e_z, clim_rho_beam, video_file='field_movie.avi',
+# run(config_file, clim_t, clim_e_z, clim_rho_beam, video_file='field_movie.avi',
 #     time_range=None, cmap=None, dry-run=False, view=False, use_grid=False):
 # input("Press 'Return' to exit ")
