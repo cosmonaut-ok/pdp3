@@ -273,6 +273,7 @@ void Temperature::normalize(Particles *prtls)
     for (unsigned int z = 0; z < geom->n_grid_z - 1; z++)
     {
       double p_sum2 = t_vec_r[r][z] * t_vec_r[r][z] + t_vec_phi[r][z] * t_vec_phi[r][z] + t_vec_z[r][z] * t_vec_z[r][z];
-      t[r][z] = (t_sum[r][z] * t_sum[r][z] - p_sum2) / (2 * prtls->mass * count_sum[r][z] * count_sum[r][z] * EL_CHARGE);
+      t[r][z] = (t_sum[r][z] * t_sum[r][z] - p_sum2) / (2 * prtls->mass * count_sum[r][z] * count_sum[r][z]);
+      t[r][z] /= EL_CHARGE; // convert from joules to eV
     }
 }
