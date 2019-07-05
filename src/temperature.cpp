@@ -90,7 +90,7 @@ void Temperature::calc_t(Particles *prtls)
       ro_v_r = prtls->mass_array[i] * vel_r / v_0;
       ro_v_phi = prtls->mass_array[i] * vel_phi / v_0;
       ro_v_z = prtls->mass_array[i] * vel_z / v_0;
-      ro_p = prtls->mass_array[i] / EL_MASS / v_0;
+      ro_p = prtls->mass_array[i] / prtls->mass / v_0;
 
       v_1 = CELL_VOLUME(r_i, dr, dz);
       v_2 = CELL_VOLUME(r_i + 1, dr, dz);
@@ -144,7 +144,7 @@ void Temperature::calc_t(Particles *prtls)
       ro_v_phi = prtls->mass_array[i] * vel_phi / v_0;
       ro_v_z = prtls->mass_array[i] * vel_z / v_0;
 
-      ro_p = prtls->mass_array[i] / EL_MASS / v_0;
+      ro_p = prtls->mass_array[i] / prtls->mass / v_0;
       v_1 = CYL_VOL(dz, dr);
       v_2 = CELL_VOLUME(r_i + 1, dr, dz);
       ////////////////////////// /
@@ -196,7 +196,7 @@ void Temperature::calc_t(Particles *prtls)
       ro_v_phi = prtls->mass_array[i] * vel_phi / v_0;
       ro_v_z = prtls->mass_array[i] * vel_z / v_0;
 
-      ro_p = prtls->mass_array[i] / EL_MASS / v_0;
+      ro_p = prtls->mass_array[i] / prtls->mass / v_0;
       v_1 = CYL_VOL(dz, dr);
       v_2 = CELL_VOLUME(r_i + 1, dr, dz);
       ////////////////////////// /
