@@ -86,11 +86,11 @@ void Temperature::calc_t(Particles *prtls)
       r3 = prtls->pos[i][0] + 0.5 * dr;
       v_0 = 2. * PI * dz * dr * prtls->pos[i][0];
 
-      ro_v = prtls->mass_array[i] * vel / v_0;
-      ro_v_r = prtls->mass_array[i] * vel_r / v_0;
-      ro_v_phi = prtls->mass_array[i] * vel_phi / v_0;
-      ro_v_z = prtls->mass_array[i] * vel_z / v_0;
       ro_p = prtls->mass_array[i] / prtls->mass / v_0;
+      ro_v = ro_p * vel;
+      ro_v_r = ro_p * vel_r;
+      ro_v_phi = ro_p * vel_phi;
+      ro_v_z = ro_p * vel_z;
 
       v_1 = CELL_VOLUME(r_i, dr, dz);
       v_2 = CELL_VOLUME(r_i + 1, dr, dz);
@@ -139,12 +139,12 @@ void Temperature::calc_t(Particles *prtls)
       dz2 = (prtls->pos[i][2] + 0.5 * dz) - (z_k + 0.5) * dz;
       v_0 = PI * dz * (2. * prtls->pos[i][0] * prtls->pos[i][0] + dr * dr / 2.);
 
-      ro_v = prtls->mass_array[i] * vel / v_0;
-      ro_v_r = prtls->mass_array[i] * vel_r / v_0;
-      ro_v_phi = prtls->mass_array[i] * vel_phi / v_0;
-      ro_v_z = prtls->mass_array[i] * vel_z / v_0;
-
       ro_p = prtls->mass_array[i] / prtls->mass / v_0;
+      ro_v = ro_p * vel;
+      ro_v_r = ro_p * vel_r;
+      ro_v_phi = ro_p * vel_phi;
+      ro_v_z = ro_p * vel_z;
+
       v_1 = CYL_VOL(dz, dr);
       v_2 = CELL_VOLUME(r_i + 1, dr, dz);
       ////////////////////////// /
@@ -191,12 +191,12 @@ void Temperature::calc_t(Particles *prtls)
       dz2 = (prtls->pos[i][2] + 0.5 * dz) - (z_k + 0.5) * dz;
       v_0 = 2. * PI * dz * dr * prtls->pos[i][0];
 
-      ro_v = prtls->mass_array[i] * vel / v_0;
-      ro_v_r = prtls->mass_array[i] * vel_r / v_0;
-      ro_v_phi = prtls->mass_array[i] * vel_phi / v_0;
-      ro_v_z = prtls->mass_array[i] * vel_z / v_0;
-
       ro_p = prtls->mass_array[i] / prtls->mass / v_0;
+      ro_v = ro_p * vel;
+      ro_v_r = ro_p * vel_r;
+      ro_v_phi = ro_p * vel_phi;
+      ro_v_z = ro_p * vel_z;
+
       v_1 = CYL_VOL(dz, dr);
       v_2 = CELL_VOLUME(r_i + 1, dr, dz);
       ////////////////////////// /
@@ -273,7 +273,9 @@ void Temperature::normalize(Particles *prtls)
     for (unsigned int z = 0; z < geom->n_grid_z - 1; z++)
     {
       double p_sum2 = t_vec_r[r][z] * t_vec_r[r][z] + t_vec_phi[r][z] * t_vec_phi[r][z] + t_vec_z[r][z] * t_vec_z[r][z];
-      t[r][z] = (t_sum[r][z] * t_sum[r][z] - p_sum2) / (2 * prtls->mass * count_sum[r][z] * count_sum[r][z]);
-      t[r][z] /= EL_CHARGE; // convert from joules to eV
+
+      double pp2 = (t_sum[r][z] * t_sum[r][z] - p_sum2) * prtls->mass * prtls->mass;
+
+      t[r][z] = pp2 / (2 * prtls->mass * count_sum[r][z] * count_sum[r][z] * abs(prtls->charge));
     }
 }
