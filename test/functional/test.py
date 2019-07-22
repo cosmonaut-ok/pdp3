@@ -81,12 +81,13 @@ class Util ():
 class bootstrap ():
     def __init__(self, testdir='testdir', parameters_template_name='parameters.xml.tmpl',
                  result_path='.', data_root='pdp3_result', keep_working_dir=False,
-                 accept_ieee=True, verbose=False):
+                 accept_ieee=True, verbose=False, debug=False):
         self.rootdir = os.path.realpath(os.path.dirname(os.path.dirname(me)))
         self.testdir = os.path.join(self.rootdir, testdir)
         self.keep_working_dir = keep_working_dir
         self.accept_ieee = accept_ieee
-        self.verbose = verbose
+        self.verbose = verbose or debug
+        self.debug = debug
         tmpldir = me
 
         utils = Util()
@@ -184,19 +185,21 @@ class pdp3Test ():
 
 
 def test_example(template_name, number, accept_ieee=True,
-                 rel_tolerance=0.01, verbose=False):
+                 rel_tolerance=0.01, verbose=False, debug=False):
     status=True
 
     b = bootstrap(testdir='testingdir',
                   parameters_template_name=template_name,
-                  keep_working_dir=verbose, # if verbose, keep working dir for analysis
+                  keep_working_dir=debug, # if debug, keep working dir for analysis
                   accept_ieee=accept_ieee,
-                  verbose=verbose)
+                  verbose=verbose,
+                  debug=debug)
 
     t = pdp3Test(os.path.join(b.testdir, 'parameters.xml'),
                  rel_tolerance=rel_tolerance,
                  abs_tolerance=1) # use abs tolerance to avoid comparing of very small numbers
     t.verbose = verbose
+    t.debug = debug
 
     t.components['E_r'] = 'frame_0:0_32:256'
     t.components['E_phi'] = 'frame_32:256_64:512'
@@ -232,7 +235,7 @@ def test_example(template_name, number, accept_ieee=True,
     return status
 
 
-def regression_test_example(template_name, accept_ieee=True, verbose=False):
+def regression_test_example(template_name, accept_ieee=True, verbose=False, debug=False):
     status=True
 
     # regression_dir
@@ -241,7 +244,8 @@ def regression_test_example(template_name, accept_ieee=True, verbose=False):
                   parameters_template_name=template_name,
                   keep_working_dir=verbose, # if verbose, keep working dir for analysis
                   accept_ieee=accept_ieee,
-                  verbose=verbose)
+                  verbose=verbose,
+                  debug=debug)
 
 
     utils = Util()
@@ -465,6 +469,7 @@ if __name__ == "__main__":
                         help='Use fast math, which are not compatible with IEEE calculation standard',
                         default=False)
     parser.add_argument('-v', '--verbose', action='count', default=0)
+    parser.add_argument('-d', '--debug', action='count', default=0)
 
     args = parser.parse_args()
 
@@ -478,7 +483,8 @@ if __name__ == "__main__":
             rtol = 0.1
         status = test_example('parameters.xml.tmpl', 4,
                               accept_ieee=ieee, rel_tolerance=rtol,
-                              verbose=args.verbose)
+                              verbose=args.verbose,
+                              debug=args.debug)
     elif args.type == 'ext':
         if ieee:
             rtol = 0.001
@@ -486,11 +492,13 @@ if __name__ == "__main__":
             rtol = 0.25
         status = test_example('parameters_ext.xml.tmpl', 11,
                               accept_ieee=ieee, rel_tolerance=rtol,
-                              verbose=args.verbose)
+                              verbose=args.verbose,
+                              debug=args.debug)
     elif args.type == 'regression':
         status = regression_test_example('parameters_regression.xml.tmpl',
                                          accept_ieee=ieee,
-                                         verbose=args.verbose)
+                                         verbose=args.verbose,
+                                         debug=args.debug)
     else:
         raise Exception("there is no test type {}".format(args.type))
 
