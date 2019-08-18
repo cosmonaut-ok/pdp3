@@ -8,7 +8,7 @@
 
 using namespace constant;
 
-class Temperature
+class TemperatureClassic
 {
 public:
   double **t;
@@ -25,10 +25,10 @@ private:
   double **count_sum;
 
 public:
-  Temperature(Geometry *geom1);
-  Temperature(void);
+  TemperatureClassic(Geometry *geom1);
+  TemperatureClassic(void);
 
-  ~Temperature(void);
+  ~TemperatureClassic(void);
 
   void calc_t(Particles *prtls);
   void reset(void);

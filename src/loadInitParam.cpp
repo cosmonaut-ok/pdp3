@@ -93,7 +93,25 @@ LoadInitParam::LoadInitParam(char *xml_file_name)
   //! 2. creating field objects
   cerr << "INFO! Initializing E/M Fields Data" << endl;
   init_fields ();
+
+  // switch between temperature calculation
+  // with weighting or classical algorithms
+#ifdef TEMPERATURE_WEIGHTED
   temperature = new Temperature(params->geom);
+  cerr << "INFO! Using weighting temperature algorithm" << endl;
+  #else
+  temperature = new TemperatureClassic(params->geom);
+  cerr << "INFO! Using counting temperature algorithm" << endl;
+#endif
+
+#if defined TEMPERATURE_POSTPROC_BILINEAR
+  cerr << "INFO! Using bilinear temperature postprocessing" << endl;
+#elif defined TEMPERATURE_POSTPROC_BICUBIC
+  cerr << "INFO! Using bicubic temperature postprocessing" << endl;
+#else
+  cerr << "INFO! No temperature postprocessing used" << endl;
+#endif
+
   density = new ParticlesDensity(params->geom);
 
   //! 3. load particle parameters

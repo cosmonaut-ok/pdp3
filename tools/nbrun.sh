@@ -29,7 +29,7 @@ for i in "$@"; do
     VAR=$(echo $i | cut -d'=' -f1)
     VAL=$(echo $i | cut -d'=' -f2)
     # echo "var:" $VAR and "val:" $VAL
-    sed -i "s|\"${VAR}.*=.*\\\\n\"|\"${VAR}=${VAL}\\\\n\"|g" $TMPFILE
+    sed -i "s|\"${VAR}[[:blank:]]*=.*\\\\n\"|\"${VAR}=${VAL}\\\\n\"|g" $TMPFILE
 done
 
 jupyter nbconvert ${TMPFILE} --stdout --to python | sed '/get_ipython/d' > ${TMPFILE}.py

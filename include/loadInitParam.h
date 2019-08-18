@@ -36,7 +36,13 @@
 #include "pdp3Time.h"
 #include "poissonDirichlet.h"
 #include "parameters.h"
+
+#ifdef TEMPERATURE_WEIGHTED
 #include "temperature.h"
+#else
+#include "temperatureClassic.h"
+#endif
+
 #include "particlesDensity.h"
 
 using namespace std;
@@ -69,7 +75,11 @@ public:
   ParticlesList *p_list;
   EField *efield;
   HField *hfield;
+#ifdef TEMPERATURE_WEIGHTED
   Temperature *temperature;
+#else
+  TemperatureClassic *temperature;
+#endif
   ParticlesDensity *density;
 
 #ifndef LEGACY

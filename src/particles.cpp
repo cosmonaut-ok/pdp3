@@ -236,38 +236,41 @@ void Particles::velocity_distribution(double tempr_ev)
   {
     double therm_vel_el = lib::sq_rt(2 * EL_CHARGE * energies[p] / mass);
 
-    // velocity for components. Require to normalize values
-    // we need to get velocity vector equal to temperature
-    // it calculated with $v = \sqrt{v_r^2 + v_z^2}$
-    // so, normalization coefftient should be $\frac{1}{\sqrt{2}}$
-    double norm_coeff = 0.7071067811865475;
-    therm_vel_el = therm_vel_el * norm_coeff;
-
+    // multiply to $\frac{1}{\sqrt{3}}$
+    double norm = 0.74;
+    therm_vel_el *= norm;
+    
     double rnd_0, rnd_1, rnd_2;
 
+// to get predictable random-like values in testmode
+// simple pseudorandom numbers generator used
 #ifdef TESTMODE
     rnd_0 = random_reverse(p, 3);
+    rnd_1 = random_reverse(p, 5);
     rnd_2 = random_reverse(p, 7);
 
     // emulate negative numbers
     double k0 = random_reverse(p, 4);
+    double k1 = random_reverse(p, 6);
     double k2 = random_reverse(p, 8);
 
     if (k0 > 0.5) rnd_0 = -rnd_0;
+    if (k1 > 0.5) rnd_1 = -rnd_1;
     if (k2 > 0.5) rnd_2 = -rnd_2;
 #else
     rnd_0 = uniform2();
+    rnd_1 = uniform2();
     rnd_2 = uniform2();
 #endif
 
     vel[p][0] = rnd_0 * therm_vel_el;
-    vel[p][1] = 0;
+    vel[p][1] = rnd_1 * therm_vel_el;
     vel[p][2] = rnd_2 * therm_vel_el;
 
     // take into account relativistic factor
     // maxwellJuttner procedure returns relativistic momentums
     vel[p][0] *= lib::get_gamma_inv(vel[p][0] * vel[p][0]);
-    vel[p][1] *= 0;
+    vel[p][1] *= lib::get_gamma_inv(vel[p][1] * vel[p][1]);
     vel[p][2] *= lib::get_gamma_inv(vel[p][2] * vel[p][2]);
   }
 }
