@@ -58,6 +58,12 @@ AC_ARG_ENABLE([hdf5], [AC_HELP_STRING([--enable-hdf5], [Build application with h
 AC_ARG_WITH([doc-formats], [AC_HELP_STRING([--with-doc-formats], [Set list of documentation formats to be generated])], [DOXYGEN_FORMATS="$withval"], [DOXYGEN_FORMATS="latex html rtf"])
 AC_ARG_WITH([pusher], [AC_HELP_STRING([--with-pusher], [Set particles pusher (supported: boris-adaptive (default), boris, boris-relativistic, vay, hc (n/a), rrll (n/a))])], [PUSHER="$withval"], [PUSHER="boris-adaptive"])
 
+
+
+AC_ARG_ENABLE([temperature-weighted], [AC_HELP_STRING([--enable-temperature-weighted], [Enable temperature calculation algorithm, based on weighting, instead of classic calculations])], [TEMPERATURE_WEIGHTED="$enableval"], [TEMPERATURE_WEIGHTED=no])
+
+AC_ARG_WITH([temperature-postproc], [AC_HELP_STRING([--with-temperature-postproc], [Set temperature postprocessing to: none or bilinear])], [TEMPERATURE_POSTPROC="$withval"], [TEMPERATURE_POSTPROC="none"])
+
 AC_PROG_CXXCPP
 AC_LANG(C++)
 
@@ -147,8 +153,23 @@ else
    AC_MSG_ERROR([Pusher is not supported.])
 fi
 
+# define a pusher
+if test x$TEMPERATURE_POSTPROC == xnone; then
+   AC_DEFINE_UNQUOTED([TEMPERATURE_POSTPROC_NONE], [true], [temperature postprocessing])
+elif test x$TEMPERATURE_POSTPROC == xbilinear; then
+   AC_DEFINE_UNQUOTED([TEMPERATURE_POSTPROC_BILINEAR], [true], [temperature postprocessing])
+dnl elif test x$TEMPERATURE_POSTPROC == xbicubic; then # FIXME: bicubic still not working correctly
+dnl    AC_DEFINE_UNQUOTED([TEMPERATURE_POSTPROC_BICUBIC], [true], [temperature postprocessing])
+else
+   AC_MSG_ERROR([Temperature postprocessing method is not supported.])
+fi
+
 if test x$OMP_DYNAMIC == xyes; then
    AC_DEFINE([OPENMP_DYNAMIC_THREADS], [true], [Set OpenMP threads to be created dynamically])
+fi
+
+if test x$TEMPERATURE_WEIGHTED == xyes; then
+   AC_DEFINE([TEMPERATURE_WEIGHTED], [true], [Enable new temperature calculation algorithm])
 fi
 
 # Checks for library functions.

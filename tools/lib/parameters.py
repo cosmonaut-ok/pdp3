@@ -223,3 +223,12 @@ class Parameters:
 
     def get_col_by_longitude(self, longitude):
         return(int(round(longitude * self.number_z_grid / self.z_size)))
+
+
+    def get_radius_by_row(self, row):
+        # return(int(round(radius * self.number_r_grid / self.r_size)))
+        return(row * self.r_size / self.number_r_grid)
+
+
+    def get_longitude_by_col(self, col):
+        return(col * self.z_size / self.number_z_grid)
