@@ -1,7 +1,5 @@
 #include "loadInitParam.h"
 
-#include <typeinfo>  //for 'typeid' to work
-
 using namespace std;
 using namespace math::fourier;
 
@@ -119,10 +117,6 @@ LoadInitParam::LoadInitParam(char *xml_file_name)
   init_particles ();
   current_bunch_number = 0;
 
-  //! 4. load boundary conditions
-  cerr << "INFO! Initializing Boundary Conditions Data" << endl;
-  init_boundary ();
-
   LimitationsChecker *limcheck = new LimitationsChecker(params);
   limcheck->check_velocity_time_step();
   limcheck->check_grid_size();
@@ -168,8 +162,6 @@ void LoadInitParam::init_particles()
     prtls->load_cylindrical_spatial_distribution(p_p.left_density, p_p.right_density, 0);
     prtls->velocity_distribution(p_p.temperature);
   }
-
-  p_list->charge_weighting(c_rho_new);
 }
 
 void LoadInitParam::init_beam()
@@ -252,27 +244,6 @@ void LoadInitParam::init_beam()
   // inject bunch
   for (auto i = c_bunches.begin(); i != c_bunches.end(); ++i)
     (*i)->bunch_inject(params->time);
-}
-
-void LoadInitParam::init_boundary ()
-{
-  //! initialize boundaries and boundary conditions
-
-  // Maxwell initial conditions
-  BoundaryMaxwellConditions maxwell_rad(efield); // TODO: WTF?
-  maxwell_rad.specify_initial_field(params->geom,
-                                    params->boundary_maxwell_e_phi_upper,
-                                    params->boundary_maxwell_e_phi_left,
-                                    params->boundary_maxwell_e_phi_right);
-
-  if (params->boundary_conditions == 0)
-  {
-    p_list->charge_weighting(c_rho_new);
-
-    // Seems: https://en.wikipedia.org/wiki/Dirichlet_distribution
-    PoissonDirichlet dirih(params->geom);
-    dirih.poisson_solve(efield, c_rho_new);
-  }
 }
 
 void LoadInitParam::init_fields ()
@@ -387,7 +358,12 @@ void LoadInitParam::dump_data(int step_number)
         w->write(file_name, c_current->get_j_z());
       //
       else if (strcmp(w->component, "rho_beam") == 0)
+      {
+        for (auto i = c_bunches.begin(); i != c_bunches.end(); ++i)
+          (*i)->charge_weighting(c_rho_bunch);
         w->write(file_name, c_rho_bunch->get_rho());
+      }
+
       //
       else if (strcmp(w->component, "T") == 0)
       {
@@ -557,9 +533,6 @@ void LoadInitParam::run(void)
     the_time = clock();
 #endif
 
-    //! FIXME: for some reason charge_weighting has no effect on result
-    // p_list->charge_weighting(c_rho_new); // continuity equation
-
 #ifdef LEGACY
     //! print header on every 20 logging steps
     if  ((int)(params->time->current_time / params->time->delta_t) % (params->dump_data_interval * 20) == 0)
@@ -588,14 +561,6 @@ void LoadInitParam::run(void)
            << left << setw(18) << lib::get_simulation_duration()
            << left << setw(34) << avg_step_exec_time
            << endl;
-
-      for (auto i = c_bunches.begin(); i != c_bunches.end(); ++i)
-        (*i)->charge_weighting(c_rho_bunch);
-
-#ifdef DEBUG
-      cerr << ((double)(clock() - the_time) / (double)CLOCKS_PER_SEC) << " sec. for: c_bunches[i]->charge_weighting" << endl;
-      the_time = clock();
-#endif
 
       dump_data(step_number);
 
