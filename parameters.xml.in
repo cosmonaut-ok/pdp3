@@ -95,8 +95,8 @@
       <probe type="row" r="10" schedule="50" component="E_r" />
       <probe type="dot" r="10" z="50" schedule="5" component="rho_beam" />
       <probe type="frame" r_start="0" z_start="0" r_end="10" z_end="200" schedule="5" component="E_r" />
-      <probe type="frame" r_start="0" z_start="0" r_end="10" z_end="20" schedule="5" component="T" specie="Electrons" />
-      <probe type="mpframe" r_start="0" z_start="0" r_end="10" z_end="20" schedule="5" component="Electrons" />
+      <probe type="frame" r_start="0" z_start="0" r_end="10" z_end="20" schedule="5" component="T" specie="electrons" />
+      <probe type="mpframe" r_start="0" z_start="0" r_end="10" z_end="20" schedule="5" component="electrons" />
     </probes>
 
   </file_save_parameters>

@@ -80,6 +80,7 @@ LoadInitParam::LoadInitParam(char *xml_file_name)
 
       c_probes.push_back(wp);
     }
+
 #else
     c_io_class = new IOText (params->dump_result_path, params->dump_result_path, params->dump_compress);
 #endif
