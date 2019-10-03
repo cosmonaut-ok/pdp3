@@ -8,7 +8,7 @@ from os.path import normpath
 
 class Probe:
     def __init__(self, probe_type, component, schedule, r_start=-1, z_start=-1, r_end=-1, z_end=-1, specie=None):
-        if (probe_type == 'frame' or probe_type == 'col' or probe_type == 'row' or probe_type == 'dot'):
+        if (probe_type == 'frame' or probe_type == 'mpframe' or probe_type == 'col' or probe_type == 'row' or probe_type == 'dot'):
             self.type = probe_type
 
         self.component = component
@@ -83,6 +83,15 @@ class Parameters:
             z_end = -1
 
             if p_type == 'frame':
+                r_start = int(i.getAttribute('r_start'))
+                r_end = int(i.getAttribute('r_end'))
+                z_start = int(i.getAttribute('z_start'))
+                z_end = int(i.getAttribute('z_end'))
+                p = Probe(p_type, p_compon, p_schedule,
+                          r_start, z_start,
+                          r_end, z_end, p_specie)
+
+            elif p_type == 'mpframe':
                 r_start = int(i.getAttribute('r_start'))
                 r_end = int(i.getAttribute('r_end'))
                 z_start = int(i.getAttribute('z_start'))
