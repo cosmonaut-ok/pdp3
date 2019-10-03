@@ -394,7 +394,10 @@ void LoadInitParam::dump_data(int step_number)
       {
         for (auto i = p_list->part_list.begin(); i != p_list->part_list.end(); ++i)
           if (strcmp((*i)->name, w->component) == 0)
-            w->mpwrite(file_name, (*i));
+	    {
+	      sprintf(file_name, "%d", w->step_number); // we don't apply frames_per_file to mpframes
+	      w->mpwrite(file_name, (*i));
+	    }
       }
       else
         cerr << "WARNING! probe for component ``" << w->component << "'' does not exist. Skipping" << endl;

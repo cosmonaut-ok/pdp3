@@ -239,7 +239,7 @@ void Particles::velocity_distribution(double tempr_ev)
     // multiply to $\frac{1}{\sqrt{3}}$
     double norm = 0.74;
     therm_vel_el *= norm;
-    
+
     double rnd_0, rnd_1, rnd_2;
 
 // to get predictable random-like values in testmode
@@ -295,9 +295,12 @@ void Particles::load_cylindrical_spatial_distribution(double n1, double n2, doub
 
     pos[n][0] = (geom1->r_size - dr) * rand_r + dr / 2;
     pos[n][1] = 0;
-    pos[n][2] = (geom1->z_size - left_plasma_boundary - dz)
-      / dn * (lib::sq_rt(pow(n1, 2) + rand_z * (2 * n1 * dn + pow(dn, 2))) - n1)
-      + left_plasma_boundary + dz / 2;
+    if (dn == 0)
+      pos[n][2] = rand_z * (geom1->z_size - dz) + left_plasma_boundary + dz / 2;
+    else
+      pos[n][2] = (geom1->z_size - left_plasma_boundary - dz)
+        / dn * (lib::sq_rt(pow(n1, 2) + rand_z * (2 * n1 * dn + pow(dn, 2))) - n1)
+        + left_plasma_boundary + dz / 2;
 
     v_sum += 2 * PI * pos[n][0] * dr * dz;
   }

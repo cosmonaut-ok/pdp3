@@ -65,12 +65,14 @@ class PlainReader:
     def __get_path__(self, p_component, p_type, shape):
         if p_type == 'frame':
             path = join(self.__data_path__, "{}/{}_{}:{}_{}:{}".format(p_component, p_type, shape[0], shape[1], shape[2], shape[3]))
+        elif p_type == 'mpframe':
+            path = join(self.__data_path__, "{}/{}_{}:{}_{}:{}".format(p_component, p_type, shape[0], shape[1], shape[2], shape[3]))
         elif p_type == 'col' or p_type == 'row':
             path = join(self.__data_path__, "{}/{}_{}".format(p_component, p_type, shape[0]))
         elif p_type == 'dot':
             path = join(self.__data_path__, "{}/{}_{}_{}".format(p_component, p_type, shape[1], shape[0])) # use shape[1] then [0] because xy translates to zr :)
         else:
-            raise TypeError("Incorrect data type {}. Must be frame/col/row/dot".format(p_type))
+            raise TypeError("Incorrect data type {}. Must be frame/mpframe/col/row/dot".format(p_type))
 
         return path
 
@@ -78,6 +80,18 @@ class PlainReader:
         path = self.__get_path__(p_component, p_type, shape)
 
         return(join(path, "{}.dat".format(filenumber)))
+
+
+    def __get_mpframe_files_path__(self, p_component, p_type, shape, filenumber):
+        path = self.__get_path__(p_component, p_type, shape)
+        p0 = join(path, "{}_pos_r.dat".format(filenumber))
+        p1 = join(path, "{}_pos_phi.dat".format(filenumber))
+        p2 = join(path, "{}_pos_z.dat".format(filenumber))
+        v0 = join(path, "{}_vel_r.dat".format(filenumber))
+        v1 = join(path, "{}_vel_phi.dat".format(filenumber))
+        v2 = join(path, "{}_vel_z.dat".format(filenumber))
+
+        return([p0, p1, p2, v0, v1, v2])
 
 
     def __frame_size__(self, shape):
@@ -121,6 +135,19 @@ class PlainReader:
 
     def __validate_frame__(self, p_component, shape, number):
         frange = self.__get_ds_range__(p_component, 'frame', shape) * self.__fpds__
+        if number < 0:
+            raise IndexError('Frame should not be less, than 0. The value was: {}'
+                             .format(number))
+        elif frange <= number:
+            raise IndexError('Frame should be less, than {}. The value was: {}'
+                             .format(frange - 1, number))
+        else:
+
+            return True
+
+
+    def __validate_mpframe__(self, p_component, shape, number):
+        frange = self.__get_ds_range__(p_component, 'mpframe', shape) * self.__fpds__
         if number < 0:
             raise IndexError('Frame should not be less, than 0. The value was: {}'
                              .format(number))
@@ -337,7 +364,41 @@ class PlainReader:
         return frame
 
 
-    def get_col(self, p_component, shape, number):
+    def get_mpframe(self, p_component, shape, mp_component, number):
+        ''' get frame by number. Find required dataset automatically
+        mp_components:
+        0 - position r
+        1 - position phi
+        2 - position z
+        3 - velocity r
+        4 - velocity phi
+        5 - velocity z'''
+        p_type = 'mpframe'
+        size = self.__frame_size__(shape)
+        self.__validate_mpframe__(p_component, shape, number)
+        frame = []
+        cache_file_name = "{}_component:{}_shape:{}-{}-{}-{}_number:{}".format(
+            p_type, p_component, shape[0], shape[1], shape[2], shape[3], number)
+
+        if self.use_cache:
+            frame = self.__tiny_cache__.get_cache(cache_file_name)
+
+        if len(frame) == 0:
+            frameds, frame_in_ds = self.get_ds_frame_by_frame(number)
+            self.__validate_ds__(p_component, p_type, shape, frameds)
+            path = self.__get_mpframe_files_path__(p_component, p_type, shape, number)[mp_component]
+            with open(path, 'r', encoding='utf-8') as datafile:
+                frame = np.fromfile(datafile, dtype=float,
+                                    count=size[0] * size[1] * self.__fpds__,
+                                    sep=' ')
+
+        if self.use_cache:
+            self.__tiny_cache__.update_cache(cache_file_name, frame)
+
+        return frame
+
+
+    def get_col(self, p_component, shape, mp_component, number):
         ''' get col by number. Find required dataset automatically '''
         p_type = 'col'
         size = self.__frame_size__(shape)
