@@ -1,5 +1,7 @@
 # PDP3
 
+## **WARNING!** Project freezed as unsupportable. The successor of this project is [PiCOPIC](https://github.com/cosmonaut-ok/picopic) particle-in-cell code.
+
 Renew [PDP3](https://github.com/knuniv/pdp3) project
 
 [![Gitlab Pipeline Status](https://gitlab.com/my-funny-plasma/PIC/pdp3/badges/master/pipeline.svg)](https://gitlab.com/my-funny-plasma/PIC/pdp3/commits/master)
